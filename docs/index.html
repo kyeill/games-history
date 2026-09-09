@@ -64,6 +64,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .fsel:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 .flabel{font-size:11px;text-transform:uppercase;letter-spacing:.07em;
   color:var(--muted);font-weight:700;margin-right:2px}
+/* the quick-action group carries no label, so it must not keep the gap */
+.flabel:empty{margin-right:0}
 
 /* one column on a phone, two from 900px -- the gap replaces the row margin */
 #list{display:grid;grid-template-columns:1fr;gap:8px;align-content:start}
@@ -85,11 +87,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
 .tl.won{background:var(--winwash)}
-/* A maize border marks a result he wants to see: Michigan won, or a rival
-   lost. A full maize box was too loud, so the winner's line keeps its own
-   colour and only the frame carries the flag. */
-.row.celebrate{border-color:#ffcb05;box-shadow:0 0 0 1px #ffcb0544}
-.row.celebrate:hover{border-color:#ffd633}
+/* A coloured border marks a result he wants to see: Michigan won (maize), or a
+   rival lost (the colour of whoever beat them). A full maize box was too loud,
+   so the winner's line keeps its own wash and only the frame carries the flag.
+   Both colours are computed per row in app.js -- do NOT hardcode maize here,
+   which is exactly the bug that made every border look like a Michigan win. */
+.row.celebrate{border-color:var(--celeb,#ffcb05);
+  box-shadow:0 0 0 1px var(--celebring,#ffcb0544)}
+.row.celebrate:hover{filter:brightness(1.12)}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
@@ -244,6 +249,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909-170924"></script>
+<script src="app.js?v=20260909-171506"></script>
 </body>
 </html>

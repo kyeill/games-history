@@ -147,6 +147,18 @@ luminance, which is exact because luminance is linear in the blend factor.
 calls it well above its position in the file; as a `const` arrow it sat in the
 temporal dead zone and threw.
 
+**The celebrate border colour MUST come from a CSS variable.** The rule
+originally hardcoded maize, so the per-team colours app.js computed were never
+applied and every flagged row looked like a Michigan win -- and it looked
+correct, because most flagged rows ARE Michigan wins. Verified by reading
+`getComputedStyle(row).borderTopColor`, not by reading the function that
+returns the colour: testing the helper proves nothing about what renders.
+
+**The TV window filter holds a LIST, not a value.** Marquee Windows selects
+three at once. The dropdown writes a one-element list and falls back to its
+"All" label whenever the selection is not exactly one, so the marquee state is
+shown by its own lit button rather than by the dropdown.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

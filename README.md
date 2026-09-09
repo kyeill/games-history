@@ -50,8 +50,8 @@ source of truth for both the vocabulary and the display sequence, and
 **CBB** — FOX · CBS · NBC · ABC · B1G Peacock · Big Monday · Super Tuesday ·
 *ESPN Sat night*.
 
-ESPN Sat night is parked last because it was in his original slot list but not
-in the order he later gave; it is kept rather than dropped, pending his call.
+ESPN Sat night sits last because it was in his original slot list but not in
+the order he later gave. He confirmed keeping it.
 
 `B1G Peacock` is narrowed to **Big Ten vs Big Ten, Tue/Thu, at least one ranked
 team**. Peacock alone carries every Big Ten home non-conference game and
@@ -131,14 +131,24 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Game type | dropdown, `rules.ORDER` sequence | `rules.game_type` |
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
 | Team | dropdown, alphabetical | 147 of them |
+| Marquee Windows | toggle button | `rules.MARQUEE` — three windows at once |
+| Sort | toggle button | oldest first (default) / newest first |
+
+**Marquee Windows** is the one-tap shortcut to the networks he plans a Saturday
+around: FOX Big Noon + CBS B1G Time + NBC Saturday Night on football, FOX + CBS
++ NBC on basketball. It selects all three, which is why the TV window filter
+holds a **list** rather than a single value — the dropdown writes a
+one-element list, the button writes three.
 
 Years read **2025** on football and **2025-26** on basketball — football is one
 calendar year, basketball straddles two.
 
-**Opening state is not an empty state.** Every tab opens on the newest season,
-and the Big Games view additionally opens on the sport's upset category — Top
-10 Upsets for football, Top 5 Upsets for basketball. That turns an opening list
-of hundreds into 10 and 9. TV Windows opens unfiltered.
+**Opening state is not an empty state.** Every tab opens on the newest season
+available (whatever `harvest.py` last pulled), sorted **oldest first** so a
+season reads as it unfolded. The Big Games view additionally opens on the
+sport's upset category — Top 10 Upsets for football, Top 5 Upsets for
+basketball — which turns an opening list of hundreds into 10 and 9. TV Windows
+opens unfiltered.
 
 **Game type and TV window are built from the active sport tab**, because CFB
 and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3

@@ -12,8 +12,11 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
-let FILT = { season: null, type: null, window: null, team: null };
-let ORDER = {}, SEASONS = [];
+let FILT = { season: null, type: null, windows: null, team: null };
+let ORDER = {}, SEASONS = [], MARQUEE = {};
+// Oldest-first by default (his call 2026-09-09): with a season filter on, that
+// reads as the season unfolding. The toggle flips it.
+let SORT = "asc";
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
 // Big Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
@@ -184,13 +187,14 @@ function visible() {
     ? (g.slots || []).length
     : ((g.type || g.champ) && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
-  if (FILT.window) list = list.filter(g =>
-    (g.slots || []).indexOf(FILT.window) > -1);
+  if (FILT.windows && FILT.windows.length) list = list.filter(g =>
+    (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
-  list.sort((a, b) => a.date === b.date
-    ? a.time.localeCompare(b.time) : b.date.localeCompare(a.date));
+  const dir = SORT === "asc" ? 1 : -1;
+  list.sort((a, b) => dir * (a.date === b.date
+    ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)));
   return list;
 }
 
@@ -201,7 +205,7 @@ function clearFilters() {
   FILT = {
     season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
     type: VIEW === "big" ? OPENING_TYPE[TAB] || null : null,
-    window: null, team: null
+    windows: null, team: null
   };
 }
 
@@ -239,12 +243,28 @@ function filterChips() {
     FILT.season));
   h += group("Game type", select("type", "All game types",
     order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
+  // The dropdown holds ONE window; Marquee Windows sets three at once, and
+  // while it is on the dropdown falls back to its "All" label.
+  const one = (FILT.windows && FILT.windows.length === 1) ? FILT.windows[0] : "";
   h += group("TV window", select("window", "All TV windows",
-    order.windows.filter(w => windows.has(w)).map(w => [w, w]), FILT.window));
+    order.windows.filter(w => windows.has(w)).map(w => [w, w]), one));
   h += group("Team", select("team", "All teams",
     Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
       .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
+  h += group("", quickButtons());
   return h;
+}
+
+function marqueeOn() {
+  const m = MARQUEE[SPORT_OF[TAB]] || [];
+  return !!FILT.windows && FILT.windows.length === m.length &&
+    m.every(w => FILT.windows.indexOf(w) > -1);
+}
+function quickButtons() {
+  return '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
+    '">Marquee Windows</button>' +
+    '<button class="f" data-act="sort">' +
+    (SORT === "asc" ? "Oldest first" : "Newest first") + "</button>";
 }
 
 function draw() {
@@ -473,6 +493,7 @@ async function init() {
   GAMES = r[0].games; TEAMS = r[0].teams; COLORS = r[1]; CRESTS = r[2];
   ORDER = r[0].order || {};
   SEASONS = r[0].seasons || [];
+  MARQUEE = r[0].marquee || {};
   clearFilters();
   try {
     // cache-bust: Pages serves with max-age, and this file is the shared state
@@ -500,15 +521,26 @@ async function init() {
       // game-type / TV-window pair is view-specific
       VIEW = e.currentTarget.dataset.view;
       FILT.type = VIEW === "big" ? OPENING_TYPE[TAB] || null : null;
-      FILT.window = null;
+      FILT.windows = null;
       draw();
       window.scrollTo({ top: 0 });
     }));
+  document.getElementById("filters").addEventListener("click", e => {
+    const b = e.target.closest("button.f[data-act]");
+    if (!b) return;
+    if (b.dataset.act === "marquee") {
+      FILT.windows = marqueeOn() ? null : (MARQUEE[SPORT_OF[TAB]] || []).slice();
+    } else {
+      SORT = SORT === "asc" ? "desc" : "asc";
+    }
+    draw();
+  });
   document.getElementById("filters").addEventListener("change", e => {
     const k = e.target.dataset && e.target.dataset.kind;
     if (!k) return;
     const v = e.target.value;
-    FILT[k] = v === "" ? null : (k === "season" ? +v : v);
+    if (k === "window") FILT.windows = v === "" ? null : [v];
+    else FILT[k] = v === "" ? null : (k === "season" ? +v : v);
     draw();
   });
   document.getElementById("list").addEventListener("click", e => {

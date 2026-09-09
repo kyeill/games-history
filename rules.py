@@ -34,6 +34,12 @@ CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
 ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
          "CBB": {"types": CBB_TYPES, "windows": CBB_WINDOWS}}
 
+# The "Marquee Windows" shortcut -- the networks he actually plans a Saturday
+# around. One button selects all three at once, which is why the app's TV
+# window filter holds a LIST rather than a single value.
+MARQUEE = {"CFB": ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"],
+           "CBB": ["FOX", "CBS", "NBC"]}
+
 
 def cfb_slots(nets, d):
     day, t = DOW[d.weekday()], _mins(d)
