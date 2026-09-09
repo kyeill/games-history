@@ -27,6 +27,9 @@ OUT = os.path.join(HERE, "output")
 OVERRIDES = {
     "183": ("f76900", "Syracuse: ESPN returns navy #000e54; the school is orange"),
     "251": ("bf5700", "Texas: ESPN's #af5c37 is a muddy tan, not burnt orange"),
+    # His call 2026-09-09, overruling the note above about washes wanting the
+    # darker colour: a Michigan win should read MAIZE, not navy blue.
+    "130": ("ffcb05", "Michigan: he wants the winning row yellow, not blue"),
 }
 
 NEAR_BLACK = 36      # luminance below this reads as black on a light wash

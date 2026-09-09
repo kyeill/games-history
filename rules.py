@@ -66,20 +66,31 @@ ARMY, NAVY = "349", "2426"
 # Dame is an INDEPENDENT, conference 18, despite being NBC's entire package.
 
 
-def cfb_slots(nets, d, team_ids=(), conf_ids=()):
+def cfb_slots(nets, d, season, team_ids=(), conf_ids=()):
+    """Football's windows, which did not all exist for the whole archive.
+
+    His rule, 2026-09-09: **no CBS or NBC window before the 2023 season**, and
+    in 2021-22 the ABC window is PRIMETIME only, 7pm or later. That matches how
+    the packages actually moved -- Big Ten Saturday Night began on NBC in 2023
+    and CBS picked the Big Ten up in 2024 -- so the early seasons are FOX Big
+    Noon plus ABC at night, and nothing else.
+    """
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
     if ARMY in team_ids and NAVY in team_ids:
         return out                       # see ARMY, NAVY above
+    early = season < 2023
     if "FOX" in nets and day == "Fri" and t >= 18 * 60:
         out.add("FOX Friday")
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
         out.add("FOX Big Noon")
-    if "CBS" in nets and day == "Sat" and abs(t - (15 * 60 + 30)) <= 45:
+    if (not early and "CBS" in nets and day == "Sat"
+            and abs(t - (15 * 60 + 30)) <= 45):
         out.add("CBS B1G Time")
-    if "NBC" in nets and day == "Sat" and abs(t - (19 * 60 + 30)) <= 45:
+    if (not early and "NBC" in nets and day == "Sat"
+            and abs(t - (19 * 60 + 30)) <= 45):
         out.add("NBC Saturday Night")
-    if "ABC" in nets and day == "Sat":
+    if "ABC" in nets and day == "Sat" and (not early or t >= 19 * 60):
         out.add("ABC Saturday")
     return out
 

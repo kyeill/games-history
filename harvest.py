@@ -101,7 +101,7 @@ def harvest():
 
                 team_ids = [k["team"]["id"] for k in cs]
                 if code == "CFB":
-                    slots = rules.cfb_slots(nets, d, team_ids, confs)
+                    slots = rules.cfb_slots(nets, d, y, team_ids, confs)
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks))

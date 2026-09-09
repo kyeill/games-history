@@ -213,6 +213,17 @@ result: upset -> Ranked Upsets, anything else -> Ranked Games. **CBB conference
 tournaments are deliberately NOT covered** -- 302 games, different category
 names, and 269 remain uncategorised, visible only under "All Game Types".
 
+**Football's TV windows are ERA-DEPENDENT.** No CBS or NBC window before the
+2023 season, and ABC is primetime-only (7pm+) in 2021-22. Without that, the
+early seasons showed windows that did not exist yet -- the packages moved to
+NBC in 2023 and CBS in 2024. `cfb_slots` therefore needs the SEASON, which is
+why harvest passes it.
+
+**Baseline alignment in flex needs matching line-heights.** The header's h1
+(22px) and count (13.5px) both inherit line-height 1.45, which computes the
+flex baseline off differently-sized boxes and drops the count. Setting both to
+1.2 fixes it.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

@@ -132,17 +132,16 @@ function rowHtml(g, browse) {
   // The game type is what the Big Games view is ABOUT, so it is redundant on
   // the TV Windows cards and drawn only on the other view.
   if (g.type && VIEW === "big") tags.push(chip("big", g.type));
+  // The purple chip is the conference championship OR the location, never
+  // both -- a title game is played somewhere, but the title is the story.
   if (g.champ) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
+  } else if (g.neutral && g.city) {
+    tags.push(chip("champ", g.city));
   }
   myTags(g.id).forEach(t => tags.push(chip("mine", t)));
-  // The city marks a NEUTRAL site only -- there is no neutral label any more,
-  // so a city belonging to neither school is what gives it away.
-  if (g.neutral && g.city) {
-    tags.push('<span class="tag t-site">' + esc(g.city) + "</span>");
-  }
   if (g.ot) tags.push('<span class="otnote">OT</span>');
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
@@ -150,7 +149,7 @@ function rowHtml(g, browse) {
   // Football is played in numbered weeks and he thinks in them, so the week
   // leads and the date follows in parentheses. Basketball just gets the date.
   const when = (g.sport === "CFB" && g.week)
-    ? '<b>Week ' + g.week + "</b> (" + g.dow + " " + fmtDate(g.date) + ")"
+    ? "Week " + g.week + " (" + g.dow + " " + fmtDate(g.date) + ")"
     : g.dow + " " + fmtDate(g.date);
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
@@ -161,11 +160,9 @@ function rowHtml(g, browse) {
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport">' + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
-    // the network sits on the away team's line, the time on the home team's
-    '<div class="meta"><div class="mrow">' +
-      esc(primaryNet(g.nets) || "—") + '</div>' +
-      '<div class="mrow">' + fmtTime(g.time) + "</div></div>" +
-    '<div class="tags">' + tags.join("") +
+    '<div class="meta"><div class="mrow">' + fmtTime(g.time) + "</div></div>" +
+    '<div class="tags"><span class="net">' +
+    esc(primaryNet(g.nets) || "—") + "</span>" + tags.join("") +
     // the TV window sits apart, at the lower right of the card
     ((g.slots || []).length
       ? '<span class="tvtag">' +
@@ -229,8 +226,13 @@ function visible() {
     ? ((g.slots || []).length || g.title)
     : ((g.type || g.champ) && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
-  if (FILT.windows && FILT.windows.length) list = list.filter(g =>
-    g.title || (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
+  // A championship game has no window of its own. It rides along with Marquee
+  // Windows (his call), but picking ONE window must not surface it.
+  if (FILT.windows && FILT.windows.length) {
+    const viaMarquee = marqueeOn();
+    list = list.filter(g => (viaMarquee && g.title) ||
+      (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
+  }
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));

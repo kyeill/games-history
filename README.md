@@ -47,6 +47,13 @@ source of truth for both the vocabulary and the display sequence, and
 
 **CFB** — FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC Saturday · FOX Friday.
 
+**The football windows did not all exist for the whole archive.** There is **no
+CBS or NBC window before the 2023 season**, and in **2021-22 the ABC window is
+primetime only** (7pm or later). That tracks how the packages actually moved —
+Big Ten Saturday Night began on NBC in 2023, CBS picked the Big Ten up in 2024
+— so the first two seasons are FOX Big Noon plus ABC at night and nothing else:
+13 and 13 a season, against ~120 from 2023 on.
+
 **CBB** — FOX · CBS · NBC · ABC · B1G Peacock · Big Monday · Super Tuesday ·
 *ESPN Sat night*.
 
@@ -99,8 +106,9 @@ football's labels.
 
 They also carry **no TV window chip**. A championship game is not part of a
 broadcast package, so the card shows none; the `title` flag is what admits it
-to that view, and it is exempt from the window filter so Marquee Windows
-cannot hide it.
+to the TV Windows view. It rides along with **Marquee Windows**, but selecting
+one specific window shows none of them — 23 under Marquee, 0 under "FOX Big
+Noon".
 
 **Power Four/Five scopes CHAMPIONSHIP GAMES ONLY** — not TV windows. A window
 is a time slot on a network, whoever is playing, so Boise State at BYU on ABC
@@ -230,13 +238,15 @@ blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
 is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
 "Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
 
-The **TV window chip sits at the lower right**, apart from the game's own tags,
-and the **game type is drawn only on the Big Games view** — it is what that view
-is about, so it is redundant on a TV Windows card.
+The tag row runs **network at the far left**, then the game's own tags, with
+the **TV window chip pushed to the lower right**. The **game type is drawn only
+on the Big Games view** — it is what that view is about, so it is noise on a TV
+Windows card. The kickoff time sits alone in the meta column.
 
-The tag row otherwise carries the **venue city on neutral-site games only** — there is
-no neutral marker any more, so a city belonging to neither school is what gives
-it away — and an **OT** note where it applies.
+**The purple chip is the conference championship OR the location, never both.**
+A title game is played somewhere, but the title is the story; otherwise a
+neutral-site game shows its city, which is also what tells you it was neutral
+now that there is no neutral marker. An **OT** note follows where it applies.
 
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to

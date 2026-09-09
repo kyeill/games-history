@@ -51,9 +51,13 @@ body{margin:0;background:var(--bg);color:var(--ink);
   overscroll-behavior-y:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 14px 90px}
 
-header{display:flex;align-items:baseline;gap:10px;padding:18px 0 10px}
-h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700}
-.count{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+/* h1 and the count share a baseline, so both need the SAME line-height --
+   otherwise flex computes the baseline off different boxes and the count
+   rides low against the title. */
+header{display:flex;align-items:baseline;gap:9px;padding:18px 0 10px}
+h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
+.count{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums;
+  line-height:1.2}
 .spacer{flex:1}
 .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);
   border-radius:7px;padding:4px 9px;font:inherit;font-size:13px;cursor:pointer}
@@ -111,7 +115,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* week + date, where the sport label used to be */
 .sport{grid-area:sport;font-size:12.5px;font-weight:500;
   color:var(--muted);margin-bottom:5px}
-.sport b{color:var(--accent);font-weight:700}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
@@ -133,15 +136,16 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl:not(.won) .nm,.tl:not(.won) .sc{color:#a5a5a0}
 .sc{font-size:16px;font-variant-numeric:tabular-nums;font-weight:600;
   min-width:30px;text-align:right}
-/* Network on the away team's line, time on the home team's. The rows carry
-   the same height and gap as .tl so the two columns line up exactly. */
+/* just the kickoff time now -- the network moved back to the bottom left */
 .meta{grid-area:meta;padding-left:14px;border-left:1px solid var(--line);
-  min-width:96px;align-self:stretch;
-  display:grid;grid-template-rows:1fr 1fr;gap:3px}
-.mrow{display:flex;align-items:center;justify-content:flex-end;
+  min-width:74px;align-self:stretch;display:flex;align-items:center}
+.mrow{display:flex;align-items:center;justify-content:flex-end;width:100%;
   font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;
   align-items:center}
+/* the network, back at the bottom left where he wants it */
+.net{font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;
+  margin-right:3px}
 /* the TV window sits apart at the lower right, away from the game's own tags */
 .tvtag{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap;
   justify-content:flex-end}
@@ -161,8 +165,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
 .t-champ{background:#26202f;border-color:#3a3145;color:#bda9d4}
 .t-mine{background:#1f2e28;border-color:#2f4539;color:#9ecab0}
-/* the venue city, sitting with the tags rather than in the meta column */
-.t-site{background:transparent;border-color:var(--line);color:var(--muted)}
 
 .empty{color:var(--muted);text-align:center;padding:44px 10px;font-size:14.5px}
 .daterow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
