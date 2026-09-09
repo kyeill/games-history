@@ -92,33 +92,43 @@ language throughout — `#16161a` ground, `#1e1e23` cards, `--rank` blue `#8fb0d
 for rankings, Source Sans 3, and `logos.py`'s measured crest variants. One
 column on a phone, **two from 900px**.
 
-**Three tabs.** *Slots* and *Big Games* are the rule-driven collections.
+**Tabs are the SPORT** — College Football, College Basketball, Browse — and a
+segmented control under them switches the **view**: *TV Windows* or *Big
+Games*. Kyle asked for this over a single mixed list: the two sports share no
+game types and no TV windows, and he wants to be able to isolate one population
+at a time. Four populations result:
+
+| | TV Windows | Big Games |
+|---|---|---|
+| CFB | 422 | 113 |
+| CBB | 775 | 485 |
+
+Switching sport clears every filter (a CFB game type would empty a CBB list);
+switching view clears only game type and TV window, since the rest still apply.
+
 *Browse* takes a date range and queries **ESPN live from the browser** — ESPN
 sends `Access-Control-Allow-Origin: *`, so the page can call it directly and
 the site never ships all ~35,000 games. Anything found there can be pulled into
 the archive by hand.
 
-**The Big Games tab hides what he does not want to relive:** no Michigan
-losses, and no Ohio State, Michigan State or Notre Dame wins. Both still appear
-on the Slots tab, which is a record of what was *on*, not a highlight reel.
-598 games pass; the Slots tab still carries the 31 Michigan losses and 115
-rival wins.
+**Big Games hides what he does not want to relive:** no Michigan losses, and no
+Ohio State, Michigan State or Notre Dame wins. Both still appear under TV
+Windows, which is a record of what was *on*, not a highlight reel. Enforced in
+the app rather than the harvest, precisely so TV Windows keeps them.
 
 **Filters** are a sport toggle plus five dropdowns — his call, 2026-09-09:
 
 | filter | control | source |
 |---|---|---|
-| Sport | buttons | CFB / CBB |
 | Year | dropdown | season |
 | Game type | dropdown | `rules.game_type` |
 | TV window | dropdown | whichever slot rule matched |
 | Team | dropdown | 147 of them |
 | Tag | dropdown | overtime, neutral site, conference titles |
 
-**Game type and TV window follow the sport toggle**, because CFB and CBB share
-none of their values — CFB offers 3 types and 5 windows, CBB 3 and 8. That is
-what lets one pair of tabs serve both sports instead of two. Switching sport
-clears both, or a leftover value would silently filter everything away.
+**Game type and TV window are built from the active sport tab**, because CFB
+and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
+and 8.
 
 His own tags (**College GameDay**, **Big Noon Kickoff**) are **details on the
 row, not filter options**. Note that Big Noon Kickoff is FOX's pregame *show*
@@ -128,9 +138,14 @@ Noon".
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
 Kyle chose it over washing the whole row, which turns a long list into a colour
-chart. **The exception is a Michigan win, which takes the whole box in maize** —
-maize is right for a full box and wrong for a single line, which is the same
-reason `colors.py` keeps ESPN's navy for the per-line wash.
+chart.
+
+**A maize border flags a result he wants to see: Michigan won, or a rival
+lost.** A full maize box was tried first and was too loud, so the frame carries
+the flag and the winner's line keeps its own colour. The rival half means an
+Oregon win over Ohio State is marked even with Michigan nowhere near it — 17
+such games in CFB alone. A Michigan loss is never flagged, including when the
+rival is the one beating them.
 
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to

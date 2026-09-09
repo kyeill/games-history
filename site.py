@@ -68,6 +68,15 @@ nav button{flex:1;background:none;border:0;border-bottom:2px solid transparent;
 nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
+/* the two populations within a sport -- a segmented control, not more tabs,
+   so the sport stays put while he switches which view of it he is reading */
+.viewbar{display:inline-flex;gap:0;margin:0 0 12px;border:1px solid var(--line);
+  border-radius:8px;overflow:hidden;background:var(--card)}
+.viewbar button{background:none;border:0;color:var(--muted);font:inherit;
+  font-size:13.5px;font-weight:600;padding:6px 16px;cursor:pointer}
+.viewbar button[aria-selected="true"]{background:#2e3a48;color:#cfe0f2}
+.viewbar button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
+
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .f{border:1px solid var(--line);background:var(--card);color:var(--muted);
   border-radius:999px;padding:3px 11px;font:inherit;font-size:13px;
@@ -102,10 +111,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
 .tl.won{background:var(--winwash)}
-/* a Michigan win takes the whole box in maize; the per-line wash steps aside */
-.row.michwin{background:var(--rowwash);border-color:#6b5c26}
-.row.michwin .tl.won{background:transparent}
-.row.michwin .tl:not(.won) .nm,.row.michwin .tl:not(.won) .sc{color:#b0aa96}
+/* A maize border marks a result he wants to see: Michigan won, or a rival
+   lost. A full maize box was too loud, so the winner's line keeps its own
+   colour and only the frame carries the flag. */
+.row.celebrate{border-color:#ffcb05;box-shadow:0 0 0 1px #ffcb0544}
+.row.celebrate:hover{border-color:#ffd633}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
@@ -199,10 +209,15 @@ BODY = """
 </header>
 
 <nav>
-  <button data-tab="slots" aria-selected="true">Slots</button>
-  <button data-tab="big" aria-selected="false">Big Games</button>
+  <button data-tab="cfb" aria-selected="true">College Football</button>
+  <button data-tab="cbb" aria-selected="false">College Basketball</button>
   <button data-tab="browse" aria-selected="false">Browse</button>
 </nav>
+
+<div class="viewbar" id="viewbar">
+  <button data-view="tv" aria-selected="true">TV Windows</button>
+  <button data-view="big" aria-selected="false">Big Games</button>
+</div>
 
 <div class="daterow" id="daterow" style="display:none">
   <input type="date" id="from" aria-label="From date">

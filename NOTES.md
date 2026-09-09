@@ -130,8 +130,14 @@ wiped every tag on the next build. Nothing else in `docs/` is hand-edited;
 everything but `tags.json` is regenerated.
 
 **The Big Games exclusions live in the APP, not the harvest.** Michigan losses
-and rival wins stay in `games.json` because the Slots tab still shows them —
-filtering them at harvest time would lose them from both.
+and rival wins stay in `games.json` because the TV Windows view still shows
+them — filtering them at harvest time would lose them from both.
+
+**Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
+Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
+windows, so a leftover value empties the list and the page looks broken rather
+than empty-by-choice); switching view clears only game type and TV window,
+because year, team and tag still apply.
 
 ## Validation
 
