@@ -53,35 +53,57 @@ def cbb_slots(nets, d, both_big_ten, any_ranked):
     return out
 
 
-def big_games(rank_win, rank_lose, has_big_ten):
-    """Ranking-driven. rank_* are None when unranked."""
-    out = set()
-    if rank_lose == 1:
-        out.add("#1 loses")
-    if rank_win and rank_lose and rank_win <= 10 and rank_lose <= 10:
-        out.add("top-10 vs top-10")
-    if rank_win and rank_lose and has_big_ten:
-        out.add("ranked vs ranked (B1G)")
-    if rank_lose and rank_lose <= 10 and rank_win is None:
-        out.add("top-10 upset")
-    return out
+# Kyle's teams, 2026-09-09. ESPN gives a school ONE id across both sports.
+MICHIGAN = "130"
+# Rivals whose WINS he does not want on the Big Games tab
+RIVALS = {"194": "Ohio State", "127": "Michigan State", "87": "Notre Dame"}
+
+CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
+CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
 
 
-def game_type(rank_win, rank_lose):
-    """Kyle's three filter categories, 2026-09-09. A partition of the
-    ranking-involved outcomes -- a game returns at most one.
+def game_type(sport, rank_win, rank_lose, has_big_ten):
+    """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
+    they DIFFER by sport, which is why the app's dropdown follows the sport
+    toggle. `rank_*` are None when unranked. A game gets at most one category,
+    and membership of the Big Games tab is exactly "has one".
 
-      Ranked Win     both ranked, the better-ranked team won (chalk)
-      Ranked Upset   both ranked, the worse-ranked team won
-      Upset          the loser was ranked and the winner was not
+    CFB
+      Top 10 Upsets   unranked beats a top-10 team, OR anyone beats #1
+      Ranked Upsets   the worse-ranked team won, in top-10 v top-10
+                      or in ranked v ranked with a Big Ten team
+      Ranked Games    the same two scopes, better-ranked team won
 
-    A ranked team beating an unranked one is none of these, which is the
-    point: it is the unremarkable case.
+    CBB (a tighter net -- college basketball is far the bigger slate)
+      Top 5 Upsets    unranked beats a top-5 team, OR anyone beats #1
+      Top 10 Games    top-10 v top-10, either winner
+      Ranked Big Ten  any OTHER ranked v ranked with a Big Ten team
+
+    The upset categories are tested first on purpose: "anyone beats #1" would
+    otherwise be swallowed by the ranked-v-ranked cases, and beating #1 is the
+    reading he wants.
     """
-    if rank_win and rank_lose:
-        return "Ranked Win" if rank_win < rank_lose else "Ranked Upset"
-    if rank_lose and not rank_win:
-        return "Upset"
+    top = 10 if sport == "CFB" else 5
+    upset_label = "Top %d Upsets" % top
+    if rank_lose == 1:                                  # anyone beats #1
+        return upset_label
+    if rank_lose and rank_lose <= top and rank_win is None:
+        return upset_label
+
+    both = rank_win and rank_lose
+    if not both:
+        return None
+
+    if sport == "CFB":
+        top10 = rank_win <= 10 and rank_lose <= 10
+        if not (top10 or has_big_ten):
+            return None
+        return "Ranked Upsets" if rank_win > rank_lose else "Ranked Games"
+
+    if rank_win <= 10 and rank_lose <= 10:
+        return "Top 10 Games"
+    if has_big_ten:
+        return "Ranked Big Ten"
     return None
 
 

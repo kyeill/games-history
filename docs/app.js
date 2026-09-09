@@ -2,11 +2,11 @@
    __PLACEHOLDERS__. Kept as a real .js file rather than a Python string so it
    stays editable and lintable. */
 const REPO = "kyeill/games-history", TAGS_PATH = "docs/tags.json";
-const STARTER = ["College GameDay", "Big Noon Kickoff", "home and home"];
+const STARTER = ["College GameDay", "Big Noon Kickoff"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-163124";
+const BUILD = "20260909-164925";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 let BROWSE = null, TAB = "slots", SHEET = null;
@@ -107,8 +107,15 @@ function rowHtml(g, browse) {
   const neutral = g.neutral ? ' <span class="nu">neutral</span>' : "";
   const site = g.neutral && g.city
     ? '<div class="site">' + esc(g.city) + "</div>" : "";
-  return '<button class="row" data-id="' + g.id + '" style="--winwash:' +
-    shade(teamColor(win)) + '">' +
+  // A Michigan win takes the WHOLE box in maize rather than one washed line.
+  // Maize is the right colour here and navy is right for the line elsewhere --
+  // the same reason colors.py keeps ESPN's navy for the per-line wash.
+  const mich = michiganWon(g);
+  const style = mich
+    ? "--rowwash:" + shade(MICH_GOLD, 0.30, 0.30)
+    : "--winwash:" + shade(teamColor(win));
+  return '<button class="row' + (mich ? " michwin" : "") + '" data-id="' +
+    g.id + '" style="' + style + '">' +
     '<div class="sport">' + g.sport + neutral + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
     '<div class="meta"><div class="when">' + g.dow + " " +
@@ -118,6 +125,23 @@ function rowHtml(g, browse) {
       esc((g.nets || []).slice(0, 2).join(", ") || "—") + "</div>" +
       site + "</div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
+}
+
+/* Kyle's teams. ESPN gives a school one id across both sports. */
+const MICHIGAN = "130";
+const RIVALS = ["194", "127", "87"];   // Ohio State, Michigan State, Notre Dame
+const MICH_GOLD = "ffcb05";
+
+function bigTabAllows(g) {
+  // The Big Games tab is the one he browses for pleasure: no Michigan losses
+  // and no rival wins. Both still appear on the Slots tab, which is a record
+  // of what was ON, not a highlight reel.
+  const mich = g.teams.find(t => t.id === MICHIGAN);
+  if (mich && !mich.win) return false;
+  return !g.teams.some(t => RIVALS.indexOf(t.id) > -1 && t.win);
+}
+function michiganWon(g) {
+  return g.teams.some(t => t.id === MICHIGAN && t.win);
 }
 
 function visible() {
@@ -130,7 +154,7 @@ function visible() {
   });
   list = list.filter(g => TAB === "slots"
     ? (g.slots || []).length
-    : ((g.big || []).length || g.champ));
+    : ((g.type || g.champ) && bigTabAllows(g)));
   if (FILT.sport) list = list.filter(g => g.sport === FILT.sport);
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.window) list = list.filter(g =>
@@ -149,56 +173,49 @@ function visible() {
 
 function filterChips() {
   if (TAB === "browse") return "";
-  // TV windows come from whatever the rules actually assigned, so a slot Kyle
-  // later adds or drops needs no change here
-  const windows = new Set(), champs = new Set();
-  GAMES.forEach(g => {
+  // Everything except the sport toggle is a dropdown (his call 2026-09-09).
+  // Game type and TV window are drawn from the games the SPORT toggle leaves
+  // in scope, because CFB and CBB have entirely distinct values for both --
+  // that is what makes one pair of tabs work instead of two.
+  const scope = GAMES.filter(g => !FILT.sport || g.sport === FILT.sport);
+  const types = new Set(), windows = new Set(), champs = new Set();
+  scope.forEach(g => {
+    if (g.type) types.add(g.type);
     (g.slots || []).forEach(s => windows.add(s));
     if (g.champ) champs.add(g.champ);
   });
-  const mine = new Set();
-  Object.keys(TAGS).concat(Object.keys(PENDING)).forEach(
-    id => myTags(id).forEach(t => mine.add(t)));
 
   const btn = (label, on, kind, val) => '<button class="f" aria-pressed="' +
     on + '" data-kind="' + kind + '" data-val="' + esc(val) + '">' +
     esc(label) + "</button>";
   const group = (label, inner) => '<div class="fgroup"><span class="flabel">' +
     label + "</span>" + inner + "</div>";
+  const select = (kind, allLabel, pairs, current) =>
+    '<select class="fsel" data-kind="' + kind + '">' +
+    '<option value="">' + allLabel + "</option>" +
+    pairs.map(p => '<option value="' + esc(p[1]) + '"' +
+      (String(current) === String(p[1]) ? " selected" : "") + ">" +
+      esc(p[0]) + "</option>").join("") + "</select>";
 
   let h = group("Sport",
     btn("All", !FILT.sport, "sport", "") +
     btn("CFB", FILT.sport === "CFB", "sport", "CFB") +
     btn("CBB", FILT.sport === "CBB", "sport", "CBB"));
-  h += group("Year",
-    btn("All", FILT.season == null, "season", "") +
+  h += group("Year", select("season", "All years",
     [2021, 2022, 2023, 2024, 2025].map(y =>
-      btn(y + "-" + String(y + 1).slice(2), FILT.season === y, "season", y)
-    ).join(""));
-  h += group("Game type",
-    btn("All", !FILT.type, "type", "") +
-    ["Upset", "Ranked Win", "Ranked Upset"].map(t =>
-      btn(t, FILT.type === t, "type", t)).join(""));
-  h += group("TV window",
-    btn("All", !FILT.window, "window", "") +
-    Array.from(windows).sort().map(w =>
-      btn(w, FILT.window === w, "window", w)).join(""));
-
-  // 150 teams will not fit as chips, so this one is a select
-  const opts = Object.keys(TEAMS)
-    .map(id => [TEAMS[id].short || id, id])
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(p => '<option value="' + p[1] + '"' +
-      (FILT.team === p[1] ? " selected" : "") + ">" + esc(p[0]) + "</option>")
-    .join("");
-  h += group("Team", '<select class="teamsel" id="teamsel">' +
-    '<option value="">All teams</option>' + opts + "</select>");
-
-  const extras = ["OT", "neutral"].concat(Array.from(champs).sort())
-    .concat(Array.from(mine).sort());
-  h += group("Tag",
-    btn("All", !FILT.tag, "tag", "") +
-    extras.map(t => btn(t, FILT.tag === t, "tag", t)).join(""));
+      [y + "-" + String(y + 1).slice(2), y]), FILT.season));
+  h += group("Game type", select("type", "All game types",
+    Array.from(types).sort().map(t => [t, t]), FILT.type));
+  h += group("TV window", select("window", "All TV windows",
+    Array.from(windows).sort().map(w => [w, w]), FILT.window));
+  h += group("Team", select("team", "All teams",
+    Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
+      .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
+  // His own tags (College GameDay, Big Noon Kickoff) are DETAILS on the row,
+  // not filters -- he said so explicitly.
+  h += group("Tag", select("tag", "Any",
+    [["Overtime", "OT"], ["Neutral site", "neutral"]].concat(
+      Array.from(champs).sort().map(c => [c + " title", c])), FILT.tag));
   return h;
 }
 
@@ -445,11 +462,16 @@ async function init() {
     if (!b) return;
     const k = b.dataset.kind, v = b.dataset.val;
     FILT[k] = v === "" ? null : (k === "season" ? +v : v);
+    // CFB and CBB share no game types or TV windows, so a leftover value
+    // would silently filter everything away
+    if (k === "sport") { FILT.type = null; FILT.window = null; }
     draw();
   });
   document.getElementById("filters").addEventListener("change", e => {
-    if (e.target.id !== "teamsel") return;
-    FILT.team = e.target.value || null;
+    const k = e.target.dataset && e.target.dataset.kind;
+    if (!k) return;
+    const v = e.target.value;
+    FILT[k] = v === "" ? null : (k === "season" ? +v : v);
     draw();
   });
   document.getElementById("list").addEventListener("click", e => {

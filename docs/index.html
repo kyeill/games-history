@@ -23,7 +23,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
   font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
   overscroll-behavior-y:none}
-.wrap{max-width:880px;margin:0 auto;padding:0 14px 90px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 14px 90px}
 
 header{display:flex;align-items:baseline;gap:10px;padding:18px 0 10px}
 h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700}
@@ -49,15 +49,20 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .f[aria-pressed="true"]{background:#2e3a48;border-color:#3f5064;color:#cfe0f2}
 .f:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 .fgroup{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.teamsel{background:var(--card);border:1px solid var(--line);color:var(--ink);
-  border-radius:999px;padding:3px 10px;font:inherit;font-size:13px;
-  max-width:200px;cursor:pointer}
-.teamsel:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
+.fsel{background:var(--card);border:1px solid var(--line);color:var(--ink);
+  border-radius:999px;padding:4px 10px;font:inherit;font-size:13px;
+  max-width:210px;cursor:pointer}
+.fsel:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 .flabel{font-size:11px;text-transform:uppercase;letter-spacing:.07em;
   color:var(--muted);font-weight:700;margin-right:2px}
 
+/* one column on a phone, two from 900px -- the gap replaces the row margin */
+#list{display:grid;grid-template-columns:1fr;gap:8px;align-content:start}
+@media (min-width:900px){#list{grid-template-columns:1fr 1fr;gap:9px}}
+#list .empty{grid-column:1/-1}
+
 .row{display:grid;background:var(--card);border:1px solid var(--line);
-  border-radius:9px;margin:8px 0;padding:10px 13px;
+  border-radius:9px;padding:10px 13px;
   grid-template-columns:1fr auto;
   grid-template-areas:"sport meta" "teams meta" "tags tags";
   column-gap:14px;align-items:start;cursor:pointer;text-align:left;
@@ -71,6 +76,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
 .tl.won{background:var(--winwash)}
+/* a Michigan win takes the whole box in maize; the per-line wash steps aside */
+.row.michwin{background:var(--rowwash);border-color:#6b5c26}
+.row.michwin .tl.won{background:transparent}
+.row.michwin .tl:not(.won) .nm,.row.michwin .tl:not(.won) .sc{color:#b0aa96}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
@@ -220,6 +229,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909-163124"></script>
+<script src="app.js?v=20260909-164925"></script>
 </body>
 </html>

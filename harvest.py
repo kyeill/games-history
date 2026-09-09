@@ -104,14 +104,13 @@ def harvest():
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks))
-                big, gtype = set(), None
+                gtype = None
                 if len(win) == 1 and len(lose) == 1:
-                    rw, rl = rank_of(win[0]), rank_of(lose[0])
-                    big = rules.big_games(rw, rl, bt in confs)
-                    gtype = rules.game_type(rw, rl)
+                    gtype = rules.game_type(code, rank_of(win[0]),
+                                            rank_of(lose[0]), bt in confs)
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads)
-                if not slots and not big and not conf:
+                if not slots and not gtype and not conf:
                     continue
 
                 side = []
@@ -135,7 +134,7 @@ def harvest():
                     "venue": v.get("fullName"),
                     "city": (v.get("address") or {}).get("city"),
                     "nets": sorted(nets), "teams": side,
-                    "slots": sorted(slots), "big": sorted(big), "type": gtype,
+                    "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
@@ -154,7 +153,7 @@ if __name__ == "__main__":
     tags = collections.Counter()
     for x in g:
         for s in x["slots"]: tags["slot: " + s] += 1
-        for b in x["big"]:   tags["big: " + b] += 1
+        if x["type"]:        tags["type: " + x["type"]] += 1
         if x["champ"]:       tags["champ: " + x["champ"]] += 1
     for k, v in sorted(tags.items()):
         print(f"   {v:5d}  {k}")

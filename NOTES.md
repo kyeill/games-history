@@ -84,6 +84,18 @@ pixels of both variants. Ported from sports-daily; its two imports (`espn`,
 `sports_daily`) are made optional here because this project takes its team list
 from the harvest, not a config.
 
+**Game types differ by sport and are not interchangeable.** CFB uses Top 10
+Upsets / Ranked Upsets / Ranked Games; CBB uses Top 5 Upsets / Top 10 Games /
+Ranked Big Ten. The two sets share no values, and neither do their TV windows.
+So the app's dropdowns are rebuilt from the games the sport toggle leaves in
+scope, and switching sport **clears** the game-type and TV-window filters —
+without that, a CFB value left set while viewing CBB filters everything away
+and the page looks broken rather than empty-by-choice.
+
+**The upset categories must be tested before the ranked-v-ranked ones.**
+"Anyone beats #1" and "top-10 v top-10 with the worse rank winning" both match
+a #2-over-#1 result; Kyle wants it read as an upset.
+
 ## The app
 
 **GitHub's REST API is CORS-open**, including `PUT` with an `Authorization`
@@ -110,6 +122,16 @@ installed icon crop to the launcher's own shape.
 
 **`localStorage` can throw**, not just return null — a locked-down browser
 raises on the accessor itself. Every read and write is wrapped.
+
+**`docs/` is both the build output AND the repo folder**, so `docs/tags.json`
+is its own source. `site.py` seeds it once and must never copy over it — an
+earlier version tried to, which raised `SameFileError` and would otherwise have
+wiped every tag on the next build. Nothing else in `docs/` is hand-edited;
+everything but `tags.json` is regenerated.
+
+**The Big Games exclusions live in the APP, not the harvest.** Michigan losses
+and rival wins stay in `games.json` because the Slots tab still shows them —
+filtering them at harvest time would lose them from both.
 
 ## Validation
 
