@@ -159,6 +159,17 @@ three at once. The dropdown writes a one-element list and falls back to its
 "All" label whenever the selection is not exactly one, so the marquee state is
 shown by its own lit button rather than by the dropdown.
 
+**ESPN's `broadcasts` lists simulcasts and streams, not just the broadcaster.**
+"NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+", "ESPN, ESPN3". Only one is
+wanted on the row, and picking the first alphabetically is wrong (BTN sorts
+before FOX), so `primaryNet()` ranks the majors explicitly. The full list stays
+in `games.json` -- this is display only, and the slot RULES still read every
+network, which is what lets "NBC, Peacock" match the NBC window.
+
+**`event.week.number` is on every CFB event** (weeks 1-16, zero missing across
+all five seasons). Basketball has one too but it means nothing to a viewer, so
+only football renders it.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

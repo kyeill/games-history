@@ -176,6 +176,16 @@ Michigan loss is never flagged, including when a rival does it.
 lightening by a fixed factor — at one factor Penn State's navy stayed muddy
 while Indiana's red turned pink.
 
+**The row** carries, left to right: sport (plus **Week N** on football, which
+ESPN provides on every event), the two teams with crests, ranks and scores, and
+a meta column of day, date, time and **one** network. ESPN lists simulcasts
+alongside the broadcaster — "NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+" —
+so `primaryNet()` ranks the majors explicitly and shows only that one;
+alphabetical order would not do it (BTN would beat FOX). Under that sit the
+tags, ending with the **venue city**, which used to live in the meta column.
+Dates read `9/03/21` — the month drops its leading zero, the day keeps its own.
+There is no neutral-site marker and no OT tag; both were removed.
+
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to
 the device immediately and batch into the sync bar.

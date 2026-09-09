@@ -108,7 +108,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 .sport{grid-area:sport;font-size:11px;font-weight:700;letter-spacing:.09em;
   color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.nu{color:var(--accent);font-weight:600;letter-spacing:.05em}
+.wk{color:var(--accent);font-weight:700;letter-spacing:.06em}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
@@ -134,7 +134,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   border-left:1px solid var(--line);min-width:118px;align-self:stretch}
 .when,.tm{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .net{font-size:13px;margin-top:2px}
-.site{font-size:12px;color:var(--muted);margin-top:2px}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
 .tag{font-size:11.5px;border-radius:4px;padding:2px 7px;letter-spacing:.02em;
   border:1px solid transparent;white-space:nowrap}
@@ -142,7 +141,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
 .t-champ{background:#26202f;border-color:#3a3145;color:#bda9d4}
 .t-mine{background:#1f2e28;border-color:#2f4539;color:#9ecab0}
-.t-ot{background:#2b2b31;border-color:#3a3a42;color:#c3c3bd}
+/* the venue city, sitting with the tags rather than in the meta column */
+.t-site{background:transparent;border-color:var(--line);color:var(--muted)}
 
 .empty{color:var(--muted);text-align:center;padding:44px 10px;font-size:14.5px}
 .daterow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}

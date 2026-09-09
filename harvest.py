@@ -131,6 +131,10 @@ def harvest():
                     "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
                     "time": d.strftime("%H:%M"),
                     "neutral": bool(c.get("neutralSite")), "ot": overtime,
+                    # ESPN carries week.number on every CFB event; basketball
+                    # has one too but it means nothing to a viewer, so only
+                    # football displays it.
+                    "week": (x.get("week") or {}).get("number"),
                     "venue": v.get("fullName"),
                     "city": (v.get("address") or {}).get("city"),
                     "nets": sorted(nets), "teams": side,

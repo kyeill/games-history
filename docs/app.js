@@ -6,7 +6,7 @@ const STARTER = ["College GameDay", "Big Noon Kickoff"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-171506";
+const BUILD = "20260909-172202";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -81,10 +81,31 @@ function setPending(id, patch, game) {
 }
 
 /* ---------- rendering --------------------------------------------------- */
+function fmtDate(d) {
+  // "2025-09-06" -> "9/06/25": the month drops its leading zero, the day keeps
+  // its own (his instruction was the month).
+  return String(+d.slice(5, 7)) + "/" + d.slice(8, 10) + "/" + d.slice(2, 4);
+}
 function fmtTime(t) {
   const p = t.split(":"), h = +p[0] % 12 || 12;
   return h + ":" + p[1] + (+p[0] < 12 ? "am" : "pm");
 }
+// ESPN lists simulcasts and streams alongside the real network -- "NBC,
+// Peacock", "CBS, Paramount+", "ESPN, ESPN+". Only the broadcaster is wanted,
+// and alphabetical order does not reliably put it first (BTN would beat FOX),
+// so the majors are ranked explicitly.
+const NET_RANK = ["ABC", "CBS", "NBC", "FOX", "ESPN", "ESPN2", "ESPNU", "BTN",
+                  "FS1", "FS2", "SECN", "Peacock", "Paramount+", "ESPN+"];
+function primaryNet(nets) {
+  if (!nets || !nets.length) return "";
+  let best = nets[0], bestRank = 999;
+  nets.forEach(n => {
+    const r = NET_RANK.indexOf(n);
+    if (r > -1 && r < bestRank) { bestRank = r; best = n; }
+  });
+  return best;
+}
+
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
@@ -109,14 +130,15 @@ function rowHtml(g, browse) {
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
   }
-  if (g.ot) tags.push(chip("ot", "OT"));
   myTags(g.id).forEach(t => tags.push(chip("mine", t)));
+  // The venue city sits with the tags rather than in the meta column
+  if (g.city) tags.push('<span class="tag t-site">' + esc(g.city) + "</span>");
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
   const mark = browse && inArch ? ' <span class="inarch">IN ARCHIVE</span>' : "";
-  const neutral = g.neutral ? ' <span class="nu">neutral</span>' : "";
-  const site = g.neutral && g.city
-    ? '<div class="site">' + esc(g.city) + "</div>" : "";
+  // Football is played in numbered weeks and he thinks in them
+  const week = (g.sport === "CFB" && g.week)
+    ? ' <span class="wk">Week ' + g.week + "</span>" : "";
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   const flag = celebrated(g);
@@ -124,14 +146,12 @@ function rowHtml(g, browse) {
   return '<button class="row' + (flag ? " celebrate" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
-    '<div class="sport">' + g.sport + neutral + mark + "</div>" +
+    '<div class="sport">' + g.sport + week + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
-    '<div class="meta"><div class="when">' + g.dow + " " +
-      g.date.slice(5).replace("-", "/") + "/" + g.date.slice(2, 4) +
+    '<div class="meta"><div class="when">' + g.dow + " " + fmtDate(g.date) +
       '</div><div class="tm">' + fmtTime(g.time) + "</div>" +
-      '<div class="net">' +
-      esc((g.nets || []).slice(0, 2).join(", ") || "—") + "</div>" +
-      site + "</div>" +
+      '<div class="net">' + esc(primaryNet(g.nets) || "—") + "</div>" +
+      "</div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
@@ -313,7 +333,7 @@ function openSheet(id) {
   document.getElementById("sh-sub").textContent =
     g.dow + " " + g.date + "  ·  " + g.teams[1].score + "–" +
     g.teams[0].score + "  ·  " +
-    ((g.nets || []).join(", ") || "no network listed");
+    (primaryNet(g.nets) || "no network listed");
   document.getElementById("sh-tags").innerHTML = known.map(t =>
     '<button class="f" aria-pressed="' + (mine.indexOf(t) > -1) +
     '" data-tag="' + esc(t) + '">' + esc(t) + "</button>").join("");
@@ -387,6 +407,7 @@ function normalize(ev, sport) {
     ot: ((c.status || {}).period || 0) > (sport === "CFB" ? 4 : 2),
     venue: v.fullName, city: (v.address || {}).city,
     nets: Array.from(new Set(nets)).sort(), teams: teams,
+    week: (ev.week || {}).number || null,
     slots: [], big: [], champ: null,
     round: ((c.notes || [])[0] || {}).headline || null
   };
