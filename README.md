@@ -172,7 +172,8 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Year | dropdown, newest first | season |
 | Game type | dropdown, `rules.ORDER` sequence | `rules.game_type` |
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
-| Team | dropdown, alphabetical | 147 of them |
+| Week | dropdown, **football only** | 1-16, following the chosen season |
+| Team | dropdown, alphabetical | 141 of them |
 | Marquee Windows | toggle button | `rules.MARQUEE` — three windows at once |
 | Sort | toggle button | oldest first (default) / newest first |
 
@@ -238,10 +239,11 @@ blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
 is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
 "Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
 
-The tag row runs **network at the far left**, then the game's own tags, with
-the **TV window chip pushed to the lower right**. The **game type is drawn only
-on the Big Games view** — it is what that view is about, so it is noise on a TV
-Windows card. The kickoff time sits alone in the meta column.
+The **TV window chip sits top right**, opposite the week and date. Beside the
+team lines, a meta column carries **the network on the away team's line and the
+kickoff time on the home team's** — structural alignment, measured at 0px. The
+**game type is drawn only on the Big Games view**, where it is the point rather
+than noise.
 
 **The purple chip is the conference championship OR the location, never both.**
 A title game is played somewhere, but the title is the story; otherwise a

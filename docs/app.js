@@ -6,13 +6,13 @@ const STARTER = ["College GameDay", "Big Noon Kickoff"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-175556";
+const BUILD = "20260909-180340";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
-let FILT = { season: null, type: null, windows: null, team: null };
+let FILT = { season: null, week: null, type: null, windows: null, team: null };
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
@@ -149,7 +149,8 @@ function rowHtml(g, browse) {
   // Football is played in numbered weeks and he thinks in them, so the week
   // leads and the date follows in parentheses. Basketball just gets the date.
   const when = (g.sport === "CFB" && g.week)
-    ? "Week " + g.week + " (" + g.dow + " " + fmtDate(g.date) + ")"
+    ? '<span class="wk">Week ' + g.week + "</span> (" + g.dow + " " +
+      fmtDate(g.date) + ")"
     : g.dow + " " + fmtDate(g.date);
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
@@ -159,16 +160,15 @@ function rowHtml(g, browse) {
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport">' + when + mark + "</div>" +
+    '<div class="tvtag">' +
+      (g.slots || []).map(w => chip("slot " + netClass(w), w)).join("") +
+      "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
-    '<div class="meta"><div class="mrow">' + fmtTime(g.time) + "</div></div>" +
-    '<div class="tags"><span class="net">' +
-    esc(primaryNet(g.nets) || "—") + "</span>" + tags.join("") +
-    // the TV window sits apart, at the lower right of the card
-    ((g.slots || []).length
-      ? '<span class="tvtag">' +
-        g.slots.map(w => chip("slot " + netClass(w), w)).join("") + "</span>"
-      : "") +
-    "</div></button>";
+    // network on the away team's line, time on the home team's
+    '<div class="meta"><div class="mrow">' +
+      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow">' +
+      fmtTime(g.time) + "</div></div>" +
+    '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
 /* Kyle's teams. ESPN gives a school one id across both sports. */
@@ -226,6 +226,7 @@ function visible() {
     ? ((g.slots || []).length || g.title)
     : ((g.type || g.champ) && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
+  if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
   // A championship game has no window of its own. It rides along with Marquee
   // Windows (his call), but picking ONE window must not surface it.
   if (FILT.windows && FILT.windows.length) {
@@ -252,7 +253,7 @@ function clearFilters() {
     // TV Windows opens on Marquee Windows -- the networks he plans around
     windows: VIEW === "tv"
       ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null,
-    team: null
+    week: null, team: null
   };
 }
 
@@ -288,6 +289,19 @@ function filterChips() {
   let h = group("Year", select("season", "All Years",
     SEASONS.slice().sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
+  // Football is played in numbered weeks; basketball is not. The list follows
+  // the season, since week 16 only exists in some years.
+  if (sport === "CFB") {
+    const weeks = new Set();
+    GAMES.forEach(g => {
+      if (g.sport !== "CFB" || !g.week) return;
+      if (FILT.season != null && g.season !== FILT.season) return;
+      weeks.add(g.week);
+    });
+    h += group("Week", select("week", "All Weeks",
+      Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]),
+      FILT.week));
+  }
   h += group("Game type", select("type", "All Game Types",
     order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
   // The dropdown holds ONE window; Marquee Windows sets three at once, and
@@ -590,7 +604,10 @@ async function init() {
     if (!k) return;
     const v = e.target.value;
     if (k === "window") FILT.windows = v === "" ? null : [v];
-    else FILT[k] = v === "" ? null : (k === "season" ? +v : v);
+    else FILT[k] = v === "" ? null
+      : ((k === "season" || k === "week") ? +v : v);
+    // a week chosen under one season may not exist in another
+    if (k === "season") FILT.week = null;
     draw();
   });
   document.getElementById("list").addEventListener("click", e => {

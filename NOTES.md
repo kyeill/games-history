@@ -224,6 +224,11 @@ why harvest passes it.
 flex baseline off differently-sized boxes and drops the count. Setting both to
 1.2 fixes it.
 
+**The Week filter follows the SEASON.** Week 16 exists only in some years, so
+the options are rebuilt from the games in the chosen season and the week is
+cleared whenever the season changes -- otherwise a stale week empties the list.
+Football only: basketball has no meaningful week.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather
