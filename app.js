@@ -13,7 +13,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, type: null, windows: null, team: null };
-let ORDER = {}, SEASONS = [], MARQUEE = {};
+let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
@@ -106,16 +106,12 @@ function primaryNet(nets) {
   return best;
 }
 
-// A TV window chip is painted in its network's colour. The window NAMES carry
-// the network ("FOX Big Noon", "CBS B1G Time"), so the class comes from the
-// name rather than a second lookup table that could drift out of step.
+// A TV window chip is painted in its network's colour, from the explicit map
+// in rules.py. Parsing the name does not work: "Big Monday", "Super Tuesday"
+// and "B1G Peacock" carry no network in their names.
 function netClass(window) {
-  const w = String(window);
-  if (w.indexOf("FOX") > -1) return "n-fox";
-  if (w.indexOf("CBS") > -1) return "n-cbs";
-  if (w.indexOf("NBC") > -1) return "n-nbc";
-  if (w.indexOf("ABC") > -1) return "n-abc";
-  return "";
+  const n = WINDOW_NET[window];
+  return n ? "n-" + n : "";
 }
 
 function chip(kind, text) {
@@ -221,12 +217,15 @@ function visible() {
     if (e.add && e.game && !list.some(g => g.id === id)) list.push(e.game);
   });
   list = list.filter(g => g.sport === SPORT_OF[TAB]);
+  // A championship game shows on TV Windows even with no broadcast window --
+  // 17 of the 46 have none, because the Big Ten title game kicks at 8pm and
+  // the Pac-12 one was on a Friday. His call: they must all show.
   list = list.filter(g => VIEW === "tv"
-    ? (g.slots || []).length
+    ? ((g.slots || []).length || g.title)
     : ((g.type || g.champ) && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.windows && FILT.windows.length) list = list.filter(g =>
-    (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
+    g.title || (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
@@ -243,7 +242,10 @@ function clearFilters() {
   FILT = {
     season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
     type: VIEW === "big" ? OPENING_TYPE[TAB] || null : null,
-    windows: null, team: null
+    // TV Windows opens on Marquee Windows -- the networks he plans around
+    windows: VIEW === "tv"
+      ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null,
+    team: null
   };
 }
 
@@ -533,6 +535,7 @@ async function init() {
   ORDER = r[0].order || {};
   SEASONS = r[0].seasons || [];
   MARQUEE = r[0].marquee || {};
+  WINDOW_NET = r[0].window_net || {};
   clearFilters();
   try {
     // cache-bust: Pages serves with max-age, and this file is the shared state
@@ -560,7 +563,8 @@ async function init() {
       // game-type / TV-window pair is view-specific
       VIEW = e.currentTarget.dataset.view;
       FILT.type = VIEW === "big" ? OPENING_TYPE[TAB] || null : null;
-      FILT.windows = null;
+      FILT.windows = VIEW === "tv"
+        ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null;
       draw();
       window.scrollTo({ top: 0 });
     }));

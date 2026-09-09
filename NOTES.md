@@ -176,6 +176,17 @@ covered `"sport meta" "teams meta"`, so its first line sat against the header,
 row (`"sport sport"`) and making `.meta` a two-row grid inside the teams row.
 Verify alignment by comparing bounding-box centres, not by eye.
 
+**Army-Navy is a FALSE CBS match, five years out of five.** December Saturday
+afternoon on CBS hits the CBS window exactly, but the game belongs to no
+package. Excluded by team id in `cfb_slots`. Removed 5 games (1659 -> 1654).
+
+**17 of the 46 championship games have NO TV window** and would vanish from
+that view: the Big Ten football title kicks at 8pm, the Pac-12 one was on a
+Friday, and every basketball final is on ESPN either just outside the
+Saturday-night cutoff or on a Sunday. They are admitted to the view by the
+`title` flag AND exempted from the window filter, or Marquee Windows (now the
+opening state) would hide them again.
+
 **Every Power Five CFB championship game now carries a category.** They belong
 in Big Games, but many match no ranking rule (an unranked pair, or a ranked
 favourite winning), and Big Games DEFAULTS to the upset category -- so an

@@ -45,7 +45,7 @@ Named and ordered as Kyle names them, 2026-09-09. `rules.ORDER` is the single
 source of truth for both the vocabulary and the display sequence, and
 `harvest.py` copies it into `games.json` so the page never re-derives it.
 
-**CFB** — FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC · FOX Friday.
+**CFB** — FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC Saturday · FOX Friday.
 
 **CBB** — FOX · CBS · NBC · ABC · B1G Peacock · Big Monday · Super Tuesday ·
 *ESPN Sat night*.
@@ -82,6 +82,24 @@ slate. An unranked win over a CBB #7 is deliberately *not* a category.
 
 **Power Five titles** — ACC, Big Ten, Big 12, SEC, Pac-12 championship games
 (CFB) and conference tournaments (CBB), every round.
+
+**A "championship game"** in the app's sense is narrower: a football title game
+or a basketball tournament **final** — "finals only, not the rest of the
+tournaments". 23 of each, 46 in all (`rules.is_title_game`). Those 46 get two
+privileges: a category even when no ranking rule fits, and a guaranteed place
+on TV Windows even with no broadcast window. Both matter — **17 of the 46 have
+no window**, because the Big Ten title game kicks at 8pm, the Pac-12 one was on
+a Friday, and every basketball final is on ESPN just outside the Saturday-night
+cutoff or on a Sunday.
+
+The fallback (`rules.title_fallback`) files them by result: an upset becomes
+**Ranked Upsets**, anything else **Ranked Games**. Those two labels are the only
+categories shared by both sports — basketball has no "Ranked Games" of its own,
+and inventing a third name for 23 games would be worse than reusing football's.
+
+**Army–Navy is excluded from the CBS window.** It is played on a December
+Saturday afternoon on CBS, which made it a false match every year, five for
+five. It is the last game of the season and belongs to neither package.
 
 ### What the rules return
 
@@ -145,10 +163,9 @@ calendar year, basketball straddles two.
 
 **Opening state is not an empty state.** Every tab opens on the newest season
 available (whatever `harvest.py` last pulled), sorted **oldest first** so a
-season reads as it unfolded. The Big Games view additionally opens on the
-sport's upset category — Top 10 Upsets for football, Top 5 Upsets for
-basketball — which turns an opening list of hundreds into 10 and 9. TV Windows
-opens unfiltered.
+season reads as it unfolded. TV Windows opens with **Marquee Windows** on. The
+Big Games view instead opens on the sport's upset category — Top 10 Upsets for football, Top 5 Upsets for
+basketball — which turns an opening list of hundreds into 10 and 9.
 
 **Game type and TV window are built from the active sport tab**, because CFB
 and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
@@ -193,9 +210,9 @@ The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
 
 **TV window chips carry their network's colour** — FOX yellow, CBS a lighter
-blue, NBC grey, ABC a darker blue, everything else the default slate. The class
-is derived from the window NAME (`netClass`), since the names already carry the
-network, rather than a second table that could drift.
+blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
+is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
+"Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
 
 The tag row ends with the **venue city on neutral-site games only** — there is
 no neutral marker any more, so a city belonging to neither school is what gives

@@ -99,20 +99,22 @@ def harvest():
                 win = [k for k in cs if k.get("winner")]
                 lose = [k for k in cs if not k.get("winner")]
 
+                team_ids = [k["team"]["id"] for k in cs]
                 if code == "CFB":
-                    slots = rules.cfb_slots(nets, d)
+                    slots = rules.cfb_slots(nets, d, team_ids)
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks))
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads)
+                title = rules.is_title_game(code, conf, head)
                 gtype = None
                 if len(win) == 1 and len(lose) == 1:
-                    # a P5 title game with no category of its own is filed by
-                    # result rather than left uncategorised
+                    # a championship game with no category of its own is filed
+                    # by result rather than left uncategorised
                     gtype = rules.game_type(code, rank_of(win[0]),
                                             rank_of(lose[0]), bt in confs,
-                                            p5_title=bool(conf))
+                                            p5_title=title)
                 if not slots and not gtype and not conf:
                     continue
 
@@ -142,12 +144,12 @@ def harvest():
                     "city": (v.get("address") or {}).get("city"),
                     "nets": sorted(nets), "teams": side,
                     "slots": sorted(slots), "type": gtype,
-                    "champ": conf, "round": head,
+                    "champ": conf, "round": head, "title": title,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
-               "marquee": rules.MARQUEE,
+               "marquee": rules.MARQUEE, "window_net": rules.WINDOW_NET,
                "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),
               separators=(",", ":"))

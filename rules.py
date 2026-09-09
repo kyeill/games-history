@@ -22,14 +22,16 @@ def _mins(d):
 # These lists are the display order AND the full vocabulary; harvest.py copies
 # them into games.json so the page has one source of truth.
 CFB_WINDOWS = ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night",
-               "ABC", "FOX Friday"]
+               "ABC Saturday", "FOX Friday"]
 CBB_WINDOWS = ["FOX", "CBS", "NBC", "ABC", "B1G Peacock", "Big Monday",
                "Super Tuesday",
                # Not in the order he gave, but it WAS in his original slot
                # list, so it is kept and parked last rather than dropped.
                "ESPN Sat night"]
 CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
-CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
+# the last two are the shared championship fallbacks -- see title_fallback
+CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten",
+             "Ranked Upsets", "Ranked Games"]
 
 ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
          "CBB": {"types": CBB_TYPES, "windows": CBB_WINDOWS}}
@@ -40,10 +42,28 @@ ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
 MARQUEE = {"CFB": ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"],
            "CBB": ["FOX", "CBS", "NBC"]}
 
+# Which network paints each window's chip. Explicit rather than parsed from the
+# name: "Big Monday", "Super Tuesday" and "B1G Peacock" carry no network in
+# their names at all. Peacock mirrors NBC; ESPN is red.
+WINDOW_NET = {
+    "FOX Big Noon": "fox", "FOX Friday": "fox", "FOX": "fox",
+    "CBS B1G Time": "cbs", "CBS": "cbs",
+    "NBC Saturday Night": "nbc", "NBC": "nbc", "B1G Peacock": "nbc",
+    "ABC Saturday": "abc", "ABC": "abc",
+    "Big Monday": "espn", "Super Tuesday": "espn", "ESPN Sat night": "espn",
+}
 
-def cfb_slots(nets, d):
+# The Army-Navy game is played on a December Saturday afternoon on CBS, which
+# makes it a false match for the CBS window every single year (five for five).
+# It is the last game of the season and belongs to neither package.
+ARMY, NAVY = "349", "2426"
+
+
+def cfb_slots(nets, d, team_ids=()):
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
+    if ARMY in team_ids and NAVY in team_ids:
+        return out                       # see ARMY, NAVY above
     if "FOX" in nets and day == "Fri" and t >= 18 * 60:
         out.add("FOX Friday")
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
@@ -53,7 +73,7 @@ def cfb_slots(nets, d):
     if "NBC" in nets and day == "Sat" and abs(t - (19 * 60 + 30)) <= 45:
         out.add("NBC Saturday Night")
     if "ABC" in nets and day == "Sat":
-        out.add("ABC")
+        out.add("ABC Saturday")
     return out
 
 
@@ -114,8 +134,7 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
 
     both = rank_win and rank_lose
     if not both:
-        return (title_fallback(rank_win, rank_lose)
-                if (p5_title and sport == "CFB") else None)
+        return title_fallback(rank_win, rank_lose) if p5_title else None
 
     if sport == "CFB":
         top10 = rank_win <= 10 and rank_lose <= 10
@@ -127,17 +146,33 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
         return "Top 10 Games"
     if has_big_ten:
         return "Ranked Big Ten"
-    return None
+    return title_fallback(rank_win, rank_lose) if p5_title else None
+
+
+def is_title_game(sport, conf, headline):
+    """A CHAMPIONSHIP game, as Kyle means it: a Power Five football title game,
+    or a Power Five basketball conference tournament FINAL -- "finals only, not
+    the rest of the tournaments" (2026-09-09). 23 of each, 46 in all.
+
+    These get two privileges: a category even when no ranking rule fits, and a
+    guaranteed place on the TV Windows view even with no broadcast window.
+    """
+    if not conf:
+        return False
+    if sport == "CFB":
+        return True
+    return (headline or "").endswith("- Final")
 
 
 def title_fallback(rank_win, rank_lose):
-    """Every Power Five championship game belongs in Big Games (his call
-    2026-09-09), but plenty match none of the ranking rules -- an unranked
-    pair, or a ranked favourite beating an unranked team. Those are filed by
-    RESULT: an upset is a Ranked Upset, anything else a Ranked Game.
+    """A championship game belongs in Big Games, but plenty match none of the
+    ranking rules -- an unranked pair, or a ranked favourite beating an
+    unranked team. Those are filed by RESULT: an upset is a Ranked Upset,
+    anything else a Ranked Game.
 
-    CFB only. College basketball's conference tournaments are 302 games and its
-    categories are named differently, so they are left alone pending his call.
+    These two labels are shared by BOTH sports, unlike every other category.
+    Basketball has no "Ranked Games" of its own, and inventing a third name for
+    23 games would be worse than reusing football's.
     """
     upset = ((rank_lose and not rank_win)
              or (rank_win and rank_lose and rank_win > rank_lose))

@@ -151,6 +151,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-slot.n-cbs{background:#1b3340;border-color:#2b4d61;color:#8fc9e4}
 .t-slot.n-nbc{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-slot.n-abc{background:#1b2440;border-color:#2b3860;color:#93a9dc}
+.t-slot.n-espn{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
 .otnote{font-size:11.5px;color:var(--muted);letter-spacing:.06em;
   align-self:center;font-weight:600}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
