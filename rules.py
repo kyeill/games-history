@@ -30,8 +30,7 @@ CBB_WINDOWS = ["FOX", "CBS", "NBC", "ABC", "B1G Peacock", "Big Monday",
                "ESPN Sat night"]
 CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
 # the last two are the shared championship fallbacks -- see title_fallback
-CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten",
-             "Ranked Upsets", "Ranked Games"]
+CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
 
 ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
          "CBB": {"types": CBB_TYPES, "windows": CBB_WINDOWS}}
@@ -58,12 +57,28 @@ WINDOW_NET = {
 # It is the last game of the season and belongs to neither package.
 ARMY, NAVY = "349", "2426"
 
+# A football TV window is a Power Four/Five package, so a game between two
+# outsiders is not in it however well the time slot fits -- UNLV at Boise State
+# on a Friday night is not "FOX Friday" in the sense he means. Notre Dame is an
+# INDEPENDENT (conference 18) and must be admitted anyway: NBC's whole college
+# football package is Notre Dame home games.
+# Conference ids differ per sport -- 4 is the Big 12 in football and the BIG
+# EAST in basketball -- so this is football-only, and deliberately.
+CFB_POWER = {"1", "4", "5", "8", "9"}      # ACC, Big 12, Big Ten, SEC, Pac-12
+CFB_INDEPENDENT_OK = {"87"}                # Notre Dame
 
-def cfb_slots(nets, d, team_ids=()):
+
+def cfb_power_game(team_ids, conf_ids):
+    return any(c in CFB_POWER for c in conf_ids) or         any(t in CFB_INDEPENDENT_OK for t in team_ids)
+
+
+def cfb_slots(nets, d, team_ids=(), conf_ids=()):
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
     if ARMY in team_ids and NAVY in team_ids:
         return out                       # see ARMY, NAVY above
+    if not cfb_power_game(team_ids, conf_ids):
+        return out                       # see CFB_POWER above
     if "FOX" in nets and day == "Fri" and t >= 18 * 60:
         out.add("FOX Friday")
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
@@ -134,7 +149,10 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
 
     both = rank_win and rank_lose
     if not both:
-        return title_fallback(rank_win, rank_lose) if p5_title else None
+        if not p5_title:
+            return None
+        return (title_fallback(rank_win, rank_lose) if sport == "CFB"
+                else "Top 10 Games")
 
     if sport == "CFB":
         top10 = rank_win <= 10 and rank_lose <= 10
@@ -146,7 +164,8 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
         return "Top 10 Games"
     if has_big_ten:
         return "Ranked Big Ten"
-    return title_fallback(rank_win, rank_lose) if p5_title else None
+    # a basketball final matching nothing is a Top 10 Game (his call)
+    return "Top 10 Games" if p5_title else None
 
 
 def is_title_game(sport, conf, headline):
@@ -170,9 +189,8 @@ def title_fallback(rank_win, rank_lose):
     unranked team. Those are filed by RESULT: an upset is a Ranked Upset,
     anything else a Ranked Game.
 
-    These two labels are shared by BOTH sports, unlike every other category.
-    Basketball has no "Ranked Games" of its own, and inventing a third name for
-    23 games would be worse than reusing football's.
+    FOOTBALL ONLY. A basketball final that matches nothing becomes a Top 10
+    Game instead -- his call, rather than borrowing football's labels.
     """
     upset = ((rank_lose and not rank_win)
              or (rank_win and rank_lose and rank_win > rank_lose))

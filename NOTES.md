@@ -176,6 +176,18 @@ covered `"sport meta" "teams meta"`, so its first line sat against the header,
 row (`"sport sport"`) and making `.meta` a two-row grid inside the teams row.
 Verify alignment by comparing bounding-box centres, not by eye.
 
+**Conference ids are per SPORT and they collide.** 4 is the Big 12 in football
+and the **Big East** in basketball; the ACC is 1 in football and 2 in
+basketball. Any conference rule must therefore be written per sport. This is
+why the Power Four window rule is football-only: applied to basketball it would
+drop 177 games (UConn 42, St. John's 28, Creighton 27, Villanova 23, Gonzaga
+21, Marquette 19, San Diego State 18) -- measured, not assumed.
+
+**Notre Dame must survive the Power Four rule.** It is an INDEPENDENT
+(conference 18), so a plain conference test drops it -- and NBC's entire
+college football package is Notre Dame home games, which would gut the NBC
+window.
+
 **Army-Navy is a FALSE CBS match, five years out of five.** December Saturday
 afternoon on CBS hits the CBS window exactly, but the game belongs to no
 package. Excluded by team id in `cfb_slots`. Removed 5 games (1659 -> 1654).

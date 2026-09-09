@@ -101,7 +101,7 @@ def harvest():
 
                 team_ids = [k["team"]["id"] for k in cs]
                 if code == "CFB":
-                    slots = rules.cfb_slots(nets, d, team_ids)
+                    slots = rules.cfb_slots(nets, d, team_ids, confs)
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks))
@@ -117,6 +117,10 @@ def harvest():
                                             p5_title=title)
                 if not slots and not gtype and not conf:
                     continue
+                # A championship game carries NO TV window chip (his call): it
+                # is admitted to that view by the `title` flag instead.
+                if title:
+                    slots = set()
 
                 side = []
                 for k in cs:

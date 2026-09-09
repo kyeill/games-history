@@ -129,10 +129,9 @@ function rowHtml(g, browse) {
   const home = g.teams[0], away = g.teams[1];
   const win = home.win ? home : away;
   const tags = [];
-  (g.slots || []).forEach(s => tags.push(chip("slot " + netClass(s), s)));
-  // the raw rule names (#1 loses, top-10 vs top-10, ...) stay in the data but
-  // are not drawn: Game Type is the vocabulary Kyle filters in
-  if (g.type) tags.push(chip("big", g.type));
+  // The game type is what the Big Games view is ABOUT, so it is redundant on
+  // the TV Windows cards and drawn only on the other view.
+  if (g.type && VIEW === "big") tags.push(chip("big", g.type));
   if (g.champ) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
@@ -166,7 +165,13 @@ function rowHtml(g, browse) {
     '<div class="meta"><div class="mrow">' +
       esc(primaryNet(g.nets) || "—") + '</div>' +
       '<div class="mrow">' + fmtTime(g.time) + "</div></div>" +
-    '<div class="tags">' + tags.join("") + "</div></button>";
+    '<div class="tags">' + tags.join("") +
+    // the TV window sits apart, at the lower right of the card
+    ((g.slots || []).length
+      ? '<span class="tvtag">' +
+        g.slots.map(w => chip("slot " + netClass(w), w)).join("") + "</span>"
+      : "") +
+    "</div></button>";
 }
 
 /* Kyle's teams. ESPN gives a school one id across both sports. */

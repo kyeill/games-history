@@ -92,10 +92,23 @@ no window**, because the Big Ten title game kicks at 8pm, the Pac-12 one was on
 a Friday, and every basketball final is on ESPN just outside the Saturday-night
 cutoff or on a Sunday.
 
-The fallback (`rules.title_fallback`) files them by result: an upset becomes
-**Ranked Upsets**, anything else **Ranked Games**. Those two labels are the only
-categories shared by both sports — basketball has no "Ranked Games" of its own,
-and inventing a third name for 23 games would be worse than reusing football's.
+Football's fallback (`rules.title_fallback`) files by result: an upset becomes
+**Ranked Upsets**, anything else **Ranked Games**. A basketball final matching
+nothing becomes a **Top 10 Games** instead — his call, rather than borrowing
+football's labels.
+
+They also carry **no TV window chip**. A championship game is not part of a
+broadcast package, so the card shows none; the `title` flag is what admits it
+to that view, and it is exempt from the window filter so Marquee Windows
+cannot hide it.
+
+**A football TV window requires a Power Four/Five team.** UNLV at Boise State
+on a Friday night is not "FOX Friday" in the sense he means. Notre Dame is an
+independent and admitted anyway — NBC's entire college football package is
+Notre Dame home games. This costs 9 games and is **football only**: conference
+ids differ per sport (4 is the Big 12 in football and the **Big East** in
+basketball), and the same rule on basketball would drop 177 games including all
+of UConn, St. John's, Creighton, Villanova, Gonzaga and Marquette.
 
 **Army–Navy is excluded from the CBS window.** It is played on a December
 Saturday afternoon on CBS, which made it a false match every year, five for
@@ -214,7 +227,11 @@ blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
 is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
 "Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
 
-The tag row ends with the **venue city on neutral-site games only** — there is
+The **TV window chip sits at the lower right**, apart from the game's own tags,
+and the **game type is drawn only on the Big Games view** — it is what that view
+is about, so it is redundant on a TV Windows card.
+
+The tag row otherwise carries the **venue city on neutral-site games only** — there is
 no neutral marker any more, so a city belonging to neither school is what gives
 it away — and an **OT** note where it applies.
 
