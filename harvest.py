@@ -108,6 +108,12 @@ def harvest():
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads)
                 title = rules.is_title_game(code, conf, head)
+                # A championship game outside the Power Four/Five keeps no TV
+                # window -- the Mountain West title game is not "FOX Friday".
+                # Football only: a Big East tournament game on FOX genuinely is
+                # a FOX basketball game.
+                if code == "CFB" and not conf and rules.is_championship(heads):
+                    slots = set()
                 gtype = None
                 if len(win) == 1 and len(lose) == 1:
                     # a championship game with no category of its own is filed

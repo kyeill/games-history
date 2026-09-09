@@ -57,19 +57,13 @@ WINDOW_NET = {
 # It is the last game of the season and belongs to neither package.
 ARMY, NAVY = "349", "2426"
 
-# A football TV window is a Power Four/Five package, so a game between two
-# outsiders is not in it however well the time slot fits -- UNLV at Boise State
-# on a Friday night is not "FOX Friday" in the sense he means. Notre Dame is an
-# INDEPENDENT (conference 18) and must be admitted anyway: NBC's whole college
-# football package is Notre Dame home games.
-# Conference ids differ per sport -- 4 is the Big 12 in football and the BIG
-# EAST in basketball -- so this is football-only, and deliberately.
-CFB_POWER = {"1", "4", "5", "8", "9"}      # ACC, Big 12, Big Ten, SEC, Pac-12
-CFB_INDEPENDENT_OK = {"87"}                # Notre Dame
-
-
-def cfb_power_game(team_ids, conf_ids):
-    return any(c in CFB_POWER for c in conf_ids) or         any(t in CFB_INDEPENDENT_OK for t in team_ids)
+# NOTE: "Power Four/Five" scopes which CONFERENCE CHAMPIONSHIP games count
+# (see POWER5 and power5_title). It is deliberately NOT a condition on TV
+# windows -- a window is a time slot on a network, whoever is playing. An
+# earlier version gated windows on it too and he corrected that on 2026-09-09.
+# If a narrower rule is ever wanted, note that conference ids differ per sport
+# (4 is the Big 12 in football and the BIG EAST in basketball) and that Notre
+# Dame is an INDEPENDENT, conference 18, despite being NBC's entire package.
 
 
 def cfb_slots(nets, d, team_ids=(), conf_ids=()):
@@ -77,8 +71,6 @@ def cfb_slots(nets, d, team_ids=(), conf_ids=()):
     out = set()
     if ARMY in team_ids and NAVY in team_ids:
         return out                       # see ARMY, NAVY above
-    if not cfb_power_game(team_ids, conf_ids):
-        return out                       # see CFB_POWER above
     if "FOX" in nets and day == "Fri" and t >= 18 * 60:
         out.add("FOX Friday")
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
@@ -195,6 +187,27 @@ def title_fallback(rank_win, rank_lose):
     upset = ((rank_lose and not rank_win)
              or (rank_win and rank_lose and rank_win > rank_lose))
     return "Ranked Upsets" if upset else "Ranked Games"
+
+
+def is_championship(headlines):
+    """Any conference title game or playoff round, Power Five or not.
+
+    The Power Four/Five restriction applies to CHAMPIONSHIP GAMES ONLY (his
+    correction, 2026-09-09) -- not to TV windows generally. So this catches
+    the ones that are NOT Power Five and lets harvest.py strip their window:
+    the Mountain West Championship kicks off on a December Friday night and
+    lands squarely in FOX Friday, the American Athletic Championship sits in
+    ABC Saturday, and the FCS playoff quarterfinals do the same. None of them
+    belong to those packages.
+
+    Ordinary regular-season games between the same teams are untouched --
+    Boise State at BYU on ABC in September is a real ABC Saturday game.
+    """
+    for h in headlines:
+        base = (h or "").split(" - ")[0]
+        if "hampionship" in base or "Tournament" in base or "Playoff" in base:
+            return True
+    return False
 
 
 def power5_title(headlines):

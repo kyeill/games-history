@@ -102,13 +102,16 @@ broadcast package, so the card shows none; the `title` flag is what admits it
 to that view, and it is exempt from the window filter so Marquee Windows
 cannot hide it.
 
-**A football TV window requires a Power Four/Five team.** UNLV at Boise State
-on a Friday night is not "FOX Friday" in the sense he means. Notre Dame is an
-independent and admitted anyway — NBC's entire college football package is
-Notre Dame home games. This costs 9 games and is **football only**: conference
-ids differ per sport (4 is the Big 12 in football and the **Big East** in
-basketball), and the same rule on basketball would drop 177 games including all
-of UConn, St. John's, Creighton, Villanova, Gonzaga and Marquette.
+**Power Four/Five scopes CHAMPIONSHIP GAMES ONLY** — not TV windows. A window
+is a time slot on a network, whoever is playing, so Boise State at BYU on ABC
+in September is a real ABC Saturday game.
+
+What it does exclude is a **non-Power-Five championship or playoff** that lands
+in a window by accident of scheduling: the Mountain West Championship kicks off
+on a December Friday night and falls squarely into FOX Friday, the American
+Athletic Championship into ABC Saturday, and the FCS playoff quarterfinals do
+the same. Seven games, all football. Basketball is untouched — a Big East
+tournament game on FOX genuinely is a FOX basketball game.
 
 **Army–Navy is excluded from the CBS window.** It is played on a December
 Saturday afternoon on CBS, which made it a false match every year, five for

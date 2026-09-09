@@ -176,17 +176,23 @@ covered `"sport meta" "teams meta"`, so its first line sat against the header,
 row (`"sport sport"`) and making `.meta` a two-row grid inside the teams row.
 Verify alignment by comparing bounding-box centres, not by eye.
 
-**Conference ids are per SPORT and they collide.** 4 is the Big 12 in football
-and the **Big East** in basketball; the ACC is 1 in football and 2 in
-basketball. Any conference rule must therefore be written per sport. This is
-why the Power Four window rule is football-only: applied to basketball it would
-drop 177 games (UConn 42, St. John's 28, Creighton 27, Villanova 23, Gonzaga
-21, Marquette 19, San Diego State 18) -- measured, not assumed.
+**"Power Four/Five" scopes CHAMPIONSHIP GAMES, not TV windows.** A version
+that gated every window on a power-conference team was wrong and he corrected
+it: a TV window is a time slot on a network, whoever is playing. The real
+problem was narrower -- non-Power-Five CHAMPIONSHIP games falling into windows
+by accident of scheduling (Mountain West Championship -> FOX Friday, American
+Athletic Championship -> ABC Saturday, FCS playoff quarterfinals -> ABC
+Saturday). `rules.is_championship` catches any title/playoff headline and
+harvest strips the window when the conference is not Power Five. 7 games.
 
-**Notre Dame must survive the Power Four rule.** It is an INDEPENDENT
-(conference 18), so a plain conference test drops it -- and NBC's entire
-college football package is Notre Dame home games, which would gut the NBC
-window.
+Two things measured while getting this wrong, worth keeping:
+* **Conference ids are per SPORT and they collide.** 4 is the Big 12 in
+  football and the **Big East** in basketball; the ACC is 1 vs 2.
+* **A power-conference test would drop Notre Dame**, an INDEPENDENT
+  (conference 18) -- and NBC's entire college football package is Notre Dame
+  home games. Any future conference rule must special-case it.
+* On basketball the same test would have dropped **177 games** -- UConn 42,
+  St. John's 28, Creighton 27, Villanova 23, Gonzaga 21, Marquette 19.
 
 **Army-Navy is a FALSE CBS match, five years out of five.** December Saturday
 afternoon on CBS hits the CBS window exactly, but the game belongs to no
