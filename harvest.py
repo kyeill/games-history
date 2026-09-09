@@ -139,7 +139,8 @@ def harvest():
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     os.makedirs(OUT, exist_ok=True)
-    json.dump({"games": keep, "teams": teams},
+    json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
+               "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),
               separators=(",", ":"))
     return keep, teams

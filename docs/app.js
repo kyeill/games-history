@@ -6,14 +6,18 @@ const STARTER = ["College GameDay", "Big Noon Kickoff"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-165817";
+const BUILD = "20260909-170924";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
-let FILT = { season: null, type: null, window: null, team: null, tag: null };
+let FILT = { season: null, type: null, window: null, team: null };
+let ORDER = {}, SEASONS = [];
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
+// Big Games opens on the upset category -- it is the longest list and the one
+// he actually came for. TV Windows opens unfiltered.
+const OPENING_TYPE = { cfb: "Top 10 Upsets", cbb: "Top 5 Upsets" };
 
 /* ---------- storage: every accessor can throw in a locked-down browser --- */
 function lsGet(k, d) {
@@ -110,11 +114,13 @@ function rowHtml(g, browse) {
   const neutral = g.neutral ? ' <span class="nu">neutral</span>' : "";
   const site = g.neutral && g.city
     ? '<div class="site">' + esc(g.city) + "</div>" : "";
-  // A maize BORDER flags a Michigan win or a rival loss. A full maize box was
-  // too loud, so the winner's line keeps its own colour either way.
-  return '<button class="row' + (celebrated(g) ? " celebrate" : "") +
-    '" data-id="' + g.id + '" style="--winwash:' +
-    shade(teamColor(win)) + '">' +
+  // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
+  // was too loud, so the winner's line keeps its own wash either way.
+  const flag = celebrated(g);
+  const ring = flag ? celebrateColor(g) : null;
+  return '<button class="row' + (flag ? " celebrate" : "") +
+    '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
+    (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport">' + g.sport + neutral + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
     '<div class="meta"><div class="when">' + g.dow + " " +
@@ -143,6 +149,27 @@ function celebrated(g) {
   if (g.teams.some(t => t.id === MICHIGAN && t.win)) return true;
   return g.teams.some(t => RIVALS.indexOf(t.id) > -1 && !t.win);
 }
+function brighten(hex, target) {
+  // Lift a colour toward white until it reaches a target luminance, so every
+  // border reads at the same strength. A fixed lighten does not work here:
+  // Penn State navy stayed muddy at the same factor that turned Indiana's red
+  // pink. Luminance is linear in the blend factor, so solve for it directly.
+  hex = (hex || "6a6a70").replace("#", "");
+  if (hex.length !== 6) hex = "6a6a70";
+  const c = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const lum = .299 * c[0] + .587 * c[1] + .114 * c[2];
+  const t = Math.max(0, Math.min(1, (target - lum) / (255 - lum)));
+  return "#" + c.map(v => Math.round(v + (255 - v) * t)
+    .toString(16).padStart(2, "0")).join("");
+}
+function celebrateColor(g) {
+  // Michigan's own win is maize. A rival losing is coloured by whoever DID it
+  // -- Indiana over Ohio State reads Indiana red.
+  const w = g.teams.find(t => t.win);
+  if (w && w.id === MICHIGAN) return ["#ffcb05", "#ffcb0544"];
+  const solid = brighten(teamColor(w), 130);
+  return [solid, solid + "44"];
+}
 
 function visible() {
   if (TAB === "browse") return BROWSE || [];
@@ -162,26 +189,40 @@ function visible() {
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
-  if (FILT.tag) list = list.filter(g =>
-    myTags(g.id).indexOf(FILT.tag) > -1 ||
-    (FILT.tag === "OT" && g.ot) || (FILT.tag === "neutral" && g.neutral) ||
-    g.champ === FILT.tag);
   list.sort((a, b) => a.date === b.date
     ? a.time.localeCompare(b.time) : b.date.localeCompare(a.date));
   return list;
 }
 
+// Opening state, not an empty one: newest season always, plus the upset
+// category when the Big Games view is showing. A function declaration, not a
+// const -- init() calls it before this point in the file.
+function clearFilters() {
+  FILT = {
+    season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
+    type: VIEW === "big" ? OPENING_TYPE[TAB] || null : null,
+    window: null, team: null
+  };
+}
+
+function seasonLabel(y) {
+  // College football is one calendar year; basketball straddles two.
+  return SPORT_OF[TAB] === "CFB" ? String(y) : y + "-" + String(y + 1).slice(2);
+}
+
 function filterChips() {
   if (TAB === "browse") return "";
-  // Every filter is a dropdown (his call 2026-09-09). Game type and TV window
-  // are drawn from the games in the CURRENT SPORT, because CFB and CBB share
-  // none of their values.
-  const scope = GAMES.filter(g => g.sport === SPORT_OF[TAB]);
-  const types = new Set(), windows = new Set(), champs = new Set();
-  scope.forEach(g => {
+  // Every filter is a dropdown (his call 2026-09-09), and the Tag filter is
+  // gone. Game type and TV window come from ORDER in games.json -- HIS
+  // sequence, not alphabetical -- scoped to the sport tab, because CFB and CBB
+  // share none of their values.
+  const sport = SPORT_OF[TAB];
+  const order = ORDER[sport] || { types: [], windows: [] };
+  const types = new Set(), windows = new Set();
+  GAMES.forEach(g => {
+    if (g.sport !== sport) return;
     if (g.type) types.add(g.type);
-    (g.slots || []).forEach(s => windows.add(s));
-    if (g.champ) champs.add(g.champ);
+    (g.slots || []).forEach(w => windows.add(w));
   });
 
   const group = (label, inner) => '<div class="fgroup"><span class="flabel">' +
@@ -194,20 +235,15 @@ function filterChips() {
       esc(p[0]) + "</option>").join("") + "</select>";
 
   let h = group("Year", select("season", "All years",
-    [2021, 2022, 2023, 2024, 2025].map(y =>
-      [y + "-" + String(y + 1).slice(2), y]), FILT.season));
+    SEASONS.slice().sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
+    FILT.season));
   h += group("Game type", select("type", "All game types",
-    Array.from(types).sort().map(t => [t, t]), FILT.type));
+    order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
   h += group("TV window", select("window", "All TV windows",
-    Array.from(windows).sort().map(w => [w, w]), FILT.window));
+    order.windows.filter(w => windows.has(w)).map(w => [w, w]), FILT.window));
   h += group("Team", select("team", "All teams",
     Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
       .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
-  // His own tags (College GameDay, Big Noon Kickoff) are DETAILS on the row,
-  // not filters -- he said so explicitly.
-  h += group("Tag", select("tag", "Any",
-    [["Overtime", "OT"], ["Neutral site", "neutral"]].concat(
-      Array.from(champs).sort().map(c => [c + " title", c])), FILT.tag));
   return h;
 }
 
@@ -435,6 +471,9 @@ async function init() {
     fetch("colors.json" + v).then(x => x.json()).catch(() => ({})),
     fetch("crests.json" + v).then(x => x.json()).catch(() => ({}))]);
   GAMES = r[0].games; TEAMS = r[0].teams; COLORS = r[1]; CRESTS = r[2];
+  ORDER = r[0].order || {};
+  SEASONS = r[0].seasons || [];
+  clearFilters();
   try {
     // cache-bust: Pages serves with max-age, and this file is the shared state
     const t = await fetch("tags.json?" + Date.now(), { cache: "no-store" });
@@ -446,9 +485,6 @@ async function init() {
   document.getElementById("to").value = today;
   draw();
 
-  const clearFilters = () => {
-    FILT = { season: null, type: null, window: null, team: null, tag: null };
-  };
   document.querySelectorAll("nav button").forEach(b =>
     b.addEventListener("click", e => {
       TAB = e.currentTarget.dataset.tab;
@@ -463,7 +499,7 @@ async function init() {
       // the sport does not change, so the filters are still valid -- only the
       // game-type / TV-window pair is view-specific
       VIEW = e.currentTarget.dataset.view;
-      FILT.type = null;
+      FILT.type = VIEW === "big" ? OPENING_TYPE[TAB] || null : null;
       FILT.window = null;
       draw();
       window.scrollTo({ top: 0 });

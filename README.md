@@ -41,12 +41,19 @@ type 2 and **are** included, all rounds.
 
 ### TV windows
 
-**CFB** — FOX Friday night · FOX Big Noon · CBS 3:30 · NBC 7:30 · ABC Saturday.
+Named and ordered as Kyle names them, 2026-09-09. `rules.ORDER` is the single
+source of truth for both the vocabulary and the display sequence, and
+`harvest.py` copies it into `games.json` so the page never re-derives it.
 
-**CBB** — ESPN Mon night · ESPN Tue night · ESPN Sat night · FOX · CBS · NBC ·
-ABC · Peacock B1G.
+**CFB** — FOX Friday · FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC.
 
-`Peacock B1G` is narrowed to **Big Ten vs Big Ten, Tue/Thu, at least one ranked
+**CBB** — FOX · CBS · NBC · ABC · B1G Peacock · Big Monday · Super Tuesday ·
+*ESPN Sat night*.
+
+ESPN Sat night is parked last because it was in his original slot list but not
+in the order he later gave; it is kept rather than dropped, pending his call.
+
+`B1G Peacock` is narrowed to **Big Ten vs Big Ten, Tue/Thu, at least one ranked
 team**. Peacock alone carries every Big Ten home non-conference game and
 returned 246 games including Alcorn State at Minnesota; the narrowed rule
 returns 39.
@@ -120,11 +127,18 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 
 | filter | control | source |
 |---|---|---|
-| Year | dropdown | season |
-| Game type | dropdown | `rules.game_type` |
-| TV window | dropdown | whichever slot rule matched |
-| Team | dropdown | 147 of them |
-| Tag | dropdown | overtime, neutral site, conference titles |
+| Year | dropdown, newest first | season |
+| Game type | dropdown, `rules.ORDER` sequence | `rules.game_type` |
+| TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
+| Team | dropdown, alphabetical | 147 of them |
+
+Years read **2025** on football and **2025-26** on basketball — football is one
+calendar year, basketball straddles two.
+
+**Opening state is not an empty state.** Every tab opens on the newest season,
+and the Big Games view additionally opens on the sport's upset category — Top
+10 Upsets for football, Top 5 Upsets for basketball. That turns an opening list
+of hundreds into 10 and 9. TV Windows opens unfiltered.
 
 **Game type and TV window are built from the active sport tab**, because CFB
 and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
@@ -140,12 +154,17 @@ team's line takes a lightened wash of its colour, the loser's line stays plain.
 Kyle chose it over washing the whole row, which turns a long list into a colour
 chart.
 
-**A maize border flags a result he wants to see: Michigan won, or a rival
+**A coloured border flags a result he wants to see: Michigan won, or a rival
 lost.** A full maize box was tried first and was too loud, so the frame carries
-the flag and the winner's line keeps its own colour. The rival half means an
-Oregon win over Ohio State is marked even with Michigan nowhere near it — 17
-such games in CFB alone. A Michigan loss is never flagged, including when the
-rival is the one beating them.
+the flag and the winner's line keeps its own wash. A Michigan win is maize; a
+rival losing takes **the colour of whoever beat them** — Penn State over
+Michigan State reads Penn State slate. So an Oregon win over Ohio State is
+marked with Michigan nowhere near it (17 such games in CFB alone), and a
+Michigan loss is never flagged, including when a rival does it.
+
+`brighten()` lifts each border to a fixed target luminance rather than
+lightening by a fixed factor — at one factor Penn State's navy stayed muddy
+while Indiana's red turned pink.
 
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to

@@ -133,6 +133,20 @@ everything but `tags.json` is regenerated.
 and rival wins stay in `games.json` because the TV Windows view still shows
 them — filtering them at harvest time would lose them from both.
 
+**TV window and game type names are HIS, and `rules.ORDER` owns both the names
+and the sequence.** Renaming a window changes the values stored in
+`games.json`, so a rename needs a re-harvest — cheap, since `cache/` holds
+every response. Tag keys are game ids, so tags survive a rename untouched.
+
+**Border colour is normalised by LUMINANCE, not by a lighten factor.** One
+fixed factor cannot serve both: it left Penn State's navy muddy and turned
+Indiana's red pink. `brighten()` solves for the blend that hits a target
+luminance, which is exact because luminance is linear in the blend factor.
+
+**`clearFilters` must be a function declaration, not a `const`.** `init()`
+calls it well above its position in the file; as a `const` arrow it sat in the
+temporal dead zone and threw.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

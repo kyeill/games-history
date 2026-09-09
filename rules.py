@@ -18,27 +18,47 @@ def _mins(d):
     return d.hour * 60 + d.minute
 
 
+# The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.
+# These lists are the display order AND the full vocabulary; harvest.py copies
+# them into games.json so the page has one source of truth.
+CFB_WINDOWS = ["FOX Friday", "FOX Big Noon", "CBS B1G Time",
+               "NBC Saturday Night", "ABC"]
+CBB_WINDOWS = ["FOX", "CBS", "NBC", "ABC", "B1G Peacock", "Big Monday",
+               "Super Tuesday",
+               # Not in the order he gave, but it WAS in his original slot
+               # list, so it is kept and parked last rather than dropped.
+               "ESPN Sat night"]
+CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
+CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
+
+ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
+         "CBB": {"types": CBB_TYPES, "windows": CBB_WINDOWS}}
+
+
 def cfb_slots(nets, d):
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
     if "FOX" in nets and day == "Fri" and t >= 18 * 60:
-        out.add("FOX Friday night")
+        out.add("FOX Friday")
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
         out.add("FOX Big Noon")
     if "CBS" in nets and day == "Sat" and abs(t - (15 * 60 + 30)) <= 45:
-        out.add("CBS 3:30")
+        out.add("CBS B1G Time")
     if "NBC" in nets and day == "Sat" and abs(t - (19 * 60 + 30)) <= 45:
-        out.add("NBC 7:30")
+        out.add("NBC Saturday Night")
     if "ABC" in nets and day == "Sat":
-        out.add("ABC Saturday")
+        out.add("ABC")
     return out
 
 
 def cbb_slots(nets, d, both_big_ten, any_ranked):
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
-    if "ESPN" in nets and day in ("Mon", "Tue") and t >= 18 * 60:
-        out.add(f"ESPN {day} night")
+    # ESPN's own brands for the weeknight showcases
+    if "ESPN" in nets and day == "Mon" and t >= 18 * 60:
+        out.add("Big Monday")
+    if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
+        out.add("Super Tuesday")
     if "ESPN" in nets and day == "Sat" and t >= 18 * 60 + 30:
         out.add("ESPN Sat night")
     for n in ("FOX", "CBS", "NBC", "ABC"):
@@ -49,7 +69,7 @@ def cbb_slots(nets, d, both_big_ten, any_ranked):
     # window with a ranked team. Nothing before 2023-24: the package is new.
     if (any("Peacock" in n for n in nets) and both_big_ten
             and day in ("Tue", "Thu") and any_ranked):
-        out.add("Peacock B1G")
+        out.add("B1G Peacock")
     return out
 
 
