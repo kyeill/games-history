@@ -82,9 +82,9 @@ function setPending(id, patch, game) {
 
 /* ---------- rendering --------------------------------------------------- */
 function fmtDate(d) {
-  // "2025-09-06" -> "9/06/25": the month drops its leading zero, the day keeps
-  // its own (his instruction was the month).
-  return String(+d.slice(5, 7)) + "/" + d.slice(8, 10) + "/" + d.slice(2, 4);
+  // "2025-09-06" -> "9/6/25"
+  return String(+d.slice(5, 7)) + "/" + String(+d.slice(8, 10)) + "/" +
+    d.slice(2, 4);
 }
 function fmtTime(t) {
   const p = t.split(":"), h = +p[0] % 12 || 12;
@@ -106,6 +106,18 @@ function primaryNet(nets) {
   return best;
 }
 
+// A TV window chip is painted in its network's colour. The window NAMES carry
+// the network ("FOX Big Noon", "CBS B1G Time"), so the class comes from the
+// name rather than a second lookup table that could drift out of step.
+function netClass(window) {
+  const w = String(window);
+  if (w.indexOf("FOX") > -1) return "n-fox";
+  if (w.indexOf("CBS") > -1) return "n-cbs";
+  if (w.indexOf("NBC") > -1) return "n-nbc";
+  if (w.indexOf("ABC") > -1) return "n-abc";
+  return "";
+}
+
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
@@ -121,7 +133,7 @@ function rowHtml(g, browse) {
   const home = g.teams[0], away = g.teams[1];
   const win = home.win ? home : away;
   const tags = [];
-  (g.slots || []).forEach(s => tags.push(chip("slot", s)));
+  (g.slots || []).forEach(s => tags.push(chip("slot " + netClass(s), s)));
   // the raw rule names (#1 loses, top-10 vs top-10, ...) stay in the data but
   // are not drawn: Game Type is the vocabulary Kyle filters in
   if (g.type) tags.push(chip("big", g.type));
@@ -131,14 +143,20 @@ function rowHtml(g, browse) {
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
   }
   myTags(g.id).forEach(t => tags.push(chip("mine", t)));
-  // The venue city sits with the tags rather than in the meta column
-  if (g.city) tags.push('<span class="tag t-site">' + esc(g.city) + "</span>");
+  // The city marks a NEUTRAL site only -- there is no neutral label any more,
+  // so a city belonging to neither school is what gives it away.
+  if (g.neutral && g.city) {
+    tags.push('<span class="tag t-site">' + esc(g.city) + "</span>");
+  }
+  if (g.ot) tags.push('<span class="otnote">OT</span>');
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
   const mark = browse && inArch ? ' <span class="inarch">IN ARCHIVE</span>' : "";
-  // Football is played in numbered weeks and he thinks in them
-  const week = (g.sport === "CFB" && g.week)
-    ? ' <span class="wk">Week ' + g.week + "</span>" : "";
+  // Football is played in numbered weeks and he thinks in them, so the week
+  // leads and the date follows in parentheses. Basketball just gets the date.
+  const when = (g.sport === "CFB" && g.week)
+    ? '<b>Week ' + g.week + "</b> (" + g.dow + " " + fmtDate(g.date) + ")"
+    : g.dow + " " + fmtDate(g.date);
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   const flag = celebrated(g);
@@ -146,12 +164,12 @@ function rowHtml(g, browse) {
   return '<button class="row' + (flag ? " celebrate" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
-    '<div class="sport">' + g.sport + week + mark + "</div>" +
+    '<div class="sport">' + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
-    '<div class="meta"><div class="when">' + g.dow + " " + fmtDate(g.date) +
-      '</div><div class="tm">' + fmtTime(g.time) + "</div>" +
-      '<div class="net">' + esc(primaryNet(g.nets) || "—") + "</div>" +
-      "</div>" +
+    // the network sits on the away team's line, the time on the home team's
+    '<div class="meta"><div class="mrow">' +
+      esc(primaryNet(g.nets) || "—") + '</div>' +
+      '<div class="mrow">' + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
@@ -258,17 +276,17 @@ function filterChips() {
       (String(current) === String(p[1]) ? " selected" : "") + ">" +
       esc(p[0]) + "</option>").join("") + "</select>";
 
-  let h = group("Year", select("season", "All years",
+  let h = group("Year", select("season", "All Years",
     SEASONS.slice().sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
-  h += group("Game type", select("type", "All game types",
+  h += group("Game type", select("type", "All Game Types",
     order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
   // The dropdown holds ONE window; Marquee Windows sets three at once, and
   // while it is on the dropdown falls back to its "All" label.
   const one = (FILT.windows && FILT.windows.length === 1) ? FILT.windows[0] : "";
-  h += group("TV window", select("window", "All TV windows",
+  h += group("TV window", select("window", "All TV Windows",
     order.windows.filter(w => windows.has(w)).map(w => [w, w]), one));
-  h += group("Team", select("team", "All teams",
+  h += group("Team", select("team", "All Teams",
     Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
       .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
   h += group("", quickButtons());

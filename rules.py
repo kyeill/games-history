@@ -21,8 +21,8 @@ def _mins(d):
 # The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.
 # These lists are the display order AND the full vocabulary; harvest.py copies
 # them into games.json so the page has one source of truth.
-CFB_WINDOWS = ["FOX Friday", "FOX Big Noon", "CBS B1G Time",
-               "NBC Saturday Night", "ABC"]
+CFB_WINDOWS = ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night",
+               "ABC", "FOX Friday"]
 CBB_WINDOWS = ["FOX", "CBS", "NBC", "ABC", "B1G Peacock", "Big Monday",
                "Super Tuesday",
                # Not in the order he gave, but it WAS in his original slot
@@ -84,11 +84,7 @@ MICHIGAN = "130"
 # Rivals whose WINS he does not want on the Big Games tab
 RIVALS = {"194": "Ohio State", "127": "Michigan State", "87": "Notre Dame"}
 
-CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
-CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
-
-
-def game_type(sport, rank_win, rank_lose, has_big_ten):
+def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
     """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
     they DIFFER by sport, which is why the app's dropdown follows the sport
     toggle. `rank_*` are None when unranked. A game gets at most one category,
@@ -118,12 +114,13 @@ def game_type(sport, rank_win, rank_lose, has_big_ten):
 
     both = rank_win and rank_lose
     if not both:
-        return None
+        return (title_fallback(rank_win, rank_lose)
+                if (p5_title and sport == "CFB") else None)
 
     if sport == "CFB":
         top10 = rank_win <= 10 and rank_lose <= 10
         if not (top10 or has_big_ten):
-            return None
+            return title_fallback(rank_win, rank_lose) if p5_title else None
         return "Ranked Upsets" if rank_win > rank_lose else "Ranked Games"
 
     if rank_win <= 10 and rank_lose <= 10:
@@ -131,6 +128,20 @@ def game_type(sport, rank_win, rank_lose, has_big_ten):
     if has_big_ten:
         return "Ranked Big Ten"
     return None
+
+
+def title_fallback(rank_win, rank_lose):
+    """Every Power Five championship game belongs in Big Games (his call
+    2026-09-09), but plenty match none of the ranking rules -- an unranked
+    pair, or a ranked favourite beating an unranked team. Those are filed by
+    RESULT: an upset is a Ranked Upset, anything else a Ranked Game.
+
+    CFB only. College basketball's conference tournaments are 302 games and its
+    categories are named differently, so they are left alone pending his call.
+    """
+    upset = ((rank_lose and not rank_win)
+             or (rank_win and rank_lose and rank_win > rank_lose))
+    return "Ranked Upsets" if upset else "Ranked Games"
 
 
 def power5_title(headlines):

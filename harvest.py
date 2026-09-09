@@ -104,12 +104,15 @@ def harvest():
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks))
-                gtype = None
-                if len(win) == 1 and len(lose) == 1:
-                    gtype = rules.game_type(code, rank_of(win[0]),
-                                            rank_of(lose[0]), bt in confs)
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads)
+                gtype = None
+                if len(win) == 1 and len(lose) == 1:
+                    # a P5 title game with no category of its own is filed by
+                    # result rather than left uncategorised
+                    gtype = rules.game_type(code, rank_of(win[0]),
+                                            rank_of(lose[0]), bt in confs,
+                                            p5_title=bool(conf))
                 if not slots and not gtype and not conf:
                     continue
 

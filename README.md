@@ -45,7 +45,7 @@ Named and ordered as Kyle names them, 2026-09-09. `rules.ORDER` is the single
 source of truth for both the vocabulary and the display sequence, and
 `harvest.py` copies it into `games.json` so the page never re-derives it.
 
-**CFB** — FOX Friday · FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC.
+**CFB** — FOX Big Noon · CBS B1G Time · NBC Saturday Night · ABC · FOX Friday.
 
 **CBB** — FOX · CBS · NBC · ABC · B1G Peacock · Big Monday · Super Tuesday ·
 *ESPN Sat night*.
@@ -176,15 +176,30 @@ Michigan loss is never flagged, including when a rival does it.
 lightening by a fixed factor — at one factor Penn State's navy stayed muddy
 while Indiana's red turned pink.
 
-**The row** carries, left to right: sport (plus **Week N** on football, which
-ESPN provides on every event), the two teams with crests, ranks and scores, and
-a meta column of day, date, time and **one** network. ESPN lists simulcasts
-alongside the broadcaster — "NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+" —
-so `primaryNet()` ranks the majors explicitly and shows only that one;
-alphabetical order would not do it (BTN would beat FOX). Under that sit the
-tags, ending with the **venue city**, which used to live in the meta column.
-Dates read `9/03/21` — the month drops its leading zero, the day keeps its own.
-There is no neutral-site marker and no OT tag; both were removed.
+**The row** heads with the date, which on football reads **`Week 1 (Fri
+8/29/25)`** — ESPN carries `week.number` on every football event. Basketball
+gets the date alone.
+
+Below that, the two team lines, and beside them a meta column carrying **the
+network on the away team's line and the time on the home team's**, both in
+white at the same size. That alignment is structural: `meta` occupies only the
+teams grid row and is itself a two-row grid, so the rows match exactly (checked
+at 0px offset). Spanning the header row too put it 64px out.
+
+Only **one network** is shown. ESPN lists simulcasts alongside the broadcaster
+— "NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+" — so `primaryNet()` ranks
+the majors explicitly; alphabetical order would not do it (BTN would beat FOX).
+The full list stays in the data, and the slot rules still read all of it, which
+is what lets a "NBC, Peacock" game match the NBC window.
+
+**TV window chips carry their network's colour** — FOX yellow, CBS a lighter
+blue, NBC grey, ABC a darker blue, everything else the default slate. The class
+is derived from the window NAME (`netClass`), since the names already carry the
+network, rather than a second table that could drift.
+
+The tag row ends with the **venue city on neutral-site games only** — there is
+no neutral marker any more, so a city belonging to neither school is what gives
+it away — and an **OT** note where it applies.
 
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to

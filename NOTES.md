@@ -170,6 +170,20 @@ network, which is what lets "NBC, Peacock" match the NBC window.
 all five seasons). Basketball has one too but it means nothing to a viewer, so
 only football renders it.
 
+**A grid item spanning two rows cannot align with either.** `.meta` originally
+covered `"sport meta" "teams meta"`, so its first line sat against the header,
+64px off the away team's line. Fixed by giving the header its own full-width
+row (`"sport sport"`) and making `.meta` a two-row grid inside the teams row.
+Verify alignment by comparing bounding-box centres, not by eye.
+
+**Every Power Five CFB championship game now carries a category.** They belong
+in Big Games, but many match no ranking rule (an unranked pair, or a ranked
+favourite winning), and Big Games DEFAULTS to the upset category -- so an
+uncategorised title game was invisible. `rules.title_fallback` files them by
+result: upset -> Ranked Upsets, anything else -> Ranked Games. **CBB conference
+tournaments are deliberately NOT covered** -- 302 games, different category
+names, and 269 remain uncategorised, visible only under "All Game Types".
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

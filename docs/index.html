@@ -75,14 +75,17 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row{display:grid;background:var(--card);border:1px solid var(--line);
   border-radius:9px;padding:10px 13px;
   grid-template-columns:1fr auto;
-  grid-template-areas:"sport meta" "teams meta" "tags tags";
+  /* meta occupies ONLY the teams row, so its two rows can be made to match
+     the two team lines exactly. Spanning the header row too put it 64px out. */
+  grid-template-areas:"sport sport" "teams meta" "tags tags";
   column-gap:14px;align-items:start;cursor:pointer;text-align:left;
   width:100%;font:inherit;color:inherit}
 .row:hover{border-color:#3b3b43}
 .row:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
-.sport{grid-area:sport;font-size:11px;font-weight:700;letter-spacing:.09em;
-  color:var(--muted);text-transform:uppercase;margin-bottom:5px}
-.wk{color:var(--accent);font-weight:700;letter-spacing:.06em}
+/* week + date, where the sport label used to be */
+.sport{grid-area:sport;font-size:12.5px;font-weight:500;
+  color:var(--muted);margin-bottom:5px}
+.sport b{color:var(--accent);font-weight:700}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
@@ -104,14 +107,26 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl:not(.won) .nm,.tl:not(.won) .sc{color:#a5a5a0}
 .sc{font-size:16px;font-variant-numeric:tabular-nums;font-weight:600;
   min-width:30px;text-align:right}
-.meta{grid-area:meta;text-align:right;padding-left:14px;
-  border-left:1px solid var(--line);min-width:118px;align-self:stretch}
-.when,.tm{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.net{font-size:13px;margin-top:2px}
+/* Network on the away team's line, time on the home team's. The rows carry
+   the same height and gap as .tl so the two columns line up exactly. */
+.meta{grid-area:meta;padding-left:14px;border-left:1px solid var(--line);
+  min-width:96px;align-self:stretch;
+  display:grid;grid-template-rows:1fr 1fr;gap:3px}
+.mrow{display:flex;align-items:center;justify-content:flex-end;
+  font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
 .tag{font-size:11.5px;border-radius:4px;padding:2px 7px;letter-spacing:.02em;
   border:1px solid transparent;white-space:nowrap}
+/* TV window chips carry the network's own colour: FOX yellow, CBS a lighter
+   blue, NBC grey, ABC a darker blue. Anything else (ESPN, Peacock) keeps the
+   default slate. */
 .t-slot{background:#232f3a;border-color:#31414f;color:#a9c6dd}
+.t-slot.n-fox{background:#3a3218;border-color:#584a1d;color:#e8c766}
+.t-slot.n-cbs{background:#1b3340;border-color:#2b4d61;color:#8fc9e4}
+.t-slot.n-nbc{background:#2c2c31;border-color:#414147;color:#bcbcb7}
+.t-slot.n-abc{background:#1b2440;border-color:#2b3860;color:#93a9dc}
+.otnote{font-size:11.5px;color:var(--muted);letter-spacing:.06em;
+  align-self:center;font-weight:600}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
 .t-champ{background:#26202f;border-color:#3a3145;color:#bda9d4}
 .t-mine{background:#1f2e28;border-color:#2f4539;color:#9ecab0}
@@ -169,10 +184,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .toast.bad{background:#3a2a28;border-color:#54413d;color:#e6cdc8}
 
 @media (max-width:560px){
-  .row{grid-template-columns:1fr;
-    grid-template-areas:"sport" "teams" "meta" "tags"}
-  .meta{text-align:left;border-left:0;padding-left:0;margin-top:7px;
-    display:flex;gap:12px}
+  /* the phone keeps the two columns -- the meta side is only ~90px wide and
+     stacking it would lose the away/home alignment that is the point of it */
+  .row{column-gap:10px}
+  .meta{min-width:78px;padding-left:10px}
   h1{font-size:20px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -249,6 +264,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909-172202"></script>
+<script src="app.js?v=20260909-173030"></script>
 </body>
 </html>
