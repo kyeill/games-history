@@ -61,10 +61,14 @@ VENUE_METROS = {
 }
 
 
+# Cities ESPN names in a way he does not want read back.
+CITY_OVERRIDES = {"Washington": "Washington DC"}
+
+
 def display_city(city, venue=None):
     if city in VENUE_METROS and venue:
         return venue
-    return city
+    return CITY_OVERRIDES.get(city, city)
 
 
 # The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.
