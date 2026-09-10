@@ -350,25 +350,33 @@ self.addEventListener("fetch",e=>{
 """
 
 
-def png(size, accent=(0xE0, 0x83, 0x4F), bg=(0x16, 0x16, 0x1A)):
-    """A maskable app icon drawn by pixel maths -- no image library on this
-    machine. Three stacked bars (a run of games down a page), the top one in
-    the accent. `purpose: any maskable` means the launcher crops to its own
-    shape, so every bar stays inside the safe circle (r = 0.4 from centre).
+def png(size):
+    """The app icon: the archive's own card, reduced to two team rows with the
+    winner washed maize. His pick of six candidates (see icons.py).
+
+    Drawn by pixel maths -- there is no image library on this machine. The
+    manifest declares `purpose: "any maskable"`, which means Android crops this
+    square to the launcher's own shape, so the background is FULL BLEED and
+    every mark sits inside the maskable safe circle (radius 0.4 about centre).
+    The card corners land at 0.384 from centre, inside the 0.400 limit;
+    an earlier 0.18/0.24 rectangle measured 0.408 and would have been cropped.
     """
+    bg, card = (0x16, 0x16, 0x1A), (0x1E, 0x1E, 0x23)
+    maize, line = (0xFF, 0xCB, 0x05), (0x4A, 0x4A, 0x54)
     rows = []
-    bar_h, gap = size * 0.13, size * 0.075
-    top = size * 0.28
-    widths = [0.46, 0.34, 0.40]
     for y in range(size):
         row = bytearray([0])
         for x in range(size):
-            c = bg
-            for i, w in enumerate(widths):
-                y0 = top + i * (bar_h + gap)
-                x0 = size * 0.30
-                if y0 <= y < y0 + bar_h and x0 <= x < x0 + size * w:
-                    c = accent if i == 0 else (0x9A, 0x9A, 0x95)
+            u, v = x / size, y / size
+            if 0.20 <= u < 0.80 and 0.26 <= v < 0.74:
+                if 0.24 <= u < 0.76 and 0.33 <= v < 0.46:
+                    c = maize                      # the winning team
+                elif 0.24 <= u < 0.76 and 0.54 <= v < 0.67:
+                    c = line                       # the losing team
+                else:
+                    c = card
+            else:
+                c = bg                             # full bleed for the mask
             row += bytes(c)
         rows.append(bytes(row))
     raw = zlib.compress(b"".join(rows), 9)

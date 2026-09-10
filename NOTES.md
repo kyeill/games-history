@@ -265,6 +265,14 @@ and Super Tuesday take EVERY game between 6:00 and 9:30pm, several a night.
 The header suffixes use the same brackets as the windows, so a card's label
 can never disagree with the window it is in.
 
+**The app icon is the scoreboard** -- two team rows, winner washed maize (his
+pick of six; `icons.py` draws all six and a preview page). It is declared
+`purpose: "any maskable"`, so Android crops the square to the launcher shape:
+the background must be FULL BLEED and every mark must sit inside the safe
+circle of radius 0.40 about centre. **Measure it, do not eyeball it** -- the
+first version put the card corners at 0.408 and would have been clipped. The
+shipped card is 0.20-0.80 by 0.26-0.74, furthest mark 0.383.
+
 **YELLOW BELONGS TO MICHIGAN.** Nine other schools washed yellow and were
 moved to their other colour. Six of them are black-and-gold schools
 (Appalachian State, Central Florida, Colorado, Iowa, Missouri, Vanderbilt), so
