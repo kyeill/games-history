@@ -355,7 +355,7 @@ def harvest():
                     "week": (x.get("week") or {}).get("number"),
                     "venue": v.get("fullName"),
                     "city": rules.display_city(
-                        (v.get("address") or {}).get("city")),
+                        (v.get("address") or {}).get("city"), v.get("fullName")),
                     "nets": sorted(nets), "teams": side,
                     "header": (rules.cfb_header(slots, d, forced)
                                if code == "CFB" else suffix),

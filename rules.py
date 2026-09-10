@@ -47,13 +47,24 @@ def display_name(location):
     return NAME_OVERRIDES.get(location, location)
 
 
-# The neutral-site city as it should read on a card. ESPN files the Yankee
-# Stadium games under the borough, which nobody says.
-CITY_OVERRIDES = {"Bronx": "Yankee Stadium"}
+# In the New York and Los Angeles metros the VENUE is what people say, not the
+# municipality -- nobody calls it a Bronx game or an Inglewood game. ESPN files
+# those under the borough or suburb, so a game in one of these cities shows its
+# venue instead: Madison Square Garden, Yankee Stadium, MetLife Stadium,
+# Barclays Center, Intuit Dome.
+VENUE_METROS = {
+    # New York
+    "New York", "Bronx", "Brooklyn", "Queens", "East Rutherford", "Newark",
+    "Uniondale", "Harrison", "Elmont",
+    # Los Angeles
+    "Los Angeles", "Inglewood", "Pasadena", "Carson", "Anaheim",
+}
 
 
-def display_city(city):
-    return CITY_OVERRIDES.get(city, city)
+def display_city(city, venue=None):
+    if city in VENUE_METROS and venue:
+        return venue
+    return city
 
 
 # The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.

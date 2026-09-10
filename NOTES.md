@@ -255,8 +255,10 @@ after 1 May. 2026 football is live right now and refetches every run.
 
 **FOOTBALL never shows an event name -- the city, every time** (his call).
 The Aflac and Chick-fil-A Kickoffs read Atlanta and Charlotte. The rule below
-therefore runs for basketball only. `rules.CITY_OVERRIDES` fixes the one city
-ESPN files oddly: the Yankee Stadium games come through as "Bronx".
+therefore runs for basketball only. In the New York and Los Angeles metros the
+location shows the VENUE rather than the municipality -- nobody says "a Bronx
+game" or "an Inglewood game" -- so `rules.VENUE_METROS` swaps in Madison Square
+Garden, Yankee Stadium, MetLife Stadium, Barclays Center and Intuit Dome.
 
 **"Is it an event or one neutral-site game?" is DERIVABLE, not a judgement.**
 A tournament fields more than two teams under its name; a showcase game fields
