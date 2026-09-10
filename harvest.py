@@ -160,9 +160,13 @@ def harvest():
                 if len(win) == 1 and len(lose) == 1:
                     # a championship game with no category of its own is filed
                     # by result rather than left uncategorised
+                    # a Big Ten Tournament game before the Final
+                    b1g_run = (code == "CBB" and conf == "Big Ten"
+                               and not title)
                     gtype = rules.game_type(code, rank_of(win[0]),
                                             rank_of(lose[0]), bt in confs,
-                                            p5_title=title)
+                                            p5_title=title,
+                                            b1g_tourney_run=b1g_run)
                 # a named event (Battle 4 Atlantis, SEC Quarterfinals) for the
                 # blue chip, when it is not already a Power Five title
                 event = None

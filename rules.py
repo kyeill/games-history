@@ -210,7 +210,8 @@ MICHIGAN = "130"
 # Rivals whose WINS he does not want on the Big Games tab
 RIVALS = {"194": "Ohio State", "127": "Michigan State", "87": "Notre Dame"}
 
-def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
+def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
+              b1g_tourney_run=False):
     """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
     they DIFFER by sport, which is why the app's dropdown follows the sport
     toggle. `rank_*` are None when unranked. A game gets at most one category,
@@ -225,7 +226,12 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
     CBB (a tighter net -- college basketball is far the bigger slate)
       Top 5 Upsets    unranked beats a top-5 team, OR anyone beats #1
       Top 10 Games    top-10 v top-10, either winner
-      Ranked Big Ten  any OTHER ranked v ranked with a Big Ten team
+      Ranked Big Ten  any OTHER ranked v ranked with a Big Ten team, EXCEPT
+                      the Big Ten Tournament before its Final -- those are
+                      tournament games, not regular-season meetings, and he
+                      does not want the quarters and semis in that category
+                      (`b1g_tourney_run`). They stay in the archive on their
+                      conference-tournament billing.
 
     The upset categories are tested first on purpose: "anyone beats #1" would
     otherwise be swallowed by the ranked-v-ranked cases, and beating #1 is the
@@ -253,7 +259,7 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False):
 
     if rank_win <= 10 and rank_lose <= 10:
         return "Top 10 Games"
-    if has_big_ten:
+    if has_big_ten and not b1g_tourney_run:
         return "Ranked Big Ten"
     # a basketball final matching nothing is a Top 10 Game (his call)
     return "Top 10 Games" if p5_title else None

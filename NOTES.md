@@ -92,6 +92,12 @@ scope, and switching sport **clears** the game-type and TV-window filters —
 without that, a CFB value left set while viewing CBB filters everything away
 and the page looks broken rather than empty-by-choice.
 
+**The Big Ten Tournament is excluded from "Ranked Big Ten" before its Final.**
+A ranked-v-ranked quarterfinal otherwise lands in a category meant for
+regular-season meetings. Those games are NOT removed from the archive -- they
+keep their conference-tournament billing and their blue chip, and stay
+reachable under "All Game Types". 83 -> 75.
+
 **The upset categories must be tested before the ranked-v-ranked ones.**
 "Anyone beats #1" and "top-10 v top-10 with the worse rank winning" both match
 a #2-over-#1 result; Kyle wants it read as an upset.

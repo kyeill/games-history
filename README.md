@@ -82,7 +82,7 @@ swallowed by the ranked-vs-ranked cases.
 |---|---|---|
 | Top 5 Upsets | unranked beats a top-**5** team, **or anyone beats #1** | 82 |
 | Top 10 Games | top-10 v top-10, either winner | 75 |
-| Ranked Big Ten | any *other* ranked v ranked with a Big Ten team | 83 |
+| Ranked Big Ten | any *other* ranked v ranked with a Big Ten team, **excluding the Big Ten Tournament before its Final** | 75 |
 
 CBB casts a tighter net on purpose — college basketball is far the bigger
 slate. An unranked win over a CBB #7 is deliberately *not* a category.
