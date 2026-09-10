@@ -253,6 +253,11 @@ RANGE, so a partial answer fetched in week one would be served for the rest of
 the year. `season_over()` gates it: football is done after 1 Feb, basketball
 after 1 May. 2026 football is live right now and refetches every run.
 
+**FOOTBALL never shows an event name -- the city, every time** (his call).
+The Aflac and Chick-fil-A Kickoffs read Atlanta and Charlotte. The rule below
+therefore runs for basketball only. `rules.CITY_OVERRIDES` fixes the one city
+ESPN files oddly: the Yankee Stadium games come through as "Bronx".
+
 **"Is it an event or one neutral-site game?" is DERIVABLE, not a judgement.**
 A tournament fields more than two teams under its name; a showcase game fields
 exactly two. Counted per season from the raw events (`event_sizes`), that

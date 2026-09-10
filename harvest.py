@@ -284,8 +284,11 @@ def harvest():
                 # under it this season -- otherwise it is one neutral-site game
                 # and the CITY is the more useful label. `ev_overrides` can
                 # force either answer: a name to use, or null to force the city.
+                # FOOTBALL never shows an event name: he wants the city every
+                # time, so the Aflac and Chick-fil-A Kickoffs read Atlanta and
+                # Charlotte. Basketball keeps its tournaments.
                 event = None
-                for h in heads:
+                for h in (heads if code == "CBB" else []):
                     base = h.split(" - ")[0].strip()
                     if not base or conf:
                         break
@@ -351,7 +354,8 @@ def harvest():
                     # football displays it.
                     "week": (x.get("week") or {}).get("number"),
                     "venue": v.get("fullName"),
-                    "city": (v.get("address") or {}).get("city"),
+                    "city": rules.display_city(
+                        (v.get("address") or {}).get("city")),
                     "nets": sorted(nets), "teams": side,
                     "header": (rules.cfb_header(slots, d, forced)
                                if code == "CFB" else suffix),

@@ -47,6 +47,15 @@ def display_name(location):
     return NAME_OVERRIDES.get(location, location)
 
 
+# The neutral-site city as it should read on a card. ESPN files the Yankee
+# Stadium games under the borough, which nobody says.
+CITY_OVERRIDES = {"Bronx": "Yankee Stadium"}
+
+
+def display_city(city):
+    return CITY_OVERRIDES.get(city, city)
+
+
 # The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.
 # These lists are the display order AND the full vocabulary; harvest.py copies
 # them into games.json so the page has one source of truth.
