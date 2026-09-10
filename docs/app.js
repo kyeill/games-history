@@ -6,13 +6,20 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-093208";
+const BUILD = "20260910-093949";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
-let FILT = { season: null, week: null, type: null, windows: null, team: null };
+let FILT = { season: null, week: null, month: null, type: null, windows: null,
+              team: null };
+
+/* Season order, not calendar order: a basketball season runs Nov to Apr. */
+const MONTHS = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November",
+                "December"];
+function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -298,6 +305,8 @@ function visible() {
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
+  if (FILT.month != null)
+    list = list.filter(g => +g.date.slice(5, 7) === FILT.month);
   // A championship game has no window of its own. It rides along with Marquee
   // Windows (his call), but picking ONE window must not surface it.
   if (FILT.windows && FILT.windows.length) {
@@ -346,7 +355,7 @@ function clearFilters() {
     // TV Windows opens on Marquee Windows -- the networks he plans around
     windows: VIEW === "tv"
       ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null,
-    week: null, team: null
+    week: null, month: null, team: null
   };
 }
 
@@ -394,6 +403,24 @@ function filterChips() {
     h += group("Week", select("week", "All Weeks",
       Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]),
       FILT.week));
+  }
+  // Basketball has no week worth showing, so the month is its equivalent
+  // coarse cut. Like the week list it follows the SEASON, and it also follows
+  // the VIEW -- the TV tab is January to March, so offering November there
+  // would be offering an empty list.
+  if (sport === "CBB") {
+    const months = new Set();
+    GAMES.forEach(g => {
+      if (g.sport !== "CBB") return;
+      if (FILT.season != null && g.season !== FILT.season) return;
+      const m = +g.date.slice(5, 7);
+      if (VIEW === "tv" && (m < 1 || m > 3)) return;
+      months.add(m);
+    });
+    h += group("Month", select("month", "All Months",
+      Array.from(months).sort((a, b) => monthOrder(a) - monthOrder(b))
+        .map(m => [MONTHS[m - 1], m]),
+      FILT.month));
   }
   h += group("Game type", select("type", "All Game Types",
     order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
@@ -688,6 +715,10 @@ async function init() {
       // game-type / TV-window pair is view-specific
       VIEW = e.currentTarget.dataset.view;
       FILT.type = null;
+      // The TV tab is January to March on basketball, so a November chosen
+      // under Key Games would survive the switch and empty the list.
+      if (VIEW === "tv" && FILT.month != null
+          && (FILT.month < 1 || FILT.month > 3)) FILT.month = null;
       FILT.windows = VIEW === "tv"
         ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null;
       draw();
@@ -709,9 +740,9 @@ async function init() {
     const v = e.target.value;
     if (k === "window") FILT.windows = v === "" ? null : [v];
     else FILT[k] = v === "" ? null
-      : ((k === "season" || k === "week") ? +v : v);
-    // a week chosen under one season may not exist in another
-    if (k === "season") FILT.week = null;
+      : ((k === "season" || k === "week" || k === "month") ? +v : v);
+    // a week or month chosen under one season may not exist in another
+    if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();
   });
   document.getElementById("list").addEventListener("click", e => {
@@ -742,7 +773,8 @@ async function init() {
   // Clear Filters wipes everything, including the opening defaults -- it is
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
-    FILT = { season: null, week: null, type: null, windows: null, team: null };
+    FILT = { season: null, week: null, month: null, type: null, windows: null,
+             team: null };
     draw();
     window.scrollTo({ top: 0 });
   });

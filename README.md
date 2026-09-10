@@ -180,6 +180,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Game type | dropdown, `rules.ORDER` sequence | `rules.game_type` |
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
 | Week | dropdown, **football only** | 1-16, following the chosen season |
+| Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
 | Team | dropdown, alphabetical | 141 of them |
 | Marquee Windows | toggle button | `rules.MARQUEE` — three windows at once |
 | Sort | toggle button | Oldest First (default) / Newest First |
@@ -189,6 +190,16 @@ around: FOX Big Noon + CBS B1G Time + NBC Saturday Night on football, FOX + CBS
 + NBC on basketball. It selects all three, which is why the TV window filter
 holds a **list** rather than a single value — the dropdown writes a
 one-element list, the button writes three.
+
+**Week and Month are the same idea for the two sports** — the coarse cut
+through a season. Football thinks in numbered weeks and basketball does not,
+so basketball gets the month instead, listed in SEASON order (November,
+December, January...) rather than calendar order. Both lists are rebuilt from
+the games actually available: week 16 exists only in some years, and the
+basketball TV tab runs January to March, so offering November there would be
+offering an empty list. Both are cleared when the season changes, and a month
+outside January-March is cleared when you switch from Key Games to TV Windows,
+for the same reason.
 
 Years read **2025** on football and **2025-26** on basketball — football is one
 calendar year, basketball straddles two.
