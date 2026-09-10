@@ -147,7 +147,9 @@ def harvest():
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks), bt in confs)
                     suffix = rules.cbb_header_suffix(
-                        nets, d, tourney=rules.is_championship(heads))
+                        nets, d,
+                        tourney=(rules.is_championship(heads)
+                                 and d.month in (3, 4)))
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
@@ -181,6 +183,20 @@ def harvest():
                 # could reach. A championship game always has a type.
                 if (not slots and not gtype and not title and not black_friday
                         and x["id"] not in overrides):
+                    continue
+                # A conference tournament or playoff round that is NOT the
+                # final is out of the archive entirely, both tabs (his call
+                # 2026-09-09). ESPN publishes no rankings for tournament games
+                # in the early seasons anyway -- 0 of 600 in 2021-22 -- so the
+                # ranking rules could never judge them fairly. That also drops
+                # non-Power-Six conference titles and the FCS playoff rounds.
+                # ...but "Championship" in an early-season showcase name is not
+                # a conference tournament -- the Baha Mar Championship is a
+                # November event, and Purdue v Texas Tech there is a real game.
+                # Conference tournaments are a MARCH thing in basketball.
+                tourney_round = rules.is_championship(heads) and (
+                    code == "CFB" or d.month in (3, 4))
+                if tourney_round and not title:
                     continue
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.

@@ -99,6 +99,28 @@ held 265 early-round basketball games that Big Games showed but nobody wanted
 and TV Windows could not reach at all. Check `not type and not slots and not
 bfri` after any rule change: it should be zero.
 
+**ESPN publishes NO RANKINGS for conference tournament games** in the early
+seasons -- 0 of 600 in 2021-22, 0 of 302 in 2022-23, and only ~13% from
+2023-24. Auburn reads unranked in the 2022 SEC tournament six weeks after being
+#1. Any rule that judges a tournament game on rank is therefore unreliable,
+which is part of why non-final tournament games are excluded outright.
+
+**Non-final conference tournament and playoff games are OUT of the archive
+entirely**, both tabs. Only Power SIX finals survive (basketball adds the Big
+East; the AAC is deliberately excluded). That also drops mid-major conference
+finals that held a real TV window -- the MVC final on CBS, the WCC final on
+Super Tuesday, the Atlantic 10 final.
+
+**"Championship" in an event name does NOT mean a conference tournament.**
+The Baha Mar Championship is a November showcase, and excluding it cost a real
+Purdue-Texas Tech game. Basketball conference tournaments are a MARCH thing, so
+the exclusion is gated on the month -- and note `d.month >= 3` is WRONG, since
+November is 11: it must be `in (3, 4)`.
+
+**The Jan-Mar limit is on the TV WINDOWS only.** Big Games spans every month,
+which is how the November showcases (Champions Classic, Players Era, Fort Myers
+Tip-Off) stay in.
+
 **The Big Ten Tournament is excluded from "Ranked Big Ten" before its Final.**
 A ranked-v-ranked quarterfinal otherwise lands in a category meant for
 regular-season meetings. Those games are NOT removed from the archive -- they
