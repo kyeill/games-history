@@ -247,13 +247,14 @@ carries `week.number` on every football event. Basketball has no week a viewer
 thinks in, so it reads the window (**`SUPER TUESDAY`**) or, failing that, the
 day (**`THURSDAY`**).
 
-The **date moved out of the header** and into the top right (his call
-2026-09-10), where it sits above the time and the network as a three-line
-stack: date muted, time and network in white. The date leads with the weekday
-UNLESS the header already named that day -- "THURSDAY", "SUPER TUESDAY" and
-"WEEK 1 | FOX FRIDAY" all drop it, "FOX PRIMETIME" keeps it. Three lines against two team
-lines cannot be row-matched, so `.meta` is a centred flex column rather than
-the two-row grid it was when it held only two.
+Down the right edge, three lines at one size, each level with something on
+the left (his call 2026-09-10): the **date** against the header, the
+**network** against the away team, the **time** against the home team. The
+date carries no weekday. It also lives in the header row rather than the meta
+column -- that is the only way it can line up with the header -- so `.meta`
+stays the two-row grid that matches the two team lines exactly. Measured at
+0.00px on all 280 cards; see NOTES for the `align-content` trap that broke
+this silently.
 
 Only **one network** is shown. ESPN lists simulcasts alongside the broadcaster
 — "NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+" — so `primaryNet()` ranks

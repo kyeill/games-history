@@ -225,9 +225,27 @@ where a team may not have played enough home games for "usual" to mean
 anything: the usual venue must have strictly more games, and the team must
 have at least four home games on record.
 
+**Basketball's TV tab is January to March, ride-alongs included.**
+`cbb_slots` already returns nothing outside those months, but a College
+GameDay game is admitted to the TV tab on `show` with no window of its own,
+and two November 2025 games were reaching Marquee that way. The filter is now
+applied to the CBB TV list as a whole. Key Games still carries every month --
+that split is his standing rule.
+
 **`event.week.number` is on every CFB event** (weeks 1-16, zero missing across
 all five seasons). Basketball has one too but it means nothing to a viewer, so
 only football renders it.
+
+**A stretched card spreads its slack across every grid track.** Cards sit in
+a two-column list and each is stretched to the height of its taller neighbour.
+`.row` is itself a grid, and the default `align-content:stretch` hands that
+extra height to ALL THREE tracks -- so the teams row grew about 10px taller
+than the two team lines it contains, and `.meta`'s 1fr/1fr split silently
+stopped matching them. Every card was off by an amount that depended on its
+neighbour, which is why an earlier spot check measured 0px: that card happened
+to be the tallest in its row. `align-content:start` sends the slack to the
+bottom and every track keeps its content height. Verified at 0.00px across
+280 cards on all four tabs.
 
 **A grid item spanning two rows cannot align with either.** `.meta` originally
 covered `"sport meta" "teams meta"`, so its first line sat against the header,

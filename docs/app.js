@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-092648";
+const BUILD = "20260910-093208";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -186,12 +186,6 @@ function rowHtml(g, browse) {
   } else {
     when = esc(label || DAYS[g.dow] || g.dow);
   }
-  // The meta date leads with the weekday, EXCEPT where the header already
-  // names that day -- "THURSDAY" or "SUPER TUESDAY" over "Thu 11/6/25" says
-  // Thursday twice. "FOX PRIMETIME" names no day, so that one keeps it.
-  const dayName = DAYS[g.dow] || "";
-  const said = dayName && when.toUpperCase().indexOf(dayName.toUpperCase()) > -1;
-
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   const flag = celebrated(g);
@@ -200,16 +194,19 @@ function rowHtml(g, browse) {
     (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
-    '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") +
-      ">" + when + mark + "</div>" +
+    // The header row: slot label left, DATE right. The date sits here rather
+    // than in the meta column because this is the only way it lines up with
+    // the header. No weekday -- his call 2026-09-10.
+    '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") + ">" +
+      "<span>" + when + mark + "</span>" +
+      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
     '<div class="teams">' + teamLine(away, g.sport, g.season) +
       teamLine(home, g.sport, g.season) + "</div>" +
-    // date, then time, then network -- the date moved out of the header
-    '<div class="meta"><div class="mrow mdate">' + (said ? "" : g.dow + " ") +
-      fmtDate(g.date) + '</div><div class="mrow">' + fmtTime(g.time) +
-      '</div><div class="mrow"' +
+    // network on the away team's line, time on the home team's
+    '<div class="meta"><div class="mrow"' +
       (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
-      esc(primaryNet(g.nets) || "—") + "</div></div>" +
+      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow">' +
+      fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
@@ -288,6 +285,17 @@ function visible() {
   list = list.filter(g => VIEW === "tv"
     ? ((g.slots || []).length || g.title || g.bfri || g.show)
     : (g.type && bigViewAllows(g)));
+  // Basketball's TV tab is JANUARY TO MARCH (his standing rule, and his call
+  // again 2026-09-10 for Marquee). The window rules already enforce it, but a
+  // College GameDay game rides along on `show` with no window of its own --
+  // two November games were reaching Marquee that way. Key Games still has
+  // every month.
+  if (VIEW === "tv" && SPORT_OF[TAB] === "CBB") {
+    list = list.filter(g => {
+      const m = +g.date.slice(5, 7);
+      return m >= 1 && m <= 3;
+    });
+  }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
   // A championship game has no window of its own. It rides along with Marquee

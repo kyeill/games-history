@@ -82,13 +82,26 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   /* meta occupies ONLY the teams row, so its two rows can be made to match
      the two team lines exactly. Spanning the header row too put it 64px out. */
   grid-template-areas:"sport sport" "teams meta" "tags tags";
-  column-gap:14px;align-items:start;cursor:pointer;text-align:left;
+  /* align-content:start is what makes the meta column line up. A card is
+     stretched to the height of the tallest card beside it, and the default
+     align-content:stretch spreads that slack across ALL THREE tracks -- so
+     the teams row grew ~10px taller than the team lines and meta's 1fr/1fr
+     split no longer matched them. Sending the slack to the bottom instead
+     keeps every track at its content height. */
+  column-gap:14px;align-items:start;align-content:start;
+  cursor:pointer;text-align:left;
   width:100%;font:inherit;color:inherit}
 .row:hover{border-color:#3b3b43}
 .row:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 /* week + date, where the sport label used to be */
-.sport{grid-area:sport;font-size:11.5px;font-weight:600;letter-spacing:.05em;
+/* The header row carries the slot label at the left and the DATE at the
+   right, where it lines up with the network and time in the column below. */
+.sport{grid-area:sport;display:flex;align-items:baseline;
+  justify-content:space-between;gap:10px;
+  font-size:11.5px;font-weight:600;letter-spacing:.05em;
   text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.hdate{flex:none;font-size:13px;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--muted);font-variant-numeric:tabular-nums}
 /* the week takes the header's colour, tinted or plain -- no orange of its own
    (his call: an untinted header should read entirely plain) */
 .wk{font-weight:500}
@@ -121,15 +134,13 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* just the kickoff time now -- the network moved back to the bottom left */
 /* Network on the away team's line, time on the home team's. Same row count
    and gap as .tl, so the two columns line up exactly. */
-/* date, time, network -- three lines against the two team lines, so this is a
-   simple stack rather than a row-matched grid */
+/* Two rows against the two team lines: network on the away line, time on the
+   home line. The date is NOT here -- it sits in the header row above, which is
+   the only way it can align with the header. */
 .meta{grid-area:meta;padding-left:14px;border-left:1px solid var(--line);
-  min-width:98px;align-self:stretch;
-  display:flex;flex-direction:column;justify-content:center;gap:1px}
+  min-width:92px;align-self:stretch;display:grid;grid-template-rows:1fr 1fr;gap:3px}
 .mrow{display:flex;align-items:center;justify-content:flex-end;
-  font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;
-  line-height:1.35}
-.mdate{color:var(--muted)}
+  font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;
   align-items:center}
 .tags:empty{display:none}
@@ -286,6 +297,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260910-092648"></script>
+<script src="app.js?v=20260910-093208"></script>
 </body>
 </html>
