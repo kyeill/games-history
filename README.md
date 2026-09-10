@@ -182,7 +182,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Week | dropdown, **football only** | 1-16, following the chosen season |
 | Team | dropdown, alphabetical | 141 of them |
 | Marquee Windows | toggle button | `rules.MARQUEE` — three windows at once |
-| Sort | toggle button | oldest first (default) / newest first |
+| Sort | toggle button | Oldest First (default) / Newest First |
 
 **Marquee Windows** is the one-tap shortcut to the networks he plans a Saturday
 around: FOX Big Noon + CBS B1G Time + NBC Saturday Night on football, FOX + CBS
@@ -194,8 +194,11 @@ Years read **2025** on football and **2025-26** on basketball — football is on
 calendar year, basketball straddles two.
 
 **Opening state is not an empty state.** Every tab opens on the newest season
-available (whatever `harvest.py` last pulled), sorted **oldest first** so a
-season reads as it unfolded. TV Windows opens with **Marquee Windows** on. The
+available (whatever `harvest.py` last pulled), sorted **Oldest First** so a
+season reads as it unfolded. **Newest First walks the blocks backwards but
+reads each one forwards** — week 14, then 13, then 12, and inside a week the
+Thursday game before the Saturday one. A football block is its week;
+basketball has no week, so its block is the date. TV Windows opens with **Marquee Windows** on. The
 Big Games view instead opens on the sport's upset category — Top 10 Upsets for football, Top 5 Upsets for
 basketball — which turns an opening list of hundreds into 10 and 9.
 

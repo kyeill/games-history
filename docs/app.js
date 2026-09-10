@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-220755";
+const BUILD = "20260909-221021";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -288,17 +288,26 @@ function visible() {
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
-  const dir = SORT === "asc" ? 1 : -1;
   // Same kickoff minute: the bigger network leads (his order).
   const rank = g => {
     const pri = NET_PRIORITY[g.sport] || [];
     const i = pri.indexOf(primaryNet(g.nets));
     return i < 0 ? 99 : i;
   };
+  // Newest First walks the BLOCKS backwards but reads each one forwards --
+  // week 14, then 13, then 12, and inside a week the Thursday game first.
+  // A football block is its week; basketball has none, so its block is the
+  // date. Oldest First is simply chronological throughout.
+  const block = g => (g.sport === "CFB" && g.week)
+    ? g.season + "-" + String(g.week).padStart(2, "0")
+    : g.date;
+  const chron = (a, b) => (a.date !== b.date)
+    ? a.date.localeCompare(b.date)
+    : (a.time !== b.time ? a.time.localeCompare(b.time) : rank(a) - rank(b));
   list.sort((a, b) => {
-    if (a.date !== b.date) return dir * a.date.localeCompare(b.date);
-    if (a.time !== b.time) return dir * a.time.localeCompare(b.time);
-    return rank(a) - rank(b);
+    if (SORT === "asc") return chron(a, b);
+    const ba = block(a), bb = block(b);
+    return ba === bb ? chron(a, b) : bb.localeCompare(ba);
   });
   return list;
 }
@@ -385,7 +394,7 @@ function quickButtons() {
   return '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
     '">Marquee Windows</button>' +
     '<button class="f" data-act="sort">' +
-    (SORT === "asc" ? "Oldest first" : "Newest first") + "</button>";
+    (SORT === "asc" ? "Oldest First" : "Newest First") + "</button>";
 }
 
 function draw() {
