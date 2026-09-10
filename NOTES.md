@@ -259,6 +259,12 @@ why harvest passes it.
 flex baseline off differently-sized boxes and drops the count. Setting both to
 1.2 fixes it.
 
+**ESPN Saturday is chosen PER DATE, not by a clock rule.** One game a week --
+the latest tip between 6 and 9pm ET -- so it needs a pre-pass over the season's
+events, like `fox_friday_dates`. Measured: 46 Saturdays, zero ties, so no
+tiebreak is needed. The old 6:30pm cutoff kept 11 games at 18:30 while dropping
+27 at 18:00, which is what made it wrong.
+
 **The Week filter follows the SEASON.** Week 16 exists only in some years, so
 the options are rebuilt from the games in the chosen season and the week is
 cleared whenever the season changes -- otherwise a stale week empties the list.

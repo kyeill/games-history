@@ -160,7 +160,8 @@ def cfb_black_friday(nets, d, season, big_ten=False):
     return season >= 2023 and bool(nets & {"CBS", "NBC"})
 
 
-def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
+def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
+              espn_sat=False):
     """Basketball's windows -- **January to March only** (his call: the
     November-December non-conference slate is not what he is browsing for).
 
@@ -176,7 +177,10 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
         out.add("Big Monday")
     if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
         out.add("Super Tuesday")
-    if "ESPN" in nets and day == "Sat" and t >= 18 * 60 + 30:
+    # ESPN Saturday is ONE game a week: the latest tip between 6 and 9pm.
+    # A clock cutoff could not do it -- 6:30 split the 6pm block in half and
+    # let three games through on a good Saturday. See espn_saturday_ids.
+    if espn_sat:
         out.add("ESPN Saturday")
     for n in ("FOX", "CBS", "NBC", "ABC"):
         if n not in nets:

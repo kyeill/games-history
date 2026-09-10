@@ -100,6 +100,33 @@ def load_overrides():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def espn_saturday_ids(evs):
+    """One ESPN game per Saturday: the LATEST tip between 6pm and 9pm ET.
+
+    His rule, 2026-09-09, replacing a 6:30pm cutoff that cut through the 6pm
+    block and admitted up to three games a night. Measured across the archive
+    it selects 46 Saturdays with no ties at all, and lands on the late marquee
+    game -- North Carolina at Duke, Kentucky at Tennessee, Duke at Virginia.
+    """
+    best = {}
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps:
+            continue
+        if "ESPN" not in set(networks(comps[0])):
+            continue
+        d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")               .replace(tzinfo=dt.timezone.utc).astimezone(ET)
+        if d.weekday() != 5 or d.month not in (1, 2, 3):
+            continue
+        mins = d.hour * 60 + d.minute
+        if not (18 * 60 <= mins <= 21 * 60):
+            continue
+        cur = best.get(d.date())
+        if cur is None or mins > cur[0]:
+            best[d.date()] = (mins, x["id"])
+    return {v[1] for v in best.values()}
+
+
 def harvest():
     keep, teams = [], {}
     overrides = load_overrides()
@@ -108,6 +135,7 @@ def harvest():
         for y in SEASONS:
             evs = events(code, y)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
+            espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             for x in evs:
                 comps = x.get("competitions") or []
                 if not comps:
@@ -145,7 +173,8 @@ def harvest():
                         nets, d, y, big_ten=(bt in confs))
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
-                                            any(ranks), bt in confs)
+                                            any(ranks), bt in confs,
+                                            espn_sat=x["id"] in espn_sat)
                     suffix = rules.cbb_header_suffix(
                         nets, d,
                         tourney=(rules.is_championship(heads)
