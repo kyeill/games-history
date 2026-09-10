@@ -113,14 +113,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row:hover{border-color:#3b3b43}
 .row:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
 /* week + date, where the sport label used to be */
-.sport{grid-area:sport;font-size:12.5px;font-weight:500;
-  color:var(--muted);margin-bottom:5px}
+.sport{grid-area:sport;font-size:11.5px;font-weight:600;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:5px}
 /* the week takes the header's colour, tinted or plain -- no orange of its own
    (his call: an untinted header should read entirely plain) */
 .wk{font-weight:500}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
-  gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
+  gap:8px;padding:2px 6px 2px 7px;margin-left:-7px;border-radius:5px}
 .tl.won{background:var(--winwash)}
 /* A coloured border marks a result he wants to see: Michigan won (maize), or a
    rival lost (the colour of whoever beat them). A full maize box was too loud,
@@ -138,6 +138,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .rk:not(:empty)::before{content:"#"}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
+/* overtime: the winning score is underlined, instead of an OT chip */
+.row.ot .tl.won .sc{text-decoration:underline;text-underline-offset:3px;
+  text-decoration-thickness:2px}
 .tl:not(.won) .nm,.tl:not(.won) .sc{color:#a5a5a0}
 .sc{font-size:16px;font-variant-numeric:tabular-nums;font-weight:600;
   min-width:30px;text-align:right}
@@ -251,7 +254,7 @@ BODY = """
 
 <div class="viewbar" id="viewbar">
   <button data-view="tv" aria-selected="true">TV Windows</button>
-  <button data-view="big" aria-selected="false">Big Games</button>
+  <button data-view="big" aria-selected="false">Key Games</button>
 </div>
 
 <div class="daterow" id="daterow" style="display:none">

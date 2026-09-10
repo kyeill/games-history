@@ -381,6 +381,11 @@ rule.** Narrowing Black Friday to "FOX/CBS/NBC with a Big Ten team" drops the
 only joined the Big Ten in 2024 -- and that is the very game he had asked about
 a round earlier. Flagged to him rather than quietly exempted. 30 games -> 10.
 
+**`HIDDEN_WINDOWS` hides a filter OPTION, not the games.** ABC Saturday
+(football) and ABC Weekend / ESPN Saturday (basketball) are out of the TV
+Window dropdown, but the 202 and 55 games keep their window and still appear
+under "All TV Windows".
+
 **A game with no window needs explicit admission to the TV Windows view.**
 Championship AND Black Friday games carry no window, so both need
 `|| g.title || g.bfri` in the view filter and in the Marquee exemption. Black

@@ -149,7 +149,7 @@ for rankings, Source Sans 3, and `logos.py`'s measured crest variants. One
 column on a phone, **two from 900px**.
 
 **Tabs are the SPORT** — College Football, College Basketball, Browse — and a
-segmented control under them switches the **view**: *TV Windows* or *Big
+segmented control under them switches the **view**: *TV Windows* or *Key
 Games*. Kyle asked for this over a single mixed list: the two sports share no
 game types and no TV windows, and he wants to be able to isolate one population
 at a time. Four populations result:

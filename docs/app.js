@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-085558";
+const BUILD = "20260910-090047";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -15,7 +15,7 @@ let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, type: null, windows: null, team: null };
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
-let SEASON_NAMES = {};
+let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
@@ -159,7 +159,7 @@ function rowHtml(g, browse) {
     tags.push(chip("champ", g.city));
   }
   myTags(g.id).forEach(t => tags.push(chip("mine " + tagClass(t), t)));
-  if (g.ot) tags.push(chip("grey", "OT"));
+  // overtime underlines the winning score rather than adding a chip
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
   const mark = browse && inArch ? ' <span class="inarch">IN ARCHIVE</span>' : "";
@@ -186,18 +186,18 @@ function rowHtml(g, browse) {
   const flag = celebrated(g);
   const ring = flag ? celebrateColor(g) : null;
   return '<button class="row' + (flag ? " celebrate" : "") +
-    (dimmed(g) ? " dimmed" : "") +
+    (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") +
       ">" + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away, g.sport, g.season) +
       teamLine(home, g.sport, g.season) + "</div>" +
-    // network on the away team's line, time on the home team's
-    '<div class="meta"><div class="mrow"' +
+    // time on the away team's line, network on the home team's
+    '<div class="meta"><div class="mrow">' + fmtTime(g.time) +
+      '</div><div class="mrow"' +
       (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
-      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow">' +
-      fmtTime(g.time) + "</div></div>" +
+      esc(primaryNet(g.nets) || "—") + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
@@ -380,8 +380,12 @@ function filterChips() {
   // The dropdown holds ONE window; Marquee Windows sets three at once, and
   // while it is on the dropdown falls back to its "All" label.
   const one = (FILT.windows && FILT.windows.length === 1) ? FILT.windows[0] : "";
+  // some windows are deliberately absent from the dropdown -- the games keep
+  // the window and still show under "All TV Windows"
+  const hidden = HIDDEN_WINDOWS[sport] || [];
   h += group("TV window", select("window", "All TV Windows",
-    order.windows.filter(w => windows.has(w)).map(w => [w, w]), one));
+    order.windows.filter(w => windows.has(w) && hidden.indexOf(w) < 0)
+      .map(w => [w, w]), one));
   h += group("Team", select("team", "All Teams",
     Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
       .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
@@ -635,6 +639,7 @@ async function init() {
   NET_TINT = r[0].net_tint || {};
   BIG_TEN = r[0].big_ten || {};
   SEASON_NAMES = r[0].season_names || {};
+  HIDDEN_WINDOWS = r[0].hidden_windows || {};
   NET_PRIORITY = r[0].net_priority || {};
   clearFilters();
   try {

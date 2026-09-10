@@ -93,6 +93,12 @@ ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
 MARQUEE = {"CFB": ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"],
            "CBB": ["FOX Weekend", "CBS Weekend", "NBC Weekend"]}
 
+# Windows that stay OUT of the TV Window dropdown (his call 2026-09-10). The
+# games keep the window and still appear under "All TV Windows" -- it is the
+# filter option that goes, not the games.
+HIDDEN_WINDOWS = {"CFB": ["ABC Saturday"],
+                  "CBB": ["ABC Weekend", "ESPN Saturday"]}
+
 # Which network paints each window's chip. Explicit rather than parsed from the
 # name: "Big Monday", "Super Tuesday" and "B1G Peacock" carry no network in
 # their names at all. Peacock mirrors NBC; ESPN is red.

@@ -1,5 +1,5 @@
 
-const CACHE="games-history-20260910-085558";
+const CACHE="games-history-20260910-090047";
 // Only the shell is pre-cached. The data files carry ?v=<build> and are cached
 // at runtime, so a rebuild always misses and refetches -- pre-caching them by
 // bare name is what served a stale games.json after a rebuild.
