@@ -14,6 +14,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, type: null, windows: null, team: null };
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
+let HEADER_TINT = {}, NET_PRIORITY = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
@@ -114,6 +115,12 @@ function netClass(window) {
   return n ? "n-" + n : "";
 }
 
+// His bottom-row tags each carry a colour: the pregame shows are branded,
+// H&H and OT are incidental detail.
+const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
+                    "H&H": "g-grey" };
+function tagClass(t) { return TAG_CLASS[t] || ""; }
+
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
@@ -134,24 +141,37 @@ function rowHtml(g, browse) {
   if (g.type && VIEW === "big") tags.push(chip("big", g.type));
   // The purple chip is the conference championship OR the location, never
   // both -- a title game is played somewhere, but the title is the story.
+  // One blue chip, in priority order: conference championship, then a named
+  // event (SEC Quarterfinals, Battle 4 Atlantis), then the neutral-site city.
   if (g.champ) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
+  } else if (g.event) {
+    tags.push(chip("champ", g.event));
   } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }
-  myTags(g.id).forEach(t => tags.push(chip("mine", t)));
-  if (g.ot) tags.push('<span class="otnote">OT</span>');
+  myTags(g.id).forEach(t => tags.push(chip("mine " + tagClass(t), t)));
+  if (g.ot) tags.push(chip("grey", "OT"));
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
   const mark = browse && inArch ? ' <span class="inarch">IN ARCHIVE</span>' : "";
   // Football is played in numbered weeks and he thinks in them, so the week
   // leads and the date follows in parentheses. Basketball just gets the date.
-  const when = (g.sport === "CFB" && g.week)
-    ? '<span class="wk">Week ' + g.week + "</span> (" + g.dow + " " +
-      fmtDate(g.date) + ")"
-    : g.dow + " " + fmtDate(g.date);
+  // Header: week + date on football, date on basketball, then the TV window
+  // (football) or slot name (basketball) after a dash. The whole line takes
+  // the window's colour, so the cards carry no separate window chip.
+  const label = g.sport === "CFB" ? (g.slots || [])[0] : g.suffix;
+  const tint = g.sport === "CFB"
+    ? HEADER_TINT[label]
+    : HEADER_TINT[primaryNet(g.nets) + " Weekend"];
+  const when =
+    ((g.sport === "CFB" && g.week)
+      ? '<span class="wk">Week ' + g.week + "</span> (" + g.dow + " " +
+        fmtDate(g.date) + ")"
+      : g.dow + " " + fmtDate(g.date)) +
+    (label ? " - " + esc(label) : "");
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   const flag = celebrated(g);
@@ -159,10 +179,8 @@ function rowHtml(g, browse) {
   return '<button class="row' + (flag ? " celebrate" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
-    '<div class="sport">' + when + mark + "</div>" +
-    '<div class="tvtag">' +
-      (g.slots || []).map(w => chip("slot " + netClass(w), w)).join("") +
-      "</div>" +
+    '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") +
+      ">" + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
     // network on the away team's line, time on the home team's
     '<div class="meta"><div class="mrow">' +
@@ -238,8 +256,17 @@ function visible() {
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
   const dir = SORT === "asc" ? 1 : -1;
-  list.sort((a, b) => dir * (a.date === b.date
-    ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)));
+  // Same kickoff minute: the bigger network leads (his order).
+  const rank = g => {
+    const pri = NET_PRIORITY[g.sport] || [];
+    const i = pri.indexOf(primaryNet(g.nets));
+    return i < 0 ? 99 : i;
+  };
+  list.sort((a, b) => {
+    if (a.date !== b.date) return dir * a.date.localeCompare(b.date);
+    if (a.time !== b.time) return dir * a.time.localeCompare(b.time);
+    return rank(a) - rank(b);
+  });
   return list;
 }
 
@@ -557,6 +584,8 @@ async function init() {
   SEASONS = r[0].seasons || [];
   MARQUEE = r[0].marquee || {};
   WINDOW_NET = r[0].window_net || {};
+  HEADER_TINT = r[0].header_tint || {};
+  NET_PRIORITY = r[0].net_priority || {};
   clearFilters();
   try {
     // cache-bust: Pages serves with max-age, and this file is the shared state

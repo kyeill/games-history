@@ -23,11 +23,8 @@ def _mins(d):
 # them into games.json so the page has one source of truth.
 CFB_WINDOWS = ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night",
                "ABC Saturday", "FOX Friday"]
-CBB_WINDOWS = ["FOX", "CBS", "NBC", "ABC", "B1G Peacock", "Big Monday",
-               "Super Tuesday",
-               # Not in the order he gave, but it WAS in his original slot
-               # list, so it is kept and parked last rather than dropped.
-               "ESPN Sat night"]
+CBB_WINDOWS = ["FOX Weekend", "CBS Weekend", "NBC Weekend", "ABC Weekend",
+               "ESPN Saturday", "B1G Peacock", "Big Monday", "Super Tuesday"]
 CFB_TYPES = ["Top 10 Upsets", "Ranked Upsets", "Ranked Games"]
 # the last two are the shared championship fallbacks -- see title_fallback
 CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
@@ -39,18 +36,50 @@ ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
 # around. One button selects all three at once, which is why the app's TV
 # window filter holds a LIST rather than a single value.
 MARQUEE = {"CFB": ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"],
-           "CBB": ["FOX", "CBS", "NBC"]}
+           "CBB": ["FOX Weekend", "CBS Weekend", "NBC Weekend"]}
 
 # Which network paints each window's chip. Explicit rather than parsed from the
 # name: "Big Monday", "Super Tuesday" and "B1G Peacock" carry no network in
 # their names at all. Peacock mirrors NBC; ESPN is red.
 WINDOW_NET = {
-    "FOX Big Noon": "fox", "FOX Friday": "fox", "FOX": "fox",
-    "CBS B1G Time": "cbs", "CBS": "cbs",
-    "NBC Saturday Night": "nbc", "NBC": "nbc", "B1G Peacock": "nbc",
-    "ABC Saturday": "abc", "ABC": "abc",
-    "Big Monday": "espn", "Super Tuesday": "espn", "ESPN Sat night": "espn",
+    "FOX Big Noon": "fox", "FOX Friday": "fox", "FOX Weekend": "fox",
+    "CBS B1G Time": "cbs", "CBS Weekend": "cbs",
+    "NBC Saturday Night": "nbc", "NBC Weekend": "nbc", "B1G Peacock": "nbc",
+    "ABC Saturday": "abc", "ABC Weekend": "abc",
+    "Big Monday": "espn", "Super Tuesday": "espn", "ESPN Saturday": "espn",
 }
+
+# The header line is tinted by the window it belongs to -- his hexes,
+# 2026-09-09. Anything not listed keeps the muted default.
+HEADER_TINT = {
+    "FOX Big Noon": "#ffcb05", "FOX Friday": "#ffcb05",
+    "CBS B1G Time": "#1c4469", "NBC Saturday Night": "#0b85c8",
+    "FOX Weekend": "#ffcb05", "CBS Weekend": "#1c4469",
+    "NBC Weekend": "#0b85c8",
+}
+
+# Sorting a tie: when two games kick at the same minute, the bigger network
+# leads. His order, and it differs by sport only in length.
+NET_PRIORITY = {"CFB": ["FOX", "CBS", "NBC", "ABC"],
+                "CBB": ["FOX", "CBS", "NBC", "ABC", "ESPN", "Peacock"]}
+
+# CBS's college package was the SEC through 2023 and the Big Ten from 2024 --
+# "CBS B1G Time" means whichever it was, so both conferences qualify. Without
+# this the window was a narrow 3:30 clock check and missed USC at Purdue
+# (6:45pm on CBS, 2025), which he spotted.
+CBS_CFB_CONF = {"5", "8"}                  # Big Ten, SEC
+
+
+def thanksgiving(year):
+    """US Thanksgiving: the fourth Thursday of November."""
+    import datetime as _dt
+    d = _dt.date(year, 11, 1)
+    d += _dt.timedelta(days=(3 - d.weekday()) % 7)   # first Thursday
+    return d + _dt.timedelta(days=21)
+
+
+def is_black_friday(d):
+    return d.date() == thanksgiving(d.year) + __import__("datetime").timedelta(days=1)
 
 # The Army-Navy game is played on a December Saturday afternoon on CBS, which
 # makes it a false match for the CBS window every single year (five for five).
@@ -66,26 +95,30 @@ ARMY, NAVY = "349", "2426"
 # Dame is an INDEPENDENT, conference 18, despite being NBC's entire package.
 
 
-def cfb_slots(nets, d, season, team_ids=(), conf_ids=()):
-    """Football's windows, which did not all exist for the whole archive.
-
-    His rule, 2026-09-09: **no CBS or NBC window before the 2023 season**, and
-    in 2021-22 the ABC window is PRIMETIME only, 7pm or later. That matches how
-    the packages actually moved -- Big Ten Saturday Night began on NBC in 2023
-    and CBS picked the Big Ten up in 2024 -- so the early seasons are FOX Big
-    Noon plus ABC at night, and nothing else.
+def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
+    """Football's windows. Several are era-dependent, because the packages
+    moved: no CBS or NBC window before 2023, ABC is primetime-only in 2021-22,
+    and FOX Friday does not start until 2024.
     """
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
     if ARMY in team_ids and NAVY in team_ids:
         return out                       # see ARMY, NAVY above
     early = season < 2023
-    if "FOX" in nets and day == "Fri" and t >= 18 * 60:
-        out.add("FOX Friday")
+    b1g = "5" in conf_ids
+
+    # FOX Friday is a 2024 package. FS1 deputises only when FOX itself has no
+    # Friday game that night and a Big Ten team is playing.
+    if season >= 2024 and day == "Fri" and t >= 18 * 60:
+        if "FOX" in nets:
+            out.add("FOX Friday")
+        elif "FS1" in nets and b1g and d.date() not in fox_friday_dates:
+            out.add("FOX Friday")
+
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
         out.add("FOX Big Noon")
-    if (not early and "CBS" in nets and day == "Sat"
-            and abs(t - (15 * 60 + 30)) <= 45):
+    # CBS: whichever conference its package held that year, any Saturday time
+    if not early and "CBS" in nets and day == "Sat" and (conf_ids & CBS_CFB_CONF):
         out.add("CBS B1G Time")
     if (not early and "NBC" in nets and day == "Sat"
             and abs(t - (19 * 60 + 30)) <= 45):
@@ -95,19 +128,41 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=()):
     return out
 
 
-def cbb_slots(nets, d, both_big_ten, any_ranked):
+def cfb_black_friday(nets, d, season):
+    """Black Friday football, which he wants in the archive and in Marquee but
+    WITHOUT a window label -- CBS and NBC from 2023, FOX and ABC throughout."""
+    if not is_black_friday(d):
+        return False
+    if nets & {"FOX", "ABC"}:
+        return True
+    return season >= 2023 and bool(nets & {"CBS", "NBC"})
+
+
+def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
+    """Basketball's windows -- **January to March only** (his call: the
+    November-December non-conference slate is not what he is browsing for).
+
+    The four broadcast networks are "Weekend" windows. A FOX or CBS Saturday
+    game before 7pm needs a Big Ten team, since those early slots are
+    otherwise filler.
+    """
+    if d.month not in (1, 2, 3):
+        return set()
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
-    # ESPN's own brands for the weeknight showcases
     if "ESPN" in nets and day == "Mon" and t >= 18 * 60:
         out.add("Big Monday")
     if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
         out.add("Super Tuesday")
     if "ESPN" in nets and day == "Sat" and t >= 18 * 60 + 30:
-        out.add("ESPN Sat night")
+        out.add("ESPN Saturday")
     for n in ("FOX", "CBS", "NBC", "ABC"):
-        if n in nets:
-            out.add(n)
+        if n not in nets:
+            continue
+        if (n in ("FOX", "CBS") and day == "Sat" and t < 19 * 60
+                and not any_big_ten):
+            continue
+        out.add(n + " Weekend")
     # Peacock is a firehose on its own (it carries every Big Ten home
     # non-conference game), so it is narrowed to the conference weeknight
     # window with a ranked team. Nothing before 2023-24: the package is new.
@@ -115,6 +170,21 @@ def cbb_slots(nets, d, both_big_ten, any_ranked):
             and day in ("Tue", "Thu") and any_ranked):
         out.add("B1G Peacock")
     return out
+
+
+def cbb_header_suffix(nets, d):
+    """The label that follows the date on a basketball card. Not a window --
+    the cards carry no window chips at all -- just a name for the slot."""
+    if d.month not in (1, 2, 3):
+        return None
+    day, t = DOW[d.weekday()], _mins(d)
+    if "FOX" in nets and day == "Fri":
+        return "FOX Friday"
+    if "FOX" in nets and day == "Sat" and t >= 19 * 60:
+        return "FOX Primetime"
+    if "ESPN" in nets and day == "Sat" and t >= 19 * 60:
+        return "ESPN Primetime"
+    return None
 
 
 # Kyle's teams, 2026-09-09. ESPN gives a school ONE id across both sports.

@@ -229,6 +229,19 @@ the options are rebuilt from the games in the chosen season and the week is
 cleared whenever the season changes -- otherwise a stale week empties the list.
 Football only: basketball has no meaningful week.
 
+**CBS's header tint #1c4469 measures 1.64:1 against the card** and is
+effectively unreadable -- his hex, applied as given and flagged rather than
+silently altered. 4.5:1 is the readable floor; #778fa5 is the same navy lifted
+to 4.95:1. FOX #ffcb05 is 10.9:1 and NBC #0b85c8 is 4.11:1.
+
+**CBS's football window is a PACKAGE, not a clock slot.** It was a narrow
+3:30 +/- 45min check and silently missed USC at Purdue (CBS, 6:45pm, 2025) --
+he spotted it. CBS runs Big Ten games at noon, 3:30 and primetime. The rule is
+now CBS + Saturday + (Big Ten or SEC): the SEC half matters because CBS held
+the SEC through 2023 and the Big Ten from 2024, so requiring Big Ten alone
+would have dropped twelve 2023 SEC games including the Iron Bowl. Adds 9,
+removes 0.
+
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV
 windows, so a leftover value empties the list and the page looks broken rather

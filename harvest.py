@@ -67,12 +67,31 @@ def networks(comp):
     return sorted(set(out))
 
 
+def fox_friday_dates(evs):
+    """Dates that already have a FOX Friday night game. FS1 only deputises for
+    the Big Ten on a Friday when FOX itself is not carrying one."""
+    out = set()
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps:
+            continue
+        nets = set(networks(comps[0]))
+        if "FOX" not in nets:
+            continue
+        d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")               .replace(tzinfo=dt.timezone.utc).astimezone(ET)
+        if d.weekday() == 4 and d.hour >= 18:
+            out.add(d.date())
+    return out
+
+
 def harvest():
     keep, teams = [], {}
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         for y in SEASONS:
-            for x in events(code, y):
+            evs = events(code, y)
+            fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
+            for x in evs:
                 comps = x.get("competitions") or []
                 if not comps:
                     continue                      # older payloads omit it
@@ -100,11 +119,16 @@ def harvest():
                 lose = [k for k in cs if not k.get("winner")]
 
                 team_ids = [k["team"]["id"] for k in cs]
+                black_friday = False
+                suffix = None
                 if code == "CFB":
-                    slots = rules.cfb_slots(nets, d, y, team_ids, confs)
+                    slots = rules.cfb_slots(nets, d, y, team_ids, set(confs),
+                                            fox_fri)
+                    black_friday = rules.cfb_black_friday(nets, d, y)
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
-                                            any(ranks))
+                                            any(ranks), bt in confs)
+                    suffix = rules.cbb_header_suffix(nets, d)
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads)
                 title = rules.is_title_game(code, conf, head)
@@ -121,7 +145,15 @@ def harvest():
                     gtype = rules.game_type(code, rank_of(win[0]),
                                             rank_of(lose[0]), bt in confs,
                                             p5_title=title)
-                if not slots and not gtype and not conf:
+                # a named event (Battle 4 Atlantis, SEC Quarterfinals) for the
+                # blue chip, when it is not already a Power Five title
+                event = None
+                for h in heads:
+                    base = h.split(" - ")[0]
+                    if base and not conf:
+                        event = h.replace(" - ", " ")
+                        break
+                if not slots and not gtype and not conf and not black_friday:
                     continue
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.
@@ -155,11 +187,14 @@ def harvest():
                     "nets": sorted(nets), "teams": side,
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
+                    "event": event, "bfri": black_friday, "suffix": suffix,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "marquee": rules.MARQUEE, "window_net": rules.WINDOW_NET,
+               "header_tint": rules.HEADER_TINT,
+               "net_priority": rules.NET_PRIORITY,
                "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),
               separators=(",", ":"))

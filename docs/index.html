@@ -81,7 +81,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   grid-template-columns:1fr auto;
   /* meta occupies ONLY the teams row, so its two rows can be made to match
      the two team lines exactly. Spanning the header row too put it 64px out. */
-  grid-template-areas:"sport tvtag" "teams meta" "tags tags";
+  grid-template-areas:"sport sport" "teams meta" "tags tags";
   column-gap:14px;align-items:start;cursor:pointer;text-align:left;
   width:100%;font:inherit;color:inherit}
 .row:hover{border-color:#3b3b43}
@@ -89,8 +89,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* week + date, where the sport label used to be */
 .sport{grid-area:sport;font-size:12.5px;font-weight:500;
   color:var(--muted);margin-bottom:5px}
-/* orange, but not bold -- his call after trying it both ways */
+/* the week keeps the orange accent unless the header itself is tinted, in
+   which case the whole line takes the window's colour */
 .wk{color:var(--accent);font-weight:500}
+.sport[style] .wk{color:inherit}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
@@ -123,9 +125,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;
   align-items:center}
 .tags:empty{display:none}
-/* the TV window sits top right, opposite the week and date */
-.tvtag{grid-area:tvtag;display:flex;gap:5px;flex-wrap:wrap;
-  justify-content:flex-end;align-items:start;margin-bottom:5px}
 .tag{font-size:11.5px;border-radius:4px;padding:2px 7px;letter-spacing:.02em;
   border:1px solid transparent;white-space:nowrap}
 /* TV window chips carry the network's own colour: FOX yellow, CBS a lighter
@@ -137,11 +136,13 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-slot.n-nbc{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-slot.n-abc{background:#1b2440;border-color:#2b3860;color:#93a9dc}
 .t-slot.n-espn{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
-.otnote{font-size:11.5px;color:var(--muted);letter-spacing:.06em;
-  align-self:center;font-weight:600}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
 .t-champ{background:#26202f;border-color:#3a3145;color:#bda9d4}
 .t-mine{background:#1f2e28;border-color:#2f4539;color:#9ecab0}
+.t-mine.g-yellow{background:#3a3218;border-color:#584a1d;color:#e8c766}
+.t-mine.g-red{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
+.t-mine.g-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
+.t-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 
 .empty{color:var(--muted);text-align:center;padding:44px 10px;font-size:14.5px}
 .daterow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
@@ -274,6 +275,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909-180340"></script>
+<script src="app.js?v=20260909-203435"></script>
 </body>
 </html>
