@@ -89,11 +89,32 @@ CBB_TYPES = ["Top 5 Upsets", "Top 10 Games", "Ranked Big Ten"]
 ORDER = {"CFB": {"types": CFB_TYPES, "windows": CFB_WINDOWS},
          "CBB": {"types": CBB_TYPES, "windows": CBB_WINDOWS}}
 
-# The "Marquee Windows" shortcut -- the networks he actually plans a Saturday
-# around. One button selects all three at once, which is why the app's TV
-# window filter holds a LIST rather than a single value.
-MARQUEE = {"CFB": ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"],
-           "CBB": ["FOX Weekend", "CBS Weekend", "NBC Weekend"]}
+# The "Marquee Windows" shortcut -- the games he actually plans a weekend
+# around. It used to be a LIST OF WINDOWS the button selected together, with
+# Black Friday and show broadcasts riding along on the side; his call
+# 2026-09-10 made it a set of rules of its own, so `is_marquee` below is now
+# the single definition and the button is a plain on/off.
+CFB_MARQUEE = ["FOX Big Noon", "CBS B1G Time", "NBC Saturday Night"]
+
+
+def is_marquee(sport, nets, d, slots, big_ten=False, tourney=False):
+    """Is this one of the games the Marquee button keeps?
+
+    Football is exactly its three windows -- nothing rides along any more.
+
+    Basketball is not a window list at all, because "FOX Weekend" admits any
+    FOX game in the January-March stretch, weeknights included. His rule: a
+    FOX, CBS or NBC game on a WEEKEND with a Big Ten team, plus FOX Friday and
+    FOX Primetime whether or not a Big Ten team is in them.
+    """
+    if tourney:
+        return False          # a conference tournament belongs to no package
+    if sport == "CFB":
+        return any(w in CFB_MARQUEE for w in slots)
+    day, t = DOW[d.weekday()], _mins(d)
+    if "FOX" in nets and (day == "Fri" or (day == "Sat" and t >= 19 * 60)):
+        return True           # FOX Friday and FOX Primetime, Big Ten or not
+    return big_ten and day in ("Sat", "Sun")         and bool(nets & {"FOX", "CBS", "NBC"})
 
 # Windows that stay OUT of the TV Window dropdown (his call 2026-09-10). The
 # games keep the window and still appear under "All TV Windows" -- it is the

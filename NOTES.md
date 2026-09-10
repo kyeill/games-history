@@ -367,6 +367,19 @@ Carolina 2026-03-07 were both suppressed as tournament games because the
 event before each of them was one. Fixed by hoisting the assignment above the
 branch.
 
+**Marquee could not stay a list of windows.** It began as one -- the button
+ticked three window names -- with Black Friday and show broadcasts admitted
+alongside by a special case in `visible()`. Both halves broke. Football picked
+up games he had not asked for through the ride-along, and basketball's
+"FOX Weekend" window is any FOX game between January and March, weeknights
+included, so a Tuesday game reached a filter meant for weekends. His call
+2026-09-10 made it a rule: `rules.is_marquee` decides per game and harvest
+freezes the answer as `mq`. Measured: 151 football games (exactly the three
+windows, nothing riding along) and 142 basketball games (no weekday among
+them; the 14 without a Big Ten team are all FOX Friday or FOX Primetime, as
+specified). The only weekend Big Ten games on FOX/CBS/NBC left out are the
+five Big Ten tournament finals, which is his standing rule.
+
 **The broadcast-network header labels are Big Ten only.** His rules
 2026-09-10: ABC and NBC get a label on any day, named for the day (`NBC
 Saturday`); FOX gets `FOX Saturday` for the Saturday afternoon that

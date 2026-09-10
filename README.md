@@ -113,9 +113,8 @@ football's labels.
 
 They also carry **no TV window chip**. A championship game is not part of a
 broadcast package, so the card shows none; the `title` flag is what admits it
-to the TV Windows view. It rides along with **Marquee Windows**, but selecting
-one specific window shows none of them — 23 under Marquee, 0 under "FOX Big
-Noon".
+to the TV Windows view. It is **not** Marquee — a package it belongs to none
+of cannot be one of the games he plans a weekend around.
 
 **Power Four/Five scopes CHAMPIONSHIP GAMES ONLY** — not TV windows. A window
 is a time slot on a network, whoever is playing, so Boise State at BYU on ABC
@@ -182,14 +181,25 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Week | dropdown, **football only** | 1-16, following the chosen season |
 | Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
 | Team | dropdown, alphabetical | 141 of them |
-| Marquee Windows | toggle button | `rules.MARQUEE` — three windows at once |
+| Marquee Windows | toggle button | `rules.is_marquee` — a rule, not a window list |
 | Sort | toggle button | Oldest First (default) / Newest First |
 
-**Marquee Windows** is the one-tap shortcut to the networks he plans a Saturday
-around: FOX Big Noon + CBS B1G Time + NBC Saturday Night on football, FOX + CBS
-+ NBC on basketball. It selects all three, which is why the TV window filter
-holds a **list** rather than a single value — the dropdown writes a
-one-element list, the button writes three.
+**Marquee Windows** is the games he plans a weekend around, and as of
+2026-09-10 it is a **rule of its own** rather than a set of windows the button
+ticks:
+
+* **Football** — exactly FOX Big Noon, CBS B1G Time and NBC Saturday Night.
+  Nothing else. Black Friday and College GameDay games used to ride along on
+  the side; they no longer do.
+* **Basketball** — a FOX, CBS or NBC game on a **weekend** with at least one
+  **Big Ten** team, plus **FOX Friday** and **FOX Primetime** whether or not a
+  Big Ten team is in them.
+
+The basketball half could not be expressed as windows at all, which is what
+went wrong before: "FOX Weekend" admits any FOX game in the January-March
+stretch, weeknights included. Conference tournaments are never Marquee in
+either sport. Because it is now its own flag (`mq` on each game) it **stacks**
+with the TV window dropdown instead of pretending to be it.
 
 **Week and Month are the same idea for the two sports** — the coarse cut
 through a season. Football thinks in numbered weeks and basketball does not,

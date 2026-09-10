@@ -287,6 +287,10 @@ def harvest():
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 black_friday = False
                 suffix = None
+                # A conference tournament belongs to no broadcast package, so
+                # it is never Marquee and never carries a slot label.
+                tourney = (rules.is_championship(heads)
+                           and d.month in (3, 4) and code == "CBB")
                 if code == "CFB":
                     slots = rules.cfb_slots(nets, d, y, team_ids, set(confs),
                                             fox_fri)
@@ -297,10 +301,7 @@ def harvest():
                                             any(ranks), bt in confs,
                                             espn_sat=x["id"] in espn_sat)
                     suffix = rules.cbb_header_suffix(
-                        nets, d,
-                        tourney=(rules.is_championship(heads)
-                                 and d.month in (3, 4)),
-                        big_ten=(bt in confs))
+                        nets, d, tourney=tourney, big_ten=(bt in confs))
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
                 # a show broadcast from this game? match either side of the
@@ -405,6 +406,9 @@ def harvest():
                     # football displays it.
                     "week": (x.get("week") or {}).get("number"),
                     "venue": v.get("fullName"),
+                    "mq": rules.is_marquee(code, nets, d, slots,
+                                           big_ten=(bt in confs),
+                                           tourney=tourney),
                     "offsite": offsite.get(x["id"]),
                     "city": rules.display_city(
                         (v.get("address") or {}).get("city"), v.get("fullName")),
@@ -418,7 +422,7 @@ def harvest():
     keep.sort(key=lambda g: (g["date"], g["time"]))
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
-               "marquee": rules.MARQUEE, "window_net": rules.WINDOW_NET,
+               "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
                "big_ten": rules.BIG_TEN, "season_names": rules.SEASON_NAMES,

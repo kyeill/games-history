@@ -6,21 +6,21 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-094714";
+const BUILD = "20260910-095233";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
-              team: null };
+              team: null, marquee: false };
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November",
                 "December"];
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
-let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
+let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
@@ -307,17 +307,13 @@ function visible() {
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
   if (FILT.month != null)
     list = list.filter(g => +g.date.slice(5, 7) === FILT.month);
-  // A championship game has no window of its own. It rides along with Marquee
-  // Windows (his call), but picking ONE window must not surface it.
-  if (FILT.windows && FILT.windows.length) {
-    const viaMarquee = marqueeOn();
-    // Black Friday rides along with Marquee; a conference-tournament FINAL
-    // never does (his call) -- it belongs to no broadcast package.
-    // Black Friday and show-broadcast games ride along with Marquee; a
-    // conference-tournament FINAL never does -- it belongs to no package.
-    list = list.filter(g => (viaMarquee && (g.bfri || g.show)) ||
+  // Marquee is a rule of its own now (rules.is_marquee), not a set of
+  // windows the button ticks, so it stacks with the window dropdown instead
+  // of pretending to be it. Nothing rides along any more.
+  if (FILT.marquee) list = list.filter(g => g.mq);
+  if (FILT.windows && FILT.windows.length)
+    list = list.filter(g =>
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
-  }
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
   if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
@@ -352,9 +348,9 @@ function clearFilters() {
   FILT = {
     season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
     type: null,
-    // TV Windows opens on Marquee Windows -- the networks he plans around
-    windows: VIEW === "tv"
-      ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null,
+    windows: null,
+    // TV Windows opens on Marquee -- the games he plans a weekend around
+    marquee: VIEW === "tv",
     week: null, month: null, team: null
   };
 }
@@ -440,11 +436,7 @@ function filterChips() {
   return h;
 }
 
-function marqueeOn() {
-  const m = MARQUEE[SPORT_OF[TAB]] || [];
-  return !!FILT.windows && FILT.windows.length === m.length &&
-    m.every(w => FILT.windows.indexOf(w) > -1);
-}
+function marqueeOn() { return !!FILT.marquee; }
 function quickButtons() {
   return '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
     '">Marquee Windows</button>' +
@@ -680,7 +672,6 @@ async function init() {
   GAMES = r[0].games; TEAMS = r[0].teams; COLORS = r[1]; CRESTS = r[2];
   ORDER = r[0].order || {};
   SEASONS = r[0].seasons || [];
-  MARQUEE = r[0].marquee || {};
   WINDOW_NET = r[0].window_net || {};
   HEADER_TINT = r[0].header_tint || {};
   NET_TINT = r[0].net_tint || {};
@@ -719,8 +710,8 @@ async function init() {
       // under Key Games would survive the switch and empty the list.
       if (VIEW === "tv" && FILT.month != null
           && (FILT.month < 1 || FILT.month > 3)) FILT.month = null;
-      FILT.windows = VIEW === "tv"
-        ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null;
+      FILT.windows = null;
+      FILT.marquee = VIEW === "tv";
       draw();
       window.scrollTo({ top: 0 });
     }));
@@ -728,7 +719,7 @@ async function init() {
     const b = e.target.closest("button.f[data-act]");
     if (!b) return;
     if (b.dataset.act === "marquee") {
-      FILT.windows = marqueeOn() ? null : (MARQUEE[SPORT_OF[TAB]] || []).slice();
+      FILT.marquee = !FILT.marquee;
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }
@@ -774,7 +765,7 @@ async function init() {
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
     FILT = { season: null, week: null, month: null, type: null, windows: null,
-             team: null };
+             team: null, marquee: false };
     draw();
     window.scrollTo({ top: 0 });
   });
