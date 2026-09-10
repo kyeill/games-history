@@ -264,7 +264,15 @@ the same name is an event in one season and a single game in the next.
 
 **ESPN carries NOTHING about College GameDay or Big Noon Kickoff** -- not in
 the scoreboard, not in the summary endpoint. Searching the payloads for
-"gameday" finds only article prose. Those two tags are, and will stay, manual.
+"gameday" finds only article prose. Those tags are supplied by hand.
+
+`seed_tags.py` takes a table of (date, visitor, host) rows and MERGES the tag
+into `docs/tags.json`, which is live shared state -- anything he tagged from a
+device is preserved. It also looks a day either side of the given date, since
+a late kickoff shifts the Eastern date. Of 73 Big Noon rows, 63 matched and the
+10 that did not are all games the archive correctly excludes: the show
+travelled to Thursday-night openers, 3:30 and 4pm kickoffs, an ESPN 10pm game
+and the Mountain West Championship. A useful cross-check on the window rules.
 
 **Football's TV windows are ERA-DEPENDENT.** No CBS or NBC window before the
 2023 season, and ABC is primetime-only (7pm+) in 2021-22. Without that, the

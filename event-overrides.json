@@ -1,4 +1,14 @@
 {
-  "_comment": "Overrides the automatic choice between an event NAME and the neutral-site CITY. By default a name is kept when more than two teams played under it that season, and dropped in favour of the city when only two did. Put a headline base here to force the answer: a string to display that name, or null to force the city. Run `python harvest.py && python site.py` afterwards.",
-  "_example": {"Duke\u2019s Mayo Classic": "Duke's Mayo Classic", "Some Event": null}
+  "_comment": "Overrides the automatic event-name / neutral-site-city choice. By default a name is kept when more than two teams played under it that season, and dropped in favour of the city when only two did. A string here forces that display name; null forces the city. Run `python harvest.py && python site.py` afterwards.",
+  "Allstate Maui Invitational": "Maui Invitational",
+  "The Maui Invitational Presented by Novavax": "Maui Invitational",
+  "Bad Boy Mowers Battle 4 Atlantis": "Battle 4 Atlantis",
+  "State Farm Champions Classic": "Champions Classic",
+  "Jimmy V Classic presented by Corona": "Jimmy V Classic",
+  "Jumpman Invitational presented by Novant Health": "Jumpman Invitational",
+  "SEC/ACC Men's Challenge Presented by Continental Tire": "SEC/ACC Challenge",
+  "Big East-Big 12 Battle": "Big 12-Big East Battle",
+  "Hall of Fame Series": null,
+  "The Bad Boy Mowers Series": null,
+  "Duke’s Mayo Classic": null
 }
