@@ -167,6 +167,52 @@ def load_event_overrides():
     return {k: v for k, v in raw.items() if not k.startswith("_")}
 
 
+def offsite_games(evs):
+    """Home games played somewhere that is NOT the home team's own building.
+
+    Northwestern hosted Michigan at Wrigley Field in 2025 and Michigan State
+    hosted Penn State at Ford Field in 2023. ESPN calls neither a neutral site
+    -- there IS a home team -- so nothing in the payload says the venue is
+    remarkable. It is derivable: count each home team's venues this season and
+    flag the rare one.
+
+    "Rare" is at most TWO games, not a percentage. Several teams keep a real
+    second home floor -- UConn splits Gampel and Hartford almost evenly,
+    St John's plays a quarter of its home games at Madison Square Garden --
+    and a percentage cutoff either admits all of those or loses Wrigley, which
+    was 2 of Northwestern's 7. The absolute cutoff separates them cleanly:
+    measured across the archive it keeps the six one-offs and drops every
+    second home floor.
+
+    Counted PER SEASON, because "usual" moves: Northwestern's usual venue was
+    the temporary lakefront stadium in 2025 and Ryan Field again in 2026.
+    """
+    venues = collections.defaultdict(collections.Counter)
+    rows = []
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps or comps[0].get("neutralSite"):
+            continue
+        c = comps[0]
+        name = ((c.get("venue") or {}).get("fullName") or "").strip()
+        home = next((k for k in (c.get("competitors") or [])
+                     if k.get("homeAway") == "home"), None)
+        if not name or not home:
+            continue
+        venues[home["team"]["id"]][name] += 1
+        rows.append((x["id"], home["team"]["id"], name))
+
+    out = {}
+    for gid, tid, name in rows:
+        seen = venues[tid]
+        usual, times = seen.most_common(1)[0]
+        # The last two guards protect an IN-PROGRESS season, where a team may
+        # have played too few home games for "usual" to mean anything yet.
+        if name != usual and seen[name] <= 2 and times > seen[name]                 and sum(seen.values()) >= 4:
+            out[gid] = name
+    return out
+
+
 def espn_saturday_ids(evs):
     """One ESPN game per Saturday: the LATEST tip between 6pm and 9pm ET.
 
@@ -206,6 +252,7 @@ def harvest():
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             sizes = event_sizes(evs)
+            offsite = offsite_games(evs)
             for x in evs:
                 comps = x.get("competitions") or []
                 if not comps:
@@ -354,6 +401,7 @@ def harvest():
                     # football displays it.
                     "week": (x.get("week") or {}).get("number"),
                     "venue": v.get("fullName"),
+                    "offsite": offsite.get(x["id"]),
                     "city": rules.display_city(
                         (v.get("address") or {}).get("city"), v.get("fullName")),
                     "nets": sorted(nets), "teams": side,

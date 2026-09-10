@@ -147,13 +147,18 @@ function rowHtml(g, browse) {
   // The purple chip is the conference championship OR the location, never
   // both -- a title game is played somewhere, but the title is the story.
   // One blue chip, in priority order: conference championship, then a named
-  // event (SEC Quarterfinals, Battle 4 Atlantis), then the neutral-site city.
+  // event (SEC Quarterfinals, Battle 4 Atlantis), then a home game played
+  // away from the home team's own building, then the neutral-site city.
   if (g.champ) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
   } else if (g.event) {
     tags.push(chip("champ", g.event));
+  } else if (g.offsite) {
+    // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
+    // Ford Field, Madison Square Garden.
+    tags.push(chip("champ", g.offsite));
   } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }

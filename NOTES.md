@@ -201,6 +201,30 @@ before FOX), so `primaryNet()` ranks the majors explicitly. The full list stays
 in `games.json` -- this is display only, and the slot RULES still read every
 network, which is what lets "NBC, Peacock" match the NBC window.
 
+**A "home" game is not always at home, and ESPN will not tell you.** Michigan
+at Northwestern 2025 was played at Wrigley Field; `neutralSite` is false,
+because Northwestern really was the host. The only signal is the venue field,
+so `offsite_games()` counts each home team's venues per season and flags the
+rare one.
+
+The cutoff is ABSOLUTE -- at most two games at that venue -- not a percentage,
+and that is the whole difficulty. Several teams keep a genuine second home
+floor: UConn splits Gampel and Hartford 8/9, Villanova plays 5 of 14 downtown,
+St John's a quarter of its home games at Madison Square Garden, Kansas 4 of 20
+in Kansas City. None of those deserve a chip. But Wrigley was 2 of
+Northwestern's 7 home games -- 29% -- so any percentage loose enough to catch
+it also catches every one of those second homes. The absolute cutoff splits
+them cleanly: measured across the archive it keeps exactly six games (Wrigley,
+Ford Field, MSG twice for Rutgers, Spokane Arena, Delta Center) and drops
+every second home floor.
+
+Counted per season, because "usual" moves -- Northwestern's usual venue was
+the temporary lakefront stadium in 2025 and Ryan Field again in 2026, and the
+rule follows without being told. Two guards protect an in-progress season,
+where a team may not have played enough home games for "usual" to mean
+anything: the usual venue must have strictly more games, and the team must
+have at least four home games on record.
+
 **`event.week.number` is on every CFB event** (weeks 1-16, zero missing across
 all five seasons). Basketball has one too but it means nothing to a viewer, so
 only football renders it.

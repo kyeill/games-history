@@ -274,6 +274,15 @@ A title game is played somewhere, but the title is the story; otherwise a
 neutral-site game shows its city, which is also what tells you it was neutral
 now that there is no neutral marker. An **OT** note follows where it applies.
 
+Between those two sits a fourth case: a **home game played somewhere other
+than the home team's own building**, which shows the VENUE rather than a city
+— Michigan at Northwestern in **Wrigley Field**, Penn State at Michigan State
+in **Ford Field**. ESPN calls neither neutral, because there is a home team,
+so nothing in the payload says the venue is remarkable; `offsite_games()`
+derives it by counting each home team's venues per season and flagging any it
+used at most twice. See NOTES for why that is an absolute cutoff and not a
+percentage.
+
 **Tagging.** Tap any game for a sheet with the tag chips, a free-text box for
 new tags, a note field, and an add/remove-from-archive toggle. Changes save to
 the device immediately and batch into the sync bar.

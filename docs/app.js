@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-092237";
+const BUILD = "20260910-092648";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -147,13 +147,18 @@ function rowHtml(g, browse) {
   // The purple chip is the conference championship OR the location, never
   // both -- a title game is played somewhere, but the title is the story.
   // One blue chip, in priority order: conference championship, then a named
-  // event (SEC Quarterfinals, Battle 4 Atlantis), then the neutral-site city.
+  // event (SEC Quarterfinals, Battle 4 Atlantis), then a home game played
+  // away from the home team's own building, then the neutral-site city.
   if (g.champ) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
   } else if (g.event) {
     tags.push(chip("champ", g.event));
+  } else if (g.offsite) {
+    // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
+    // Ford Field, Madison Square Garden.
+    tags.push(chip("champ", g.offsite));
   } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }
