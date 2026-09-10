@@ -1,0 +1,4 @@
+{
+  "_comment": "Overrides the automatic choice between an event NAME and the neutral-site CITY. By default a name is kept when more than two teams played under it that season, and dropped in favour of the city when only two did. Put a headline base here to force the answer: a string to display that name, or null to force the city. Run `python harvest.py && python site.py` afterwards.",
+  "_example": {"Duke\u2019s Mayo Classic": "Duke's Mayo Classic", "Some Event": null}
+}

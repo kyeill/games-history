@@ -115,6 +115,40 @@ def load_overrides():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def event_sizes(evs):
+    """How many distinct TEAMS play under each event name this season.
+
+    His principle: keep the event name when it is a tournament or a multi-team
+    event, otherwise show the neutral-site city instead. That is derivable --
+    a tournament fields more than two teams. Maui runs 8 teams over 12 games;
+    the Aer Lingus College Football Classic is one game between two.
+
+    Counted PER SEASON, because the same name can be either: there were two
+    Duke's Mayo Classic games in 2021 (4 teams) and one in every other year.
+    """
+    out = collections.defaultdict(set)
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps:
+            continue
+        for n in (comps[0].get("notes") or []):
+            base = (n.get("headline") or "").split(" - ")[0].strip()
+            if not base:
+                continue
+            out[base] |= {k["team"]["id"] for k in (comps[0].get("competitors") or [])}
+            break
+    return {k: len(v) for k, v in out.items()}
+
+
+def load_event_overrides():
+    """Manual corrections to the automatic event/city choice."""
+    path = os.path.join(HERE, "event-overrides.json")
+    if not os.path.exists(path):
+        return {}
+    raw = json.load(open(path, encoding="utf-8"))
+    return {k: v for k, v in raw.items() if not k.startswith("_")}
+
+
 def espn_saturday_ids(evs):
     """One ESPN game per Saturday: the LATEST tip between 6pm and 9pm ET.
 
@@ -145,12 +179,14 @@ def espn_saturday_ids(evs):
 def harvest():
     keep, teams = [], {}
     overrides = load_overrides()
+    ev_overrides = load_event_overrides()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         for y in SEASONS:
             evs = events(code, y)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
+            sizes = event_sizes(evs)
             for x in evs:
                 comps = x.get("competitions") or []
                 if not comps:
@@ -216,12 +252,20 @@ def harvest():
                                             b1g_tourney_run=b1g_run)
                 # a named event (Battle 4 Atlantis, SEC Quarterfinals) for the
                 # blue chip, when it is not already a Power Five title
+                # An event name is kept only when more than two teams played
+                # under it this season -- otherwise it is one neutral-site game
+                # and the CITY is the more useful label. `ev_overrides` can
+                # force either answer: a name to use, or null to force the city.
                 event = None
                 for h in heads:
-                    base = h.split(" - ")[0]
-                    if base and not conf:
-                        event = h.replace(" - ", " ")
+                    base = h.split(" - ")[0].strip()
+                    if not base or conf:
                         break
+                    if base in ev_overrides:
+                        event = ev_overrides[base]
+                    elif sizes.get(base, 0) > 2:
+                        event = base
+                    break
                 # Being a conference-tournament game is NOT a qualification on
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.

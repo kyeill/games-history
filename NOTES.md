@@ -253,6 +253,15 @@ RANGE, so a partial answer fetched in week one would be served for the rest of
 the year. `season_over()` gates it: football is done after 1 Feb, basketball
 after 1 May. 2026 football is live right now and refetches every run.
 
+**"Is it an event or one neutral-site game?" is DERIVABLE, not a judgement.**
+A tournament fields more than two teams under its name; a showcase game fields
+exactly two. Counted per season from the raw events (`event_sizes`), that
+separates all 37 names correctly: Maui runs 8 teams over 12 games, the Aer
+Lingus College Football Classic is one game between two. **Count PER SEASON** --
+there were two Duke's Mayo Classic games in 2021 and one every other year, so
+the same name is an event in one season and a single game in the next.
+`event-overrides.json` forces either answer where the rule is not what he wants.
+
 **ESPN carries NOTHING about College GameDay or Big Noon Kickoff** -- not in
 the scoreboard, not in the summary endpoint. Searching the payloads for
 "gameday" finds only article prose. Those two tags are, and will stay, manual.
