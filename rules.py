@@ -51,10 +51,12 @@ WINDOW_NET = {
 
 # The header line is tinted by the window it belongs to -- his hexes,
 # 2026-09-09. Anything not listed keeps the muted default.
+# ABC Saturday and FOX Friday are deliberately absent: he wants those headers
+# plain. A window with no tint here keeps the muted default.
 HEADER_TINT = {
-    "FOX Big Noon": "#ffcb05", "FOX Friday": "#ffcb05",
-    "CBS B1G Time": "#1c4469", "NBC Saturday Night": "#0b85c8",
-    "FOX Weekend": "#ffcb05", "CBS Weekend": "#1c4469",
+    "FOX Big Noon": "#ffcb05",
+    "CBS B1G Time": "#005ae4", "NBC Saturday Night": "#0b85c8",
+    "FOX Weekend": "#ffcb05", "CBS Weekend": "#005ae4",
     "NBC Weekend": "#0b85c8",
 }
 

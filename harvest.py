@@ -84,8 +84,25 @@ def fox_friday_dates(evs):
     return out
 
 
+def load_overrides():
+    """Manual window assignments for games ESPN records with no network.
+
+    A weather-delayed game can end up with only its streaming feed listed --
+    Texas A&M at Florida (2024) reads "ESPN+, ESPN3" and nothing else -- and no
+    rule can recover a network that is not in the data. This is the escape
+    hatch. Keys are ESPN game ids; keys starting with "_" are ignored.
+    """
+    path = os.path.join(HERE, "window-overrides.json")
+    if not os.path.exists(path):
+        return {}
+    raw = json.load(open(path, encoding="utf-8"))
+    return {k: v for k, v in raw.items()
+            if not k.startswith("_") and isinstance(v, list)}
+
+
 def harvest():
     keep, teams = [], {}
+    overrides = load_overrides()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         for y in SEASONS:
@@ -153,12 +170,15 @@ def harvest():
                     if base and not conf:
                         event = h.replace(" - ", " ")
                         break
-                if not slots and not gtype and not conf and not black_friday:
+                if (not slots and not gtype and not conf and not black_friday
+                        and x["id"] not in overrides):
                     continue
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.
                 if title:
                     slots = set()
+                if x["id"] in overrides:
+                    slots = set(overrides[x["id"]])
 
                 side = []
                 for k in cs:

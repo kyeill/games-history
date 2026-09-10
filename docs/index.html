@@ -89,10 +89,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* week + date, where the sport label used to be */
 .sport{grid-area:sport;font-size:12.5px;font-weight:500;
   color:var(--muted);margin-bottom:5px}
-/* the week keeps the orange accent unless the header itself is tinted, in
-   which case the whole line takes the window's colour */
-.wk{color:var(--accent);font-weight:500}
-.sport[style] .wk{color:inherit}
+/* the week takes the header's colour, tinted or plain -- no orange of its own
+   (his call: an untinted header should read entirely plain) */
+.wk{font-weight:500}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 2px;border-radius:5px}
@@ -275,6 +274,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909-203435"></script>
+<script src="app.js?v=20260909-204343"></script>
 </body>
 </html>

@@ -229,10 +229,20 @@ the options are rebuilt from the games in the chosen season and the week is
 cleared whenever the season changes -- otherwise a stale week empties the list.
 Football only: basketball has no meaningful week.
 
-**CBS's header tint #1c4469 measures 1.64:1 against the card** and is
-effectively unreadable -- his hex, applied as given and flagged rather than
-silently altered. 4.5:1 is the readable floor; #778fa5 is the same navy lifted
-to 4.95:1. FOX #ffcb05 is 10.9:1 and NBC #0b85c8 is 4.11:1.
+**Header tint contrast against the #1e1e23 card.** FOX #ffcb05 = 10.9:1,
+NBC #0b85c8 = 4.11:1, CBS #005ae4 = 2.83:1. The WCAG floor is 4.5:1, so CBS and
+NBC sit under it -- but #005ae4 replaced #1c4469, which measured **1.64:1** and
+was genuinely invisible. Measure any new tint before shipping it; the card is
+dark and dark blues vanish.
+
+**ESPN sometimes records a network game with only its STREAMING feed.**
+Texas A&M at Florida (2024-09-14) reads "ESPN+, ESPN3" and nothing else -- a
+weather delay, and `geoBroadcasts` is empty too, so nothing in ESPN's data
+recovers it. Of 73 power-vs-power games with no major network, the vast
+majority are GENUINE streaming exclusives (Peacock's Big Ten package, BIG12|
+ESPN+, ESPN3 for the ACC), so there is no rule that separates the real ones
+from the degraded ones. `window-overrides.json` is the escape hatch: game id ->
+window list, read by harvest.
 
 **CBS's football window is a PACKAGE, not a clock slot.** It was a narrow
 3:30 +/- 45min check and silently missed USC at Purdue (CBS, 6:45pm, 2025) --

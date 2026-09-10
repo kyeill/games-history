@@ -1,0 +1,4 @@
+{
+  "_comment": "Manual window assignments, by ESPN game id. ESPN sometimes records only a streaming feed for a game that actually aired on a network -- a weather delay can do it -- and no rule can recover a network that is not in the data. Add the game id and the window it belongs in. Run `python harvest.py` after editing.",
+  "_example": {"401628353": ["ABC Saturday"]}
+}
