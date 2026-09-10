@@ -146,9 +146,10 @@ def harvest():
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks), bt in confs)
-                    suffix = rules.cbb_header_suffix(nets, d)
+                    suffix = rules.cbb_header_suffix(
+                        nets, d, tourney=rules.is_championship(heads))
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
-                conf, head = rules.power5_title(heads)
+                conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
                 # A championship game outside the Power Four/Five keeps no TV
                 # window -- the Mountain West title game is not "FOX Friday".

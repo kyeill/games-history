@@ -272,7 +272,9 @@ function visible() {
   // Windows (his call), but picking ONE window must not surface it.
   if (FILT.windows && FILT.windows.length) {
     const viaMarquee = marqueeOn();
-    list = list.filter(g => (viaMarquee && (g.title || g.bfri)) ||
+    // Black Friday rides along with Marquee; a conference-tournament FINAL
+    // never does (his call) -- it belongs to no broadcast package.
+    list = list.filter(g => (viaMarquee && g.bfri) ||
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   }
   if (FILT.type) list = list.filter(g => g.type === FILT.type);

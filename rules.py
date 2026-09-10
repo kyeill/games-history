@@ -11,7 +11,15 @@ DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 # ESPN conferenceId, verified historical: ESPN returns the conference the team
 # was IN at the time of the game (USC reads Pac-12 in 2021, Big Ten in 2025).
 BIG_TEN = {"CFB": "5", "CBB": "7"}
+# Football has five power conferences; basketball has SIX -- the Big East is
+# a major basketball conference with no football to speak of. His "Power
+# Five/Six", 2026-09-09.
 POWER5 = ["ACC", "Big Ten", "Big 12", "SEC", "Pac-12"]
+POWER6 = POWER5 + ["Big East"]
+
+
+def power_conferences(sport):
+    return POWER6 if sport == "CBB" else POWER5
 
 
 def _mins(d):
@@ -186,12 +194,14 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
     return out
 
 
-def cbb_header_suffix(nets, d):
+def cbb_header_suffix(nets, d, tourney=False):
     """The label that follows the date on a basketball card. Not a window --
     the cards carry no window chips at all -- just a name for the slot."""
     if d.month not in (1, 2, 3):
         return None
     day, t = DOW[d.weekday()], _mins(d)
+    if tourney:
+        return None          # a conference tournament is not a TV slot
     if "FOX" in nets and day == "Fri":
         return "FOX Friday"
     if "FOX" in nets and day == "Sat" and t >= 19 * 60:
@@ -315,7 +325,7 @@ def is_championship(headlines):
     return False
 
 
-def power5_title(headlines):
+def power5_title(headlines, sport="CFB"):
     """Conference championship / tournament game, Power Five only.
 
     TRAP: ESPN prefixes a sponsor and changes the suffix year to year --
@@ -331,7 +341,7 @@ def power5_title(headlines):
             continue
         if "FCS" in base:
             continue
-        for p in POWER5:
+        for p in power_conferences(sport):
             if p in base:
                 return p, h
     return None, None
