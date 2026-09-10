@@ -132,12 +132,22 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
     return out
 
 
-def cfb_black_friday(nets, d, season):
-    """Black Friday football, which he wants in the archive and in Marquee but
-    WITHOUT a window label -- CBS and NBC from 2023, FOX and ABC throughout."""
+def cfb_black_friday(nets, d, season, big_ten=False):
+    """Black Friday football -- in the archive and in Marquee, but with NO
+    window label.
+
+    Narrowed 2026-09-09 to **ABC in primetime, plus FOX/CBS/NBC games with a
+    Big Ten team**; CBS and NBC still only from 2023. That takes the Friday
+    slate from 30 games to 10 and drops the Group of Five and afternoon
+    filler.
+    """
     if not is_black_friday(d):
         return False
-    if nets & {"FOX", "ABC"}:
+    if "ABC" in nets and _mins(d) >= 19 * 60:
+        return True
+    if not big_ten:
+        return False
+    if "FOX" in nets:
         return True
     return season >= 2023 and bool(nets & {"CBS", "NBC"})
 

@@ -141,7 +141,8 @@ def harvest():
                 if code == "CFB":
                     slots = rules.cfb_slots(nets, d, y, team_ids, set(confs),
                                             fox_fri)
-                    black_friday = rules.cfb_black_friday(nets, d, y)
+                    black_friday = rules.cfb_black_friday(
+                        nets, d, y, big_ten=(bt in confs))
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks), bt in confs)

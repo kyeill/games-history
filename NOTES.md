@@ -252,6 +252,12 @@ USC at Purdue reads 6:45pm because of the delay, and Texas A&M at Florida lost
 its network entirely. Those are `window-overrides.json` entries, not rule
 changes. Read a missing game as a data problem before widening a rule.
 
+**Conference membership is AS OF THE SEASON, which bites the Black Friday
+rule.** Narrowing Black Friday to "FOX/CBS/NBC with a Big Ten team" drops the
+2023 Oregon-Oregon State game, because Oregon was still Pac-12 that year and
+only joined the Big Ten in 2024 -- and that is the very game he had asked about
+a round earlier. Flagged to him rather than quietly exempted. 30 games -> 10.
+
 **A game with no window needs explicit admission to the TV Windows view.**
 Championship AND Black Friday games carry no window, so both need
 `|| g.title || g.bfri` in the view filter and in the Marquee exemption. Black
