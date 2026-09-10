@@ -58,6 +58,8 @@ VENUE_METROS = {
     "Uniondale", "Harrison", "Elmont",
     # Los Angeles
     "Los Angeles", "Inglewood", "Pasadena", "Carson", "Anaheim",
+    # Chicago
+    "Chicago", "Evanston", "Rosemont",
 }
 
 
