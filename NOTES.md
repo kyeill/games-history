@@ -244,13 +244,20 @@ ESPN+, ESPN3 for the ACC), so there is no rule that separates the real ones
 from the degraded ones. `window-overrides.json` is the escape hatch: game id ->
 window list, read by harvest.
 
-**CBS's football window is a PACKAGE, not a clock slot.** It was a narrow
-3:30 +/- 45min check and silently missed USC at Purdue (CBS, 6:45pm, 2025) --
-he spotted it. CBS runs Big Ten games at noon, 3:30 and primetime. The rule is
-now CBS + Saturday + (Big Ten or SEC): the SEC half matters because CBS held
-the SEC through 2023 and the Big Ten from 2024, so requiring Big Ten alone
-would have dropped twelve 2023 SEC games including the Iron Bowl. Adds 9,
-removes 0.
+**CBS B1G Time is the 3:30 window and ONLY that.** I once widened it to any
+Saturday CBS game (or CBS + Big Ten/SEC) to explain a missing game, and he
+rejected both -- they dragged in Washington-Washington State, UCLA-Hawai'i and
+a dozen 2023 fixtures. **Both games he reported missing were WEATHER DELAYED**:
+USC at Purdue reads 6:45pm because of the delay, and Texas A&M at Florida lost
+its network entirely. Those are `window-overrides.json` entries, not rule
+changes. Read a missing game as a data problem before widening a rule.
+
+**A game with no window needs explicit admission to the TV Windows view.**
+Championship AND Black Friday games carry no window, so both need
+`|| g.title || g.bfri` in the view filter and in the Marquee exemption. Black
+Friday games were harvested correctly but unreachable on the page until that
+was added -- the data was right and the view was wrong, which is the hard kind
+to spot.
 
 **Two navigation axes, not one.** TAB is the sport, VIEW is the collection.
 Switching sport must clear EVERY filter (CFB and CBB share no game types or TV

@@ -51,25 +51,27 @@ WINDOW_NET = {
 
 # The header line is tinted by the window it belongs to -- his hexes,
 # 2026-09-09. Anything not listed keeps the muted default.
-# ABC Saturday and FOX Friday are deliberately absent: he wants those headers
-# plain. A window with no tint here keeps the muted default.
+# FOOTBALL header tints. ABC Saturday and FOX Friday are deliberately absent:
+# he wants those headers plain, and an untinted window keeps the muted default.
+# Basketball does NOT tint its header -- it colours the NETWORK text instead,
+# see NET_TINT.
 HEADER_TINT = {
     "FOX Big Noon": "#ffcb05",
-    "CBS B1G Time": "#005ae4", "NBC Saturday Night": "#0b85c8",
-    "FOX Weekend": "#ffcb05", "CBS Weekend": "#005ae4",
-    "NBC Weekend": "#0b85c8",
+    "CBS B1G Time": "#4b8dff", "NBC Saturday Night": "#0b85c8",
 }
+
+# The network text in the meta column, coloured on basketball cards.
+NET_TINT = {"FOX": "#ffcb05", "CBS": "#4b8dff", "NBC": "#0b85c8"}
 
 # Sorting a tie: when two games kick at the same minute, the bigger network
 # leads. His order, and it differs by sport only in length.
 NET_PRIORITY = {"CFB": ["FOX", "CBS", "NBC", "ABC"],
                 "CBB": ["FOX", "CBS", "NBC", "ABC", "ESPN", "Peacock"]}
 
-# CBS's college package was the SEC through 2023 and the Big Ten from 2024 --
-# "CBS B1G Time" means whichever it was, so both conferences qualify. Without
-# this the window was a narrow 3:30 clock check and missed USC at Purdue
-# (6:45pm on CBS, 2025), which he spotted.
-CBS_CFB_CONF = {"5", "8"}                  # Big Ten, SEC
+# CBS B1G Time is the 3:30 window and ONLY that. A wider "any Saturday CBS
+# game" rule pulled in Washington-Washington State, UCLA-Hawai'i and a dozen
+# 2023 fixtures, which he rejected. USC at Purdue reads 6:45pm in ESPN's data
+# because it was WEATHER DELAYED -- that is an override, not a rule.
 
 
 def thanksgiving(year):
@@ -119,8 +121,8 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
 
     if "FOX" in nets and day == "Sat" and abs(t - 12 * 60) <= 40:
         out.add("FOX Big Noon")
-    # CBS: whichever conference its package held that year, any Saturday time
-    if not early and "CBS" in nets and day == "Sat" and (conf_ids & CBS_CFB_CONF):
+    if (not early and "CBS" in nets and day == "Sat"
+            and abs(t - (15 * 60 + 30)) <= 45):
         out.add("CBS B1G Time")
     if (not early and "NBC" in nets and day == "Sat"
             and abs(t - (19 * 60 + 30)) <= 45):
@@ -186,6 +188,10 @@ def cbb_header_suffix(nets, d):
         return "FOX Primetime"
     if "ESPN" in nets and day == "Sat" and t >= 19 * 60:
         return "ESPN Primetime"
+    if "ESPN" in nets and day == "Mon" and t >= 18 * 60:
+        return "Big Monday"
+    if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
+        return "Super Tuesday"
     return None
 
 

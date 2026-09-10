@@ -162,7 +162,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-slot.n-abc{background:#1b2440;border-color:#2b3860;color:#93a9dc}
 .t-slot.n-espn{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
 .t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
-.t-champ{background:#26202f;border-color:#3a3145;color:#bda9d4}
+/* conference championship / event name / neutral-site location -- BLUE,
+   his call 2026-09-09 (it was purple) */
+.t-champ{background:#1b2a40;border-color:#2c4265;color:#9dbde8}
 .t-mine{background:#1f2e28;border-color:#2f4539;color:#9ecab0}
 .t-mine.g-yellow{background:#3a3218;border-color:#584a1d;color:#e8c766}
 .t-mine.g-red{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}

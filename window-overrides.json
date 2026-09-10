@@ -1,4 +1,5 @@
 {
-  "_comment": "Manual window assignments, by ESPN game id. ESPN sometimes records only a streaming feed for a game that actually aired on a network -- a weather delay can do it -- and no rule can recover a network that is not in the data. Add the game id and the window it belongs in, then run `python harvest.py && python site.py`.",
+  "_comment": "Manual window assignments, by ESPN game id. ESPN records a WEATHER-DELAYED game at its delayed start, and sometimes with only a streaming feed, so a rule keyed on kickoff time or network cannot place it. Add the game id and the window it belongs in, then run `python harvest.py && python site.py`.",
+  "401752832": ["CBS B1G Time"],
   "401628353": ["ABC Saturday"]
 }

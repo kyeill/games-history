@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-205309";
+const BUILD = "20260909-210022";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -14,7 +14,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, type: null, windows: null, team: null };
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
-let HEADER_TINT = {}, NET_PRIORITY = {};
+let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
@@ -136,9 +136,8 @@ function rowHtml(g, browse) {
   const home = g.teams[0], away = g.teams[1];
   const win = home.win ? home : away;
   const tags = [];
-  // The game type is what the Big Games view is ABOUT, so it is redundant on
-  // the TV Windows cards and drawn only on the other view.
-  if (g.type && VIEW === "big") tags.push(chip("big", g.type));
+  // No game-type label on any card, either view (his call 2026-09-09). The
+  // field still drives the Game Type filter.
   // The purple chip is the conference championship OR the location, never
   // both -- a title game is played somewhere, but the title is the story.
   // One blue chip, in priority order: conference championship, then a named
@@ -163,9 +162,10 @@ function rowHtml(g, browse) {
   // (football) or slot name (basketball) after a dash. The whole line takes
   // the window's colour, so the cards carry no separate window chip.
   const label = g.sport === "CFB" ? (g.slots || [])[0] : g.suffix;
-  const tint = g.sport === "CFB"
-    ? HEADER_TINT[label]
-    : HEADER_TINT[primaryNet(g.nets) + " Weekend"];
+  // Football tints the header line; basketball leaves it plain and tints the
+  // NETWORK text in the meta column instead.
+  const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
+  const netCol = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
   const when =
     ((g.sport === "CFB" && g.week)
       ? '<span class="wk">Week ' + g.week + "</span> (" + g.dow + " " +
@@ -183,7 +183,8 @@ function rowHtml(g, browse) {
       ">" + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away) + teamLine(home) + "</div>" +
     // network on the away team's line, time on the home team's
-    '<div class="meta"><div class="mrow">' +
+    '<div class="meta"><div class="mrow"' +
+      (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow">' +
       fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
@@ -240,8 +241,10 @@ function visible() {
   // A championship game shows on TV Windows even with no broadcast window --
   // 17 of the 46 have none, because the Big Ten title game kicks at 8pm and
   // the Pac-12 one was on a Friday. His call: they must all show.
+  // Black Friday games carry no window, like championship games, so they need
+  // the same admission -- without this they sat in the data unreachable.
   list = list.filter(g => VIEW === "tv"
-    ? ((g.slots || []).length || g.title)
+    ? ((g.slots || []).length || g.title || g.bfri)
     : ((g.type || g.champ) && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
@@ -249,7 +252,7 @@ function visible() {
   // Windows (his call), but picking ONE window must not surface it.
   if (FILT.windows && FILT.windows.length) {
     const viaMarquee = marqueeOn();
-    list = list.filter(g => (viaMarquee && g.title) ||
+    list = list.filter(g => (viaMarquee && (g.title || g.bfri)) ||
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   }
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
@@ -585,6 +588,7 @@ async function init() {
   MARQUEE = r[0].marquee || {};
   WINDOW_NET = r[0].window_net || {};
   HEADER_TINT = r[0].header_tint || {};
+  NET_TINT = r[0].net_tint || {};
   NET_PRIORITY = r[0].net_priority || {};
   clearFilters();
   try {

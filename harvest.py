@@ -213,7 +213,7 @@ def harvest():
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "marquee": rules.MARQUEE, "window_net": rules.WINDOW_NET,
-               "header_tint": rules.HEADER_TINT,
+               "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
                "net_priority": rules.NET_PRIORITY,
                "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),
