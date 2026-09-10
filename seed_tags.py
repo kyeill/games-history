@@ -173,17 +173,14 @@ TABLES = [("Big Noon Kickoff", "CFB", BIG_NOON),
           ("College GameDay", "CFB", GAMEDAY_CFB),
           ("College GameDay", "CBB", GAMEDAY_CBB)]
 
-# the source table's names against ESPN's `location`
-ALIAS = {
-    "USC": "Southern Cal", "BYU": "Brigham Young", "TCU": "Texas Christian",
-    "UCF": "Central Florida", "UNLV": "Unlv", "UCLA": "Ucla",
-    "LSU": "Louisiana State", "SMU": "Southern Methodist",
-    "USF": "South Florida",
-}
+# Names are normalised through rules.display_name, so the source table's
+# "UConn" and the archive's "Connecticut" resolve to the same thing -- and so
+# do BYU/Brigham Young, TCU/Texas Christian, USC/Southern Cal and the rest.
+import rules
 
 
 def norm(n):
-    return ALIAS.get(n, n).lower().replace(".", "").strip()
+    return rules.display_name(n).lower().replace(".", "").strip()
 
 
 def main(dry):
@@ -235,7 +232,11 @@ def main(dry):
     stripped = 0
     for gid, entry in list(tags.items()):
         g = ids.get(gid)
-        if not g or not g["champ"]:
+        # strip a show tag from a postseason game, and from any game that has
+        # since left the archive -- unless he added it by hand, which carries
+        # its own game payload
+        gone = g is None and not entry.get("game")
+        if not gone and (not g or not g["champ"]):
             continue
         cur = [t for t in (entry.get("tags") or []) if t not in SHOW_TAGS]
         if cur != (entry.get("tags") or []):

@@ -262,6 +262,19 @@ there were two Duke's Mayo Classic games in 2021 and one every other year, so
 the same name is an event in one season and a single game in the next.
 `event-overrides.json` forces either answer where the rule is not what he wants.
 
+**A show-broadcast game is its own admission reason.** He wants every College
+GameDay and Big Noon Kickoff game in the archive, and 24 of the stragglers were
+ESPN games that no window reaches. `harvest.show_games()` reads the tables out
+of seed_tags.py -- one list, not two that drift -- and flags the game `show`,
+which admits it to the TV Windows view and lets it ride Marquee. Postseason
+still stays out: the 2024 Mountain West Championship is the case that tests it.
+
+**Names must be compared through `rules.display_name` on BOTH sides.** The
+seeder matched the table's "UConn" against the archive's "Connecticut" and
+missed a game that was sitting right there. `norm()` routes everything through
+display_name so UConn/Connecticut, BYU/Brigham Young and USC/Southern Cal all
+resolve.
+
 **ESPN carries NOTHING about College GameDay or Big Noon Kickoff** -- not in
 the scoreboard, not in the summary endpoint. Searching the payloads for
 "gameday" finds only article prose. Those tags are supplied by hand.

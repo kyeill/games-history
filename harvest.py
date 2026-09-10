@@ -115,6 +115,24 @@ def load_overrides():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def show_games():
+    """(sport, date, {team names}) for every game College GameDay or Big Noon
+    Kickoff broadcast from. He wants all of them in the archive even when no
+    window rule reaches them -- 24 of the 50 stragglers are ESPN games, and
+    neither sport has a general ESPN window.
+
+    The tables live in seed_tags.py, which is also what writes the tags, so
+    there is one list rather than two that can drift.
+    """
+    import seed_tags
+    out = set()
+    for _tag, sport, rows in seed_tags.TABLES:
+        for date, visitor, host in rows:
+            out.add((sport, date,
+                     frozenset({seed_tags.norm(visitor), seed_tags.norm(host)})))
+    return out
+
+
 def event_sizes(evs):
     """How many distinct TEAMS play under each event name this season.
 
@@ -179,6 +197,7 @@ def espn_saturday_ids(evs):
 def harvest():
     keep, teams = [], {}
     overrides = load_overrides()
+    shows = show_games()
     ev_overrides = load_event_overrides()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
@@ -233,6 +252,15 @@ def harvest():
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
+                # a show broadcast from this game? match either side of the
+                # date, since a late kickoff shifts the Eastern one
+                import seed_tags as _st
+                names = frozenset(_st.norm(k["team"].get("location") or "")
+                                  for k in cs)
+                show = any((code, dd, names) in shows for dd in (
+                    d.date().isoformat(),
+                    (d.date() - dt.timedelta(days=1)).isoformat(),
+                    (d.date() + dt.timedelta(days=1)).isoformat()))
                 # A championship game outside the Power Four/Five keeps no TV
                 # window -- the Mountain West title game is not "FOX Friday".
                 # Football only: a Big East tournament game on FOX genuinely is
@@ -270,7 +298,7 @@ def harvest():
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.
                 if (not slots and not gtype and not title and not black_friday
-                        and x["id"] not in overrides):
+                        and not show and x["id"] not in overrides):
                     continue
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -284,6 +312,10 @@ def harvest():
                 # Conference tournaments are a MARCH thing in basketball.
                 tourney_round = rules.is_championship(heads) and (
                     code == "CFB" or d.month in (3, 4))
+                # A conference championship or playoff round stays out even
+                # when a show broadcast from it -- he does not want postseason
+                # under Big Noon or GameDay, and the 2024 Mountain West
+                # Championship is the case that tests it.
                 if tourney_round and not title:
                     continue
                 # A championship game carries NO TV window chip (his call): it
@@ -313,6 +345,7 @@ def harvest():
                     "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
                     "time": d.strftime("%H:%M"),
                     "neutral": bool(c.get("neutralSite")), "ot": overtime,
+                    "show": show,
                     # ESPN carries week.number on every CFB event; basketball
                     # has one too but it means nothing to a viewer, so only
                     # football displays it.
