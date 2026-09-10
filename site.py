@@ -130,6 +130,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.celebrate{border-color:var(--celeb,#ffcb05);
   box-shadow:0 0 0 1px var(--celebring,#ffcb0544)}
 .row.celebrate:hover{filter:brightness(1.12)}
+/* a rival won, or Michigan lost: both team lines go italic */
+.row.dimmed .nm{font-style:italic}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
@@ -237,6 +239,7 @@ BODY = """
   <h1>Games History</h1>
   <span class="count" id="count"></span>
   <span class="spacer"></span>
+  <button class="iconbtn" id="clearbtn">Clear Filters</button>
   <button class="iconbtn" id="settingsbtn">Settings</button>
 </header>
 

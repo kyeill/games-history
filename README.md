@@ -206,6 +206,19 @@ team's line takes a lightened wash of its colour, the loser's line stays plain.
 Kyle chose it over washing the whole row, which turns a long list into a colour
 chart.
 
+**Row borders and italics, in one table.** Michigan's presence decides first,
+and two rivals playing each other cancel out -- one of them had to win, so
+colouring the winner would celebrate a rival.
+
+| the game | border | teams |
+|---|---|---|
+| Michigan won | maize `#ffcb05` | upright |
+| Michigan lost | grey `#5a5a62` | *italic* |
+| a rival lost to anyone else | the winner's colour | upright |
+| two rivals played each other | none | *italic* |
+| a rival won | none | *italic* |
+| nobody's team | none | upright |
+
 **A coloured border flags a result he wants to see: Michigan won, or a rival
 lost.** A full maize box was tried first and was too loud, so the frame carries
 the flag and the winner's line keeps its own wash. A Michigan win is maize; a

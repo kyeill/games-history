@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-210415";
+const BUILD = "20260909-210903";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -177,6 +177,7 @@ function rowHtml(g, browse) {
   const flag = celebrated(g);
   const ring = flag ? celebrateColor(g) : null;
   return '<button class="row' + (flag ? " celebrate" : "") +
+    (dimmed(g) ? " dimmed" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") +
@@ -202,10 +203,23 @@ function bigViewAllows(g) {
   if (mich && !mich.win) return false;
   return !g.teams.some(t => RIVALS.indexOf(t.id) > -1 && t.win);
 }
+function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
+function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
+
+/* A result he does not want to relive: a rival won, or Michigan lost. Both
+   team lines go italic. */
+function dimmed(g) {
+  const m = michTeam(g);
+  return (m && !m.win) || g.teams.some(t => isRival(t) && t.win);
+}
+
 function celebrated(g) {
-  // Michigan won, or a rival lost -- the two results worth flagging.
-  if (g.teams.some(t => t.id === MICHIGAN && t.win)) return true;
-  return g.teams.some(t => RIVALS.indexOf(t.id) > -1 && !t.win);
+  const m = michTeam(g);
+  if (m) return true;                       // maize for a win, grey for a loss
+  // Two rivals playing each other cancel out -- one of them had to win, and
+  // colouring the winner would celebrate a rival.
+  if (g.teams.every(isRival)) return false;
+  return g.teams.some(t => isRival(t) && !t.win);
 }
 function brighten(hex, target) {
   // Lift a colour toward white until it reaches a target luminance, so every
@@ -221,11 +235,14 @@ function brighten(hex, target) {
     .toString(16).padStart(2, "0")).join("");
 }
 function celebrateColor(g) {
-  // Michigan's own win is maize. A rival losing is coloured by whoever DID it
-  // -- Indiana over Ohio State reads Indiana red.
-  const w = g.teams.find(t => t.win);
-  if (w && w.id === MICHIGAN) return ["#ffcb05", "#ffcb0544"];
-  const solid = brighten(teamColor(w), 130);
+  // Michigan's own win is maize; a Michigan loss is plain grey. A rival losing
+  // to anyone else is coloured by whoever DID it -- Indiana over Ohio State
+  // reads Indiana red.
+  const m = michTeam(g);
+  if (m) {
+    return m.win ? ["#ffcb05", "#ffcb0544"] : ["#5a5a62", "#5a5a6244"];
+  }
+  const solid = brighten(teamColor(g.teams.find(t => t.win)), 130);
   return [solid, solid + "44"];
 }
 
@@ -668,6 +685,13 @@ async function init() {
   document.querySelectorAll(".done").forEach(b =>
     b.addEventListener("click", hideAll));
   document.getElementById("scrim").addEventListener("click", hideAll);
+  // Clear Filters wipes everything, including the opening defaults -- it is
+  // the escape from "newest season + Marquee", not a reset to it.
+  document.getElementById("clearbtn").addEventListener("click", () => {
+    FILT = { season: null, week: null, type: null, windows: null, team: null };
+    draw();
+    window.scrollTo({ top: 0 });
+  });
   document.getElementById("settingsbtn").addEventListener("click", () => {
     document.getElementById("tokbox").value = token();
     show("settings");
