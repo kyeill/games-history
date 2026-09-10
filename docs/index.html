@@ -121,11 +121,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* just the kickoff time now -- the network moved back to the bottom left */
 /* Network on the away team's line, time on the home team's. Same row count
    and gap as .tl, so the two columns line up exactly. */
+/* date, time, network -- three lines against the two team lines, so this is a
+   simple stack rather than a row-matched grid */
 .meta{grid-area:meta;padding-left:14px;border-left:1px solid var(--line);
-  min-width:92px;align-self:stretch;
-  display:grid;grid-template-rows:1fr 1fr;gap:3px}
+  min-width:98px;align-self:stretch;
+  display:flex;flex-direction:column;justify-content:center;gap:1px}
 .mrow{display:flex;align-items:center;justify-content:flex-end;
-  font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+  font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums;
+  line-height:1.35}
+.mdate{color:var(--muted)}
 .tags{grid-area:tags;display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;
   align-items:center}
 .tags:empty{display:none}
@@ -282,6 +286,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260910-090047"></script>
+<script src="app.js?v=20260910-091137"></script>
 </body>
 </html>

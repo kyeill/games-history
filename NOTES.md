@@ -46,7 +46,7 @@ fetches the summary endpoint today.
 ## Rules
 
 **Top-10 vs top-10 is not an upset.** Two of the four "upset" rules Kyle gave
-are marquee-matchup rules. The tab is named Big Games for that reason.
+are marquee-matchup rules. The tab is named Key Games for that reason.
 
 **Peacock on its own is a firehose.** 246 games, including Alcorn State at
 Minnesota 95-50 and Providence vs George Washington. It carries every Big Ten
@@ -95,7 +95,7 @@ and the page looks broken rather than empty-by-choice.
 **Every game in the archive must be REACHABLE from a view.** A game qualifies
 by a TV window, a game type, a Black Friday flag or a manual override -- and
 being a conference-tournament game is NOT one of them. It used to be, and it
-held 265 early-round basketball games that Big Games showed but nobody wanted
+held 265 early-round basketball games that Key Games showed but nobody wanted
 and TV Windows could not reach at all. Check `not type and not slots and not
 bfri` after any rule change: it should be zero.
 
@@ -117,7 +117,7 @@ Purdue-Texas Tech game. Basketball conference tournaments are a MARCH thing, so
 the exclusion is gated on the month -- and note `d.month >= 3` is WRONG, since
 November is 11: it must be `in (3, 4)`.
 
-**The Jan-Mar limit is on the TV WINDOWS only.** Big Games spans every month,
+**The Jan-Mar limit is on the TV WINDOWS only.** Key Games spans every month,
 which is how the November showcases (Champions Classic, Players Era, Fort Myers
 Tip-Off) stay in.
 
@@ -164,7 +164,7 @@ earlier version tried to, which raised `SameFileError` and would otherwise have
 wiped every tag on the next build. Nothing else in `docs/` is hand-edited;
 everything but `tags.json` is regenerated.
 
-**The Big Games exclusions live in the APP, not the harvest.** Michigan losses
+**The Key Games exclusions live in the APP, not the harvest.** Michigan losses
 and rival wins stay in `games.json` because the TV Windows view still shows
 them — filtering them at harvest time would lose them from both.
 
@@ -209,7 +209,10 @@ only football renders it.
 covered `"sport meta" "teams meta"`, so its first line sat against the header,
 64px off the away team's line. Fixed by giving the header its own full-width
 row (`"sport sport"`) and making `.meta` a two-row grid inside the teams row.
-Verify alignment by comparing bounding-box centres, not by eye.
+Verify alignment by comparing bounding-box centres, not by eye. The two-row
+grid is gone as of 2026-09-10 -- the date joined the column, and three lines
+against two team lines have no row to match -- but `"sport sport"` stays,
+because the header still has to be full width.
 
 **"Power Four/Five" scopes CHAMPIONSHIP GAMES, not TV windows.** A version
 that gated every window on a power-conference team was wrong and he corrected
@@ -241,8 +244,8 @@ Saturday-night cutoff or on a Sunday. They are admitted to the view by the
 opening state) would hide them again.
 
 **Every Power Five CFB championship game now carries a category.** They belong
-in Big Games, but many match no ranking rule (an unranked pair, or a ranked
-favourite winning), and Big Games DEFAULTS to the upset category -- so an
+in Key Games, but many match no ranking rule (an unranked pair, or a ranked
+favourite winning), and Key Games DEFAULTS to the upset category -- so an
 uncategorised title game was invisible. `rules.title_fallback` files them by
 result: upset -> Ranked Upsets, anything else -> Ranked Games. **CBB conference
 tournaments are deliberately NOT covered** -- 302 games, different category

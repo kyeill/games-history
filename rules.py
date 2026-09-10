@@ -297,7 +297,7 @@ def cbb_header_suffix(nets, d, tourney=False):
 
 # Kyle's teams, 2026-09-09. ESPN gives a school ONE id across both sports.
 MICHIGAN = "130"
-# Rivals whose WINS he does not want on the Big Games tab
+# Rivals whose WINS he does not want on the Key Games tab
 RIVALS = {"194": "Ohio State", "127": "Michigan State", "87": "Notre Dame"}
 
 def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
@@ -305,7 +305,7 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
     """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
     they DIFFER by sport, which is why the app's dropdown follows the sport
     toggle. `rank_*` are None when unranked. A game gets at most one category,
-    and membership of the Big Games tab is exactly "has one".
+    and membership of the Key Games tab is exactly "has one".
 
     CFB
       Top 10 Upsets   unranked beats a top-10 team, OR anyone beats #1
@@ -371,7 +371,7 @@ def is_title_game(sport, conf, headline):
 
 
 def title_fallback(rank_win, rank_lose):
-    """A championship game belongs in Big Games, but plenty match none of the
+    """A championship game belongs in Key Games, but plenty match none of the
     ranking rules -- an unranked pair, or a ranked favourite beating an
     unranked team. Those are filed by RESULT: an upset is a Ranked Upset,
     anything else a Ranked Game.

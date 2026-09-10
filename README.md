@@ -68,7 +68,7 @@ returns 39.
 ### Game types — and they differ by sport
 
 Kyle's definitions, 2026-09-09. A game gets **at most one**, and membership of
-the Big Games tab is exactly "has one, or is a conference title game". The
+the Key Games tab is exactly "has one, or is a conference title game". The
 upset categories are tested first on purpose, so "anyone beats #1" is not
 swallowed by the ranked-vs-ranked cases.
 
@@ -90,7 +90,7 @@ slate. An unranked win over a CBB #7 is deliberately *not* a category.
 **Power Five titles** — ACC, Big Ten, Big 12, SEC, Pac-12 championship games
 (CFB) and conference tournaments (CBB), every round.
 
-**Big Games requires a game TYPE.** Being a conference-tournament game is not
+**Key Games requires a game TYPE.** Being a conference-tournament game is not
 itself a qualification -- that admitted 265 early-round basketball games (ACC
 first-rounders between unranked teams and the like) that no view could
 usefully surface. Every championship game carries a type anyway, so nothing
@@ -154,7 +154,7 @@ Games*. Kyle asked for this over a single mixed list: the two sports share no
 game types and no TV windows, and he wants to be able to isolate one population
 at a time. Four populations result:
 
-| | TV Windows | Big Games |
+| | TV Windows | Key Games |
 |---|---|---|
 | CFB | 422 | 113 |
 | CBB | 775 | 485 |
@@ -167,7 +167,7 @@ sends `Access-Control-Allow-Origin: *`, so the page can call it directly and
 the site never ships all ~35,000 games. Anything found there can be pulled into
 the archive by hand.
 
-**Big Games hides what he does not want to relive:** no Michigan losses, and no
+**Key Games hides what he does not want to relive:** no Michigan losses, and no
 Ohio State, Michigan State or Notre Dame wins. Both still appear under TV
 Windows, which is a record of what was *on*, not a highlight reel. Enforced in
 the app rather than the harvest, precisely so TV Windows keeps them.
@@ -198,9 +198,9 @@ available (whatever `harvest.py` last pulled), sorted **Oldest First** so a
 season reads as it unfolded. **Newest First walks the blocks backwards but
 reads each one forwards** — week 14, then 13, then 12, and inside a week the
 Thursday game before the Saturday one. A football block is its week;
-basketball has no week, so its block is the date. TV Windows opens with **Marquee Windows** on. The
-Big Games view instead opens on the sport's upset category — Top 10 Upsets for football, Top 5 Upsets for
-basketball — which turns an opening list of hundreds into 10 and 9.
+basketball has no week, so its block is the date. TV Windows opens with **Marquee Windows** on;
+Key Games opens on **All Game Types**, so the whole year's shortlist is there
+before any narrowing.
 
 **Game type and TV window are built from the active sport tab**, because CFB
 and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
@@ -241,15 +241,17 @@ Michigan loss is never flagged, including when a rival does it.
 lightening by a fixed factor — at one factor Penn State's navy stayed muddy
 while Indiana's red turned pink.
 
-**The row** heads with the date, which on football reads **`Week 1 (Fri
-8/29/25)`** — ESPN carries `week.number` on every football event. Basketball
-gets the date alone.
+**The row** heads with what the game WAS, not when it was. Football reads
+**`WEEK 1`**, or **`WEEK 1 | ABC PRIMETIME`** when the slot has a name — ESPN
+carries `week.number` on every football event. Basketball has no week a viewer
+thinks in, so it reads the window (**`SUPER TUESDAY`**) or, failing that, the
+day (**`THURSDAY`**).
 
-Below that, the two team lines, and beside them a meta column carrying **the
-network on the away team's line and the time on the home team's**, both in
-white at the same size. That alignment is structural: `meta` occupies only the
-teams grid row and is itself a two-row grid, so the rows match exactly (checked
-at 0px offset). Spanning the header row too put it 64px out.
+The **date moved out of the header** and into the top right (his call
+2026-09-10), where it sits above the time and the network as a three-line
+stack: date muted, time and network in white. Three lines against two team
+lines cannot be row-matched, so `.meta` is a centred flex column rather than
+the two-row grid it was when it held only two.
 
 Only **one network** is shown. ESPN lists simulcasts alongside the broadcaster
 — "NBC, Peacock", "CBS, Paramount+", "ESPN, ESPN+" — so `primaryNet()` ranks
@@ -262,11 +264,8 @@ blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
 is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
 "Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
 
-The **TV window chip sits top right**, opposite the week and date. Beside the
-team lines, a meta column carries **the network on the away team's line and the
-kickoff time on the home team's** — structural alignment, measured at 0px. The
-**game type is drawn only on the Big Games view**, where it is the point rather
-than noise.
+No **game type** is drawn on any card, either view — the field survives only
+to drive the Game Type filter.
 
 **The purple chip is the conference championship OR the location, never both.**
 A title game is played somewhere, but the title is the story; otherwise a

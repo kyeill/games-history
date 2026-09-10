@@ -20,9 +20,8 @@ let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
-// Big Games opens on the upset category -- it is the longest list and the one
+// Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
-const OPENING_TYPE = { cfb: "Top 10 Upsets", cbb: "Top 5 Upsets" };
 
 /* ---------- storage: every accessor can throw in a locked-down browser --- */
 function lsGet(k, d) {
@@ -163,24 +162,26 @@ function rowHtml(g, browse) {
 
   const inArch = GAMES.some(x => x.id === g.id) || isAdded(g.id);
   const mark = browse && inArch ? ' <span class="inarch">IN ARCHIVE</span>' : "";
-  // Football is played in numbered weeks and he thinks in them, so the week
-  // leads and the date follows in parentheses. Basketball just gets the date.
-  // Header: week + date on football, date on basketball, then the TV window
-  // (football) or slot name (basketball) after a dash. The whole line takes
-  // the window's colour, so the cards carry no separate window chip.
-  // harvest decides the label: usually the window name, but ABC's reads
-  // "ABC Primetime" only for a 7-8pm kick and nothing otherwise
+  // Header: football reads "WEEK 1", with the window after a pipe when there
+  // is one. Basketball reads the window, or the day of the week when there is
+  // none. The DATE itself lives in the meta column now.
   const label = g.header;
-  // Football tints the header line; basketball leaves it plain and tints the
-  // NETWORK text in the meta column instead.
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
   const netCol = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
-  const when =
-    ((g.sport === "CFB" && g.week)
-      ? '<span class="wk">Week ' + g.week + "</span> (" + g.dow + " " +
-        fmtDate(g.date) + ")"
-      : g.dow + " " + fmtDate(g.date)) +
-    (label ? " - " + esc(label) : "");
+  const DAYS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
+                 Thu: "Thursday", Fri: "Friday", Sat: "Saturday",
+                 Sun: "Sunday" };
+  let when;
+  if (g.sport === "CFB") {
+    when = (g.week ? '<span class="wk">Week ' + g.week + "</span>" : "") +
+      (label ? (g.week ? " | " : "") + esc(label) : "");
+    // Browse pulls straight from ESPN, where a week number can be missing;
+    // never leave the header empty.
+    if (!when) when = esc(DAYS[g.dow] || g.dow);
+  } else {
+    when = esc(label || DAYS[g.dow] || g.dow);
+  }
+
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   const flag = celebrated(g);
@@ -193,8 +194,9 @@ function rowHtml(g, browse) {
       ">" + when + mark + "</div>" +
     '<div class="teams">' + teamLine(away, g.sport, g.season) +
       teamLine(home, g.sport, g.season) + "</div>" +
-    // time on the away team's line, network on the home team's
-    '<div class="meta"><div class="mrow">' + fmtTime(g.time) +
+    // date, then time, then network -- the date moved out of the header
+    '<div class="meta"><div class="mrow mdate">' + g.dow + " " +
+      fmtDate(g.date) + '</div><div class="mrow">' + fmtTime(g.time) +
       '</div><div class="mrow"' +
       (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
       esc(primaryNet(g.nets) || "—") + "</div></div>" +
@@ -206,7 +208,7 @@ const MICHIGAN = "130";
 const RIVALS = ["194", "127", "87"];   // Ohio State, Michigan State, Notre Dame
 
 function bigViewAllows(g) {
-  // Big Games is the view he browses for pleasure: no Michigan losses and no
+  // Key Games is the view he browses for pleasure: no Michigan losses and no
   // rival wins. Both still appear under TV Windows, which is a record of what
   // was ON, not a highlight reel.
   const mich = g.teams.find(t => t.id === MICHIGAN);
@@ -270,7 +272,7 @@ function visible() {
   // the Pac-12 one was on a Friday. His call: they must all show.
   // Black Friday games carry no window, like championship games, so they need
   // the same admission -- without this they sat in the data unreachable.
-  // Big Games needs a game TYPE. Being a conference-tournament game is not
+  // Key Games needs a game TYPE. Being a conference-tournament game is not
   // itself a qualification -- an ACC first-rounder between unranked teams has
   // no business here, and every championship game carries a type anyway.
   list = list.filter(g => VIEW === "tv"
@@ -317,12 +319,12 @@ function visible() {
 }
 
 // Opening state, not an empty one: newest season always, plus the upset
-// category when the Big Games view is showing. A function declaration, not a
+// category when the Key Games view is showing. A function declaration, not a
 // const -- init() calls it before this point in the file.
 function clearFilters() {
   FILT = {
     season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
-    type: VIEW === "big" ? OPENING_TYPE[TAB] || null : null,
+    type: null,
     // TV Windows opens on Marquee Windows -- the networks he plans around
     windows: VIEW === "tv"
       ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null,
@@ -667,7 +669,7 @@ async function init() {
       // the sport does not change, so the filters are still valid -- only the
       // game-type / TV-window pair is view-specific
       VIEW = e.currentTarget.dataset.view;
-      FILT.type = VIEW === "big" ? OPENING_TYPE[TAB] || null : null;
+      FILT.type = null;
       FILT.windows = VIEW === "tv"
         ? (MARQUEE[SPORT_OF[TAB]] || []).slice() : null;
       draw();
