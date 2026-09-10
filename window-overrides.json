@@ -1,5 +1,6 @@
 {
-  "_comment": "Manual window assignments, by ESPN game id. ESPN records a WEATHER-DELAYED game at its delayed start, and sometimes with only a streaming feed, so a rule keyed on kickoff time or network cannot place it. Add the game id and the window it belongs in, then run `python harvest.py && python site.py`.",
+  "_comment": "Manual window assignments, by ESPN game id. A WEATHER-DELAYED game is recorded by ESPN at its delayed start, and sometimes with only a streaming feed, so no rule keyed on kickoff time or network can place it. Add the game id and the window it belongs in, then run `python harvest.py && python site.py`.",
   "401752832": ["CBS B1G Time"],
-  "401628353": ["ABC Saturday"]
+  "401628353": ["ABC Saturday"],
+  "401856660": ["ABC Saturday"]
 }
