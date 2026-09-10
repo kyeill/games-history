@@ -175,7 +175,10 @@ def harvest():
                     if base and not conf:
                         event = h.replace(" - ", " ")
                         break
-                if (not slots and not gtype and not conf and not black_friday
+                # Being a conference-tournament game is NOT a qualification on
+                # its own: it took in 265 early-round basketball games nothing
+                # could reach. A championship game always has a type.
+                if (not slots and not gtype and not title and not black_friday
                         and x["id"] not in overrides):
                     continue
                 # A championship game carries NO TV window chip (his call): it

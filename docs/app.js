@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-211518";
+const BUILD = "20260909-211808";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -260,9 +260,12 @@ function visible() {
   // the Pac-12 one was on a Friday. His call: they must all show.
   // Black Friday games carry no window, like championship games, so they need
   // the same admission -- without this they sat in the data unreachable.
+  // Big Games needs a game TYPE. Being a conference-tournament game is not
+  // itself a qualification -- an ACC first-rounder between unranked teams has
+  // no business here, and every championship game carries a type anyway.
   list = list.filter(g => VIEW === "tv"
     ? ((g.slots || []).length || g.title || g.bfri)
-    : ((g.type || g.champ) && bigViewAllows(g)));
+    : (g.type && bigViewAllows(g)));
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
   // A championship game has no window of its own. It rides along with Marquee

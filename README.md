@@ -90,6 +90,13 @@ slate. An unranked win over a CBB #7 is deliberately *not* a category.
 **Power Five titles** — ACC, Big Ten, Big 12, SEC, Pac-12 championship games
 (CFB) and conference tournaments (CBB), every round.
 
+**Big Games requires a game TYPE.** Being a conference-tournament game is not
+itself a qualification -- that admitted 265 early-round basketball games (ACC
+first-rounders between unranked teams and the like) that no view could
+usefully surface. Every championship game carries a type anyway, so nothing
+real is lost. Those 265 left the archive entirely, since they were not on a TV
+window either.
+
 **A "championship game"** in the app's sense is narrower: a football title game
 or a basketball tournament **final** — "finals only, not the rest of the
 tournaments". 23 of each, 46 in all (`rules.is_title_game`). Those 46 get two

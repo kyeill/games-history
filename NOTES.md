@@ -92,6 +92,13 @@ scope, and switching sport **clears** the game-type and TV-window filters —
 without that, a CFB value left set while viewing CBB filters everything away
 and the page looks broken rather than empty-by-choice.
 
+**Every game in the archive must be REACHABLE from a view.** A game qualifies
+by a TV window, a game type, a Black Friday flag or a manual override -- and
+being a conference-tournament game is NOT one of them. It used to be, and it
+held 265 early-round basketball games that Big Games showed but nobody wanted
+and TV Windows could not reach at all. Check `not type and not slots and not
+bfri` after any rule change: it should be zero.
+
 **The Big Ten Tournament is excluded from "Ranked Big Ten" before its Final.**
 A ranked-v-ranked quarterfinal otherwise lands in a category meant for
 regular-season meetings. Those games are NOT removed from the archive -- they
