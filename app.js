@@ -168,7 +168,9 @@ function rowHtml(g, browse) {
   // Header: week + date on football, date on basketball, then the TV window
   // (football) or slot name (basketball) after a dash. The whole line takes
   // the window's colour, so the cards carry no separate window chip.
-  const label = g.sport === "CFB" ? (g.slots || [])[0] : g.suffix;
+  // harvest decides the label: usually the window name, but ABC's reads
+  // "ABC Primetime" only for a 7-8pm kick and nothing otherwise
+  const label = g.header;
   // Football tints the header line; basketball leaves it plain and tints the
   // NETWORK text in the meta column instead.
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;

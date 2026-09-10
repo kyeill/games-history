@@ -274,6 +274,13 @@ a late kickoff shifts the Eastern date. Of 73 Big Noon rows, 63 matched and the
 travelled to Thursday-night openers, 3:30 and 4pm kickoffs, an ESPN 10pm game
 and the Mountain West Championship. A useful cross-check on the window rules.
 
+**The WINDOW and the HEADER LABEL are not the same thing.** ABC is the case
+that forces the distinction: the window holds EVERY Saturday ABC game (202 of
+them), while the header reads "ABC Primetime" only for a 7-8pm kick (69) and
+nothing at all otherwise. `rules.cfb_header` decides the label; `cfb_slots`
+decides the window. Narrowing the window to 7-8pm instead cost 134 games and
+was a misreading of what he asked for.
+
 **Football's TV windows are ERA-DEPENDENT.** No CBS or NBC window before the
 2023 season, and ABC is primetime-only (7pm+) in 2021-22. Without that, the
 early seasons showed windows that did not exist yet -- the packages moved to

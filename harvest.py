@@ -290,7 +290,8 @@ def harvest():
                 # is admitted to that view by the `title` flag instead.
                 if title:
                     slots = set()
-                if x["id"] in overrides:
+                forced = x["id"] in overrides
+                if forced:
                     slots = set(overrides[x["id"]])
 
                 side = []
@@ -319,6 +320,8 @@ def harvest():
                     "venue": v.get("fullName"),
                     "city": (v.get("address") or {}).get("city"),
                     "nets": sorted(nets), "teams": side,
+                    "header": (rules.cfb_header(slots, d, forced)
+                               if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
                     "event": event, "bfri": black_friday, "suffix": suffix,

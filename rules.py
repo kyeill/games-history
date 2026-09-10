@@ -156,12 +156,30 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
     if (not early and "NBC" in nets and day == "Sat"
             and abs(t - (19 * 60 + 30)) <= 45):
         out.add("NBC Saturday Night")
-    # ABC Saturday is the LATE game only, 7-8pm (his call 2026-09-09). ABC
-    # also carries a noon and a 3:30 game -- 70 and 61 of them in the archive
-    # -- and neither is what he means by the phrase.
-    if "ABC" in nets and day == "Sat" and 19 * 60 <= t <= 20 * 60:
+    # EVERY Saturday ABC game is in the window. Restricting it to 7-8pm was a
+    # misreading -- what he wanted narrowed was the header LABEL, not the
+    # window. See cfb_header().
+    if "ABC" in nets and day == "Sat":
         out.add("ABC Saturday")
     return out
+
+
+def cfb_header(slots, d, forced=False):
+    """The label after the date on a football card.
+
+    It is USUALLY the window's own name, but ABC is the exception: the window
+    holds every Saturday ABC game while the label reads "ABC Primetime" only
+    for a 7-8pm kick, and nothing at all otherwise. `forced` covers a game
+    placed by hand in window-overrides.json -- the Clemson-LSU weather delay
+    is recorded at its 9:40pm restart but was scheduled in primetime.
+    """
+    named = [w for w in CFB_WINDOWS if w in slots and w != "ABC Saturday"]
+    if named:
+        return named[0]
+    if "ABC Saturday" not in slots:
+        return None
+    t = _mins(d)
+    return "ABC Primetime" if (forced or 19 * 60 <= t <= 20 * 60) else None
 
 
 def cfb_black_friday(nets, d, season, big_ten=False):

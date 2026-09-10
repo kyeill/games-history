@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260909-222607";
+const BUILD = "20260909-222941";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -168,7 +168,9 @@ function rowHtml(g, browse) {
   // Header: week + date on football, date on basketball, then the TV window
   // (football) or slot name (basketball) after a dash. The whole line takes
   // the window's colour, so the cards carry no separate window chip.
-  const label = g.sport === "CFB" ? (g.slots || [])[0] : g.suffix;
+  // harvest decides the label: usually the window name, but ABC's reads
+  // "ABC Primetime" only for a 7-8pm kick and nothing otherwise
+  const label = g.header;
   // Football tints the header line; basketball leaves it plain and tints the
   // NETWORK text in the meta column instead.
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
