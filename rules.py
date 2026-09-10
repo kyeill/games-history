@@ -7,6 +7,8 @@ is excluded everywhere -- that is ESPN season type 3.
 """
 
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+            "Saturday", "Sunday"]
 
 # ESPN conferenceId, verified historical: ESPN returns the conference the team
 # was IN at the time of the game (USC reads Pac-12 in 2021, Big Ten in 2025).
@@ -122,7 +124,8 @@ HEADER_TINT = {
 }
 
 # The network text in the meta column, coloured on basketball cards.
-NET_TINT = {"FOX": "#ffcb05", "CBS": "#4b8dff", "NBC": "#0b85c8"}
+NET_TINT = {"FOX": "#ffcb05", "CBS": "#4b8dff", "NBC": "#0b85c8",
+            "ABC": "#e52534"}
 
 # Sorting a tie: when two games kick at the same minute, the bigger network
 # leads. His order, and it differs by sport only in length.
@@ -272,9 +275,14 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
     return out
 
 
-def cbb_header_suffix(nets, d, tourney=False):
-    """The label that follows the date on a basketball card. Not a window --
-    the cards carry no window chips at all -- just a name for the slot."""
+def cbb_header_suffix(nets, d, tourney=False, big_ten=False):
+    """The label on a basketball card. Not a window -- the cards carry no
+    window chips at all -- just a name for the slot.
+
+    The FOX and ESPN labels are open to anyone. The broadcast-network labels
+    added 2026-09-10 are NOT: they need a Big Ten team, because that is what
+    he is browsing for and ABC will put any two teams on a Saturday.
+    """
     if d.month not in (1, 2, 3):
         return None
     day, t = DOW[d.weekday()], _mins(d)
@@ -284,6 +292,18 @@ def cbb_header_suffix(nets, d, tourney=False):
         return "FOX Friday"
     if "FOX" in nets and day == "Sat" and t >= 19 * 60:
         return "FOX Primetime"
+    # --- his additions 2026-09-10, all of them Big Ten only ---------------
+    if big_ten:
+        # FOX's Saturday afternoon game, the half of Saturday that Primetime
+        # above does not cover.
+        if "FOX" in nets and day == "Sat":
+            return "FOX Saturday"
+        if "CBS" in nets and day == "Sun":
+            return "CBS Sunday"
+        # ABC and NBC get a label on ANY day, named for the day itself.
+        for n in ("NBC", "ABC"):
+            if n in nets:
+                return n + " " + DAY_FULL[d.weekday()]
     # the same brackets the windows use, so a card's label and its window
     # can never disagree
     if "ESPN" in nets and day == "Sat" and 18 * 60 <= t <= 21 * 60:
@@ -294,11 +314,6 @@ def cbb_header_suffix(nets, d, tourney=False):
         return "Super Tuesday"
     return None
 
-
-# Kyle's teams, 2026-09-09. ESPN gives a school ONE id across both sports.
-MICHIGAN = "130"
-# Rivals whose WINS he does not want on the Key Games tab
-RIVALS = {"194": "Ohio State", "127": "Michigan State", "87": "Notre Dame"}
 
 def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
               b1g_tourney_run=False):

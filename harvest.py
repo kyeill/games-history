@@ -281,6 +281,10 @@ def harvest():
                 lose = [k for k in cs if not k.get("winner")]
 
                 team_ids = [k["team"]["id"] for k in cs]
+                # Read BEFORE the branch below: the CBB suffix needs it, and
+                # assigning it after meant every basketball game was tested
+                # against the PREVIOUS game's headlines.
+                heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 black_friday = False
                 suffix = None
                 if code == "CFB":
@@ -295,8 +299,8 @@ def harvest():
                     suffix = rules.cbb_header_suffix(
                         nets, d,
                         tourney=(rules.is_championship(heads)
-                                 and d.month in (3, 4)))
-                heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
+                                 and d.month in (3, 4)),
+                        big_ten=(bt in confs))
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
                 # a show broadcast from this game? match either side of the

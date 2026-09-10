@@ -273,6 +273,13 @@ the majors explicitly; alphabetical order would not do it (BTN would beat FOX).
 The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
 
+**Basketball card labels.** A basketball card's header names its slot. FOX
+Friday, FOX Primetime and the three ESPN labels are open to anyone; the
+broadcast-network labels added 2026-09-10 need **at least one Big Ten team**
+and never apply to a conference tournament — `ABC`/`NBC` plus the day on any
+day of the week, `FOX Saturday` for the Saturday afternoon `FOX Primetime`
+does not cover, and `CBS Sunday`. Everything else falls back to the weekday.
+
 **TV window chips carry their network's colour** — FOX yellow, CBS a lighter
 blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
 is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since

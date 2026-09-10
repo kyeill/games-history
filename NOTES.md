@@ -357,6 +357,26 @@ why harvest passes it.
 flex baseline off differently-sized boxes and drops the count. Setting both to
 1.2 fixes it.
 
+**A variable read one line before it is assigned reads the PREVIOUS loop
+pass.** `heads` (an event's headline notes) was assigned just below the
+CFB/CBB branch but used inside it, so every basketball game's
+conference-tournament test ran against the game harvested before it. Python
+raises nothing -- the name is bound from the last iteration -- so it looked
+like it worked. It cost two labels: Duke-Wake Forest 2025-03-03 and Duke-North
+Carolina 2026-03-07 were both suppressed as tournament games because the
+event before each of them was one. Fixed by hoisting the assignment above the
+branch.
+
+**The broadcast-network header labels are Big Ten only.** His rules
+2026-09-10: ABC and NBC get a label on any day, named for the day (`NBC
+Saturday`); FOX gets `FOX Saturday` for the Saturday afternoon that
+`FOX Primetime` does not cover; CBS gets `CBS Sunday`. All three need at least
+one Big Ten team -- ABC will put any two teams on a Saturday -- and none apply
+to a conference tournament. Measured, they label 64 games: 40 CBS Sunday, 21
+FOX Saturday, 3 NBC Saturday, and ZERO ABC, because all 15 ABC basketball
+games in the archive are non-Big-Ten. The rules still carry the January-March
+gate every other CBB label has, which suppresses five Nov/Dec games.
+
 **The three ESPN brackets, and they differ on purpose.** ESPN Saturday takes
 the LATEST tip between 6:00 and 9:00pm -- exactly one game a week. Big Monday
 and Super Tuesday take EVERY game between 6:00 and 9:30pm, several a night.
