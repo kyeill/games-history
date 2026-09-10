@@ -238,7 +238,8 @@ def harvest():
                 for k in cs:
                     t = k["team"]
                     teams[t["id"]] = {"name": t["displayName"],
-                                      "short": t.get("location") or t["displayName"],
+                                      "short": rules.display_name(
+                                          t.get("location") or t["displayName"]),
                                       "abbr": t.get("abbreviation"),
                                       "color": t.get("color"),
                                       "alt": t.get("alternateColor")}
@@ -268,6 +269,7 @@ def harvest():
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "marquee": rules.MARQUEE, "window_net": rules.WINDOW_NET,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
+               "big_ten": rules.BIG_TEN,
                "net_priority": rules.NET_PRIORITY,
                "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),

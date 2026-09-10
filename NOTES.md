@@ -259,6 +259,18 @@ why harvest passes it.
 flex baseline off differently-sized boxes and drops the count. Setting both to
 1.2 fixes it.
 
+**The three ESPN brackets, and they differ on purpose.** ESPN Saturday takes
+the LATEST tip between 6:00 and 9:00pm -- exactly one game a week. Big Monday
+and Super Tuesday take EVERY game between 6:00 and 9:30pm, several a night.
+The header suffixes use the same brackets as the windows, so a card's label
+can never disagree with the window it is in.
+
+**Big Ten team names render in CAPS, keyed on conference AS OF THAT SEASON.**
+USC is capitalised from 2024 and not before; so are Oregon and Washington.
+The name itself comes from `rules.NAME_OVERRIDES`, which spells out the schools
+ESPN abbreviates (BYU -> Brigham Young, LSU -> Louisiana State, TCU -> Texas
+Christian and so on) and softens UNLV and UConn the other way.
+
 **ESPN Saturday is chosen PER DATE, not by a clock rule.** One game a week --
 the latest tip between 6 and 9pm ET -- so it needs a pre-pass over the season's
 events, like `fox_friday_dates`. Measured: 46 Saturdays, zero ties, so no

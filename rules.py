@@ -26,6 +26,20 @@ def _mins(d):
     return d.hour * 60 + d.minute
 
 
+# ESPN abbreviates these schools; he wants them spelled out. UNLV and UConn go
+# the other way -- ESPN's all-caps forms become ordinary words.
+NAME_OVERRIDES = {
+    "BYU": "Brigham Young", "LSU": "Louisiana State",
+    "SMU": "Southern Methodist", "TCU": "Texas Christian",
+    "UCF": "Central Florida", "USF": "South Florida",
+    "USC": "Southern Cal", "UNLV": "Unlv", "UConn": "Connecticut",
+}
+
+
+def display_name(location):
+    return NAME_OVERRIDES.get(location, location)
+
+
 # The order the app lists these in -- his, 2026-09-09, and NOT alphabetical.
 # These lists are the display order AND the full vocabulary; harvest.py copies
 # them into games.json so the page has one source of truth.
@@ -173,10 +187,10 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
         return set()
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
-    if "ESPN" in nets and day == "Mon" and t >= 18 * 60:
-        out.add("Big Monday")
-    if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
-        out.add("Super Tuesday")
+    # Big Monday and Super Tuesday may carry SEVERAL games a night, unlike
+    # ESPN Saturday -- his call. The bracket is 6:00 to 9:30pm.
+    if "ESPN" in nets and day in ("Mon", "Tue") and 18 * 60 <= t <= 21 * 60 + 30:
+        out.add("Big Monday" if day == "Mon" else "Super Tuesday")
     # ESPN Saturday is ONE game a week: the latest tip between 6 and 9pm.
     # A clock cutoff could not do it -- 6:30 split the 6pm block in half and
     # let three games through on a good Saturday. See espn_saturday_ids.
@@ -210,11 +224,13 @@ def cbb_header_suffix(nets, d, tourney=False):
         return "FOX Friday"
     if "FOX" in nets and day == "Sat" and t >= 19 * 60:
         return "FOX Primetime"
-    if "ESPN" in nets and day == "Sat" and t >= 19 * 60:
+    # the same brackets the windows use, so a card's label and its window
+    # can never disagree
+    if "ESPN" in nets and day == "Sat" and 18 * 60 <= t <= 21 * 60:
         return "ESPN Primetime"
-    if "ESPN" in nets and day == "Mon" and t >= 18 * 60:
+    if "ESPN" in nets and day == "Mon" and 18 * 60 <= t <= 21 * 60 + 30:
         return "Big Monday"
-    if "ESPN" in nets and day == "Tue" and t >= 18 * 60:
+    if "ESPN" in nets and day == "Tue" and 18 * 60 <= t <= 21 * 60 + 30:
         return "Super Tuesday"
     return None
 
