@@ -249,7 +249,9 @@ day (**`THURSDAY`**).
 
 The **date moved out of the header** and into the top right (his call
 2026-09-10), where it sits above the time and the network as a three-line
-stack: date muted, time and network in white. Three lines against two team
+stack: date muted, time and network in white. The date leads with the weekday
+UNLESS the header already named that day -- "THURSDAY", "SUPER TUESDAY" and
+"WEEK 1 | FOX FRIDAY" all drop it, "FOX PRIMETIME" keeps it. Three lines against two team
 lines cannot be row-matched, so `.meta` is a centred flex column rather than
 the two-row grid it was when it held only two.
 

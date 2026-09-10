@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-091137";
+const BUILD = "20260910-092237";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -181,6 +181,11 @@ function rowHtml(g, browse) {
   } else {
     when = esc(label || DAYS[g.dow] || g.dow);
   }
+  // The meta date leads with the weekday, EXCEPT where the header already
+  // names that day -- "THURSDAY" or "SUPER TUESDAY" over "Thu 11/6/25" says
+  // Thursday twice. "FOX PRIMETIME" names no day, so that one keeps it.
+  const dayName = DAYS[g.dow] || "";
+  const said = dayName && when.toUpperCase().indexOf(dayName.toUpperCase()) > -1;
 
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
@@ -195,7 +200,7 @@ function rowHtml(g, browse) {
     '<div class="teams">' + teamLine(away, g.sport, g.season) +
       teamLine(home, g.sport, g.season) + "</div>" +
     // date, then time, then network -- the date moved out of the header
-    '<div class="meta"><div class="mrow mdate">' + g.dow + " " +
+    '<div class="meta"><div class="mrow mdate">' + (said ? "" : g.dow + " ") +
       fmtDate(g.date) + '</div><div class="mrow">' + fmtTime(g.time) +
       '</div><div class="mrow"' +
       (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
