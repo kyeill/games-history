@@ -30,6 +30,22 @@ OVERRIDES = {
     # His call 2026-09-09, overruling the note above about washes wanting the
     # darker colour: a Michigan win should read MAIZE, not navy blue.
     "130": ("ffcb05", "Michigan: he wants the winning row yellow, not blue"),
+
+    # YELLOW BELONGS TO MICHIGAN. Every other school whose wash came out yellow
+    # is moved to its other colour (2026-09-09). Six of these are black-and-gold
+    # schools, so they wash GREY and are not distinguishable from each other --
+    # that is the honest trade for keeping maize unique.
+    "2026": ("000000", "Appalachian State: black, not the gold"),
+    "9": ("8c1d40", "Arizona State: maroon, not the gold"),
+    "2116": ("000000", "Central Florida: black, not the gold"),
+    "38": ("000000", "Colorado: black, not the gold"),
+    "142": ("000000", "Missouri: black, not the gold"),
+    "238": ("000000", "Vanderbilt: black, not the gold"),
+    "277": ("002855", "West Virginia: navy, not the gold"),
+    "2294": ("231f20", "Iowa: black, not the gold"),
+    # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
+    # is the school's real navy rather than an ESPN value.
+    "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),
 }
 
 NEAR_BLACK = 36      # luminance below this reads as black on a light wash

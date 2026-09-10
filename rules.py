@@ -36,6 +36,12 @@ NAME_OVERRIDES = {
 }
 
 
+# Names that depend on the SEASON. UCLA reads "Ucla" before 2023, in the same
+# spirit as Unlv -- an all-caps acronym only earns its capitals once the team
+# is Big Ten, where caps carry meaning.
+SEASON_NAMES = {"26": {"before": 2023, "name": "Ucla"}}
+
+
 def display_name(location):
     return NAME_OVERRIDES.get(location, location)
 

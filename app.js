@@ -15,6 +15,7 @@ let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, type: null, windows: null, team: null };
 let ORDER = {}, SEASONS = [], MARQUEE = {}, WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
+let SEASON_NAMES = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
 let SORT = "asc";
@@ -53,8 +54,11 @@ function crest(t) {
   return CRESTS[t.id] ||
     "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/" + t.id + ".png";
 }
-function teamName(t, sport) {
-  const nm = (TEAMS[t.id] && TEAMS[t.id].short) || t.name || t.id;
+function teamName(t, sport, season) {
+  let nm = (TEAMS[t.id] && TEAMS[t.id].short) || t.name || t.id;
+  // a name that changes with the era -- UCLA reads "Ucla" before 2023
+  const sn = SEASON_NAMES[t.id];
+  if (sn && season != null && season < sn.before) nm = sn.name;
   // Big Ten teams go up in caps. Membership is as of THAT SEASON, so USC is
   // capitalised from 2024 and not before.
   return (sport && t.conf === BIG_TEN[sport]) ? nm.toUpperCase() : nm;
@@ -127,11 +131,11 @@ function tagClass(t) { return TAG_CLASS[t] || ""; }
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
-function teamLine(t, sport) {
+function teamLine(t, sport, season) {
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
     '<span class="rk">' + (t.rank || "") + "</span>" +
-    '<span class="nm">' + esc(teamName(t, sport)) + "</span>" +
+    '<span class="nm">' + esc(teamName(t, sport, season)) + "</span>" +
     '<span class="sc">' + t.score + "</span></div>";
 }
 
@@ -185,8 +189,8 @@ function rowHtml(g, browse) {
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") +
       ">" + when + mark + "</div>" +
-    '<div class="teams">' + teamLine(away, g.sport) +
-      teamLine(home, g.sport) + "</div>" +
+    '<div class="teams">' + teamLine(away, g.sport, g.season) +
+      teamLine(home, g.sport, g.season) + "</div>" +
     // network on the away team's line, time on the home team's
     '<div class="meta"><div class="mrow"' +
       (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
@@ -426,8 +430,8 @@ function openSheet(id) {
 
   // a neutral-site game has no home team, so "at" would be wrong
   document.getElementById("sh-title").textContent =
-    teamName(g.teams[1], g.sport) + (g.neutral ? " vs " : " at ") +
-    teamName(g.teams[0], g.sport);
+    teamName(g.teams[1], g.sport, g.season) + (g.neutral ? " vs " : " at ") +
+    teamName(g.teams[0], g.sport, g.season);
   document.getElementById("sh-sub").textContent =
     g.dow + " " + g.date + "  ·  " + g.teams[1].score + "–" +
     g.teams[0].score + "  ·  " +
@@ -617,6 +621,7 @@ async function init() {
   HEADER_TINT = r[0].header_tint || {};
   NET_TINT = r[0].net_tint || {};
   BIG_TEN = r[0].big_ten || {};
+  SEASON_NAMES = r[0].season_names || {};
   NET_PRIORITY = r[0].net_priority || {};
   clearFilters();
   try {

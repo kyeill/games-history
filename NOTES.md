@@ -265,6 +265,15 @@ and Super Tuesday take EVERY game between 6:00 and 9:30pm, several a night.
 The header suffixes use the same brackets as the windows, so a card's label
 can never disagree with the window it is in.
 
+**YELLOW BELONGS TO MICHIGAN.** Nine other schools washed yellow and were
+moved to their other colour. Six of them are black-and-gold schools
+(Appalachian State, Central Florida, Colorado, Iowa, Missouri, Vanderbilt), so
+they now wash GREY and are not distinguishable from one another -- the honest
+trade for keeping maize unique. Arizona State took its maroon and West Virginia
+its navy. **Georgia Tech had no usable ESPN alternative** (old gold, then
+WHITE), so its override is the school's real navy #003057 rather than an ESPN
+value.
+
 **Big Ten team names render in CAPS, keyed on conference AS OF THAT SEASON.**
 USC is capitalised from 2024 and not before; so are Oregon and Washington.
 The name itself comes from `rules.NAME_OVERRIDES`, which spells out the schools
