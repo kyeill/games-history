@@ -14,22 +14,33 @@ CACHE = os.path.join(HERE, "cache")
 OUT = os.path.join(HERE, "output")
 ET = ZoneInfo("America/New_York")
 BASE = "https://site.api.espn.com/apis/site/v2/sports"
-SEASONS = [2021, 2022, 2023, 2024, 2025]
+SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
+
+
+def season_over(code, y):
+    """Has this season finished? Football runs Aug y to mid-Jan y+1;
+    basketball Nov y to mid-April y+1. A season still in progress must NOT be
+    cached -- the cache is keyed on a date RANGE, so a partial week-one answer
+    would be served for the rest of the year."""
+    today = dt.date.today()
+    end = dt.date(y + 1, 2, 1) if code == "CFB" else dt.date(y + 1, 5, 1)
+    return today >= end
 
 # CFB is groups=80 (FBS). CBB is groups=50 (D-I).
 SPORTS = {"CFB": ("football/college-football", "80"),
           "CBB": ("basketball/mens-college-basketball", "50")}
 
 
-def fetch(sport, params, key):
+def fetch(sport, params, key, cacheable=True):
     os.makedirs(CACHE, exist_ok=True)
     p = os.path.join(CACHE, key + ".json")
-    if os.path.exists(p):
+    if cacheable and os.path.exists(p):
         return json.load(open(p, encoding="utf-8"))
     r = requests.get(f"{BASE}/{sport}/scoreboard", params=params, timeout=60)
     r.raise_for_status()
     d = r.json()
-    json.dump(d, open(p, "w", encoding="utf-8"))
+    if cacheable:
+        json.dump(d, open(p, "w", encoding="utf-8"))
     return d
 
 
@@ -37,17 +48,21 @@ def events(code, y):
     """CFB accepts a wide date range; CBB 404s on one and silently caps at
     limit=1000, so it is walked a week at a time."""
     sport, grp = SPORTS[code]
+    keep = season_over(code, y)
     ev = []
     if code == "CFB":
         for rng, tag in ((f"{y}0801-{y}1231", "a"), (f"{y+1}0101-{y+1}0131", "b")):
             ev += fetch(sport, {"dates": rng, "groups": grp, "limit": 1000},
-                        f"cfb-{y}-{grp}-{tag}").get("events", [])
+                        f"cfb-{y}-{grp}-{tag}", keep).get("events", [])
     else:
         d, end = dt.date(y, 11, 1), dt.date(y + 1, 4, 10)
         while d < end:
             e = min(d + dt.timedelta(days=6), end)
+            if d > dt.date.today():
+                break                      # nothing played yet this season
             got = fetch(sport, {"dates": f"{d:%Y%m%d}-{e:%Y%m%d}", "groups": grp,
-                                "limit": 1000}, f"cbb-{d:%Y%m%d}").get("events", [])
+                                "limit": 1000}, f"cbb-{d:%Y%m%d}",
+                        keep).get("events", []) 
             if len(got) >= 1000:
                 print(f"  WARN: week of {d} hit the 1000 cap", file=sys.stderr)
             ev += got

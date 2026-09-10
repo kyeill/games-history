@@ -248,6 +248,15 @@ result: upset -> Ranked Upsets, anything else -> Ranked Games. **CBB conference
 tournaments are deliberately NOT covered** -- 302 games, different category
 names, and 269 remain uncategorised, visible only under "All Game Types".
 
+**An IN-PROGRESS season must never be cached.** The cache is keyed on a date
+RANGE, so a partial answer fetched in week one would be served for the rest of
+the year. `season_over()` gates it: football is done after 1 Feb, basketball
+after 1 May. 2026 football is live right now and refetches every run.
+
+**ESPN carries NOTHING about College GameDay or Big Noon Kickoff** -- not in
+the scoreboard, not in the summary endpoint. Searching the payloads for
+"gameday" finds only article prose. Those two tags are, and will stay, manual.
+
 **Football's TV windows are ERA-DEPENDENT.** No CBS or NBC window before the
 2023 season, and ABC is primetime-only (7pm+) in 2021-22. Without that, the
 early seasons showed windows that did not exist yet -- the packages moved to

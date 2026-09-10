@@ -156,7 +156,10 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
     if (not early and "NBC" in nets and day == "Sat"
             and abs(t - (19 * 60 + 30)) <= 45):
         out.add("NBC Saturday Night")
-    if "ABC" in nets and day == "Sat" and (not early or t >= 19 * 60):
+    # ABC Saturday is the LATE game only, 7-8pm (his call 2026-09-09). ABC
+    # also carries a noon and a 3:30 game -- 70 and 61 of them in the archive
+    # -- and neither is what he means by the phrase.
+    if "ABC" in nets and day == "Sat" and 19 * 60 <= t <= 20 * 60:
         out.add("ABC Saturday")
     return out
 
