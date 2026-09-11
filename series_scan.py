@@ -339,8 +339,16 @@ def main():
     # a pair he ruled OUT (seed_series.NOT_SERIES) carries no tag on purpose
     ruled_out = {(s, frozenset((a, b))) for s, a, b, _pair, _why in seed_series.NOT_SERIES}
 
+    # Notre Dame v an ACC team from 2014 is the ACC scheduling agreement, never
+    # a series (his call 2026-09-11; seed_series.nd_acc strips the tags)
+    def nd_acc(k, legs):
+        return (k[1] == "CFB" and seed_series.NOTRE_DAME in k[2] and all(
+            q["season"] >= seed_series.ND_ACC_SINCE
+            and seed_series.ACC_CFB in q["confs"] for q in legs))
+
     def needs_ruling(k, legs):
-        return (k[1], k[2]) not in ruled_out and bool(untagged(legs))
+        return ((k[1], k[2]) not in ruled_out and not nd_acc(k, legs)
+                and bool(untagged(legs)))
 
     order = ["Home & Home", "Neutral & Neutral?: both meetings at neutral sites",
              "Home & Neutral?: one neutral-site meeting, one campus meeting",

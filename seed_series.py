@@ -74,9 +74,7 @@ SERIES = [
     ("401282059", "Home & Home", "CFB 2021    Florida at South Florida"),
     ("401282798", "Home & Home", "CFB 2021    Nebraska at Oklahoma"),
     ("401403868", "Home & Home", "CFB 2022    Alabama at Texas"),
-    ("401404130", "Home & Home", "CFB 2022    Clemson at Notre Dame"),
     ("401403994", "Home & Home", "CFB 2022    Michigan State at Washington"),
-    ("401404126", "Home & Home", "CFB 2022    Notre Dame at North Carolina"),
     ("401404124", "Home & Home", "CFB 2022    Notre Dame at Ohio State"),
     ("401404070", "Home & Home", "CFB 2022    Oklahoma at Nebraska"),
     ("401403886", "Home & Home", "CFB 2022    Ole Miss at Georgia Tech"),
@@ -87,8 +85,6 @@ SERIES = [
     ("401524007", "Home & Home", "CFB 2023    Colorado State at Colorado"),
     ("401523994", "Home & Home", "CFB 2023    Colorado at Texas Christian"),
     ("401520188", "Home & Home", "CFB 2023    Nebraska at Colorado"),
-    ("401525441", "Home & Home", "CFB 2023    Notre Dame at Clemson"),
-    ("401525439", "Home & Home", "CFB 2023    Notre Dame at Louisville"),
     ("401521330", "Home & Home", "CFB 2023    Ohio State at Notre Dame"),
     ("401532573", "Home & Home", "CFB 2023    Oregon State at San José State"),
     ("401520242", "Home & Home", "CFB 2023    Syracuse at Purdue"),
@@ -109,7 +105,6 @@ SERIES = [
     ("401752709", "Home & Home", "CFB 2025    Florida at Miami"),
     ("401752671", "Home & Home", "CFB 2025    Louisiana State at Clemson"),
     ("401752690", "Home & Home", "CFB 2025    Michigan at Oklahoma"),
-    ("401754522", "Home & Home", "CFB 2025    Notre Dame at Miami"),
     ("401752824", "Home & Home", "CFB 2025    Oklahoma State at Oregon"),
     ("401752707", "Home & Home", "CFB 2025    Texas A&M at Notre Dame"),
     ("401752677", "Home & Home", "CFB 2025    Texas at Ohio State"),
@@ -141,8 +136,6 @@ SERIES = [
     ("400547826", "Home & Home", "CFB 2014    Virginia Tech at Ohio State"),
     ("400868946", "Home & Home", "CFB 2016    Notre Dame at Texas"),
     ("400934502", "Home & Home", "CFB 2017    Oklahoma at Ohio State"),
-    ("400934581", "Home & Home", "CFB 2017    Notre Dame at Miami"),
-    ("400868955", "Home & Home", "CFB 2016    Virginia Tech at Notre Dame"),
     ("400933845", "Home & Home", "CFB 2017    Georgia at Notre Dame"),
     ("401012727", "Home & Home", "CFB 2018    Michigan State at Arizona State"),
     # rival losses from 2019 on that the first Rivals scan missed (2026-09-11)
@@ -233,6 +226,21 @@ NOT_SERIES = [
     ("CBB", "277", "194", "West Virginia / Ohio State", "Cleveland 2019, 2023, 2025: not a series"),
 ]
 
+# Notre Dame plays ACC teams by its scheduling agreement with the ACC (from
+# 2014), so a return trip is the agreement's rotation, not a series. His call
+# 2026-09-11: no Home & Home / Neutral & Neutral / Home & Neutral for ANY
+# Notre Dame football game against an ACC team from 2014 on -- rows for them
+# are ignored and the tags stripped. Annual is left alone.
+NOTRE_DAME, ACC_CFB, ND_ACC_SINCE = "87", "1", 2014
+H_AND_H_TAGS = ("Home & Home", "Neutral & Neutral", "Home & Neutral")
+
+
+def nd_acc(g):
+    ids = [t["id"] for t in g["teams"]]
+    return (g["sport"] == "CFB" and g["season"] >= ND_ACC_SINCE and NOTRE_DAME in ids
+            and any(t["id"] != NOTRE_DAME and t["conf"] == ACC_CFB for t in g["teams"]))
+
+
 BUY_GAMES = [
     # ESPN game id, the game
     ("401404125", "CFB 2022    Marshall at Notre Dame"),
@@ -259,6 +267,8 @@ def main(dry):
             misses.append((label, tag, "not in archive"))
         elif g["champ"]:
             misses.append((label, tag, "postseason"))
+        elif tag in H_AND_H_TAGS and nd_acc(g):
+            misses.append((label, tag, "Notre Dame v ACC"))
         else:
             want.setdefault(gid, set()).add(tag)
     for gid, label in BUY_GAMES:
@@ -312,6 +322,8 @@ def main(dry):
             kept = [t for t in new if t not in MANAGED]
         elif g and pair_of(g) in ruled_out:
             kept = [t for t in new if t not in SERIES_TAGS]
+        elif g and nd_acc(g):
+            kept = [t for t in new if t not in H_AND_H_TAGS]
         else:
             kept = new
         stripped += len(new) - len(kept)

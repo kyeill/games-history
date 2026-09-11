@@ -329,6 +329,9 @@ among them, live in `seed_series.NOT_SERIES`: the scan stops re-asking, and a
 seeder run strips any series tag from their games.
 The scan only looks a season either side, so a home & home stretched over
 three or more years (LSU-UCLA, 2021 and 2024) needs a human eye.
+Notre Dame football against an ACC team from 2014 on is never tagged Home &
+Home, Neutral & Neutral or Home & Neutral (his call 2026-09-11): the ACC
+scheduling agreement makes those return trips a rotation, not a series.
 
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.

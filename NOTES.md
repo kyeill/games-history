@@ -480,6 +480,17 @@ Dame, Notre Dame-Navy): otherwise an untagged pair looks like an open question
 forever, and a seeder run strips any series tag its games already carry --
 which is how Notre Dame-Navy's four Annual tags came off.
 
+**Notre Dame against an ACC team is never a series, from 2014 on** (his call
+2026-09-11). Its scheduling agreement with the ACC sends it home and away
+against the same schools, which reads exactly like a home & home to the scan.
+Seven had been tagged -- Virginia Tech (2016), Miami (2017, 2025), North
+Carolina (2022), Clemson (2022, 2023), Louisville (2023) -- and all came off;
+Virginia Tech at Notre Dame (2016) left Rivals with its tag, since nothing else
+qualified it. `seed_series.nd_acc` ignores such rows and strips Home & Home /
+Neutral & Neutral / Home & Neutral from those games (Annual is untouched), and
+`series_scan.py` no longer asks about them. It is a rule, not NOT_SERIES rows,
+so a new ACC opponent needs no entry.
+
 **series_scan records carry NO winner.** `load_all()` keeps teams, venue and
 conference but not who won, so a check that picks rival LOSSES out of them
 finds none from 2019 on -- only the 2013-2020 rival caches, which keep the raw
