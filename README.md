@@ -347,9 +347,10 @@ not on a Saturday: "WEEK 1 (THU)".
 every game that season: the same card frame, but ONE team line, the opponent,
 with its rank at the time, how far it went -- [Semis] in the CFP or NCAA
 Tournament, [#13] for a final AP ranking, or his SP+ / KenPom rank as (73+) --
-and the result from Michigan's side (W 34-17). A Dense / Compact button
-switches layouts: Compact adds a second line with Michigan's rank and his
-note; Dense moves those into the chips. Football headers lead with the game
+and the score from Michigan's side (34-17, no W or L -- a loss is the dashed,
+italic card). A Dense / Compact button switches layouts: Compact adds a second
+line with Michigan's rank and his note; Dense moves those, and the opponent's
+finish or rating, into the chips and stacks the network over the time. Football headers lead with the game
 number (NC 1-3, B1G 1-9). Losses are dashed and muted. His own details come
 from two spreadsheets in the repo, read by `harvest.py`: `michigan.csv` (per
 game: emoji, border colour, caps Y/N, jersey / pants / accessories or one

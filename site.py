@@ -215,7 +215,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   color:var(--muted);font-style:normal}
 .row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
-.row.mdense .meta{grid-template-rows:1fr}
+.row.mdense .meta{grid-template-rows:1fr;min-width:0}
+/* Dense: network over time, small, inside one team line -- side by side they
+   took 40px from the opponent name on a phone */
+.row.mdense .mrow.mstack{flex-direction:column;align-items:flex-end;
+  justify-content:center;font-size:11.5px;line-height:1.2}
 .t-uni{background:#2c2c31;border-color:#414147;color:#d6d6d1}
 .t-uni i{display:inline-block;width:9px;height:9px;border-radius:2px;
   margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px #55555c}

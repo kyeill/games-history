@@ -328,22 +328,24 @@ function michCard(g, p) {
     rankCell(opp) +
     '<span class="nm">' + esc(where + nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") +
-      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
-    '<span class="sc">' + (lost ? "L " : "W ") + m.score + "-" + opp.score +
-    "</span></div>";
+      (fin && !MDENSE ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+    // Michigan's score first; no W / L -- the wash, or the dashed italic card of
+    // a loss, already says it, and a phone needs the width for the name
+    '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
   const mLine = '<div class="tl mm"><img class="crest" loading="lazy" src="' +
     crest(m) + '" alt="">' + rankCell(m) + '<span class="nm">' +
     esc(mx.note || "") + "</span><span></span></div>";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   const net = esc(primaryNet(g.nets) || "\u2014"), time = fmtTime(g.time);
   const meta = MDENSE
-    ? '<div class="meta"><div class="mrow"><span' + col(p.netCol) + ">" + net +
-      "</span>&nbsp;<span" + col(p.timeCol) + ">" + time + "</span></div></div>"
+    ? '<div class="meta"><div class="mrow mstack"><span' + col(p.netCol) + ">" + net +
+      "</span><span" + col(p.timeCol) + ">" + time + "</span></div></div>"
     : '<div class="meta"><div class="mrow"' + col(p.netCol) + ">" + net +
       '</div><div class="mrow"' + col(p.timeCol) + ">" + time + "</div></div>";
   const uni = (mx.uni || []).map(uniChip);
   const chips = (MDENSE
-    ? [m.rank ? chip("grey", (playoffGame(g) ? "UM NO. " : "UM #") + m.rank) : "",
+    ? [fin ? chip("grey", fin) : "",
+       m.rank ? chip("grey", (playoffGame(g) ? "UM NO. " : "UM #") + m.rank) : "",
        mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
     : uni.concat(p.tags)).filter(Boolean);
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
