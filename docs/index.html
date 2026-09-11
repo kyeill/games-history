@@ -136,9 +136,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    lost or Ohio State / Michigan State / Notre Dame won */
 .row.rk-upset .rk{color:var(--accent)}
 .row.rk-grey .rk{color:var(--muted)}
-/* the CFP and the NCAA Tournament say "No. 3"; the rank column widens to fit */
+/* the CFP and the NCAA Tournament say "NO. 3", left-aligned (his call
+   2026-09-11); the rank column widens to fit */
 .row.rk-no .tl{grid-template-columns:22px 44px 1fr auto}
-.row.rk-no .rk:not(:empty)::before{content:"No. "}
+.row.rk-no .rk{text-align:left}
+.row.rk-no .rk:not(:empty)::before{content:"NO. "}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
 /* overtime: the winning score is underlined, instead of an OT chip */
@@ -314,6 +316,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-151724"></script>
+<script src="app.js?v=20260911-152120"></script>
 </body>
 </html>

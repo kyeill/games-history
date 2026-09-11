@@ -262,7 +262,7 @@ function rowHtml(g, browse) {
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
-    // the CFP and the NCAA Tournament read "No. 3", not "#3"
+    // the CFP and the NCAA Tournament read "NO. 3", not "#3"
     (playoffGame(g) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +

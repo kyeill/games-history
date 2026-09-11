@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-151724";
+const BUILD = "20260911-152120";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -262,7 +262,7 @@ function rowHtml(g, browse) {
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
-    // the CFP and the NCAA Tournament read "No. 3", not "#3"
+    // the CFP and the NCAA Tournament read "NO. 3", not "#3"
     (playoffGame(g) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
