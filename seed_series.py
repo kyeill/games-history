@@ -239,6 +239,8 @@ BUY_GAMES = [
     ("401403878", "CFB 2022    Appalachian State at Texas A&M"),
     ("401628977", "CFB 2024    Northern Illinois at Notre Dame"),
     ("401581835", "CBB 2023-24 James Madison at Michigan State"),
+    ("400595422", "CBB 2014-15 Texas Southern at Michigan State"),
+    ("401369971", "CBB 2021-22 Notre Dame at Howard"),
 ]
 
 

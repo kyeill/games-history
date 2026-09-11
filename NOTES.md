@@ -693,7 +693,13 @@ network there can place a game in a window. It did twice: Iowa at Ohio State
 (2022-02-19, FOX) became FOX Saturday and Marquee and left Rivals-only for TV
 Windows, and Ole Miss-Purdue (2024-11-29, FOX) joined FOX Weekend.
 `window-overrides.json` could not have done this -- it sets windows, not
-networks. Separately, 244 games carry
+networks.
+
+**A Buy Game is by id and on any tab, not only Key Games.** He named two from
+the non-conference review (2026-09-11) that sit on Rivals and TV Windows:
+Texas Southern at Michigan State (2014-15) and Notre Dame at Howard (2021-22).
+`seed_series.BUY_GAMES` tags whatever id it is given; the "Key Games only" of
+the first round was which games he was asked about, not a rule. Separately, 244 games carry
 only networks outside `NET_PRIORITY`; they still display, because the primary
 network falls back to the first one listed.
 

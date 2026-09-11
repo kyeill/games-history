@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-135108";
+const BUILD = "20260911-141440";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -193,7 +193,11 @@ function rowHtml(g, browse) {
   // Basketball takes the NETWORK's colour: the network cell always, and the
   // header and time as well on a Marquee game (his call 2026-09-10).
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
-  const netTint = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
+  // no network colour on a Big Ten or NCAA Tournament game (his call
+  // 2026-09-11): the tournament, not the broadcaster, is the story
+  const bigTourney = /^(Big Ten|NCAA) Tournament/.test(g.stage || "");
+  const netTint = g.sport === "CBB" && !bigTourney
+    ? NET_TINT[primaryNet(g.nets)] : null;
   const netCol = g.sport === "CFB" ? tint : netTint;
   const winCol = g.sport === "CFB" ? tint : (g.mq ? netTint : null);
   // ...but the HEADER keeps that colour only when a Big Ten team is playing

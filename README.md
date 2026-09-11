@@ -404,7 +404,7 @@ game the header and tip time do too. The date stays muted in both. Football
 games outside those three windows, and basketball games outside Marquee, are
 plain. The HEADER keeps its colour only when a Big Ten team is playing (his call
 2026-09-11): Texas-Alabama in FOX Big Noon reads a plain header over a yellow
-FOX and kickoff time.
+FOX and kickoff time. Big Ten Tournament and NCAA Tournament cards carry no network colour at all (his call 2026-09-11): the tournament is the story, not the broadcaster.
 
 **Basketball card labels.** A basketball card's header names its slot. FOX
 Friday, FOX Primetime and the three ESPN labels are open to anyone; the
