@@ -73,6 +73,20 @@ VENUE_METROS = {
 CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut"}
 
 
+# MICHIGAN view (trial, his call 2026-09-11): every Michigan game in these
+# seasons gets a view of its own -- one opponent per card, with his own
+# details from michigan.csv and ratings.csv. 2011 onward if the trial holds.
+MICHIGAN = "130"
+MICHIGAN_SEASONS = {"CFB": {2023}, "CBB": {2025}}
+
+# How far an opponent went in the CFP or the NCAA Tournament, written the way
+# his sheet writes it: [Qtrs], [Semis], [Champs].
+FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2",
+                "Round 3": "Rd 3", "Sweet Sixteen": "Sweet 16",
+                "Elite Eight": "Elite 8", "Final Four": "Final Four",
+                "Quarters": "Qtrs", "Semis": "Semis", "Championship": "Final"}
+
+
 # ...except these arenas inside those metros, which read as the city (his
 # call 2026-09-11)
 CITY_NOT_VENUE = {"Credit Union 1 Arena"}

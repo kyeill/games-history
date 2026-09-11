@@ -210,6 +210,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-mine.g-red{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
 .t-mine.g-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
+/* MICHIGAN view (trial, 2026-09-11): one opponent line, then Michigan's own */
+.row.mich .mfin{margin-left:6px;font-size:12px;font-weight:400;
+  color:var(--muted);font-style:normal}
+.row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
+.row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
+.row.mdense .meta{grid-template-rows:1fr}
+.t-uni{background:#2c2c31;border-color:#414147;color:#d6d6d1}
+.t-uni i{display:inline-block;width:9px;height:9px;border-radius:2px;
+  margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px #55555c}
 
 .empty{color:var(--muted);text-align:center;padding:44px 10px;font-size:14.5px}
 .daterow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
@@ -291,6 +300,7 @@ BODY = """
   <button data-view="tv" aria-selected="true">TV Windows</button>
   <button data-view="big" aria-selected="false">Key Games</button>
   <button data-view="rivals" aria-selected="false">Rivals</button>
+  <button data-view="michigan" aria-selected="false">Michigan</button>
 </div>
 
 <div class="daterow" id="daterow" style="display:none">

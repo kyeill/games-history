@@ -12,6 +12,9 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
+// the Michigan view's density switch, remembered on this device (dense by default)
+let MDENSE = true;
+try { MDENSE = localStorage.getItem("gh_mdense") !== "0"; } catch (e) { }
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null };
 
@@ -247,6 +250,10 @@ function rowHtml(g, browse) {
   } else {
     when = esc(label || DAYS[g.dow] || g.dow);
   }
+  // the Michigan view draws its own card from the same header and chips
+  if (VIEW === "michigan" && !browse)
+    return michCard(g, { tags: tags, when: when, headCol: headCol,
+                         netCol: netCol, timeCol: timeCol });
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   let flag = celebrated(g);
@@ -282,6 +289,85 @@ function rowHtml(g, browse) {
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
       col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
+}
+
+/* MICHIGAN view (trial, his call 2026-09-11). One card per Michigan game, in
+   the same frame as every other card: the header (his emoji and the NC / B1G
+   game number in front), then ONE team line -- the opponent, with its rank at
+   the time, its playoff finish [Semis] or final rank [#13] or his SP+/KenPom
+   (73+), and the result from Michigan's side. Compact adds a Michigan line
+   (Michigan's rank and his note); Dense folds those into the chips instead.
+   His own columns come from michigan.csv via harvest: emoji, border, caps,
+   uniform and note. */
+const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#f2f2f0",
+  gold: "#c28c19", grey: "#8a8a92", gray: "#8a8a92", black: "#111114",
+  red: "#c8102e", green: "#1d7a3a", navy: "#00274c" };
+function michColour(v) {
+  const s = String(v || "").trim();
+  if (/^#?[0-9a-f]{6}$/i.test(s)) return "#" + s.replace("#", "");
+  return MICH_COLOURS[s.toLowerCase()] || null;
+}
+function uniChip(v) {
+  return '<span class="tag t-uni"><i style="background:' +
+    (michColour(v) || "#6a6a70") + '"></i>' + esc(v) + "</span>";
+}
+function michCard(g, p) {
+  const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
+  const mx = g.mx || {}, lost = !m.win;
+  // his caps column wins; left blank, the Big Ten rule of every other view holds
+  let nm = mx.caps === "N" ? teamName(opp, null, g.season)
+    : teamName(opp, g.sport, g.season);
+  if (mx.caps === "Y") nm = nm.toUpperCase();
+  const where = g.neutral ? "vs. " : opp.home ? "at " : "";
+  const fin = mx.finish ? "[" + mx.finish + "]" : mx.final ? "[#" + mx.final + "]"
+    : mx.rating ? "(" + mx.rating + "+)" : "";
+  const rankCell = t => '<span class="rk">' +
+    (t.rank ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>";
+  const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
+    '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
+    rankCell(opp) +
+    '<span class="nm">' + esc(where + nm) +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") +
+      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+    '<span class="sc">' + (lost ? "L " : "W ") + m.score + "-" + opp.score +
+    "</span></div>";
+  const mLine = '<div class="tl mm"><img class="crest" loading="lazy" src="' +
+    crest(m) + '" alt="">' + rankCell(m) + '<span class="nm">' +
+    esc(mx.note || "") + "</span><span></span></div>";
+  const col = c => (c ? ' style="color:' + c + '"' : "");
+  const net = esc(primaryNet(g.nets) || "\u2014"), time = fmtTime(g.time);
+  const meta = MDENSE
+    ? '<div class="meta"><div class="mrow"><span' + col(p.netCol) + ">" + net +
+      "</span>&nbsp;<span" + col(p.timeCol) + ">" + time + "</span></div></div>"
+    : '<div class="meta"><div class="mrow"' + col(p.netCol) + ">" + net +
+      '</div><div class="mrow"' + col(p.timeCol) + ">" + time + "</div></div>";
+  const uni = (mx.uni || []).map(uniChip);
+  const chips = (MDENSE
+    ? [m.rank ? chip("grey", (playoffGame(g) ? "UM NO. " : "UM #") + m.rank) : "",
+       mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
+    : uni.concat(p.tags)).filter(Boolean);
+  const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
+    (mx.num ? esc(mx.num) + " \u00b7 " : "") + p.when;
+  let cls = " mich" + (MDENSE ? " mdense" : "") + (lost ? " dimmed" : "") +
+    (g.ot ? " ot" : "") +
+    (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
+    (playoffGame(g) ? " rk-no" : "");
+  // his border colour when he gives one; otherwise a loss is dashed and muted
+  const bc = michColour(mx.border);
+  let ring = "";
+  if (bc) {
+    cls += " celebrate";
+    ring = ";--celeb:" + bc + ";--celebring:" + bc + "44";
+  } else if (lost) {
+    cls += " celebrate mloss";
+    ring = ";--celeb:#5a5a62";
+  }
+  return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
+    shade(teamColor(opp)) + ring + '">' +
+    '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
+      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
+    '<div class="teams">' + oppLine + (MDENSE ? "" : mLine) + "</div>" + meta +
+    '<div class="tags">' + chips.join("") + "</div></button>";
 }
 
 /* Kyle's teams. ESPN gives a school one id across both sports. */
@@ -376,7 +462,8 @@ function visible() {
   // Key Games needs a game TYPE. Being a conference-tournament game is not
   // itself a qualification -- an ACC first-rounder between unranked teams has
   // no business here, and every championship game carries a type anyway.
-  list = list.filter(g => VIEW === "rivals" ? rivalsAllows(g)
+  list = list.filter(g => VIEW === "michigan" ? !!g.michigan
+    : VIEW === "rivals" ? rivalsAllows(g)
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
@@ -427,7 +514,8 @@ function visible() {
   // date. Oldest First is simply chronological throughout.
   // Rivals orders by TRUE date (his call 2026-09-11): a CFP game has no week,
   // so a week block would put the Big Ten title game ahead of it
-  const block = g => (VIEW !== "rivals" && g.sport === "CFB" && g.week != null)
+  const block = g => (VIEW !== "rivals" && VIEW !== "michigan" &&
+      g.sport === "CFB" && g.week != null)
     ? g.season + "-" + String(g.week).padStart(2, "0")
     : g.date;
   const chron = (a, b) => (a.date !== b.date)
@@ -445,7 +533,8 @@ function visible() {
 // sports, and basketball's newest one is empty for months -- 2026-27 has no
 // games until November -- so the overall max opened the tab on nothing.
 function latestSeason() {
-  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only)
+  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB] &&
+      (VIEW === "michigan" ? g.michigan : !g.rivals_only))
     .map(g => g.season);
   if (own.length) return Math.max.apply(null, own);
   return SEASONS.length ? Math.max.apply(null, SEASONS) : null;
@@ -500,10 +589,14 @@ function filterChips() {
   // only the seasons this view can show: Rivals reaches back to 2014, the
   // other views start with the archive
   const viewSeasons = Array.from(new Set(GAMES.filter(g => g.sport === sport &&
-    (VIEW === "rivals" ? rivalsAllows(g) : !g.rivals_only)).map(g => g.season)));
+    (VIEW === "rivals" ? rivalsAllows(g)
+      : VIEW === "michigan" ? g.michigan : !g.rivals_only)).map(g => g.season)));
   let h = group("Year", select("season", "All Years",
     viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
+  // MICHIGAN (trial, 2026-09-11): Year, the density switch and the sort
+  if (VIEW === "michigan")
+    return h + group("", densityButton() + sortButton());
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
   // Marquee
@@ -661,6 +754,12 @@ function rivalsBorder(g) {
 function postButton() {
   return '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
     '">Postseason</button>';
+}
+
+// Michigan view: the button names the layout it is showing
+function densityButton() {
+  return '<button class="f" data-act="dense">' + (MDENSE ? "Dense" : "Compact") +
+    "</button>";
 }
 
 function sortButton() {
@@ -958,10 +1057,16 @@ async function init() {
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
         FILT.post = false; FILT.winner = null;
         SORT = "desc";
-      } else if (leaving === "rivals") {
-        // leaving Rivals puts back the season a normal view opens on
+      } else if (VIEW === "michigan") {
+        // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+        SORT = "asc";
+      } else if (leaving === "rivals" || leaving === "michigan") {
+        // leaving Rivals or Michigan puts back the season a normal view opens on
+        FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
+        FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+        if (leaving === "michigan") SORT = "desc";
       }
       draw();
       window.scrollTo({ top: 0 });
@@ -973,6 +1078,9 @@ async function init() {
       FILT.marquee = !FILT.marquee;
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
+    } else if (b.dataset.act === "dense") {
+      MDENSE = !MDENSE;
+      try { localStorage.setItem("gh_mdense", MDENSE ? "1" : "0"); } catch (e) { }
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }

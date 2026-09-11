@@ -342,6 +342,20 @@ blue. In the CFP and the NCAA Tournament a ranking reads "NO. 3" rather than
 "#3". Every card shares one ranking column, so team names start in the same place and the last digit of "#10" lines up with "NO. 11". A football header that is only its week names the day when the game is
 not on a Saturday: "WEEK 1 (THU)".
 
+**Michigan** is a fourth view on each tab -- a TRIAL (his call 2026-09-11),
+2023 football and 2025-26 basketball only for now. One card per Michigan game,
+every game that season: the same card frame, but ONE team line, the opponent,
+with its rank at the time, how far it went -- [Semis] in the CFP or NCAA
+Tournament, [#13] for a final AP ranking, or his SP+ / KenPom rank as (73+) --
+and the result from Michigan's side (W 34-17). A Dense / Compact button
+switches layouts: Compact adds a second line with Michigan's rank and his
+note; Dense moves those into the chips. Football headers lead with the game
+number (NC 1-3, B1G 1-9). Losses are dashed and muted. His own details come
+from two spreadsheets in the repo, read by `harvest.py`: `michigan.csv` (per
+game: emoji, border colour, caps Y/N, jersey / pants / accessories or one
+basketball uniform, note) and `ratings.csv` (per opponent per season: SP+ or
+KenPom). The "^" after a name marks last season's national champion.
+
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
 Kyle chose it over washing the whole row, which turns a long list into a colour
@@ -491,6 +505,8 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `window-overrides.json` | re-files a game into a window, header and all |
 | `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
 | `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
+| `michigan.csv` | his per-game details for the Michigan view: emoji, border, caps, uniform, note (open in Excel or Sheets; keep it CSV UTF-8) |
+| `ratings.csv` | his final SP+ / KenPom rank for each opponent, per season, for the Michigan view |
 | `event-overrides.json` | a clean name for a basketball event chip (sponsor and capitals stripped), or null for the city; matched case-blind |
 | `logos.py` | ported from sports-daily; measures both crest variants |
 | `site.py` | builds `docs/` — HTML, icons, manifest, service worker |

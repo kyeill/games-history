@@ -688,6 +688,22 @@ NBC sit under it -- but #005ae4 replaced #1c4469, which measured **1.64:1** and
 was genuinely invisible. Measure any new tint before shipping it; the card is
 dark and dark blues vanish.
 
+**The Michigan view (trial) keeps games no other view wants** (2026-09-11).
+`rules.MICHIGAN_SEASONS` names the seasons; harvest keeps every Michigan game
+in them and marks it `michigan` with an `mx` object (finish, final AP rank,
+reigning champion, rating, his sheet columns, football game number). A game
+kept only for this view is `rivals_only` -- the flag really means "not on TV
+Windows or Key Games" -- and `rivalsAllows` still rejects it, so TV, Key and
+Rivals are unchanged (checked: 27 games added, none visible there). TRAP: the
+early `stype != 2` filter dropped every postseason game that was not a rival
+loss before the Michigan test ran -- the CFP semifinal and final and all six
+NCAA Tournament games went missing until `mich` joined that test. The final AP
+poll is the LAST entry in the core API's season list (`final_poll`), not a
+fixed week: football 2023 ends types/3/weeks/1, basketball 2025-26 types/3/
+weeks/3. His sheet keeps uniforms, borders and caps as cell FORMATTING, so
+they come from `michigan.csv`, not an import. Printing the emoji to the Windows
+console raises UnicodeEncodeError -- set PYTHONIOENCODING=utf-8; the data is fine.
+
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
 (orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`
 #9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. Grey is

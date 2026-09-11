@@ -4,7 +4,7 @@ Past games never change, so this runs once per new week of games -- there is
 no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
-import collections, datetime as dt, json, os, re, sys
+import collections, csv, datetime as dt, json, os, re, sys
 from zoneinfo import ZoneInfo
 import requests
 import rules
@@ -191,6 +191,110 @@ def ap_ranks(code, y, week):
         os.makedirs(POLLS, exist_ok=True)
         json.dump(ranks, open(path, "w", encoding="utf-8"))
     return ranks
+
+
+def final_poll(code, y):
+    """The season's FINAL AP poll as {team id: rank}, cached under cache/polls/.
+
+    ESPN lists a season's polls in order and the final one comes last: football
+    2023 ends on "Final Rankings" (types/3/weeks/1), basketball 2025-26 on a
+    postseason week 3 -- so take the last entry rather than guessing its week.
+    """
+    season = y if code == "CFB" else y + 1
+    path = os.path.join(POLLS, "%s-%d-final.json" % (code.lower(), season))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))
+    ranks = {}
+    try:
+        r = requests.get("%s/%s/seasons/%d/rankings/1" % (CORE, POLL_PATHS[code], season),
+                         timeout=30)
+        refs = ([x.get("$ref") for x in (r.json().get("rankings") or [])]
+                if r.status_code == 200 else [])
+        if refs:
+            q = requests.get(refs[-1].replace("http://", "https://"), timeout=30)
+            if q.status_code == 200:
+                for t in q.json().get("ranks") or []:
+                    m = re.search(r"/teams/([0-9]+)", (t.get("team") or {}).get("$ref", ""))
+                    if m:
+                        ranks[m.group(1)] = t.get("current")
+    except (requests.RequestException, ValueError):
+        return {}
+    if ranks and season_over(code, y):
+        os.makedirs(POLLS, exist_ok=True)
+        json.dump(ranks, open(path, "w", encoding="utf-8"))
+    return ranks
+
+
+def playoff_finish(code, y, evs):
+    """How far each team went in the CFP or the NCAA Tournament that season:
+    {team id: "Semis" / "Champs" / ...}, in his sheet's words (rules.FINISH_SHORT).
+    A team is filed under the round it LOST; the title-game winner is "Champs".
+    """
+    out = {}
+    for x in evs:
+        if (x.get("season") or {}).get("type") != 3:
+            continue
+        c = (x.get("competitions") or [{}])[0]
+        cs = c.get("competitors") or []
+        if len(cs) != 2 or not ((c.get("status") or {}).get("type") or {}).get("completed"):
+            continue
+        heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
+        stage = rules.stage_label(code, 3, heads, season=y) or ""
+        if not (stage.startswith("CFP") or stage.startswith("NCAA Tournament")):
+            continue
+        rnd = stage.split(" | ")[1] if " | " in stage else ""
+        for k in cs:
+            if k.get("winner"):
+                if rnd == "Championship":
+                    out[k["team"]["id"]] = "Champs"
+            else:
+                out[k["team"]["id"]] = rules.FINISH_SHORT.get(rnd, rnd or "Playoff")
+    return out
+
+
+def load_michigan_sheet():
+    """michigan.csv -- his own details for the Michigan view, by ESPN game id:
+    the highlight emoji, a border colour, capitals (Y/N), the uniform (jersey,
+    pants, accessories in football; one uniform in basketball) and a note on
+    why the game was played. Blank cells mean "nothing to add"."""
+    path = os.path.join(HERE, "michigan.csv")
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            gid = (row.get("game_id") or "").strip()
+            if not gid:
+                continue
+
+            def cell(k):
+                return (row.get(k) or "").strip()
+            e = {"emoji": cell("emoji"), "border": cell("border"),
+                 "caps": cell("caps").upper()[:1], "note": cell("note"),
+                 "uni": [cell(k) for k in ("jersey", "pants", "accessories", "uniform")
+                         if cell(k)]}
+            out[gid] = {k: v for k, v in e.items() if v}
+    return out
+
+
+def load_ratings():
+    """ratings.csv -- his final SP+ (football) or KenPom (basketball) rank for
+    each opponent, by (sport, season, team id)."""
+    path = os.path.join(HERE, "ratings.csv")
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            v = (row.get("rating") or "").strip()
+            if not v:
+                continue
+            try:
+                out[((row.get("sport") or "").strip(), int(row.get("season")),
+                     (row.get("team_id") or "").strip())] = v
+            except (TypeError, ValueError):
+                continue
+    return out
 
 
 def rank_of(c):
@@ -442,6 +546,8 @@ def harvest():
         pass
     shows = show_games()
     ev_overrides = load_event_overrides()
+    mich_sheet = load_michigan_sheet()
+    ratings = load_ratings()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         for y in RIVAL_SEASONS + SEASONS:
@@ -453,6 +559,15 @@ def harvest():
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
+            # the Michigan view: opponents' playoff finish and final AP rank this
+            # season, and last season's national champion (the "^" in his sheet)
+            mich_season = y in rules.MICHIGAN_SEASONS.get(code, ())
+            finish = playoff_finish(code, y, evs) if mich_season else {}
+            final_ap = final_poll(code, y) if mich_season else {}
+            reigning = None
+            if mich_season and (y - 1) in SEASONS:
+                last = playoff_finish(code, y - 1, events(code, y - 1))
+                reigning = next((t for t, f in last.items() if f == "Champs"), None)
             for x in evs:
                 comps = x.get("competitions") or []
                 if not comps:
@@ -482,7 +597,10 @@ def harvest():
                          or x["id"] in rules.RIVALS_INCLUDE))
                 postseason = stype == 3
                 # bowls / CFP / NCAA are dropped -- unless a rival lost one
-                if stype != 2 and not (postseason and rival_loss):
+                # a Michigan-view season keeps every Michigan game, bowls and
+                # tournaments included
+                mich = mich_season and any(k["team"]["id"] == rules.MICHIGAN for k in cs)
+                if stype != 2 and not (postseason and (rival_loss or mich)):
                     continue
 
                 d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") \
@@ -636,9 +754,12 @@ def harvest():
                     or any(ap.get(k["team"]["id"]) for k in cs)
                     or rules.is_marquee(code, nets, d, slots, big_ten=(bt in confs),
                                         tourney=tourney))
-                if not normal and not rivals:
+                # every Michigan game in a Michigan-view season is kept, whatever
+                # else is true of it
+                if not normal and not rivals and not mich:
                     continue
-                # kept ONLY for Rivals (a bowl, an early tournament round): strip
+                # kept ONLY for Rivals or the Michigan view (a bowl, an early
+                # tournament round, a Michigan game no rule admits): strip
                 # whatever would put it on TV Windows or Key Games
                 rivals_only = not normal
                 if rivals_only:
@@ -710,7 +831,24 @@ def harvest():
                     "stage": rules.stage_label(code, stype, heads, conf=conf,
                                                month=d.month, season=y),
                 })
+                if mich:
+                    opp = next(k["team"]["id"] for k in cs
+                               if k["team"]["id"] != rules.MICHIGAN)
+                    mx = {"finish": finish.get(opp), "final": final_ap.get(opp),
+                          "reigning": opp == reigning,
+                          "rating": ratings.get((code, y, opp))}
+                    mx.update(mich_sheet.get(x["id"], {}))
+                    keep[-1]["michigan"] = True
+                    keep[-1]["mx"] = {k: v for k, v in mx.items() if v}
     keep.sort(key=lambda g: (g["date"], g["time"]))
+    # football game numbers for the Michigan view, as his sheet writes them:
+    # NC 1-3 for the non-conference games, B1G 1-9 for the conference ones
+    count = collections.Counter()
+    for g in keep:
+        if g.get("michigan") and g["sport"] == "CFB" and not g["post"] and not g["champ"]:
+            key = (g["season"], len({t["conf"] for t in g["teams"]}) == 1)
+            count[key] += 1
+            g["mx"]["num"] = ("B1G %d" if key[1] else "NC %d") % count[key]
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf
