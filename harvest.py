@@ -622,6 +622,9 @@ def harvest():
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
                     "rivals_only": rivals_only,
+                    # a CFP game short of the final is located by its bowl
+                    "bowl": (rules.cfp_bowl(stype, heads, season=y)
+                             if code == "CFB" else None),
                     "showcase": showcase, "kickoff": kickoff,
                     # the header of a game that is an EVENT: "Fiesta Bowl",
                     # "College Football Playoff | Quarters", "NCAA Tournament |

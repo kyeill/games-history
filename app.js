@@ -168,6 +168,10 @@ function rowHtml(g, browse) {
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
   } else if (g.event && !g.stage) {
     tags.push(chip("champ", g.event));
+  } else if (g.bowl) {
+    // a CFP game short of the final names its bowl, not the city (his call
+    // 2026-09-11): Rose, Cotton, Peach, Fiesta, Orange or Sugar
+    tags.push(chip("champ", g.bowl));
   } else if (g.offsite) {
     // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
     // Ford Field, Madison Square Garden.
@@ -614,7 +618,9 @@ function rivalsBorder(g) {
   if (s.indexOf("CFP") === 0) return "#c28c19";
   if (s.indexOf("NCAA Tournament") === 0) return "#0053b8";
   if (g.champ === "Big Ten" || s.indexOf("Big Ten ") === 0) return "#0088ce";
-  if (g.post) return "#8a8a92";                  // bowls and the NIT
+  // grey for bowls, the NIT, and any other conference title game -- Notre
+  // Dame's 2020 ACC Championship is the one case (his call 2026-09-11)
+  if (g.post || s) return "#8a8a92";
   return null;
 }
 

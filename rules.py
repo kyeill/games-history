@@ -438,6 +438,21 @@ def stage_label(sport, season_type, headlines, conf=None, month=None, season=Non
     return None
 
 
+# The six bowls that host CFP games short of the final (his call 2026-09-11).
+# Such a game names its bowl in the location chip rather than the city --
+# Rose Bowl, not Arlington or Pasadena.
+CFP_BOWLS = ("Rose Bowl", "Cotton Bowl", "Peach Bowl", "Fiesta Bowl",
+             "Orange Bowl", "Sugar Bowl")
+
+
+def cfp_bowl(season_type, headlines, season=None):
+    label = stage_label("CFB", season_type, headlines, season=season)
+    if not label or not label.startswith("CFP") or label.endswith("Championship"):
+        return None
+    bowl = bowl_name([h for h in headlines if h][0])
+    return bowl if bowl in CFP_BOWLS else None
+
+
 def cfb_black_friday(nets, d, season, big_ten=False):
     """Black Friday football -- in the archive and in Marquee, but with NO
     window label.

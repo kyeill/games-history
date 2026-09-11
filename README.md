@@ -246,7 +246,7 @@ and Winner, plus a Postseason button -- off shows every game, pressed shows only
 the CFP and the NCAA Tournament. No week, month, game type, TV window, team or
 Marquee. Rivals cards carry an EVENT border instead of the usual ones: #0088ce
 for the Big Ten championship game or tournament, #c28c19 for the CFP, #0053b8
-for the NCAA Tournament, grey for bowls and the NIT, none for the regular
+for the NCAA Tournament, grey for bowls, the NIT and any other conference title game, none for the regular
 season. Notre Dame basketball counts too, for its NCAA Tournament losses only
 (`rules.RIVALS_NCAA_ONLY`). Rival is whose loss it was,
 opening on Ohio State in football and Michigan State in basketball. Winner lists
@@ -377,7 +377,9 @@ no round to show, `BIG TEN CHAMPIONSHIP (SAT)`. Names are spelled out except the
 CFP, which stays CFP. A postseason game also carries its YEAR: the season for
 football (`2020 CFP | SEMIS (FRI)`), the March for basketball (`2016 NCAA
 TOURNAMENT | ROUND 1 (FRI)`). The chip then shows
-the location instead of the event name. `rules.stage_label` builds it from the
+the location instead of the event name -- except a CFP game short of the
+final, whose chip names its bowl (Rose, Cotton, Peach, Fiesta, Orange or Sugar)
+rather than the city. `rules.stage_label` builds it from the
 ESPN note headline: the sponsor comes off a bowl name (Vrbo Fiesta Bowl becomes
 Fiesta Bowl) unless the bowl is named for its sponsor (Guaranteed Rate Bowl),
 and rounds are normalised -- 1st Round to Round 1, Quarterfinal to Quarters,
