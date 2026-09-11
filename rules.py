@@ -64,11 +64,13 @@ VENUE_METROS = {
     "Los Angeles", "Inglewood", "Pasadena", "Carson", "Anaheim",
     # Chicago
     "Chicago", "Evanston", "Rosemont",
+    # Detroit (his call 2026-09-11): Ford Field, Little Caesars Arena
+    "Detroit",
 }
 
 
 # Cities ESPN names in a way he does not want read back.
-CITY_OVERRIDES = {"Washington": "Washington DC"}
+CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut"}
 
 
 # ...except these arenas inside those metros, which read as the city (his

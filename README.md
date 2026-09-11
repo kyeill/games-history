@@ -380,6 +380,8 @@ Only **one network** is shown. ESPN lists simulcasts alongside the broadcaster
 the majors explicitly; alphabetical order would not do it (BTN would beat FOX).
 The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
+A TV channel always beats a streaming service, so a TNT game carried on HBO
+Max reads TNT.
 
 **A game that is an EVENT reads its stage in the header** (his call
 2026-09-11): `FIESTA BOWL (SAT)`, `CFP | QUARTERS (WED)`, `NCAA TOURNAMENT | ROUND 1 (THU)`,

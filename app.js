@@ -108,15 +108,21 @@ function fmtTime(t) {
 // Peacock", "CBS, Paramount+", "ESPN, ESPN+". Only the broadcaster is wanted,
 // and alphabetical order does not reliably put it first (BTN would beat FOX),
 // so the majors are ranked explicitly.
+// A TV channel ALWAYS beats a streaming service (2026-09-11): a channel
+// missing from the list used to lose to a listed streamer, so Creighton at
+// UConn read "HBO Max" over TNT and Iowa State at Cincinnati "Peacock" over
+// NBCSN. Unlisted channels rank after the listed ones, streamers last.
 const NET_RANK = ["ABC", "CBS", "NBC", "FOX", "ESPN", "ESPN2", "ESPNU", "BTN",
-                  "FS1", "FS2", "SECN", "Peacock", "Paramount+", "ESPN+"];
+                  "FS1", "FS2", "TNT", "TBS", "truTV", "CBSSN", "NBCSN",
+                  "USA Net", "SEC Network", "SECN", "ACC Network", "PACN", "CW"];
+const STREAMERS = ["Peacock", "Paramount+", "ESPN+", "HBO Max", "Disney+",
+                   "ESPN3", "B1G+", "BIG12|ESPN+", "SECN+", "ACCNX"];
 function primaryNet(nets) {
   if (!nets || !nets.length) return "";
-  let best = nets[0], bestRank = 999;
-  nets.forEach(n => {
-    const r = NET_RANK.indexOf(n);
-    if (r > -1 && r < bestRank) { bestRank = r; best = n; }
-  });
+  const rank = n => NET_RANK.indexOf(n) > -1 ? NET_RANK.indexOf(n)
+    : STREAMERS.indexOf(n) > -1 ? 900 + STREAMERS.indexOf(n) : 500;
+  let best = nets[0];
+  nets.forEach(n => { if (rank(n) < rank(best)) best = n; });
   return best;
 }
 

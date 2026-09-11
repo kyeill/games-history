@@ -63,6 +63,9 @@ both move every year. The New York / Los Angeles / Chicago arena rule has one
 exception, `rules.CITY_NOT_VENUE`: Credit Union 1 Arena reads Chicago. A
 game with an event forced to the city still shows the ARENA when that city is
 one of those three metros -- the Thanksgiving Classic reads United Center.
+Detroit joined those metros (his call 2026-09-11), so Little Caesars Arena
+and Ford Field show by name, and Uncasville reads "Connecticut"
+(`rules.CITY_OVERRIDES`) -- nobody knows where Mohegan Sun Arena is by town.
 
 **Rank 99 means unranked**, not 99th. `curatedRank.current` is 99 for everyone
 outside the poll, and the ranks are the poll on the day of the game.
