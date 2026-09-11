@@ -2,11 +2,11 @@
    __PLACEHOLDERS__. Kept as a real .js file rather than a Python string so it
    stays editable and lintable. */
 const REPO = "kyeill/games-history", TAGS_PATH = "docs/tags.json";
-const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H", "N&N", "H&N", "Annual"];
+const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral & Neutral", "Home & Neutral", "Annual", "Buy Game"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-095619";
+const BUILD = "20260911-104404";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -130,11 +130,13 @@ function netClass(window) {
 
 // His bottom-row tags each carry a colour: the pregame shows are branded,
 // H&H and OT are incidental detail.
-// The series tags (home & home, neutral & neutral, home & neutral, annual)
-// share one quiet grey -- they describe the scheduling, not the broadcast.
+// The scheduling tags (Home & Home, Neutral & Neutral, Home & Neutral, Annual,
+// Buy Game) share one quiet grey -- they describe how the game was arranged,
+// not how it was broadcast.
 const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
-                    "H&H": "g-grey", "N&N": "g-grey", "H&N": "g-grey",
-                    "Annual": "g-grey" };
+                    "Home & Home": "g-grey", "Neutral & Neutral": "g-grey",
+                    "Home & Neutral": "g-grey", "Annual": "g-grey",
+                    "Buy Game": "g-grey" };
 function tagClass(t) { return TAG_CLASS[t] || ""; }
 
 function chip(kind, text) {

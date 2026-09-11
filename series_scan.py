@@ -39,7 +39,7 @@ GAMES = os.path.join(HERE, "output", "games.json")
 TAGS = os.path.join(HERE, "docs", "tags.json")
 OUT = os.path.join(HERE, "output", "series_review.txt")
 SIDE_CACHE = os.path.join(tempfile.gettempdir(), "games-history-scan")
-SERIES_TAGS = ("H&H", "N&N", "H&N", "Annual")
+SERIES_TAGS = ("Home & Home", "Neutral & Neutral", "Home & Neutral", "Annual")
 DEAD = ("STATUS_CANCELED", "STATUS_POSTPONED")
 NL = chr(10)
 
@@ -267,11 +267,11 @@ def classify(arch, recs, by_pair, rule):
             elif ha is not None and ha == hb:
                 put("UNSURE: the same team hosts both meetings", g["sport"], pair, tuple(run), legs)
             elif (ha is None) != (hb is None):
-                put("H&N?: one neutral-site meeting, one campus meeting", g["sport"], pair, tuple(run), legs)
+                put("Home & Neutral?: one neutral-site meeting, one campus meeting", g["sport"], pair, tuple(run), legs)
             elif ha is None and hb is None:
-                put("N&N?: both meetings at neutral sites", g["sport"], pair, tuple(run), legs)
+                put("Neutral & Neutral?: both meetings at neutral sites", g["sport"], pair, tuple(run), legs)
             else:
-                put("H&H", g["sport"], pair, tuple(run), legs)
+                put("Home & Home", g["sport"], pair, tuple(run), legs)
             continue
 
         # a run of one: no plain meeting in an adjacent season
@@ -334,8 +334,8 @@ def main():
     def needs_ruling(k, legs):
         return (k[1], k[2]) not in ruled_out and bool(untagged(legs))
 
-    order = ["H&H", "N&N?: both meetings at neutral sites",
-             "H&N?: one neutral-site meeting, one campus meeting", "ANNUAL"]
+    order = ["Home & Home", "Neutral & Neutral?: both meetings at neutral sites",
+             "Home & Neutral?: one neutral-site meeting, one campus meeting", "ANNUAL"]
     classes = order + sorted({k[0] for k in res} - set(order))
     lines = [
         "SERIES REVIEW  --  generated " + dt.date.today().isoformat(),

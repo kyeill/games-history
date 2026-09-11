@@ -130,11 +130,13 @@ function netClass(window) {
 
 // His bottom-row tags each carry a colour: the pregame shows are branded,
 // H&H and OT are incidental detail.
-// The series tags (home & home, neutral & neutral, home & neutral, annual)
-// share one quiet grey -- they describe the scheduling, not the broadcast.
+// The scheduling tags (Home & Home, Neutral & Neutral, Home & Neutral, Annual,
+// Buy Game) share one quiet grey -- they describe how the game was arranged,
+// not how it was broadcast.
 const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
-                    "H&H": "g-grey", "N&N": "g-grey", "H&N": "g-grey",
-                    "Annual": "g-grey" };
+                    "Home & Home": "g-grey", "Neutral & Neutral": "g-grey",
+                    "Home & Neutral": "g-grey", "Annual": "g-grey",
+                    "Buy Game": "g-grey" };
 function tagClass(t) { return TAG_CLASS[t] || ""; }
 
 function chip(kind, text) {

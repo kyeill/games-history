@@ -22,7 +22,7 @@ re-harvest costs nothing.
 ```
 python harvest.py    ESPN -> output/games.json   (apply rules.py; run when a season ends)
 python colors.py     the row-wash colour per team -> output/colors.json
-python seed_series.py  H&H / N&N / H&N / Annual tags -> docs/tags.json (merges)
+python seed_series.py  series + Buy Game tags -> docs/tags.json (merges)
 python series_scan.py  new series candidates -> output/series_review.txt (review first)
 python site.py       build the app -> docs/  (GitHub Pages serves this)
 python mock.py       the three row treatments Kyle chose from -> output/mockups.html
@@ -249,15 +249,17 @@ row, not filter options**. Note that Big Noon Kickoff is FOX's pregame *show*
 being on site — not the noon kickoff window, which is the TV window "FOX Big
 Noon".
 
-The **series tags** are details too (his call 2026-09-11): **H&H** home &
-home, **N&N** neutral & neutral -- each school's "home" leg in a neutral city,
-like Michigan-Wake Forest basketball in Greensboro then Detroit -- **H&N** one
-of each, and **Annual** for a perpetual series like Notre Dame-USC.
-`seed_series.py` writes them into `docs/tags.json`: the first three by game
-id, from a scan he reviewed game by game, and Annual by team pair, so later
-meetings pick it up on their own. 101 games carry one as of 2026-09-11.
-`series_scan.py` finds next season's candidates for review; pairs he has
-ruled out live in `seed_series.NOT_SERIES`, so the scan stops re-asking.
+The **scheduling tags** are details too (his call 2026-09-11), spelled out in
+full: **Home & Home**; **Neutral & Neutral**, where each school's "home" leg is
+in a neutral city (Michigan-Wake Forest basketball: Greensboro, then Detroit);
+**Home & Neutral**, one of each; **Annual**, a perpetual non-conference series
+like Notre Dame-USC; and **Buy Game**, a one-way paid visit like Marshall at
+Notre Dame in 2022. `seed_series.py` writes them into `docs/tags.json`: the
+series by game id from a scan he reviewed game by game, Annual by team pair so
+later meetings pick it up on their own, and Buy Game by id. `series_scan.py`
+finds next season's candidates for review. Pairs he ruled out, Notre Dame-Navy
+among them, live in `seed_series.NOT_SERIES`: the scan stops re-asking, and a
+seeder run strips any series tag from their games.
 
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
@@ -382,7 +384,7 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `harvest.py` | ESPN → `output/games.json` |
 | `colors.py` | row-wash colour per team |
 | `seed_tags.py` | College GameDay / Big Noon Kickoff tags, merged into `docs/tags.json` |
-| `seed_series.py` | H&H / N&N / H&N / Annual tags, merged into `docs/tags.json` |
+| `seed_series.py` | Home & Home / Neutral & Neutral / Home & Neutral / Annual / Buy Game tags, merged into `docs/tags.json` |
 | `series_scan.py` | review tool: finds series candidates for `seed_series.py` |
 | `window-overrides.json` | re-files a game into a window, header and all |
 | `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |

@@ -353,8 +353,8 @@ played before the main Week 1 weekend, whose Saturday carries the most week-1
 games. 2021-2025 that is one early Saturday a year: 8/28, 8/27, 8/26, 8/24,
 8/23.
 
-**The series scan, and the five ways its first rule was wrong.** H&H, N&N and
-H&N came from a one-off scan of the 2019-2026 schedules -- 2019 and 2020 to
+**The series scan, and the five ways its first rule was wrong.** The Home &
+Home, Neutral & Neutral and Home & Neutral tags came from a one-off scan of the 2019-2026 schedules -- 2019 and 2020 to
 catch 2021's second legs, the published 2026 football and part of the
 2026-27 basketball schedule to catch first legs -- followed by his review.
 * "Has an ESPN note" is not "is an event": Iowa-Iowa State carries "Iowa Corn
@@ -383,15 +383,30 @@ the Drive-synced cache/.
 **A new archive game can complete a series nobody reviewed.** The Week 0/1
 rule brought in Oregon State at San Jose State 2023, North Carolina at
 Minnesota 2024 and the 2022 leg of Florida State-LSU, and each turned out to be
-the missing leg of a clean H&H or of a pair he had already ruled N&N -- so they
-were tagged without a new review. Re-run the scan after any rule change that
-adds games, not just at season end. A pair he rules OUT goes in
-`seed_series.NOT_SERIES` (Arizona-Kansas State, Virginia-Notre Dame);
-otherwise an untagged pair looks like an open question forever. Annual is by pair, so it maintains
-itself -- Navy-Notre Dame 2023 picked up its tag the moment the Week 0 rule
-brought it into the archive.
+the missing leg of a clean Home & Home or of a pair he had already ruled
+Neutral & Neutral -- so they were tagged without a new review. Re-run the scan
+after any rule change that adds games, not just at season end. A pair he rules
+OUT goes in `seed_series.NOT_SERIES` (Arizona-Kansas State, Virginia-Notre
+Dame, Notre Dame-Navy): otherwise an untagged pair looks like an open question
+forever, and a seeder run strips any series tag its games already carry --
+which is how Notre Dame-Navy's four Annual tags came off.
 
-A tag can land on a game no tab shows: Arkansas-Michigan State 2025-26 is H&N,
+**Annual is by pair, and counts NON-CONFERENCE meetings only.** It maintains
+itself: Washington-Washington State 2026 was tagged as soon as the pair was
+listed (his call 2026-09-11, "as is Oregon-Oregon State"). But both pairs were
+Pac-12 rivals until 2024, so their earlier meetings were league games rather
+than a scheduled series -- and Oregon-Oregon State's only archive game, 2022,
+is one of those, so that pair carries no tag yet.
+
+**The tags are spelled out** -- Home & Home, Neutral & Neutral, Home & Neutral
+(his call 2026-09-11) -- after starting life as H&H / N&N / H&N.
+`seed_series.RENAMED` rewrites an abbreviation wherever one survives in
+tags.json, since an old cached copy of the app could still write one.
+**Buy Game** is by id, from him: Marshall and Northern Illinois at Notre Dame,
+Appalachian State at Texas A&M. He placed the Northern Illinois game in 2025;
+the only meeting in the archive is 2024-09-07, so that is the one tagged.
+
+A tag can land on a game no tab shows: Arkansas-Michigan State 2025-26 is Home & Neutral,
 but it is a November game (the basketball TV tab is January-March) and an MSU
 win (Key Games hides rival wins).
 
