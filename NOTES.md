@@ -724,8 +724,10 @@ Then the uniform moved INTO the score and rank boxes (jersey behind the
 score, pants behind Michigan's rank, accessories as the text), Michigan's
 rank moved beside the score, the TV details went into the header only when
 it names no window or stage, and the chips became one row in his order.
-TRAP: an accessories colour equal to its box (Blue / Blue / Blue) would
-print blue on blue -- `ink()` swaps in navy, or maize on navy. The rank
+TRAP: an accessories colour can vanish into its box -- blue on blue, and
+white on maize, which the first cut missed because it only tested for an
+exact match (UNLV 2023). `ink()` now swaps in navy or maize, whichever
+contrasts better, whenever the accessories colour is under 3:1 on its box. The rank
 column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
 again if the font or size changes.
 

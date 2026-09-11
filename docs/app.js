@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-165708";
+const BUILD = "20260911-165912";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -324,15 +324,22 @@ function michCard(g, p) {
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
     (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when + tv;
   // UNIFORM (his call 2026-09-11): the score box is the jersey, the rank box
-  // the pants, and the accessories colour is the text on both -- unless it
-  // matches its box, when navy (or maize on navy) takes over so the number
-  // stays readable. Basketball's single uniform colours both boxes.
+  // the pants, and the accessories colour is the text on both -- unless it is
+  // too faint on its box (under 3:1 contrast: blue on blue, white on maize),
+  // when navy or maize takes over, whichever reads better. Basketball's single
+  // uniform colours both boxes.
   const u = (mx.uni || []).map(michColour);
   const top = u[0] || null;
   const pants = (u.length >= 3 ? u[1] : u[0]) || null;
   const acc = u.length >= 3 ? u[2] : null;
-  const ink = bg => (acc && acc !== bg) ? acc
-    : (bg === "#00274c" || bg === "#111114") ? "#ffcb05" : "#00274c";
+  const lum = hex => {
+    const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+      .map(x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4));
+    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+  };
+  const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const ink = bg => (acc && ratio(acc, bg) >= 3) ? acc
+    : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = bg => (bg ? ' style="background:' + bg + ";color:" + ink(bg) + '"' : "");
   const score = '<span class="sc' + (top ? " mbox" : "") + '"' + paint(top) + ">" +
     m.score + "-" + opp.score + "</span>";
