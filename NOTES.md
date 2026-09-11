@@ -425,6 +425,16 @@ tags.json, since an old cached copy of the app could still write one.
 Appalachian State at Texas A&M. He placed the Northern Illinois game in 2025;
 the only meeting in the archive is 2024-09-07, so that is the one tagged.
 
+**A game kept only for Rivals must not leak into the other views.** Harvest
+drops postseason games at the top of its loop and non-final conference
+tournament rounds near the bottom. A rival's loss in either is now kept, and
+that game's slots, type, Black Friday, show and opener flags are cleared
+(`rivals_only`): a bowl played on a Saturday on ABC would otherwise land in ABC
+Saturday, and a ranked upset in the NCAA tournament in Key Games. Its week is
+cleared too, because ESPN numbers the bowls week 1 and the card would read
+"WEEK 1" in January. The check after any change here: the TV Windows and Key
+Games populations must come out identical before and after.
+
 A tag can land on a game no tab shows: Arkansas-Michigan State 2025-26 is Home & Neutral,
 but it is a November game (the basketball TV tab is January-March) and an MSU
 win (Key Games hides rival wins).

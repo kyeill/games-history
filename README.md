@@ -182,7 +182,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
 | Week | dropdown, **football only** | 0-16, following the chosen season |
 | Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
-| Team | dropdown, **his order** | his teams, the rest of the Big Ten, the other power leagues -- a divider -- everyone else |
+| Team | dropdown, **his order** | his teams and the rest of the Big Ten -- a divider -- the other power leagues -- a divider -- everyone else |
 | Marquee Windows | toggle button | `rules.is_marquee` — a rule, not a window list |
 | Sort | toggle button | Newest First (default) / Oldest First |
 
@@ -215,6 +215,18 @@ reproduces his reviewed list for 2021-2025 exactly (15 games, leaving out
 Fresno State-Kansas and Stanford-Hawai'i). ESPN has no week 0 -- it numbers
 those games week 1 -- so harvest finds them by date.
 
+**Rivals is a third view on each sport tab** (his call 2026-09-11): games
+Ohio State or Michigan State (both sports) or Notre Dame (football) LOST, when
+the loss meant something -- postseason or a conference tournament (any round),
+a ranked team on the field, a neutral site, a Marquee window, or a Home & Home
+/ Neutral & Neutral / Home & Neutral tag. Two of them playing each other stays
+out until he names the game in `rules.RIVALS_INCLUDE`. Bowls, the CFP, NCAA
+tournament games and early conference-tournament rounds are otherwise not in
+the archive at all, so harvest keeps a rival's loss in one ONLY for this view:
+such a game carries no window and no game type, which keeps it off TV Windows
+and Key Games. Harvest decides every criterion except the series tags, which
+the app checks because they live in tags.json.
+
 **Week and Month are the same idea for the two sports** — the coarse cut
 through a season. Football thinks in numbered weeks and basketball does not,
 so basketball gets the month instead, listed in SEASON order (November,
@@ -245,10 +257,11 @@ and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
 and 8.
 
 **The Team filter is in his order** (2026-09-11), per sport. Football:
-Michigan, Ohio State, Michigan State, Notre Dame, the rest of the Big Ten, then
-the ACC, SEC and Big 12 together, alphabetically; a divider; everyone else.
-Basketball: Michigan, Michigan State, Ohio State, the rest of the Big Ten, then
-the ACC, SEC, Big 12 and Big East together; a divider; everyone else. A team's
+Michigan, Ohio State, Michigan State, Notre Dame, the rest of the Big Ten; a
+divider; the ACC, SEC and Big 12 together, alphabetically; a divider; everyone
+else. Basketball: Michigan, Michigan State, Ohio State, the rest of the Big
+Ten; a divider; the ACC, SEC, Big 12 and Big East together; a divider;
+everyone else. A team's
 conference is its CURRENT one -- from its latest game of any kind in that
 sport, which harvest records -- so USC
 sorts with the Big Ten and Texas with the SEC, and only teams that play the

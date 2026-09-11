@@ -278,6 +278,7 @@ BODY = """
 <div class="viewbar" id="viewbar">
   <button data-view="tv" aria-selected="true">TV Windows</button>
   <button data-view="big" aria-selected="false">Key Games</button>
+  <button data-view="rivals" aria-selected="false">Rivals</button>
 </div>
 
 <div class="daterow" id="daterow" style="display:none">

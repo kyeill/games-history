@@ -171,6 +171,10 @@ NOT_SERIES = [
     ("CFB", "23", "30", "San José State / Southern California", "no return game (2026 Week 0)"),
     ("CFB", "275", "87", "Wisconsin / Notre Dame", "no return game (2026, Lambeau Field)"),
     ("CFB", "97", "145", "Louisville / Ole Miss", "no return game (2026 Music City Kickoff)"),
+    ("CFB", "152", "87", "NC State / Notre Dame", "a season apart; he ignores it"),
+    ("CFB", "221", "87", "Pittsburgh / Notre Dame", "a season apart; he ignores it"),
+    ("CBB", "239", "2250", "Baylor / Gonzaga", "a season apart; he ignores it"),
+    ("CBB", "150", "356", "Duke / Illinois", "a season apart; he ignores it"),
 ]
 
 BUY_GAMES = [

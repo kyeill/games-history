@@ -239,6 +239,21 @@ function rowHtml(g, browse) {
 const MICHIGAN = "130";
 const RIVALS = ["194", "127", "87"];   // Ohio State, Michigan State, Notre Dame
 
+/* RIVALS (his call 2026-09-11): games Ohio State or Michigan State (both sports)
+   or Notre Dame (football) LOST -- two of them playing each other only when
+   rules.RIVALS_INCLUDE names the game. Harvest flags the ones that count
+   (g.rivals): postseason or conference tournament, a ranked team, a neutral
+   site, or a Marquee window. The home & home family is checked here instead,
+   because those tags live in tags.json. Games that are ONLY here -- a bowl, an
+   early tournament round -- carry no window or type, so no other view shows
+   them. */
+function rivalsAllows(g) {
+  if (g.rivals) return true;
+  if (!g.rival_loss) return false;
+  const series = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
+  return myTags(g.id).some(t => series.indexOf(t) > -1);
+}
+
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
   // rival wins. Both still appear under TV Windows, which is a record of what
@@ -309,6 +324,7 @@ function visible() {
   // no business here, and every championship game carries a type anyway.
   list = list.filter(g => VIEW === "tv"
     ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener)
+    : VIEW === "rivals" ? rivalsAllows(g)
     : (g.type && bigViewAllows(g)));
   // Basketball's TV tab is JANUARY TO MARCH (his standing rule, and his call
   // again 2026-09-10 for Marquee). The window rules already enforce it, but a
@@ -462,16 +478,19 @@ function filterChips() {
   // not "order": that name already holds the game-type / window sequence above
   const teamList = teamOrder(sport);
   const teamOpt = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
+  // a divider line opens each group after the Big Ten's (his call 2026-09-11)
+  const withLine = ids => ids.length
+    ? [["─".repeat(12), null]].concat(ids.map(teamOpt)) : [];
   h += group("Team", select("team", "All Teams",
-    teamList.top.map(teamOpt).concat(teamList.rest.length ? [["─".repeat(12), null]] : [],
-                                      teamList.rest.map(teamOpt)), FILT.team));
+    teamList.bigTen.map(teamOpt).concat(withLine(teamList.power), withLine(teamList.rest)),
+    FILT.team));
   h += group("", quickButtons());
   return h;
 }
 
-/* The Team filter in HIS order (2026-09-11): his teams pinned, the rest of the
-   Big Ten, then the other power leagues together, alphabetically; a divider;
-   then everyone else. Only teams that play this sport are listed -- TEAMS spans
+/* The Team filter in HIS order (2026-09-11): his teams pinned and the rest of
+   the Big Ten; a divider; the other power leagues together, alphabetically; a
+   divider; everyone else. Only teams that play this sport are listed -- TEAMS spans
    both. Membership is a team's CURRENT conference, so USC sorts with the Big
    Ten and Texas with the SEC. Harvest records it from each team's latest game
    of ANY kind (teams[id].conf), because its latest ARCHIVE game can predate a
@@ -500,8 +519,8 @@ function teamOrder(sport) {
   const inBigTen = id => confOf(id) === BIG_TEN[sport];
   const inPower = id => (POWER[sport] || []).indexOf(confOf(id)) > -1;
   return {
-    top: pins.concat(others.filter(inBigTen).sort(byName),
-                     others.filter(id => !inBigTen(id) && inPower(id)).sort(byName)),
+    bigTen: pins.concat(others.filter(inBigTen).sort(byName)),
+    power: others.filter(id => !inBigTen(id) && inPower(id)).sort(byName),
     rest: others.filter(id => !inBigTen(id) && !inPower(id)).sort(byName)
   };
 }

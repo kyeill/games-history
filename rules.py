@@ -177,6 +177,14 @@ def is_black_friday(d):
 ARMY, NAVY = "349", "2426"
 NOTRE_DAME = "87"
 
+# The RIVALS view (his call 2026-09-11) shows games these teams LOST -- Notre
+# Dame in football only.
+RIVALS_BY_SPORT = {"CFB": {"194", "127", "87"},   # Ohio State, Michigan State, Notre Dame
+                   "CBB": {"194", "127"}}         # Ohio State, Michigan State
+# Two of them playing each other stays OUT of that view unless the ESPN game id
+# is named here -- "I will have to tell you when to include".
+RIVALS_INCLUDE = set()
+
 # NOTE: "Power Four/Five" scopes which CONFERENCE CHAMPIONSHIP games count
 # (see POWER5 and power5_title). It is deliberately NOT a condition on TV
 # windows -- a window is a time slot on a network, whoever is playing. An

@@ -339,8 +339,19 @@ def harvest():
                     continue
                 if any(k.get("score") in (None, "") for k in cs):
                     continue
-                if (x.get("season") or {}).get("type") != 2:
-                    continue                      # drop bowls / CFP / NCAA
+                # RIVALS (his call 2026-09-11): a game Ohio State or Michigan
+                # State (both sports) or Notre Dame (football) LOST. Two of them
+                # meeting only counts when rules.RIVALS_INCLUDE names the game.
+                stype = (x.get("season") or {}).get("type")
+                rivals_here = rules.RIVALS_BY_SPORT[code]
+                rival_loss = (
+                    any(k["team"]["id"] in rivals_here and not k.get("winner") for k in cs)
+                    and (not all(k["team"]["id"] in rivals_here for k in cs)
+                         or x["id"] in rules.RIVALS_INCLUDE))
+                postseason = stype == 3
+                # bowls / CFP / NCAA are dropped -- unless a rival lost one
+                if stype != 2 and not (postseason and rival_loss):
+                    continue
 
                 d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") \
                       .replace(tzinfo=dt.timezone.utc).astimezone(ET)
@@ -444,10 +455,8 @@ def harvest():
                 # Being a conference-tournament game is NOT a qualification on
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.
-                if (not slots and not gtype and not title and not black_friday
-                        and not show and not opener and x["id"] not in overrides
-                        and x["id"] not in extras):
-                    continue
+                normal = bool(slots or gtype or title or black_friday or show
+                              or opener or x["id"] in overrides or x["id"] in extras)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
                 # 2026-09-09). ESPN publishes no rankings for tournament games
@@ -464,8 +473,23 @@ def harvest():
                 # when a show broadcast from it -- he does not want postseason
                 # under Big Noon or GameDay, and the 2024 Mountain West
                 # Championship is the case that tests it.
-                if tourney_round and not title:
+                if (tourney_round and not title) or postseason:
+                    normal = False
+                # A rival's loss counts for Rivals when it was postseason or a
+                # conference tournament, had a ranked team, was at a neutral
+                # site, or sat in a Marquee window. (The home & home family is
+                # checked in the app, since those tags live in tags.json.)
+                rivals = rival_loss and bool(
+                    postseason or tourney_round or any(ranks) or c.get("neutralSite")
+                    or rules.is_marquee(code, nets, d, slots, big_ten=(bt in confs),
+                                        tourney=tourney))
+                if not normal and not rivals:
                     continue
+                # kept ONLY for Rivals (a bowl, an early tournament round): strip
+                # whatever would put it on TV Windows or Key Games
+                rivals_only = not normal
+                if rivals_only:
+                    slots, gtype, black_friday, show, opener = set(), None, False, False, False
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.
                 if title:
@@ -502,10 +526,11 @@ def harvest():
                     # has one too but it means nothing to a viewer, so only
                     # football displays it.
                     # ...and ESPN numbers Week 0 as week 1; see week_zero_ids
-                    "week": (0 if x["id"] in wk0
+                    "week": (None if postseason
+                             else 0 if x["id"] in wk0
                              else (x.get("week") or {}).get("number")),
                     "venue": v.get("fullName"),
-                    "mq": rules.is_marquee(code, nets, d, slots,
+                    "mq": (not rivals_only) and rules.is_marquee(code, nets, d, slots,
                                            big_ten=(bt in confs),
                                            tourney=tourney),
                     "offsite": offsite.get(x["id"]),
@@ -518,6 +543,7 @@ def harvest():
                     "champ": conf, "round": head, "title": title,
                     "event": event, "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
+                    "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     for (code, tid), (_, conf) in latest_conf.items():
