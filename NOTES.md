@@ -31,6 +31,27 @@ network as a data error in the early seasons — 2021-22 CBB is 22% blank.
 **Some old events carry no `competitions` block at all.** A 2001 CFB fetch
 raised `KeyError: 'competitions'` on one event. Guard it.
 
+**Before 2021, basketball headlines are in CAPITALS.** "BIG TEN MEN'S
+TOURNAMENT - QUARTERFINAL", "MEN'S BASKETBALL CHAMPIONSHIP - EAST REGION -
+SWEET 16", "STATE FARM CHAMPIONS CLASSIC"; from 2021 they are mixed case.
+Every test that looked for "Tournament", "hampionship" or "- Final" missed the
+old ones, so the pre-2021 Big Ten Tournament games on Rivals had no stage
+header, no Big Ten border and the raw headline as their chip (found by him
+2026-09-11). `is_championship`, `power5_title` and `is_title_game` are now
+case-blind -- the conference matched as a whole word, since capitals would let
+"SEC" hide inside other words -- and `event-overrides.json` is looked up
+case-blind too, which is what finally matched the old Champions Classic and
+the "Presented by" / "presented by" Jimmy V variants.
+
+**Before 2021 an event name can't earn its place by size.** The chip keeps an
+event name only when more than two teams played under it that season, but the
+pre-2021 caches hold only Ohio State, Michigan State and Notre Dame games, so
+the count almost never passes two and the city shows instead -- the 2014, 2016
+and 2017 CBS Sports Classic games read United Center, Las Vegas and New
+Orleans. An `event-overrides.json` entry forces the name whatever the count;
+"CBS Sports Classic" is there now (which also names the 2021 edition, a single
+game after the COVID cancellation).
+
 **Rank 99 means unranked**, not 99th. `curatedRank.current` is 99 for everyone
 outside the poll, and the ranks are the poll on the day of the game.
 

@@ -327,7 +327,9 @@ def load_event_overrides():
     if not os.path.exists(path):
         return {}
     raw = json.load(open(path, encoding="utf-8"))
-    return {k: v for k, v in raw.items() if not k.startswith("_")}
+    # keyed case-blind: ESPN wrote "BATTLE 4 ATLANTIS" before 2021 and
+    # "Presented by" / "presented by" in different years
+    return {k.lower(): v for k, v in raw.items() if not k.startswith("_")}
 
 
 def offsite_games(evs):
@@ -571,8 +573,8 @@ def harvest():
                     base = h.split(" - ")[0].strip()
                     if not base or conf:
                         break
-                    if base in ev_overrides:
-                        event = ev_overrides[base]
+                    if base.lower() in ev_overrides:
+                        event = ev_overrides[base.lower()]
                     elif sizes.get(base, 0) > 2:
                         event = base
                     break

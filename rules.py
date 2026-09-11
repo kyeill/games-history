@@ -6,6 +6,8 @@ Power Five conference championships. Postseason (bowls, CFP, NCAA tournament)
 is excluded everywhere -- that is ESPN season type 3.
 """
 
+import re
+
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday", "Sunday"]
@@ -625,7 +627,7 @@ def is_title_game(sport, conf, headline):
         return False
     if sport == "CFB":
         return True
-    return (headline or "").endswith("- Final")
+    return (headline or "").lower().endswith("- final")
 
 
 def title_fallback(rank_win, rank_lose):
@@ -656,9 +658,10 @@ def is_championship(headlines):
     Ordinary regular-season games between the same teams are untouched --
     Boise State at BYU on ABC in September is a real ABC Saturday game.
     """
+    # case-blind: before 2021 ESPN wrote "BIG TEN MEN'S TOURNAMENT" in capitals
     for h in headlines:
-        base = (h or "").split(" - ")[0]
-        if "hampionship" in base or "Tournament" in base or "Playoff" in base:
+        low = (h or "").split(" - ")[0].lower()
+        if "championship" in low or "tournament" in low or "playoff" in low:
             return True
     return False
 
@@ -673,13 +676,17 @@ def power5_title(headlines, sport="CFB"):
     2021 and 2022. Substring on the conference name is the only thing that
     holds. 'FCS Championship' must be excluded explicitly.
     """
+    # TRAP 2: before 2021 the headline is in CAPITALS ("BIG TEN MEN'S
+    # TOURNAMENT - QUARTERFINAL"), so every test is case-blind -- and the
+    # conference is matched as a whole word, since capitals would let "SEC"
+    # hide inside other words.
     for h in headlines:
-        base = h.split(" - ")[0]
-        if "Tournament" not in base and "hampionship" not in base:
+        base = h.split(" - ")[0].upper()
+        if "TOURNAMENT" not in base and "CHAMPIONSHIP" not in base:
             continue
         if "FCS" in base:
             continue
         for p in power_conferences(sport):
-            if p in base:
+            if re.search(r"(?<![A-Z])" + re.escape(p.upper()) + r"(?![A-Z])", base):
                 return p, h
     return None, None
