@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-145937";
+const BUILD = "20260911-151724";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -236,6 +236,8 @@ function rowHtml(g, browse) {
     const hasWeek = g.week != null;
     when = (hasWeek ? '<span class="wk">Week ' + g.week + "</span>" : "") +
       (label ? (hasWeek ? " | " : "") + esc(label) : "");
+    // a bare "WEEK 1" off a Saturday names its day (his call 2026-09-11)
+    if (hasWeek && !label && g.dow !== "Sat") when += " (" + esc(g.dow) + ")";
     // Browse pulls straight from ESPN, where a week number can be missing;
     // never leave the header empty.
     if (!when) when = esc(DAYS[g.dow] || g.dow);
@@ -256,9 +258,12 @@ function rowHtml(g, browse) {
     // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
     // looked like a rival loss to a black-and-gold winner such as Iowa
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
-    // ranking colour (his call 2026-09-11), every view: a Michigan loss greys
-    // the rankings; otherwise an upset paints them Sports Daily's orange
-    ((michTeam(g) && !michTeam(g).win) ? " rk-mloss" : isUpset(g) ? " rk-upset" : "") +
+    // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
+    // win by Ohio State, Michigan State or Notre Dame greys the rankings;
+    // otherwise an upset paints them Sports Daily's orange
+    (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
+    // the CFP and the NCAA Tournament read "No. 3", not "#3"
+    (playoffGame(g) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather

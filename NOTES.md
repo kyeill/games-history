@@ -689,9 +689,12 @@ was genuinely invisible. Measure any new tint before shipping it; the card is
 dark and dark blues vanish.
 
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
-(orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-mloss` (grey, `--muted`
-#9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. A Michigan
-loss is tested first, so an upset Michigan suffered reads grey. The upset test
+(orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`
+#9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. Grey is
+exactly `dimmed()` -- a Michigan loss or a win by Ohio State, Michigan State or
+Notre Dame (either sport) -- and is tested first, so such an upset reads grey.
+`rk-no` (the CFP and NCAA Tournament, `playoffGame`) swaps the "#" for "No."
+and widens the rank column from 24px to 44px on that card only. The upset test
 is by rank alone (`isUpset` in app.js: the loser ranked, the winner unranked or
 worse-ranked) -- deliberately NOT the Key Games type, which files a game once
 and would miss upsets it filed as Top 10 Games or Ranked Big Ten.
