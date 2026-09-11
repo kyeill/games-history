@@ -44,6 +44,32 @@ def fetch(sport, params, key, cacheable=True):
     return d
 
 
+def cbb_range(d, e, keep, tag=""):
+    """One week of basketball, d to e inclusive.
+
+    ESPN answers a week that STARTS before the season's first game day with
+    nothing at all -- not the games later in that week. The walk starts on
+    1 November, so the opening week of 2023-24 (games from 11/6) and of 2025-26
+    (from 11/3) came back empty, were cached empty, and ~550 games including
+    James Madison's upset at Michigan State never reached the archive. So an
+    empty week is re-asked one day at a time. A cached empty week from before
+    this fix takes the same path, so no cache file needs deleting.
+    `tag` keeps another caller's files apart (series_scan.py's daily schedule).
+    """
+    sport, grp = SPORTS["CBB"]
+    got = fetch(sport, {"dates": "%s-%s" % (d.strftime("%Y%m%d"), e.strftime("%Y%m%d")),
+                        "groups": grp, "limit": 1000},
+                "cbb-%s%s" % (d.strftime("%Y%m%d"), tag), keep).get("events", [])
+    if got:
+        return got
+    out, day = [], d
+    while day <= e:
+        out += fetch(sport, {"dates": day.strftime("%Y%m%d"), "groups": grp, "limit": 1000},
+                     "cbb-day-%s%s" % (day.strftime("%Y%m%d"), tag), keep).get("events", [])
+        day += dt.timedelta(days=1)
+    return out
+
+
 def events(code, y):
     """CFB accepts a wide date range; CBB 404s on one and silently caps at
     limit=1000, so it is walked a week at a time."""
@@ -60,13 +86,13 @@ def events(code, y):
             e = min(d + dt.timedelta(days=6), end)
             if d > dt.date.today():
                 break                      # nothing played yet this season
-            got = fetch(sport, {"dates": f"{d:%Y%m%d}-{e:%Y%m%d}", "groups": grp,
-                                "limit": 1000}, f"cbb-{d:%Y%m%d}",
-                        keep).get("events", []) 
+            got = cbb_range(d, e, keep)
             if len(got) >= 1000:
                 print(f"  WARN: week of {d} hit the 1000 cap", file=sys.stderr)
             ev += got
             d = e + dt.timedelta(days=1)
+        seen = set()
+        ev = [x for x in ev if not (x["id"] in seen or seen.add(x["id"]))]
     return ev
 
 
@@ -287,6 +313,7 @@ def espn_saturday_ids(evs):
 
 def harvest():
     keep, teams = [], {}
+    latest_conf = {}          # (sport, team id) -> (date, conference id)
     overrides = load_overrides()
     extras = load_extras()
     shows = show_games()
@@ -321,6 +348,15 @@ def harvest():
                 # basketball; any period beyond that is overtime.
                 period = (c.get("status") or {}).get("period") or 0
                 overtime = period > (4 if code == "CFB" else 2)
+                # every team's conference AS OF its latest game, archive or
+                # not: the Team filter sorts by current membership, and a
+                # team's latest ARCHIVE game can predate a move (Stanford's is
+                # a 2023 Pac-12 game)
+                for k in cs:
+                    prev = latest_conf.get((code, k["team"]["id"]))
+                    if prev is None or d >= prev[0]:
+                        latest_conf[(code, k["team"]["id"])] = (
+                            d, str(k["team"].get("conferenceId")))
                 nets = set(networks(c))
                 ranks = [rank_of(k) for k in cs]
                 confs = [str(k["team"].get("conferenceId")) for k in cs]
@@ -484,6 +520,9 @@ def harvest():
                     "opener": opener,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
+    for (code, tid), (_, conf) in latest_conf.items():
+        if tid in teams:
+            teams[tid].setdefault("conf", {})[code] = conf
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "window_net": rules.WINDOW_NET,

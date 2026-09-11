@@ -81,9 +81,8 @@ def _schedule(code, y):
     d, end = dt.date(y, 11, 1), dt.date(y + 1, 4, 10)
     while d < end:
         e = min(d + dt.timedelta(days=6), end)
-        ev += harvest.fetch(sport, {"dates": d.strftime("%Y%m%d") + "-" + e.strftime("%Y%m%d"),
-                                    "groups": grp, "limit": 1000},
-                            "scan-cbb-%s-%s" % (d.strftime("%Y%m%d"), today), True).get("events", [])
+        # same empty-opening-week trap as harvest, same fallback
+        ev += harvest.cbb_range(d, e, True, tag="-scan-" + today)
         d = e + dt.timedelta(days=1)
     return ev
 
@@ -277,6 +276,15 @@ def classify(arch, recs, by_pair, rule):
         # a run of one: no plain meeting in an adjacent season
         if rule.confmates(r):
             continue
+        # ...but a home & home can be stretched over a gap year: Villanova-UCLA
+        # basketball played 2021-22 and 2023-24 (his call 2026-09-11)
+        gap = [q for s in (r["season"] - 2, r["season"] + 2) for q in P.get(s, [])
+               if rule.site(q) != rule.site(r)]
+        if gap:
+            legs = sorted([r, gap[0]], key=lambda q: q["date"])
+            put("Home & Home?: a season apart", g["sport"], pair,
+                tuple(q["season"] for q in legs), legs)
+            continue
         nxt = [q for q in allg if q["season"] == r["season"] + 1]
         if g["sport"] == "CBB" and not nxt and not harvest.season_over("CBB", r["season"] + 1):
             put("UNSURE: next season's schedule is only partly published (possible first leg)",
@@ -335,7 +343,8 @@ def main():
         return (k[1], k[2]) not in ruled_out and bool(untagged(legs))
 
     order = ["Home & Home", "Neutral & Neutral?: both meetings at neutral sites",
-             "Home & Neutral?: one neutral-site meeting, one campus meeting", "ANNUAL"]
+             "Home & Neutral?: one neutral-site meeting, one campus meeting",
+             "Home & Home?: a season apart", "ANNUAL"]
     classes = order + sorted({k[0] for k in res} - set(order))
     lines = [
         "SERIES REVIEW  --  generated " + dt.date.today().isoformat(),

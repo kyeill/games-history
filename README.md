@@ -182,7 +182,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
 | Week | dropdown, **football only** | 0-16, following the chosen season |
 | Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
-| Team | dropdown, alphabetical | 141 of them |
+| Team | dropdown, **his order** | his teams, the rest of the Big Ten, the other power leagues -- a divider -- everyone else |
 | Marquee Windows | toggle button | `rules.is_marquee` — a rule, not a window list |
 | Sort | toggle button | Newest First (default) / Oldest First |
 
@@ -243,6 +243,16 @@ before any narrowing.
 **Game type and TV window are built from the active sport tab**, because CFB
 and CBB share none of their values — CFB offers 3 types and 5 windows, CBB 3
 and 8.
+
+**The Team filter is in his order** (2026-09-11), per sport. Football:
+Michigan, Ohio State, Michigan State, Notre Dame, the rest of the Big Ten, then
+the ACC, SEC and Big 12 together, alphabetically; a divider; everyone else.
+Basketball: Michigan, Michigan State, Ohio State, the rest of the Big Ten, then
+the ACC, SEC, Big 12 and Big East together; a divider; everyone else. A team's
+conference is its CURRENT one -- from its latest game of any kind in that
+sport, which harvest records -- so USC
+sorts with the Big Ten and Texas with the SEC, and only teams that play the
+sport are listed (the list used to mix both sports).
 
 His own tags (**College GameDay**, **Big Noon Kickoff**) are **details on the
 row, not filter options**. Note that Big Noon Kickoff is FOX's pregame *show*

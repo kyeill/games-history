@@ -27,7 +27,8 @@ ANNUAL is by PAIR instead, because an annual series keeps producing games:
 every regular-season NON-CONFERENCE meeting in the archive gets the tag,
 including ones a later harvest brings in. Non-conference matters for
 Oregon-Oregon State and Washington-Washington State, which only became
-non-conference series when Oregon and Washington left the Pac-12 in 2024.
+non-conference series when Oregon and Washington left the Pac-12 in 2024 --
+and ANNUAL_SINCE starts both at 2024, his call.
 
 NOT_SERIES records the pairs he ruled OUT: a run strips any series tag from
 their games, and series_scan.py stops asking about them.
@@ -114,6 +115,11 @@ SERIES = [
     ("401752677", "Home & Home", "CFB 2025    Texas at Ohio State"),
     ("401752696", "Home & Home", "CFB 2025    Wisconsin at Alabama"),
     ("401856660", "Home & Home", "CFB 2026    Clemson at Louisiana State"),
+    # its 2025-26 return (Kansas at North Carolina) sat in the empty opening
+    # week harvest used to drop, so the scan never saw it (his call 2026-09-11)
+    ("401700435", "Home & Home", "CBB 2024-25 North Carolina at Kansas"),
+    # a season apart rather than back to back (his call 2026-09-11)
+    ("401372032", "Home & Home", "CBB 2021-22 Villanova at UCLA"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),
@@ -151,11 +157,20 @@ ANNUAL = [
     ("CFB", "204", "2483", "Oregon State / Oregon"),
 ]
 
+# An annual series that only began in a given season (his call 2026-09-11).
+ANNUAL_SINCE = {
+    ("CFB", "264", "265"): 2024,     # Washington / Washington State
+    ("CFB", "204", "2483"): 2024,    # Oregon State / Oregon
+}
+
 NOT_SERIES = [
     # sport, ESPN team id, ESPN team id, the pair, why he ruled it out
     ("CFB", "12", "2306", "Arizona / Kansas State", "same conference when played"),
     ("CFB", "258", "87", "Virginia / Notre Dame", "2019 and 2021 are not consecutive seasons"),
     ("CFB", "87", "2426", "Notre Dame / Navy", "he does not count it as an annual series"),
+    ("CFB", "23", "30", "San José State / Southern California", "no return game (2026 Week 0)"),
+    ("CFB", "275", "87", "Wisconsin / Notre Dame", "no return game (2026, Lambeau Field)"),
+    ("CFB", "97", "145", "Louisville / Ole Miss", "no return game (2026 Music City Kickoff)"),
 ]
 
 BUY_GAMES = [
@@ -163,6 +178,7 @@ BUY_GAMES = [
     ("401404125", "CFB 2022    Marshall at Notre Dame"),
     ("401403878", "CFB 2022    Appalachian State at Texas A&M"),
     ("401628977", "CFB 2024    Northern Illinois at Notre Dame"),
+    ("401581835", "CBB 2023-24 James Madison at Michigan State"),
 ]
 
 
@@ -190,12 +206,15 @@ def main(dry):
             misses.append((label, BUY_TAG, "not in archive"))
 
     annual_pairs = {(s, frozenset((a, b))): name for s, a, b, name in ANNUAL}
+    since = {(s, frozenset((a, b))): y for (s, a, b), y in ANNUAL_SINCE.items()}
     ruled_out = {(s, frozenset((a, b))) for s, a, b, _pair, _why in NOT_SERIES}
     annual = dict.fromkeys(annual_pairs.values(), 0)
     for g in data["games"]:
-        name = annual_pairs.get(pair_of(g))
+        key = pair_of(g)
+        name = annual_pairs.get(key)
         non_conference = len({t["conf"] for t in g["teams"]}) == 2
-        if name and not g["champ"] and non_conference:
+        if (name and not g["champ"] and non_conference
+                and g["season"] >= since.get(key, 0)):
             want.setdefault(g["id"], set()).add("Annual")
             annual[name] += 1
 

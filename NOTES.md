@@ -347,6 +347,21 @@ a late kickoff shifts the Eastern date. Of 73 Big Noon rows, 63 matched and the
 travelled to Thursday-night openers, 3:30 and 4pm kickoffs, an ESPN 10pm game
 and the Mountain West Championship. A useful cross-check on the window rules.
 
+**ESPN can answer a whole week with NOTHING, and the cache believed it.**
+Basketball is fetched a week at a time from 1 November. For the opening week
+of 2023-24, 2024-25 and 2025-26 ESPN returned zero events -- 213, 289 and 360
+games in reality -- and so did the week of 14 March 2022 (95 games, all
+postseason). The empty answers were cached as if true. No error, no warning:
+the archive simply lacked opening week. That is how James Madison's upset at
+Michigan State (2023) and Baylor at Gonzaga (2024) went missing, and why the
+series scan never saw Kansas at North Carolina (2025) and so never proposed
+that home & home. It is not simply "the week starts before the first game" --
+1-7 November 2022 came back fine -- so `harvest.cbb_range` does not guess: any
+empty week is re-asked one day at a time, which also repairs the old cached
+files without deleting them. An EMPTY week is detectable; a PARTIAL one would
+not be, and nothing checks for that. Found by comparing every cached week with
+live day-by-day counts (2026-09-11).
+
 **ESPN has no week 0.** Week 0 games are numbered week 1 -- and so are the
 bowls -- so `week_zero_ids` finds them by date: the regular-season week-1 games
 played before the main Week 1 weekend, whose Saturday carries the most week-1
@@ -372,6 +387,9 @@ catch 2021's second legs, the published 2026 football and part of the
   Notre Dame-USC skipped 2020. The scan counted 5+ meetings in 2019-2025.
 * ESPN can list the same HOST both years (Illinois-UConn at MSG, then at
   Gampel flagged neutral), so hosts are compared as well as venues.
+* "Consecutive seasons" is too strict. Villanova-UCLA basketball stretched its
+  home & home over 2021-22 and 2023-24, so the scan also flags meetings a
+  season apart ("Home & Home?: a season apart") for review.
 The per-game list is a record of his rulings, not a rule to re-run: a new
 season needs a new scan and a new review. `series_scan.py` is that scan, kept
 in the repo (his call 2026-09-11). It writes output/series_review.txt, marks
@@ -396,7 +414,8 @@ itself: Washington-Washington State 2026 was tagged as soon as the pair was
 listed (his call 2026-09-11, "as is Oregon-Oregon State"). But both pairs were
 Pac-12 rivals until 2024, so their earlier meetings were league games rather
 than a scheduled series -- and Oregon-Oregon State's only archive game, 2022,
-is one of those, so that pair carries no tag yet.
+is one of those, so that pair carries no tag yet. `ANNUAL_SINCE` makes the
+start explicit: both pairs count from 2024 (his call).
 
 **The tags are spelled out** -- Home & Home, Neutral & Neutral, Home & Neutral
 (his call 2026-09-11) -- after starting life as H&H / N&N / H&N.
@@ -513,6 +532,14 @@ the dropdown, the card header and the Newest First blocks.
 basketball's newest one (2026-27) has no games until November, so opening a tab
 on the overall max showed an empty basketball list. `latestSeason()` takes the
 newest season with games in the tab's own sport.
+
+**A team's latest ARCHIVE game can come from its old conference.** The Team
+filter sorts by current membership. Taking that from each team's latest game
+in the archive put Stanford football (latest archive game: 2023, Pac-12) and
+Arizona State basketball below the divider, though both have since joined
+power leagues. Harvest now records every team's conference from its latest
+game of ANY kind in each sport (`teams[id].conf`) -- something the archive's
+own games cannot tell you.
 
 **Header tint contrast against the #1e1e23 card.** FOX #ffcb05 = 10.9:1,
 NBC #0b85c8 = 4.11:1, CBS #005ae4 = 2.83:1. The WCAG floor is 4.5:1, so CBS and

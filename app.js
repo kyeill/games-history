@@ -404,12 +404,15 @@ function filterChips() {
 
   const group = (label, inner) => '<div class="fgroup"><span class="flabel">' +
     label + "</span>" + inner + "</div>";
+  // a pair whose value is null is a divider line, not a choice
   const select = (kind, allLabel, pairs, current) =>
     '<select class="fsel" data-kind="' + kind + '">' +
     '<option value="">' + allLabel + "</option>" +
-    pairs.map(p => '<option value="' + esc(p[1]) + '"' +
-      (String(current) === String(p[1]) ? " selected" : "") + ">" +
-      esc(p[0]) + "</option>").join("") + "</select>";
+    pairs.map(p => p[1] === null
+      ? "<option disabled>" + esc(p[0]) + "</option>"
+      : '<option value="' + esc(p[1]) + '"' +
+        (String(current) === String(p[1]) ? " selected" : "") + ">" +
+        esc(p[0]) + "</option>").join("") + "</select>";
 
   let h = group("Year", select("season", "All Years",
     SEASONS.slice().sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
@@ -456,11 +459,51 @@ function filterChips() {
   h += group("TV window", select("window", "All TV Windows",
     order.windows.filter(w => windows.has(w) && hidden.indexOf(w) < 0)
       .map(w => [w, w]), one));
+  // not "order": that name already holds the game-type / window sequence above
+  const teamList = teamOrder(sport);
+  const teamOpt = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
   h += group("Team", select("team", "All Teams",
-    Object.keys(TEAMS).map(id => [TEAMS[id].short || id, id])
-      .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
+    teamList.top.map(teamOpt).concat(teamList.rest.length ? [["─".repeat(12), null]] : [],
+                                      teamList.rest.map(teamOpt)), FILT.team));
   h += group("", quickButtons());
   return h;
+}
+
+/* The Team filter in HIS order (2026-09-11): his teams pinned, the rest of the
+   Big Ten, then the other power leagues together, alphabetically; a divider;
+   then everyone else. Only teams that play this sport are listed -- TEAMS spans
+   both. Membership is a team's CURRENT conference, so USC sorts with the Big
+   Ten and Texas with the SEC. Harvest records it from each team's latest game
+   of ANY kind (teams[id].conf), because its latest ARCHIVE game can predate a
+   move -- Stanford's is a 2023 Pac-12 game; that game is only the fallback.
+   Declared inside the function, not as top-level consts, because init() runs
+   before later top-level consts are initialised (see clearFilters). */
+function teamOrder(sport) {
+  const PINS = { CFB: ["130", "194", "127", "87"],   // Michigan, Ohio State, Michigan State, Notre Dame
+                 CBB: ["130", "127", "194"] };       // Michigan, Michigan State, Ohio State
+  const POWER = { CFB: ["1", "8", "4"],              // ACC, SEC, Big 12
+                  CBB: ["2", "23", "8", "4"] };      // ACC, SEC, Big 12, Big East
+  const latest = {};
+  GAMES.forEach(g => {
+    if (g.sport !== sport) return;
+    g.teams.forEach(t => {
+      if (!latest[t.id] || g.date > latest[t.id].date)
+        latest[t.id] = { date: g.date, conf: t.conf };
+    });
+  });
+  const name = id => (TEAMS[id] && TEAMS[id].short) || id;
+  const byName = (a, b) => name(a).localeCompare(name(b));
+  const pins = (PINS[sport] || []).filter(id => latest[id]);
+  const others = Object.keys(latest).filter(id => pins.indexOf(id) < 0);
+  const confOf = id =>
+    (TEAMS[id] && TEAMS[id].conf && TEAMS[id].conf[sport]) || latest[id].conf;
+  const inBigTen = id => confOf(id) === BIG_TEN[sport];
+  const inPower = id => (POWER[sport] || []).indexOf(confOf(id)) > -1;
+  return {
+    top: pins.concat(others.filter(inBigTen).sort(byName),
+                     others.filter(id => !inBigTen(id) && inPower(id)).sort(byName)),
+    rest: others.filter(id => !inBigTen(id) && !inPower(id)).sort(byName)
+  };
 }
 
 function marqueeOn() { return !!FILT.marquee; }
