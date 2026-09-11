@@ -338,8 +338,8 @@ a ranked team beaten by an unranked or worse-ranked one -- both rankings turn
 the orange Sports Daily uses for an upset in progress (#e0834f). On any game
 Michigan lost, or Ohio State, Michigan State or Notre Dame won, they turn grey
 instead, even when it was also an upset. Every other game keeps the usual
-blue. In the CFP and the NCAA Tournament a ranking reads "No. 3" rather than
-"#3". A football header that is only its week names the day when the game is
+blue. In the CFP and the NCAA Tournament a ranking reads "NO. 3" rather than
+"#3", left-aligned. A football header that is only its week names the day when the game is
 not on a Saturday: "WEEK 1 (THU)".
 
 **The row** is variant C of the three mocked, minus the left rail: the winning

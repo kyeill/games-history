@@ -693,7 +693,7 @@ dark and dark blues vanish.
 #9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. Grey is
 exactly `dimmed()` -- a Michigan loss or a win by Ohio State, Michigan State or
 Notre Dame (either sport) -- and is tested first, so such an upset reads grey.
-`rk-no` (the CFP and NCAA Tournament, `playoffGame`) swaps the "#" for "No."
+`rk-no` (the CFP and NCAA Tournament, `playoffGame`) swaps the "#" for "NO.", left-aligns it
 and widens the rank column from 24px to 44px on that card only. The upset test
 is by rank alone (`isUpset` in app.js: the loser ranked, the winner unranked or
 worse-ranked) -- deliberately NOT the Key Games type, which files a game once
