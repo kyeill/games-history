@@ -241,11 +241,10 @@ and Michigan State in basketball; leaving it restores the season and team a
 normal view opens on. The Year dropdown lists only the seasons the current view
 can show.
 
-**Rivals has its own filters** (his call 2026-09-11): Year, Type, Rival and
-Winner -- no week, month, game type, TV window, team or Marquee. Type is
-Postseason (the Big Ten championship game or tournament and everything after
-it), Conference (a regular-season Big Ten opponent) or Non-Conf (anyone else,
-and every Notre Dame game short of the postseason). Rival is whose loss it was,
+**Rivals has its own filters** (his call 2026-09-11): Year, Rival and Winner,
+plus a Postseason button in place of a Type dropdown -- off shows every game,
+pressed shows only the Big Ten championship game or tournament and everything
+after it. No week, month, game type, TV window, team or Marquee. Rival is whose loss it was,
 opening on Ohio State in football and Michigan State in basketball. Winner lists
 Michigan, the Big Ten, the power leagues and everyone else, divided like the
 Team filter. Rivals orders by TRUE date, so the CFP loss to Miami sorts ahead of
@@ -368,8 +367,10 @@ The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
 
 **A game that is an EVENT reads its stage in the header** (his call
-2026-09-11): `FIESTA BOWL (SAT)`, `CFP | QUARTERS (WED)`, `NCAA | ROUND 1 (THU)`,
-`BIG TEN | CHAMPIONSHIP (SAT)`, `BIG TEN | QUARTERS (FRI)`. The chip then shows
+2026-09-11): `FIESTA BOWL (SAT)`, `COLLEGE FOOTBALL PLAYOFF | QUARTERS (WED)`,
+`NCAA TOURNAMENT | ROUND 1 (THU)`, `BIG TEN TOURNAMENT | QUARTERS (FRI)`, and
+for a football title game, which has no round to show, `BIG TEN CHAMPIONSHIP
+(SAT)`. The names are spelled out (his call 2026-09-11). The chip then shows
 the location instead of the event name. `rules.stage_label` builds it from the
 ESPN note headline: the sponsor comes off a bowl name (Vrbo Fiesta Bowl becomes
 Fiesta Bowl) unless the bowl is named for its sponsor (Guaranteed Rate Bowl),

@@ -620,7 +620,8 @@ def harvest():
                     "rivals_only": rivals_only,
                     "showcase": showcase, "kickoff": kickoff,
                     # the header of a game that is an EVENT: "Fiesta Bowl",
-                    # "CFP | Quarters", "NCAA | Round 1", "Big Ten | Championship"
+                    # "College Football Playoff | Quarters", "NCAA Tournament |
+                    # Round 1", "Big Ten Tournament | Semis", "Big Ten Championship"
                     "stage": rules.stage_label(code, stype, heads, conf=conf,
                                                month=d.month, season=y),
                 })

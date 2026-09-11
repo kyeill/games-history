@@ -317,9 +317,11 @@ def cbb_showcase(headlines):
 
 # ---------------------------------------------------------------- stage labels
 # His header patterns for games that are an EVENT rather than a week
-# (2026-09-11): "FIESTA BOWL (SAT)", "CFP | QUARTERS (WED)", "NCAA | ROUND 1
-# (THU)", and the conference in front of a championship game or tournament
-# round. stage_label returns the part before the day; the app adds the day.
+# (2026-09-11), names spelled out: "FIESTA BOWL (SAT)", "COLLEGE FOOTBALL
+# PLAYOFF | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1 (THU)", "BIG TEN
+# TOURNAMENT | QUARTERS (FRI)" -- and a football title game with no round to
+# show, "BIG TEN CHAMPIONSHIP (SAT)". stage_label returns the part before the
+# day; the app adds the day.
 
 # checked in order: "final four" before "final", "semifinal" before "final"
 ROUND_NAMES = (("first four", "First Four"), ("1st round", "Round 1"),
@@ -396,8 +398,9 @@ NCAA_OLD_ROUNDS = {"Round 1": "First Four", "Round 2": "Round 1", "Round 3": "Ro
 
 def stage_label(sport, season_type, headlines, conf=None, month=None, season=None):
     """The event and round of a postseason, conference-championship or
-    conference-tournament game: "Fiesta Bowl", "CFP | Quarters", "NCAA | Round
-    1", "Big Ten | Championship". None for any other game."""
+    conference-tournament game: "Fiesta Bowl", "College Football Playoff |
+    Quarters", "NCAA Tournament | Round 1", "Big Ten Tournament | Semis", "Big
+    Ten Championship". None for any other game."""
     heads = [h for h in headlines if h]
     if not heads:
         return None
@@ -407,21 +410,23 @@ def stage_label(sport, season_type, headlines, conf=None, month=None, season=Non
         if season_type == 3:
             low = text.lower()
             if "college football playoff" in low or low.startswith("cfp"):
-                return "CFP | " + (rnd or "Playoff")
+                return "College Football Playoff" + (" | " + rnd if rnd else "")
             bowl = bowl_name(text)
             if bowl in [b + " Bowl" for b in CFP_SEMIFINAL_BOWLS.get(season, ())]:
-                return "CFP | Semis"
+                return "College Football Playoff | Semis"
             return bowl
         if conf and is_championship(heads):
-            return conf + " | Championship"
+            return conf + " Championship"
         return None
     if season_type == 3:
         event = _cbb_postseason_event(text.split(" - ")[0])
-        if event == "NCAA" and season is not None and season <= 2014:
-            rnd = NCAA_OLD_ROUNDS.get(rnd, rnd)
+        if event == "NCAA":
+            if season is not None and season <= 2014:
+                rnd = NCAA_OLD_ROUNDS.get(rnd, rnd)
+            event = "NCAA Tournament"
         return event + (" | " + rnd if rnd else "")
     if conf and is_championship(heads) and month in (3, 4):
-        return conf + " | " + (rnd or "Championship")
+        return conf + " Tournament | " + (rnd or "Championship")
     return None
 
 

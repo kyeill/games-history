@@ -13,7 +13,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
-              team: null, marquee: false, rival: null, rtype: null, winner: null };
+              team: null, marquee: false, rival: null, post: false, winner: null };
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -204,7 +204,8 @@ function rowHtml(g, browse) {
   let when;
   if (g.stage) {
     // an EVENT rather than a week (his call 2026-09-11): "FIESTA BOWL (SAT)",
-    // "CFP | QUARTERS (WED)", "NCAA | ROUND 1 (THU)", "BIG TEN | CHAMPIONSHIP"
+    // "COLLEGE FOOTBALL PLAYOFF | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1
+    // (THU)", "BIG TEN TOURNAMENT | SEMIS (SAT)", "BIG TEN CHAMPIONSHIP (SAT)"
     when = esc(g.stage) + " (" + esc(g.dow) + ")";
   } else if (g.sport === "CFB") {
     // Week 0 is a real week, so test for a MISSING week, not a falsy one
@@ -350,7 +351,8 @@ function visible() {
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
-    if (FILT.rtype) list = list.filter(g => rivalType(g) === FILT.rtype);
+    // the Postseason button: everything by default, pressed only postseason
+    if (FILT.post) list = list.filter(g => rivalType(g) === "Postseason");
     if (FILT.winner) list = list.filter(g =>
       g.teams.some(t => t.win && t.id === FILT.winner));
   }
@@ -413,7 +415,7 @@ function clearFilters() {
     windows: null,
     // TV Windows opens on Marquee -- the games he plans a weekend around
     marquee: VIEW === "tv",
-    week: null, month: null, team: null, rival: null, rtype: null, winner: null
+    week: null, month: null, team: null, rival: null, post: false, winner: null
   };
 }
 
@@ -456,14 +458,13 @@ function filterChips() {
   let h = group("Year", select("season", "All Years",
     viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
-  // RIVALS has its own filters (his call 2026-09-11): Year, Type, Rival and
-  // Winner -- no week, month, game type, TV window, team or Marquee
+  // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
+  // a Postseason button -- no week, month, game type, TV window, team or
+  // Marquee
   if (VIEW === "rivals") {
     const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
     const lined = ids => ids.length
       ? [["\u2500".repeat(12), null]].concat(ids.map(optOf)) : [];
-    h += group("Type", select("rtype", "All Types",
-      ["Postseason", "Conference", "Non-Conf"].map(t => [t, t]), FILT.rtype));
     h += group("Rival", select("rival", "All Rivals",
       (sport === "CFB" ? ["194", "127", "87"] : ["127", "194"]).map(optOf),
       FILT.rival));
@@ -472,7 +473,7 @@ function filterChips() {
       g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner), ["130"]);
     h += group("Winner", select("winner", "All Winners",
       w.bigTen.map(optOf).concat(lined(w.power), lined(w.rest)), FILT.winner));
-    return h + group("", sortButton());
+    return h + group("", postButton() + sortButton());
   }
   // Football is played in numbered weeks; basketball is not. The list follows
   // the season, since week 16 only exists in some years.
@@ -591,12 +592,19 @@ function rivalLoser(g) {
   return t ? t.id : null;
 }
 function rivalType(g) {
-  if (g.post || g.champ === "Big Ten" || (g.stage || "").indexOf("Big Ten |") === 0)
+  if (g.post || g.champ === "Big Ten" || (g.stage || "").indexOf("Big Ten ") === 0)
     return "Postseason";
   const loser = rivalLoser(g);
   if (loser === "87") return "Non-Conf";
   const opp = g.teams.find(t => t.id !== loser);
   return opp && opp.conf === BIG_TEN[g.sport] ? "Conference" : "Non-Conf";
+}
+
+// Rivals shows every game until this is pressed, then only the postseason --
+// the Big Ten championship game or tournament and beyond (his call 2026-09-11)
+function postButton() {
+  return '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
+    '">Postseason</button>';
 }
 
 function sortButton() {
@@ -892,12 +900,12 @@ async function init() {
         // on Ohio State in football and Michigan State in basketball
         FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
-        FILT.rtype = null; FILT.winner = null;
+        FILT.post = false; FILT.winner = null;
         SORT = "desc";
       } else if (leaving === "rivals") {
         // leaving Rivals puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
-        FILT.team = null; FILT.rival = null; FILT.rtype = null; FILT.winner = null;
+        FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
       }
       draw();
       window.scrollTo({ top: 0 });
@@ -907,6 +915,8 @@ async function init() {
     if (!b) return;
     if (b.dataset.act === "marquee") {
       FILT.marquee = !FILT.marquee;
+    } else if (b.dataset.act === "post") {
+      FILT.post = !FILT.post;
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }
@@ -952,7 +962,7 @@ async function init() {
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
     FILT = { season: null, week: null, month: null, type: null, windows: null,
-             team: null, marquee: false, rival: null, rtype: null, winner: null };
+             team: null, marquee: false, rival: null, post: false, winner: null };
     draw();
     window.scrollTo({ top: 0 });
   });
