@@ -183,6 +183,15 @@ NOTRE_DAME = "87"
 # Dame in football only.
 RIVALS_BY_SPORT = {"CFB": {"194", "127", "87"},   # Ohio State, Michigan State, Notre Dame
                    "CBB": {"194", "127"}}         # Ohio State, Michigan State
+# ...and a team that counts ONLY for its NCAA Tournament losses (his call
+# 2026-09-11): Notre Dame in basketball. It is no rival in any other game, so an
+# Ohio State loss to Notre Dame in December still counts as it always did.
+RIVALS_NCAA_ONLY = {"CBB": {"87"}}
+
+
+def is_ncaa_tournament(season_type, headlines):
+    return (season_type == 3
+            and "basketball championship" in " ".join(h or "" for h in headlines).lower())
 # Two of them playing each other stays OUT of that view unless the ESPN game id
 # is named here -- "I will have to tell you when to include".
 RIVALS_INCLUDE = {
@@ -317,8 +326,7 @@ def cbb_showcase(headlines):
 
 # ---------------------------------------------------------------- stage labels
 # His header patterns for games that are an EVENT rather than a week
-# (2026-09-11), names spelled out: "FIESTA BOWL (SAT)", "COLLEGE FOOTBALL
-# PLAYOFF | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1 (THU)", "BIG TEN
+# (2026-09-11), names spelled out: "FIESTA BOWL (SAT)", "CFP | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1 (THU)", "BIG TEN
 # TOURNAMENT | QUARTERS (FRI)" -- and a football title game with no round to
 # show, "BIG TEN CHAMPIONSHIP (SAT)". stage_label returns the part before the
 # day; the app adds the day.
@@ -410,10 +418,10 @@ def stage_label(sport, season_type, headlines, conf=None, month=None, season=Non
         if season_type == 3:
             low = text.lower()
             if "college football playoff" in low or low.startswith("cfp"):
-                return "College Football Playoff" + (" | " + rnd if rnd else "")
+                return "CFP" + (" | " + rnd if rnd else "")
             bowl = bowl_name(text)
             if bowl in [b + " Bowl" for b in CFP_SEMIFINAL_BOWLS.get(season, ())]:
-                return "College Football Playoff | Semis"
+                return "CFP | Semis"
             return bowl
         if conf and is_championship(heads):
             return conf + " Championship"

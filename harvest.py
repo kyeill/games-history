@@ -102,7 +102,7 @@ def rival_events(code, y):
     if os.path.exists(path):
         return json.load(open(path, encoding="utf-8"))["events"]
     sport, grp = SPORTS[code]
-    wanted = rules.RIVALS_BY_SPORT[code]
+    wanted = rules.RIVALS_BY_SPORT[code] | rules.RIVALS_NCAA_ONLY.get(code, set())
     ev = []
     if code == "CFB":
         for rng in ("%d0801-%d0930" % (y, y), "%d1001-%d1130" % (y, y),
@@ -407,6 +407,10 @@ def harvest():
                 # meeting only counts when rules.RIVALS_INCLUDE names the game.
                 stype = (x.get("season") or {}).get("type")
                 rivals_here = rules.RIVALS_BY_SPORT[code]
+                # Notre Dame basketball counts only in the NCAA Tournament
+                if rules.is_ncaa_tournament(
+                        stype, [n.get("headline") for n in (c.get("notes") or [])]):
+                    rivals_here = rivals_here | rules.RIVALS_NCAA_ONLY.get(code, set())
                 rival_loss = (
                     any(k["team"]["id"] in rivals_here and not k.get("winner") for k in cs)
                     and (not all(k["team"]["id"] in rivals_here for k in cs)

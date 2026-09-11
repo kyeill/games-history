@@ -241,10 +241,14 @@ and Michigan State in basketball; leaving it restores the season and team a
 normal view opens on. The Year dropdown lists only the seasons the current view
 can show.
 
-**Rivals has its own filters** (his call 2026-09-11): Year, Rival and Winner,
-plus a Postseason button in place of a Type dropdown -- off shows every game,
-pressed shows only the Big Ten championship game or tournament and everything
-after it. No week, month, game type, TV window, team or Marquee. Rival is whose loss it was,
+**Rivals has its own filters** (his call 2026-09-11): Rival (far left), Year
+and Winner, plus a Postseason button -- off shows every game, pressed shows only
+the CFP and the NCAA Tournament. No week, month, game type, TV window, team or
+Marquee. Rivals cards carry an EVENT border instead of the usual ones: #0088ce
+for the Big Ten championship game or tournament, #c28c19 for the CFP, #0053b8
+for the NCAA Tournament, grey for bowls and the NIT, none for the regular
+season. Notre Dame basketball counts too, for its NCAA Tournament losses only
+(`rules.RIVALS_NCAA_ONLY`). Rival is whose loss it was,
 opening on Ohio State in football and Michigan State in basketball. Winner lists
 Michigan, the Big Ten, the power leagues and everyone else, divided like the
 Team filter. Rivals orders by TRUE date, so the CFP loss to Miami sorts ahead of
@@ -367,10 +371,12 @@ The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
 
 **A game that is an EVENT reads its stage in the header** (his call
-2026-09-11): `FIESTA BOWL (SAT)`, `COLLEGE FOOTBALL PLAYOFF | QUARTERS (WED)`,
-`NCAA TOURNAMENT | ROUND 1 (THU)`, `BIG TEN TOURNAMENT | QUARTERS (FRI)`, and
-for a football title game, which has no round to show, `BIG TEN CHAMPIONSHIP
-(SAT)`. The names are spelled out (his call 2026-09-11). The chip then shows
+2026-09-11): `FIESTA BOWL (SAT)`, `CFP | QUARTERS (WED)`, `NCAA TOURNAMENT | ROUND 1 (THU)`,
+`BIG TEN TOURNAMENT | QUARTERS (FRI)`, and for a football title game, which has
+no round to show, `BIG TEN CHAMPIONSHIP (SAT)`. Names are spelled out except the
+CFP, which stays CFP. A postseason game also carries its YEAR: the season for
+football (`2020 CFP | SEMIS (FRI)`), the March for basketball (`2016 NCAA
+TOURNAMENT | ROUND 1 (FRI)`). The chip then shows
 the location instead of the event name. `rules.stage_label` builds it from the
 ESPN note headline: the sponsor comes off a bowl name (Vrbo Fiesta Bowl becomes
 Fiesta Bowl) unless the bowl is named for its sponsor (Guaranteed Rate Bowl),

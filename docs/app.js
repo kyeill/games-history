@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-124113";
+const BUILD = "20260911-125053";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -204,9 +204,13 @@ function rowHtml(g, browse) {
   let when;
   if (g.stage) {
     // an EVENT rather than a week (his call 2026-09-11): "FIESTA BOWL (SAT)",
-    // "COLLEGE FOOTBALL PLAYOFF | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1
+    // "CFP | QUARTERS (WED)", "NCAA TOURNAMENT | ROUND 1
     // (THU)", "BIG TEN TOURNAMENT | SEMIS (SAT)", "BIG TEN CHAMPIONSHIP (SAT)"
-    when = esc(g.stage) + " (" + esc(g.dow) + ")";
+    // a postseason game carries its year (his call 2026-09-11): the season a
+    // football game belongs to (2020 CFP), the March a basketball game is
+    // played in (2016 NCAA Tournament)
+    const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
+    when = year + esc(g.stage) + " (" + esc(g.dow) + ")";
   } else if (g.sport === "CFB") {
     // Week 0 is a real week, so test for a MISSING week, not a falsy one
     const hasWeek = g.week != null;
@@ -220,13 +224,18 @@ function rowHtml(g, browse) {
   }
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
-  const flag = celebrated(g);
-  const ring = flag ? celebrateColor(g) : null;
+  let flag = celebrated(g);
+  let ring = flag ? celebrateColor(g) : null;
+  if (VIEW === "rivals") {
+    const c = rivalsBorder(g);
+    flag = !!c;
+    ring = c ? [c, c + "44"] : null;
+  }
   return '<button class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
     // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
     // looked like a rival loss to a black-and-gold winner such as Iowa
-    ((michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
+    ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -351,8 +360,9 @@ function visible() {
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
-    // the Postseason button: everything by default, pressed only postseason
-    if (FILT.post) list = list.filter(g => rivalType(g) === "Postseason");
+    // the Postseason button: everything by default, pressed only the CFP and
+    // the NCAA Tournament (his call 2026-09-11)
+    if (FILT.post) list = list.filter(playoffGame);
     if (FILT.winner) list = list.filter(g =>
       g.teams.some(t => t.win && t.id === FILT.winner));
   }
@@ -465,9 +475,10 @@ function filterChips() {
     const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
     const lined = ids => ids.length
       ? [["\u2500".repeat(12), null]].concat(ids.map(optOf)) : [];
-    h += group("Rival", select("rival", "All Rivals",
-      (sport === "CFB" ? ["194", "127", "87"] : ["127", "194"]).map(optOf),
-      FILT.rival));
+    // Rival sits far left, ahead of Year (his call 2026-09-11)
+    h = group("Rival", select("rival", "All Rivals",
+      (sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"]).map(optOf),
+      FILT.rival)) + h;
     // only winners that would return games under the other filters
     const w = teamOrder(sport, teamsIn(visibleWithout("winner"),
       g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner), ["130"]);
@@ -582,26 +593,33 @@ function teamsIn(list, idsOf, current) {
   return ids;
 }
 
-/* Rivals: whose loss it was, and what kind of game (his calls 2026-09-11).
-   Postseason is the Big Ten championship game or tournament and everything
-   after it. Before that, a Big Ten opponent is Conference and anyone else is
-   Non-Conf -- and every Notre Dame game short of the postseason is Non-Conf. */
+/* Rivals: whose loss it was. Notre Dame counts in basketball too, but harvest
+   only lets its NCAA Tournament losses in (rules.RIVALS_NCAA_ONLY). */
 function rivalLoser(g) {
-  const ids = g.sport === "CFB" ? ["194", "127", "87"] : ["194", "127"];
+  const ids = ["194", "127", "87"];
   const t = g.teams.find(x => !x.win && ids.indexOf(x.id) > -1);
   return t ? t.id : null;
 }
-function rivalType(g) {
-  if (g.post || g.champ === "Big Ten" || (g.stage || "").indexOf("Big Ten ") === 0)
-    return "Postseason";
-  const loser = rivalLoser(g);
-  if (loser === "87") return "Non-Conf";
-  const opp = g.teams.find(t => t.id !== loser);
-  return opp && opp.conf === BIG_TEN[g.sport] ? "Conference" : "Non-Conf";
+// The Postseason button keeps only the CFP and the NCAA Tournament (his call
+// 2026-09-11) -- not the bowls, the NIT, or the Big Ten title game and tournament
+function playoffGame(g) {
+  const s = g.stage || "";
+  return s.indexOf("CFP") === 0 || s.indexOf("NCAA Tournament") === 0;
 }
 
-// Rivals shows every game until this is pressed, then only the postseason --
-// the Big Ten championship game or tournament and beyond (his call 2026-09-11)
+// Rivals cards drop the usual borders for one coloured by the EVENT (his call
+// 2026-09-11). A regular-season game has none.
+function rivalsBorder(g) {
+  const s = g.stage || "";
+  if (s.indexOf("CFP") === 0) return "#c28c19";
+  if (s.indexOf("NCAA Tournament") === 0) return "#0053b8";
+  if (g.champ === "Big Ten" || s.indexOf("Big Ten ") === 0) return "#0088ce";
+  if (g.post) return "#8a8a92";                  // bowls and the NIT
+  return null;
+}
+
+// Rivals shows every game until this is pressed, then only the CFP and the
+// NCAA Tournament (his call 2026-09-11)
 function postButton() {
   return '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
     '">Postseason</button>';
