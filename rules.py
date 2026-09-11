@@ -34,7 +34,7 @@ NAME_OVERRIDES = {
     "BYU": "Brigham Young", "LSU": "Louisiana State",
     "SMU": "Southern Methodist", "TCU": "Texas Christian",
     "UCF": "Central Florida", "USF": "South Florida",
-    "USC": "Southern Cal", "UNLV": "Unlv", "UConn": "Connecticut",
+    "USC": "Southern California", "UNLV": "Unlv", "UConn": "Connecticut",
 }
 
 
@@ -120,7 +120,8 @@ def is_marquee(sport, nets, d, slots, big_ten=False, tourney=False):
 # games keep the window and still appear under "All TV Windows" -- it is the
 # filter option that goes, not the games.
 HIDDEN_WINDOWS = {"CFB": ["ABC Saturday"],
-                  "CBB": ["ABC Weekend", "ESPN Saturday"]}
+                  "CBB": ["ABC Weekend", "ESPN Saturday",
+                          "Big Monday", "Super Tuesday"]}
 
 # Which network paints each window's chip. Explicit rather than parsed from the
 # name: "Big Monday", "Super Tuesday" and "B1G Peacock" carry no network in
@@ -258,8 +259,7 @@ def cfb_black_friday(nets, d, season, big_ten=False):
     return season >= 2023 and bool(nets & {"CBS", "NBC"})
 
 
-def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
-              espn_sat=False):
+def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
     """Basketball's windows -- **January to March only** (his call: the
     November-December non-conference slate is not what he is browsing for).
 
@@ -275,10 +275,11 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
     # ESPN Saturday -- his call. The bracket is 6:00 to 9:30pm.
     if "ESPN" in nets and day in ("Mon", "Tue") and 18 * 60 <= t <= 21 * 60 + 30:
         out.add("Big Monday" if day == "Mon" else "Super Tuesday")
-    # ESPN Saturday is ONE game a week: the latest tip between 6 and 9pm.
-    # A clock cutoff could not do it -- 6:30 split the 6pm block in half and
-    # let three games through on a good Saturday. See espn_saturday_ids.
-    if espn_sat:
+    # ESPN Saturday is every ESPN game tipping between 6:00 and 9:30pm (his
+    # call 2026-09-10, widening it from the single latest game). Only the
+    # latest still carries the "ESPN Primetime" label -- see
+    # cbb_header_suffix -- so the window and the label part company here.
+    if "ESPN" in nets and day == "Sat" and 18 * 60 <= t <= 21 * 60 + 30:
         out.add("ESPN Saturday")
     for n in ("FOX", "CBS", "NBC", "ABC"):
         if n not in nets:
@@ -296,7 +297,7 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False,
     return out
 
 
-def cbb_header_suffix(nets, d, tourney=False, big_ten=False):
+def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False):
     """The label on a basketball card. Not a window -- the cards carry no
     window chips at all -- just a name for the slot.
 
@@ -327,7 +328,10 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False):
                 return n + " " + DAY_FULL[d.weekday()]
     # the same brackets the windows use, so a card's label and its window
     # can never disagree
-    if "ESPN" in nets and day == "Sat" and 18 * 60 <= t <= 21 * 60:
+    # The ESPN Saturday WINDOW takes every 6:00-9:30pm game; this LABEL goes
+    # to the latest of them alone (espn_saturday_ids picks it), so the rest
+    # fall through to the plain weekday.
+    if espn_sat:
         return "ESPN Primetime"
     if "ESPN" in nets and day == "Mon" and 18 * 60 <= t <= 21 * 60 + 30:
         return "Big Monday"

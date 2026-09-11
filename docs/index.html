@@ -74,6 +74,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* one column on a phone, two from 900px -- the gap replaces the row margin */
 #list{display:grid;grid-template-columns:1fr;gap:8px;align-content:start}
 @media (min-width:900px){#list{grid-template-columns:1fr 1fr;gap:9px}}
+/* Three across once there is room for it. The card gives up width in the
+   places that were padding rather than content: the gutter to the meta
+   column, the card's own side padding, and the meta column's floor. */
+@media (min-width:1240px){
+  #list{grid-template-columns:repeat(3,1fr);gap:9px}
+  #list .row{padding:10px 11px;column-gap:10px}
+  #list .meta{min-width:72px;padding-left:10px}
+}
 #list .empty{grid-column:1/-1}
 
 .row{display:grid;background:var(--card);border:1px solid var(--line);
@@ -98,13 +106,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    right, where it lines up with the network and time in the column below. */
 .sport{grid-area:sport;display:flex;align-items:baseline;
   justify-content:space-between;gap:10px;
-  font-size:11.5px;font-weight:600;letter-spacing:.05em;
+  font-size:11.5px;font-weight:500;letter-spacing:.05em;
   text-transform:uppercase;color:var(--muted);margin-bottom:5px}
 .hdate{flex:none;font-size:13px;font-weight:500;letter-spacing:0;
   text-transform:none;color:var(--muted);font-variant-numeric:tabular-nums}
 /* the week takes the header's colour, tinted or plain -- no orange of its own
    (his call: an untinted header should read entirely plain) */
-.wk{font-weight:500}
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
 .tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 7px;margin-left:-7px;border-radius:5px}
@@ -297,6 +304,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260910-095233"></script>
+<script src="app.js?v=20260910-223526"></script>
 </body>
 </html>

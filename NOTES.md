@@ -236,6 +236,13 @@ that split is his standing rule.
 all five seasons). Basketball has one too but it means nothing to a viewer, so
 only football renders it.
 
+**Three across needed padding, not content.** The desktop list went from two
+columns to three at 1240px by taking width off the card's side padding, the
+gutter to the meta column and the meta column's own floor -- 13px to 11px,
+14px to 10px, 92px to 72px. Nothing about the team lines changed. Measured at
+1400px: three 378px columns, no card overflowing its box and no horizontal
+scroll on the page; mobile stays one column.
+
 **A stretched card spreads its slack across every grid track.** Cards sit in
 a two-column list and each is stretched to the height of its taller neighbour.
 `.row` is itself a grid, and the default `align-content:stretch` hands that
@@ -324,7 +331,8 @@ still stays out: the 2024 Mountain West Championship is the case that tests it.
 **Names must be compared through `rules.display_name` on BOTH sides.** The
 seeder matched the table's "UConn" against the archive's "Connecticut" and
 missed a game that was sitting right there. `norm()` routes everything through
-display_name so UConn/Connecticut, BYU/Brigham Young and USC/Southern Cal all
+display_name so UConn/Connecticut, BYU/Brigham Young and USC/Southern
+California all
 resolve.
 
 **ESPN carries NOTHING about College GameDay or Big Noon Kickoff** -- not in
@@ -390,11 +398,14 @@ FOX Saturday, 3 NBC Saturday, and ZERO ABC, because all 15 ABC basketball
 games in the archive are non-Big-Ten. The rules still carry the January-March
 gate every other CBB label has, which suppresses five Nov/Dec games.
 
-**The three ESPN brackets, and they differ on purpose.** ESPN Saturday takes
-the LATEST tip between 6:00 and 9:00pm -- exactly one game a week. Big Monday
-and Super Tuesday take EVERY game between 6:00 and 9:30pm, several a night.
-The header suffixes use the same brackets as the windows, so a card's label
-can never disagree with the window it is in.
+**The ESPN brackets are one bracket now, and the label is what narrows it.**
+All three -- ESPN Saturday, Big Monday, Super Tuesday -- take EVERY game
+tipping between 6:00 and 9:30pm. Saturday used to take only the latest of
+them; his call 2026-09-10 widened the WINDOW to the whole bracket (16 more
+games) and left the "ESPN Primetime" LABEL on the latest game alone, which is
+the first time a card's label and its window deliberately say different
+things. Measured: 71 games in the window across 41 Saturdays, exactly one
+Primetime label on each, none missing and none doubled.
 
 **The app icon is the scoreboard** -- two team rows, winner washed maize (his
 pick of six; `icons.py` draws all six and a preview page). It is declared
@@ -419,11 +430,14 @@ The name itself comes from `rules.NAME_OVERRIDES`, which spells out the schools
 ESPN abbreviates (BYU -> Brigham Young, LSU -> Louisiana State, TCU -> Texas
 Christian and so on) and softens UNLV and UConn the other way.
 
-**ESPN Saturday is chosen PER DATE, not by a clock rule.** One game a week --
-the latest tip between 6 and 9pm ET -- so it needs a pre-pass over the season's
-events, like `fox_friday_dates`. Measured: 46 Saturdays, zero ties, so no
-tiebreak is needed. The old 6:30pm cutoff kept 11 games at 18:30 while dropping
-27 at 18:00, which is what made it wrong.
+**"The latest game" is chosen PER DATE, not by a clock rule.** It needs a
+pre-pass over the season's events, like `fox_friday_dates`, because no clock
+cutoff can express "the last one": the old 6:30pm attempt kept 11 games at
+18:30 while dropping 27 at 18:00. Measured: 41 Saturdays, zero ties, so no
+tiebreak is needed. Since 2026-09-10 this decides only which game is LABELLED
+"ESPN Primetime" -- the window itself is the plain 6:00-9:30pm bracket -- and
+the pre-pass bracket was widened to 9:30pm to match, so "the latest" means the
+latest of the games actually in the window.
 
 **The Week filter follows the SEASON.** Week 16 exists only in some years, so
 the options are rebuilt from the games in the chosen season and the week is
@@ -460,9 +474,10 @@ only joined the Big Ten in 2024 -- and that is the very game he had asked about
 a round earlier. Flagged to him rather than quietly exempted. 30 games -> 10.
 
 **`HIDDEN_WINDOWS` hides a filter OPTION, not the games.** ABC Saturday
-(football) and ABC Weekend / ESPN Saturday (basketball) are out of the TV
-Window dropdown, but the 202 and 55 games keep their window and still appear
-under "All TV Windows".
+(football) and ABC Weekend, ESPN Saturday, Big Monday and Super Tuesday
+(basketball) are out of the TV Window dropdown, but the games keep their
+window and still appear under "All TV Windows" -- 202 football, and 71 / 59 /
+77 for ESPN Saturday, Big Monday and Super Tuesday.
 
 **A game with no window needs explicit admission to the TV Windows view.**
 Championship AND Black Friday games carry no window, so both need

@@ -283,6 +283,14 @@ the majors explicitly; alphabetical order would not do it (BTN would beat FOX).
 The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
 
+**Card colour follows the broadcast.** On football the three marquee windows
+each have a colour (`rules.HEADER_TINT`), and it paints the header, the
+network and the kickoff time. On basketball the colour is the NETWORK's
+(`rules.NET_TINT`): the network cell always carries it, and on a **Marquee**
+game the header and tip time do too. The date stays muted in both. Football
+games outside those three windows, and basketball games outside Marquee, are
+plain.
+
 **Basketball card labels.** A basketball card's header names its slot. FOX
 Friday, FOX Primetime and the three ESPN labels are open to anyone; the
 broadcast-network labels added 2026-09-10 need **at least one Big Ten team**

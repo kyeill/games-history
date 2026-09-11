@@ -214,12 +214,17 @@ def offsite_games(evs):
 
 
 def espn_saturday_ids(evs):
-    """One ESPN game per Saturday: the LATEST tip between 6pm and 9pm ET.
+    """One ESPN game per Saturday: the LATEST tip between 6pm and 9:30pm ET.
 
     His rule, 2026-09-09, replacing a 6:30pm cutoff that cut through the 6pm
     block and admitted up to three games a night. Measured across the archive
     it selects 46 Saturdays with no ties at all, and lands on the late marquee
     game -- North Carolina at Duke, Kentucky at Tennessee, Duke at Virginia.
+
+    Since 2026-09-10 this no longer decides the WINDOW -- `cbb_slots` admits
+    every 6:00-9:30pm ESPN Saturday game -- only which of them is labelled
+    "ESPN Primetime". The bracket was widened to 9:30pm to match, so "the
+    latest" means the latest of the games actually in the window.
     """
     best = {}
     for x in evs:
@@ -232,7 +237,7 @@ def espn_saturday_ids(evs):
         if d.weekday() != 5 or d.month not in (1, 2, 3):
             continue
         mins = d.hour * 60 + d.minute
-        if not (18 * 60 <= mins <= 21 * 60):
+        if not (18 * 60 <= mins <= 21 * 60 + 30):
             continue
         cur = best.get(d.date())
         if cur is None or mins > cur[0]:
@@ -298,10 +303,10 @@ def harvest():
                         nets, d, y, big_ten=(bt in confs))
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
-                                            any(ranks), bt in confs,
-                                            espn_sat=x["id"] in espn_sat)
+                                            any(ranks), bt in confs)
                     suffix = rules.cbb_header_suffix(
-                        nets, d, tourney=tourney, big_ten=(bt in confs))
+                        nets, d, tourney=tourney, big_ten=(bt in confs),
+                        espn_sat=x["id"] in espn_sat)
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
                 # a show broadcast from this game? match either side of the

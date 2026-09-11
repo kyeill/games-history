@@ -178,8 +178,16 @@ function rowHtml(g, browse) {
   // is one. Basketball reads the window, or the day of the week when there is
   // none. The DATE itself lives in the meta column now.
   const label = g.header;
+  // Football takes the WINDOW's colour, which exists for exactly the three
+  // marquee windows, and paints the header, the network and the time with it.
+  // Basketball takes the NETWORK's colour: the network cell always, and the
+  // header and time as well on a Marquee game (his call 2026-09-10).
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
-  const netCol = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
+  const netTint = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
+  const netCol = g.sport === "CFB" ? tint : netTint;
+  const headCol = g.sport === "CFB" ? tint : (g.mq ? netTint : null);
+  const timeCol = headCol;
+  const col = c => (c ? ' style="color:' + c + '"' : "");
   const DAYS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
                  Thu: "Thursday", Fri: "Friday", Sat: "Saturday",
                  Sun: "Sunday" };
@@ -204,16 +212,15 @@ function rowHtml(g, browse) {
     // The header row: slot label left, DATE right. The date sits here rather
     // than in the meta column because this is the only way it lines up with
     // the header. No weekday -- his call 2026-09-10.
-    '<div class="sport"' + (tint ? ' style="color:' + tint + '"' : "") + ">" +
+    '<div class="sport"' + col(headCol) + ">" +
       "<span>" + when + mark + "</span>" +
       '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
     '<div class="teams">' + teamLine(away, g.sport, g.season) +
       teamLine(home, g.sport, g.season) + "</div>" +
     // network on the away team's line, time on the home team's
-    '<div class="meta"><div class="mrow"' +
-      (netCol ? ' style="color:' + netCol + '"' : "") + ">" +
-      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow">' +
-      fmtTime(g.time) + "</div></div>" +
+    '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
+      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
+      col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></button>";
 }
 
@@ -686,9 +693,15 @@ async function init() {
     if (t.ok) TAGS = await t.json();
   } catch (e) { }
 
-  const today = new Date().toISOString().slice(0, 10);
-  document.getElementById("from").value = today;
-  document.getElementById("to").value = today;
+  // LOCAL dates, not toISOString -- that reads UTC, so an evening in the
+  // Eastern time zone would open Browse on tomorrow.
+  const ymd = d => d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+  // Browse opens on the past week, which is the stretch he is actually
+  // checking -- a single day is almost always empty.
+  document.getElementById("from").value = ymd(new Date(Date.now() - 7 * 864e5));
+  document.getElementById("to").value = ymd(new Date());
   draw();
 
   document.querySelectorAll("nav button").forEach(b =>
