@@ -22,6 +22,7 @@ re-harvest costs nothing.
 ```
 python harvest.py    ESPN -> output/games.json   (apply rules.py; run when a season ends)
 python colors.py     the row-wash colour per team -> output/colors.json
+python seed_series.py  H&H / N&N / H&N / Annual tags -> docs/tags.json (merges)
 python site.py       build the app -> docs/  (GitHub Pages serves this)
 python mock.py       the three row treatments Kyle chose from -> output/mockups.html
 ```
@@ -178,7 +179,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Year | dropdown, newest first | season |
 | Game type | dropdown, `rules.ORDER` sequence | `rules.game_type` |
 | TV window | dropdown, `rules.ORDER` sequence | whichever slot rule matched |
-| Week | dropdown, **football only** | 1-16, following the chosen season |
+| Week | dropdown, **football only** | 0-16, following the chosen season |
 | Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
 | Team | dropdown, alphabetical | 141 of them |
 | Marquee Windows | toggle button | `rules.is_marquee` — a rule, not a window list |
@@ -200,6 +201,18 @@ went wrong before: "FOX Weekend" admits any FOX game in the January-March
 stretch, weeknights included. Conference tournaments are never Marquee in
 either sport. Because it is now its own flag (`mq` on each game) it **stacks**
 with the TV window dropdown instead of pretending to be it.
+
+**Week 0 and the non-Saturday Week 1 games sit on the TV tab under their week
+alone** (his call 2026-09-11). The card reads `WEEK 0` or `WEEK 1` and nothing
+else, because they belong to no window: a Week 0 noon kick on FOX is not FOX
+Big Noon, and the Week 1 Friday game is not FOX Friday. So `rules.cfb_opener`
+games carry no window, no header label and no Marquee flag. Two recurring
+slots are in whoever plays -- the Labor Day weekend Sunday night game on ABC,
+and FOX's Week 1 Thursday or Friday night game -- and anything else on FOX,
+CBS, NBC or ABC needs a Big Ten team, a ranked team or Notre Dame. That rule
+reproduces his reviewed list for 2021-2025 exactly (15 games, leaving out
+Fresno State-Kansas and Stanford-Hawai'i). ESPN has no week 0 -- it numbers
+those games week 1 -- so harvest finds them by date.
 
 **Week and Month are the same idea for the two sports** — the coarse cut
 through a season. Football thinks in numbered weeks and basketball does not,
@@ -231,6 +244,14 @@ His own tags (**College GameDay**, **Big Noon Kickoff**) are **details on the
 row, not filter options**. Note that Big Noon Kickoff is FOX's pregame *show*
 being on site — not the noon kickoff window, which is the TV window "FOX Big
 Noon".
+
+The **series tags** are details too (his call 2026-09-11): **H&H** home &
+home, **N&N** neutral & neutral -- each school's "home" leg in a neutral city,
+like Michigan-Wake Forest basketball in Greensboro then Detroit -- **H&N** one
+of each, and **Annual** for a perpetual series like Notre Dame-USC.
+`seed_series.py` writes them into `docs/tags.json`: the first three by game
+id, from a scan he reviewed game by game, and Annual by team pair, so later
+meetings pick it up on their own. 98 games carry one as of 2026-09-11.
 
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
@@ -352,6 +373,8 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `rules.py` | the rule set, and only that |
 | `harvest.py` | ESPN → `output/games.json` |
 | `colors.py` | row-wash colour per team |
+| `seed_tags.py` | College GameDay / Big Noon Kickoff tags, merged into `docs/tags.json` |
+| `seed_series.py` | H&H / N&N / H&N / Annual tags, merged into `docs/tags.json` |
 | `logos.py` | ported from sports-daily; measures both crest variants |
 | `site.py` | builds `docs/` — HTML, icons, manifest, service worker |
 | `app.js` | the whole client app; `site.py` fills its `__PLACEHOLDERS__` |

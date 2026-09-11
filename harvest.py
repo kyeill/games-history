@@ -99,6 +99,30 @@ def fox_friday_dates(evs):
     return out
 
 
+def week_zero_ids(evs):
+    """Football games played in WEEK 0.
+
+    ESPN has no week 0: it numbers those games week 1, so they are found by
+    date instead -- the week-1 games played before the main Week 1 weekend,
+    whose Saturday is the one carrying the most week-1 games. Measured
+    2021-2025 it is one early Saturday a year: 8/28, 8/27, 8/26, 8/24, 8/23.
+    Bowls are numbered week 1 as well, so only the regular season counts.
+    """
+    wk1 = []
+    for x in evs:
+        if ((x.get("week") or {}).get("number") != 1
+                or (x.get("season") or {}).get("type") != 2):
+            continue
+        d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ").replace(
+            tzinfo=dt.timezone.utc).astimezone(ET)
+        wk1.append((d, x["id"]))
+    sats = collections.Counter(d.date() for d, _ in wk1 if d.weekday() == 5)
+    if not sats:
+        return set()
+    main = sats.most_common(1)[0][0]
+    return {gid for d, gid in wk1 if d.date() < main - dt.timedelta(days=5)}
+
+
 def load_overrides():
     """Manual window assignments for games ESPN records with no network.
 
@@ -255,6 +279,7 @@ def harvest():
         for y in SEASONS:
             evs = events(code, y)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
+            wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
@@ -291,6 +316,7 @@ def harvest():
                 # against the PREVIOUS game's headlines.
                 heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
                 black_friday = False
+                opener = False
                 suffix = None
                 # A conference tournament belongs to no broadcast package, so
                 # it is never Marquee and never carries a slot label.
@@ -301,6 +327,14 @@ def harvest():
                                             fox_fri)
                     black_friday = rules.cfb_black_friday(
                         nets, d, y, big_ten=(bt in confs))
+                    # Week 0 and the non-Saturday Week 1 games read their week
+                    # and nothing else -- no window, so no header and no Marquee.
+                    opener = rules.cfb_opener(
+                        nets, d, (x.get("week") or {}).get("number"),
+                        week0=x["id"] in wk0, big_ten=(bt in confs),
+                        ranked=any(ranks), notre_dame=rules.NOTRE_DAME in team_ids)
+                    if opener:
+                        slots = set()
                 else:
                     slots = rules.cbb_slots(nets, d, all(q == bt for q in confs),
                                             any(ranks), bt in confs)
@@ -358,7 +392,7 @@ def harvest():
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.
                 if (not slots and not gtype and not title and not black_friday
-                        and not show and x["id"] not in overrides):
+                        and not show and not opener and x["id"] not in overrides):
                     continue
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -409,7 +443,9 @@ def harvest():
                     # ESPN carries week.number on every CFB event; basketball
                     # has one too but it means nothing to a viewer, so only
                     # football displays it.
-                    "week": (x.get("week") or {}).get("number"),
+                    # ...and ESPN numbers Week 0 as week 1; see week_zero_ids
+                    "week": (0 if x["id"] in wk0
+                             else (x.get("week") or {}).get("number")),
                     "venue": v.get("fullName"),
                     "mq": rules.is_marquee(code, nets, d, slots,
                                            big_ten=(bt in confs),
@@ -423,6 +459,7 @@ def harvest():
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
                     "event": event, "bfri": black_friday, "suffix": suffix,
+                    "opener": opener,
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     os.makedirs(OUT, exist_ok=True)

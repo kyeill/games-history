@@ -34,7 +34,7 @@ TAGS_PATH = "docs/tags.json"
 # on site, not the noon kickoff window itself (that is the TV window "FOX Big
 # Noon"). Any other tag can still be typed into the sheet.
 STARTER_TAGS = [
-    "Big Noon Kickoff", "College GameDay", "H&H",
+    "Big Noon Kickoff", "College GameDay", "H&H", "N&N", "H&N", "Annual",
 ]
 
 CSS = """

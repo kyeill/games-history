@@ -347,6 +347,40 @@ a late kickoff shifts the Eastern date. Of 73 Big Noon rows, 63 matched and the
 travelled to Thursday-night openers, 3:30 and 4pm kickoffs, an ESPN 10pm game
 and the Mountain West Championship. A useful cross-check on the window rules.
 
+**ESPN has no week 0.** Week 0 games are numbered week 1 -- and so are the
+bowls -- so `week_zero_ids` finds them by date: the regular-season week-1 games
+played before the main Week 1 weekend, whose Saturday carries the most week-1
+games. 2021-2025 that is one early Saturday a year: 8/28, 8/27, 8/26, 8/24,
+8/23.
+
+**The series scan, and the five ways its first rule was wrong.** H&H, N&N and
+H&N came from a one-off scan of the 2019-2026 schedules -- 2019 and 2020 to
+catch 2021's second legs, the published 2026 football and part of the
+2026-27 basketball schedule to catch first legs -- followed by his review.
+* "Has an ESPN note" is not "is an event": Iowa-Iowa State carries "Iowa Corn
+  Cy-Hawk Series" in some years.
+* "More than two teams under one note" is not an event either. Showcase
+  doubleheaders (Indy Classic, West Coast Hoops Showdown) are exactly how
+  neutral & neutral series get packaged. A larger event is a TOURNAMENT (a
+  team plays twice within four days -- the Hall of Fame Series has a team play
+  twice, but weeks apart), a CONFERENCE CHALLENGE, or a recurring event whose
+  teams each play once (Champions Classic, CBS Sports Classic, Jimmy V).
+* Conference ids break after realignment. ESPN's per-game
+  `conferenceCompetition` flag is the better test, but it calls UNC-Wake Forest
+  non-conference, so same-conference pairs are excluded outright.
+* "Annual" cannot mean every season: Kentucky-Louisville skipped 2021-22 and
+  Notre Dame-USC skipped 2020. The scan counted 5+ meetings in 2019-2025.
+* ESPN can list the same HOST both years (Illinois-UConn at MSG, then at
+  Gampel flagged neutral), so hosts are compared as well as venues.
+The per-game list is a record of his rulings, not a rule to re-run: a new
+season needs a new scan and a new review. Annual is by pair, so it maintains
+itself -- Navy-Notre Dame 2023 picked up its tag the moment the Week 0 rule
+brought it into the archive.
+
+A tag can land on a game no tab shows: Arkansas-Michigan State 2025-26 is H&N,
+but it is a November game (the basketball TV tab is January-March) and an MSU
+win (Key Games hides rival wins).
+
 **The WINDOW and the HEADER LABEL are not the same thing.** ABC is the case
 that forces the distinction: the window holds EVERY Saturday ABC game (202 of
 them), while the header reads "ABC Primetime" only for a 7-8pm kick (69) and
@@ -442,7 +476,9 @@ latest of the games actually in the window.
 **The Week filter follows the SEASON.** Week 16 exists only in some years, so
 the options are rebuilt from the games in the chosen season and the week is
 cleared whenever the season changes -- otherwise a stale week empties the list.
-Football only: basketball has no meaningful week.
+Football only: basketball has no meaningful week. Week 0 is a real value, so
+every test for a week must be `!= null`: `!g.week` silently dropped Week 0 from
+the dropdown, the card header and the Newest First blocks.
 
 **Header tint contrast against the #1e1e23 card.** FOX #ffcb05 = 10.9:1,
 NBC #0b85c8 = 4.11:1, CBS #005ae4 = 2.83:1. The WCAG floor is 4.5:1, so CBS and

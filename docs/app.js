@@ -2,11 +2,11 @@
    __PLACEHOLDERS__. Kept as a real .js file rather than a Python string so it
    stays editable and lintable. */
 const REPO = "kyeill/games-history", TAGS_PATH = "docs/tags.json";
-const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H"];
+const STARTER = ["Big Noon Kickoff", "College GameDay", "H&H", "N&N", "H&N", "Annual"];
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260910-223526";
+const BUILD = "20260911-094634";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -130,8 +130,11 @@ function netClass(window) {
 
 // His bottom-row tags each carry a colour: the pregame shows are branded,
 // H&H and OT are incidental detail.
+// The series tags (home & home, neutral & neutral, home & neutral, annual)
+// share one quiet grey -- they describe the scheduling, not the broadcast.
 const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
-                    "H&H": "g-grey" };
+                    "H&H": "g-grey", "N&N": "g-grey", "H&N": "g-grey",
+                    "Annual": "g-grey" };
 function tagClass(t) { return TAG_CLASS[t] || ""; }
 
 function chip(kind, text) {
@@ -193,8 +196,10 @@ function rowHtml(g, browse) {
                  Sun: "Sunday" };
   let when;
   if (g.sport === "CFB") {
-    when = (g.week ? '<span class="wk">Week ' + g.week + "</span>" : "") +
-      (label ? (g.week ? " | " : "") + esc(label) : "");
+    // Week 0 is a real week, so test for a MISSING week, not a falsy one
+    const hasWeek = g.week != null;
+    when = (hasWeek ? '<span class="wk">Week ' + g.week + "</span>" : "") +
+      (label ? (hasWeek ? " | " : "") + esc(label) : "");
     // Browse pulls straight from ESPN, where a week number can be missing;
     // never leave the header empty.
     if (!when) when = esc(DAYS[g.dow] || g.dow);
@@ -297,7 +302,7 @@ function visible() {
   // itself a qualification -- an ACC first-rounder between unranked teams has
   // no business here, and every championship game carries a type anyway.
   list = list.filter(g => VIEW === "tv"
-    ? ((g.slots || []).length || g.title || g.bfri || g.show)
+    ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener)
     : (g.type && bigViewAllows(g)));
   // Basketball's TV tab is JANUARY TO MARCH (his standing rule, and his call
   // again 2026-09-10 for Marquee). The window rules already enforce it, but a
@@ -334,7 +339,7 @@ function visible() {
   // week 14, then 13, then 12, and inside a week the Thursday game first.
   // A football block is its week; basketball has none, so its block is the
   // date. Oldest First is simply chronological throughout.
-  const block = g => (g.sport === "CFB" && g.week)
+  const block = g => (g.sport === "CFB" && g.week != null)
     ? g.season + "-" + String(g.week).padStart(2, "0")
     : g.date;
   const chron = (a, b) => (a.date !== b.date)
@@ -399,7 +404,7 @@ function filterChips() {
   if (sport === "CFB") {
     const weeks = new Set();
     GAMES.forEach(g => {
-      if (g.sport !== "CFB" || !g.week) return;
+      if (g.sport !== "CFB" || g.week == null) return;
       if (FILT.season != null && g.season !== FILT.season) return;
       weeks.add(g.week);
     });

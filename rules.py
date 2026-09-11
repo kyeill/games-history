@@ -175,6 +175,7 @@ def is_black_friday(d):
 # makes it a false match for the CBS window every single year (five for five).
 # It is the last game of the season and belongs to neither package.
 ARMY, NAVY = "349", "2426"
+NOTRE_DAME = "87"
 
 # NOTE: "Power Four/Five" scopes which CONFERENCE CHAMPIONSHIP games count
 # (see POWER5 and power5_title). It is deliberately NOT a condition on TV
@@ -237,6 +238,37 @@ def cfb_header(slots, d, forced=False):
         return None
     t = _mins(d)
     return "ABC Primetime" if (forced or 19 * 60 <= t <= 20 * 60) else None
+
+
+BROADCAST = {"FOX", "CBS", "NBC", "ABC"}
+
+
+def cfb_opener(nets, d, week, week0=False, big_ten=False, ranked=False,
+               notre_dame=False):
+    """Week 0, and the non-Saturday games of Week 1, on a broadcast network.
+
+    His call 2026-09-11. These go on the TV tab under their week alone --
+    "WEEK 0" or "WEEK 1" -- and in NO window: a Week 0 noon kick on FOX is not
+    FOX Big Noon, and the Week 1 Friday game is not FOX Friday. Harvest clears
+    the slots of any game this returns True for, which also keeps it out of
+    Marquee.
+
+    Two recurring slots are in whoever plays: the Labor Day weekend Sunday
+    night game on ABC, and FOX's Week 1 Thursday or Friday night game. Anything
+    else needs a Big Ten team, a ranked team or Notre Dame -- which is what
+    leaves out Fresno State-Kansas and Stanford-Hawai'i (both 2025 Week 0).
+    """
+    if not (week0 or (week == 1 and d.weekday() != 5)):
+        return False
+    hit = set(nets) & BROADCAST
+    if not hit:
+        return False
+    day = DOW[d.weekday()]
+    if day == "Sun" and "ABC" in hit:
+        return True
+    if day in ("Thu", "Fri") and "FOX" in hit:
+        return True
+    return big_ten or ranked or notre_dame
 
 
 def cfb_black_friday(nets, d, season, big_ten=False):
