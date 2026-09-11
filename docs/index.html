@@ -183,30 +183,39 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-mine.g-red{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
 .t-mine.g-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
-/* MICHIGAN view (trial, 2026-09-11): the header (TV details only when it names
-   no window or stage), one opponent line -- rank, name and rating, then the
+/* MICHIGAN view (trial, 2026-09-11): the header (TV details after a bar unless
+   a window label fills it; stage cards put the day beside the date), one
+   opponent line -- a colour stripe from the crest through the rating, then the
    score and Michigan's rank in uniform-coloured boxes -- and one chip row */
 .row.mich{grid-template-columns:1fr;grid-template-areas:"sport" "teams" "tags"}
 .row.mich .sport{flex-wrap:wrap;row-gap:2px}
 .row.mich .mnum{text-transform:none}
 .row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
-/* the rank column holds exactly "NO. 16" (35.4px measured in Source Sans 3), so
-   names sit further left than on the other views */
-.row.mich .tl{grid-template-columns:22px 36px minmax(0,1fr) auto auto;column-gap:7px}
+.row.mich .tl{grid-template-columns:minmax(0,1fr) auto auto;column-gap:6px;
+  padding:0;margin-left:0;background:none}
+/* the stripe: crest, a rank column that holds exactly "NO. 16" (35.4px
+   measured in Source Sans 3), then the name and rating. It stops before the
+   boxes (his call). */
+.row.mich .mstripe{display:grid;grid-template-columns:22px 36px minmax(0,1fr);
+  column-gap:7px;align-items:center;min-width:0;padding:2px 6px 2px 7px;
+  margin-left:-7px;border-radius:5px}
+.row.mich .tl.won .mstripe{background:var(--winwash)}
 /* name then rating: the name shortens first, the rating stays whole */
 .row.mich .nm.mnm{display:flex;align-items:baseline;min-width:0}
 .row.mich .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .row.mich .mfin{flex:none;margin-left:6px;font-size:12px;font-weight:400;
   color:var(--muted);font-style:normal}
-/* the score is the jersey, Michigan's rank the pants; the accessories colour
-   is the text (inline styles). No uniform: a plain score and a maize rank box */
-.row.mich .sc.mbox{padding:1px 7px;border-radius:4px;min-width:0}
-.row.mich .mrank{background:#ffcb05;color:#00274c;font-size:12.5px;font-weight:700;
-  padding:2px 7px;border-radius:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* the score (jersey) and Michigan's rank (pants): one height, one type size;
+   the accessories colour is the text (inline styles) */
+.row.mich .sc.mbox,.row.mich .mrank{display:inline-flex;align-items:center;
+  justify-content:center;box-sizing:border-box;height:24px;padding:0 8px;
+  border-radius:4px;font-size:14.5px;font-weight:700;
+  font-variant-numeric:tabular-nums;white-space:nowrap;min-width:0}
+.row.mich .mrank{min-width:34px;background:#ffcb05;color:#00274c}
 .row.mich.dimmed .mrank{background:#3a3a40;color:#b4b4ae}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
-.row.mich.mwash .tl.won{background:transparent}
+.row.mich.mwash .tl.won .mstripe{background:transparent}
 /* a bye / postseason tile: one card slot, slim on a phone */
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;
   padding:6px 10px;border:1px solid var(--line);border-radius:9px;color:#9fb6cf;
@@ -355,6 +364,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-165912"></script>
+<script src="app.js?v=20260911-170809"></script>
 </body>
 </html>

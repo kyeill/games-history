@@ -345,15 +345,17 @@ not on a Saturday: "WEEK 1 (THU)".
 **Michigan** is a fourth view on each tab -- a TRIAL (his call 2026-09-11),
 2023 football and 2025-26 basketball only for now. One card per Michigan game,
 every game that season, in three rows. The HEADER: his emoji, the game number
-in brackets ([nc1] non-conference, [g1] conference) and the week or stage; a
-header that names no window or stage adds the TV details after a pipe --
-"[nc1] WEEK 1 | PEACOCK 12:00PM" -- and one that does shows none. The date sits
-at the right. The TEAM LINE: the opponent's rank at the time (the column is
+in brackets ([nc1] non-conference, [g1] conference) and the week or stage; the TV details follow
+a bar -- "[nc1] WEEK 1 | PEACOCK 12:00PM" -- unless a window label already
+fills the header. A stage card drops its own bar and the word "Tournament",
+takes the TV details after the bar, and puts its day beside the date: "2026
+NCAA ROUND 1 | CBS 7:30PM" with "THU 3/19/26" at the right. The TEAM LINE: the opponent's rank at the time (the column is
 just wide enough for "NO. 16"), "at" / "vs.", the name ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 [#13] for a final AP ranking, or his SP+ / KenPom as (73+) -- then the score
-from Michigan's side and Michigan's rank at the time. Those two boxes are
-Michigan's uniform: the score in the jersey colour, the rank in the pants
+from Michigan's side and Michigan's rank at the time (blank when unranked). A colour stripe runs
+from the crest through the rating and stops before those two boxes, which
+share one height and type size and are Michigan's uniform: the score in the jersey colour, the rank in the pants
 colour, the accessories colour as the text (navy or maize instead when it would
 vanish into its box). ONE CHIP ROW, in his order: location, event, the home &
 home family, Big Noon, GameDay, anything else, his Big Ten note -- "Big Noon

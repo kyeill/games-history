@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-165912";
+const BUILD = "20260911-170809";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -315,14 +315,23 @@ function michCard(g, p) {
   const fin = mx.finish ? "[" + mx.finish + "]" : mx.final ? "[#" + mx.final + "]"
     : mx.rating ? "(" + mx.rating + "+)" : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
-  // HEADER (his call 2026-09-11): a card whose header already names a window
-  // or a stage shows no TV details at all; a bare one takes them after a pipe,
-  // "[nc1] WEEK 1 | PEACOCK 12:00PM". The date keeps the right.
-  const bare = !g.stage && !g.header;
-  const tv = bare ? ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
-    "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>" : "";
+  // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
+  // | PEACOCK 12:00PM" -- unless a window label already fills the header. A
+  // STAGE card drops its own bar and the word "Tournament", takes the TV
+  // details after the bar instead, and moves its day beside the date:
+  // "2026 NCAA ROUND 1 | CBS 7:30PM" ... "THU 3/19/26".
+  const tvBits = ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
+    "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
+  let when = p.when, right = fmtDate(g.date);
+  if (g.stage) {
+    const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
+    when = year + esc(g.stage.replace(" Tournament", "").replace(" | ", " ")) + tvBits;
+    right = esc(g.dow) + " " + right;
+  } else if (!g.header) {
+    when += tvBits;
+  }
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
-    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when + tv;
+    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
   // UNIFORM (his call 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both -- unless it is
   // too faint on its box (under 3:1 contrast: blue on blue, white on maize),
@@ -341,22 +350,24 @@ function michCard(g, p) {
   const ink = bg => (acc && ratio(acc, bg) >= 3) ? acc
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = bg => (bg ? ' style="background:' + bg + ";color:" + ink(bg) + '"' : "");
-  const score = '<span class="sc' + (top ? " mbox" : "") + '"' + paint(top) + ">" +
-    m.score + "-" + opp.score + "</span>";
-  // Michigan's rank at the time, right beside the score (n/a when unranked but
-  // there is a uniform to show)
-  const umText = m.rank ? (playoffGame(g) ? "NO. " : "#") + m.rank : (pants ? "n/a" : "");
-  const umRank = umText ? '<span class="mrank"' + paint(pants) + ">" + umText + "</span>"
+  // the two boxes share one height and one type size (his call)
+  const score = '<span class="sc mbox"' + paint(top) + ">" + m.score + "-" + opp.score +
+    "</span>";
+  // Michigan's rank at the time beside the score; blank when unranked, the box
+  // still showing the pants colour when there is one
+  const umRank = (m.rank || pants)
+    ? '<span class="mrank"' + paint(pants) + ">" +
+      (m.rank ? (playoffGame(g) ? "NO. " : "#") + m.rank : "") + "</span>"
     : "<span></span>";
-  // TEAM LINE: rank, name, "^" for last season's champion, the rating right
-  // after the name (the name shortens first), then the score and Michigan's rank
-  const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
+  // TEAM LINE: the colour stripe runs from the crest through the rating and
+  // stops before the two boxes (his call 2026-09-11)
+  const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' + (opp.rank ? '<span class="rn">' + opp.rank + "</span>" : "") +
     "</span>" +
     '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
-      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span></span>" +
     score + umRank + "</div>";
   // ONE CHIP ROW, in his order (2026-09-11): location, event, the home & home
   // family, Big Noon, GameDay, anything else, then his Big Ten note. The two
@@ -377,7 +388,7 @@ function michCard(g, p) {
     t !== "College GameDay").forEach(t => chips.push(tagChip(t)));
   if (mx.note) chips.push(chip("grey", mx.note));
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
-  // washes the WHOLE card in the opponent's colour instead of its name line
+  // washes the WHOLE card in the opponent's colour instead of its stripe
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
   let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
@@ -396,7 +407,7 @@ function michCard(g, p) {
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
+      '<span class="hdate">' + right + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags">' + chips.join("") + "</div></button>";
 }
