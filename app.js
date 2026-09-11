@@ -152,7 +152,10 @@ function chip(kind, text) {
 function teamLine(t, sport, season) {
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
-    '<span class="rk">' + (t.rank || "") + "</span>" +
+    // the number sits in its own box so a playoff seed can hold two digits'
+    // width ("NO. 2" leaves the room "NO. 11" needs)
+    '<span class="rk">' + (t.rank ? '<span class="rn">' + t.rank + "</span>" : "") +
+    "</span>" +
     '<span class="nm">' + esc(teamName(t, sport, season)) + "</span>" +
     '<span class="sc">' + t.score + "</span></div>";
 }

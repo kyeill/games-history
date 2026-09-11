@@ -113,7 +113,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* the week takes the header's colour, tinted or plain -- no orange of its own
    (his call: an untinted header should read entirely plain) */
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
-.tl{display:grid;grid-template-columns:22px 24px 1fr auto;align-items:center;
+.tl{display:grid;grid-template-columns:22px 44px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 7px;margin-left:-7px;border-radius:5px}
 .tl.won{background:var(--winwash)}
 /* A coloured border marks a result he wants to see: Michigan won (maize), or a
@@ -136,11 +136,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    lost or Ohio State / Michigan State / Notre Dame won */
 .row.rk-upset .rk{color:var(--accent)}
 .row.rk-grey .rk{color:var(--muted)}
-/* the CFP and the NCAA Tournament say "NO. 3", left-aligned (his call
-   2026-09-11); the rank column widens to fit */
-.row.rk-no .tl{grid-template-columns:22px 44px 1fr auto}
-.row.rk-no .rk{text-align:left}
+/* the CFP and the NCAA Tournament say "NO. 3" (his calls 2026-09-11). Every
+   card shares the 44px rank column, so names start in one place and the last
+   digit of "#10" and "NO. 11" line up; a playoff seed holds two digits' width,
+   so "NO." never moves and "NO. 2" just leaves room after the number */
 .row.rk-no .rk:not(:empty)::before{content:"NO. "}
+.row.rk-no .rn{display:inline-block;min-width:2ch;text-align:left}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
 /* overtime: the winning score is underlined, instead of an OT chip */
@@ -316,6 +317,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-152120"></script>
+<script src="app.js?v=20260911-152740"></script>
 </body>
 </html>
