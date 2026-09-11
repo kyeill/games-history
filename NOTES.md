@@ -460,6 +460,18 @@ tags.json, since an old cached copy of the app could still write one.
 Appalachian State at Texas A&M. He placed the Northern Illinois game in 2025;
 the only meeting in the archive is 2024-09-07, so that is the one tagged.
 
+**A dropdown that hides empty choices must ask the view, not the data.** The
+Team and Winner lists come from `visibleWithout(key)`: the list the current view
+would show with THAT filter cleared and every other filter left alone. Building
+them from the raw games instead would still offer a team that has nothing in
+the chosen season or view. The current selection is always added back, or
+changing another filter could make it vanish from its own dropdown.
+
+**Rivals cannot sort by week blocks.** Newest First walks football week blocks,
+and a bowl or CFP game has no week, so its block is its date -- and the string
+"2025-15" sorts after "2025-12-31". The Big Ten title game landed ahead of the
+CFP quarterfinal played three weeks later. Rivals orders by true date instead.
+
 **A game kept only for Rivals must not leak into the other views.** Harvest
 drops postseason games at the top of its loop and non-final conference
 tournament rounds near the bottom. A rival's loss in either is now kept, and

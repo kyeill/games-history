@@ -241,6 +241,24 @@ and Michigan State in basketball; leaving it restores the season and team a
 normal view opens on. The Year dropdown lists only the seasons the current view
 can show.
 
+**Rivals has its own filters** (his call 2026-09-11): Year, Type, Rival and
+Winner -- no week, month, game type, TV window, team or Marquee. Type is
+Postseason (the Big Ten championship game or tournament and everything after
+it), Conference (a regular-season Big Ten opponent) or Non-Conf (anyone else,
+and every Notre Dame game short of the postseason). Rival is whose loss it was,
+opening on Ohio State in football and Michigan State in basketball. Winner lists
+Michigan, the Big Ten, the power leagues and everyone else, divided like the
+Team filter. Rivals orders by TRUE date, so the CFP loss to Miami sorts ahead of
+the Big Ten title game loss to Indiana. Two rivals meeting counts only when
+named in `rules.RIVALS_INCLUDE` -- so far just the 2021 Ohio State-Michigan
+State football game.
+
+**Team and Winner list only teams that would return games** under the other
+filters as they stand, on every tab; the current choice always stays listed.
+
+**A Michigan loss has a DASHED muted border** (his call 2026-09-11). A solid
+grey one looked like a rival loss to a black-and-gold winner such as Iowa.
+
 **Week and Month are the same idea for the two sports** — the coarse cut
 through a season. Football thinks in numbered weeks and basketball does not,
 so basketball gets the month instead, listed in SEASON order (November,

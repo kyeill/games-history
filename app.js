@@ -13,7 +13,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
-              team: null, marquee: false };
+              team: null, marquee: false, rival: null, rtype: null, winner: null };
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -223,6 +223,9 @@ function rowHtml(g, browse) {
   const ring = flag ? celebrateColor(g) : null;
   return '<button class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
+    // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
+    // looked like a rival loss to a black-and-gold winner such as Iowa
+    ((michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -304,7 +307,7 @@ function celebrateColor(g) {
   // reads Indiana red.
   const m = michTeam(g);
   if (m) {
-    return m.win ? ["#ffcb05", "#ffcb0544"] : ["#5a5a62", "#5a5a6244"];
+    return m.win ? ["#ffcb05", "#ffcb0544"] : ["#7a7a82", "#7a7a8244"];
   }
   const solid = brighten(teamColor(g.teams.find(t => t.win)), 130);
   return [solid, solid + "44"];
@@ -344,6 +347,13 @@ function visible() {
     });
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
+  // Rivals filters by whose loss it was, what kind of game, and who won
+  if (VIEW === "rivals") {
+    if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
+    if (FILT.rtype) list = list.filter(g => rivalType(g) === FILT.rtype);
+    if (FILT.winner) list = list.filter(g =>
+      g.teams.some(t => t.win && t.id === FILT.winner));
+  }
   if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
   if (FILT.month != null)
     list = list.filter(g => +g.date.slice(5, 7) === FILT.month);
@@ -367,7 +377,9 @@ function visible() {
   // week 14, then 13, then 12, and inside a week the Thursday game first.
   // A football block is its week; basketball has none, so its block is the
   // date. Oldest First is simply chronological throughout.
-  const block = g => (g.sport === "CFB" && g.week != null)
+  // Rivals orders by TRUE date (his call 2026-09-11): a CFP game has no week,
+  // so a week block would put the Big Ten title game ahead of it
+  const block = g => (VIEW !== "rivals" && g.sport === "CFB" && g.week != null)
     ? g.season + "-" + String(g.week).padStart(2, "0")
     : g.date;
   const chron = (a, b) => (a.date !== b.date)
@@ -401,7 +413,7 @@ function clearFilters() {
     windows: null,
     // TV Windows opens on Marquee -- the games he plans a weekend around
     marquee: VIEW === "tv",
-    week: null, month: null, team: null
+    week: null, month: null, team: null, rival: null, rtype: null, winner: null
   };
 }
 
@@ -444,6 +456,24 @@ function filterChips() {
   let h = group("Year", select("season", "All Years",
     viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
+  // RIVALS has its own filters (his call 2026-09-11): Year, Type, Rival and
+  // Winner -- no week, month, game type, TV window, team or Marquee
+  if (VIEW === "rivals") {
+    const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
+    const lined = ids => ids.length
+      ? [["\u2500".repeat(12), null]].concat(ids.map(optOf)) : [];
+    h += group("Type", select("rtype", "All Types",
+      ["Postseason", "Conference", "Non-Conf"].map(t => [t, t]), FILT.rtype));
+    h += group("Rival", select("rival", "All Rivals",
+      (sport === "CFB" ? ["194", "127", "87"] : ["127", "194"]).map(optOf),
+      FILT.rival));
+    // only winners that would return games under the other filters
+    const w = teamOrder(sport, teamsIn(visibleWithout("winner"),
+      g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner), ["130"]);
+    h += group("Winner", select("winner", "All Winners",
+      w.bigTen.map(optOf).concat(lined(w.power), lined(w.rest)), FILT.winner));
+    return h + group("", sortButton());
+  }
   // Football is played in numbered weeks; basketball is not. The list follows
   // the season, since week 16 only exists in some years.
   if (sport === "CFB") {
@@ -484,7 +514,9 @@ function filterChips() {
     order.windows.filter(w => windows.has(w) && hidden.indexOf(w) < 0)
       .map(w => [w, w]), one));
   // not "order": that name already holds the game-type / window sequence above
-  const teamList = teamOrder(sport);
+  // only teams that would return games under the other filters
+  const teamList = teamOrder(sport, teamsIn(visibleWithout("team"),
+    g => g.teams.map(t => t.id), FILT.team));
   const teamOpt = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
   // a divider line opens each group after the Big Ten's (his call 2026-09-11)
   const withLine = ids => ids.length
@@ -505,7 +537,7 @@ function filterChips() {
    move -- Stanford's is a 2023 Pac-12 game; that game is only the fallback.
    Declared inside the function, not as top-level consts, because init() runs
    before later top-level consts are initialised (see clearFilters). */
-function teamOrder(sport) {
+function teamOrder(sport, allowed, pinsOverride) {
   const PINS = { CFB: ["130", "194", "127", "87"],   // Michigan, Ohio State, Michigan State, Notre Dame
                  CBB: ["130", "127", "194"] };       // Michigan, Michigan State, Ohio State
   const POWER = { CFB: ["1", "8", "4"],              // ACC, SEC, Big 12
@@ -520,8 +552,9 @@ function teamOrder(sport) {
   });
   const name = id => (TEAMS[id] && TEAMS[id].short) || id;
   const byName = (a, b) => name(a).localeCompare(name(b));
-  const pins = (PINS[sport] || []).filter(id => latest[id]);
-  const others = Object.keys(latest).filter(id => pins.indexOf(id) < 0);
+  const ok = id => !allowed || allowed.has(id);
+  const pins = (pinsOverride || PINS[sport] || []).filter(id => latest[id] && ok(id));
+  const others = Object.keys(latest).filter(id => pins.indexOf(id) < 0 && ok(id));
   const confOf = id =>
     (TEAMS[id] && TEAMS[id].conf && TEAMS[id].conf[sport]) || latest[id].conf;
   const inBigTen = id => confOf(id) === BIG_TEN[sport];
@@ -533,12 +566,49 @@ function teamOrder(sport) {
   };
 }
 
+/* A dropdown lists only choices that would return games (his call
+   2026-09-11): the list this view would show with THAT filter cleared. The
+   current choice always stays listed, so a selection never vanishes. */
+function visibleWithout(key) {
+  const saved = FILT[key];
+  FILT[key] = null;
+  try { return visible(); } finally { FILT[key] = saved; }
+}
+function teamsIn(list, idsOf, current) {
+  const ids = new Set();
+  list.forEach(g => idsOf(g).forEach(id => ids.add(id)));
+  if (current) ids.add(current);
+  return ids;
+}
+
+/* Rivals: whose loss it was, and what kind of game (his calls 2026-09-11).
+   Postseason is the Big Ten championship game or tournament and everything
+   after it. Before that, a Big Ten opponent is Conference and anyone else is
+   Non-Conf -- and every Notre Dame game short of the postseason is Non-Conf. */
+function rivalLoser(g) {
+  const ids = g.sport === "CFB" ? ["194", "127", "87"] : ["194", "127"];
+  const t = g.teams.find(x => !x.win && ids.indexOf(x.id) > -1);
+  return t ? t.id : null;
+}
+function rivalType(g) {
+  if (g.post || g.champ === "Big Ten" || (g.stage || "").indexOf("Big Ten |") === 0)
+    return "Postseason";
+  const loser = rivalLoser(g);
+  if (loser === "87") return "Non-Conf";
+  const opp = g.teams.find(t => t.id !== loser);
+  return opp && opp.conf === BIG_TEN[g.sport] ? "Conference" : "Non-Conf";
+}
+
+function sortButton() {
+  return '<button class="f" data-act="sort">' +
+    (SORT === "asc" ? "Oldest First" : "Newest First") + "</button>";
+}
+
 function marqueeOn() { return !!FILT.marquee; }
 function quickButtons() {
   return '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
     '">Marquee Windows</button>' +
-    '<button class="f" data-act="sort">' +
-    (SORT === "asc" ? "Oldest First" : "Newest First") + "</button>";
+    sortButton();
 }
 
 function draw() {
@@ -820,13 +890,14 @@ async function init() {
       if (VIEW === "rivals") {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
-        FILT.season = null; FILT.week = null; FILT.month = null;
-        FILT.team = SPORT_OF[TAB] === "CFB" ? "194" : "127";
+        FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
+        FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
+        FILT.rtype = null; FILT.winner = null;
         SORT = "desc";
       } else if (leaving === "rivals") {
-        // leaving Rivals puts back the season and team a normal view opens on
+        // leaving Rivals puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
-        FILT.team = null;
+        FILT.team = null; FILT.rival = null; FILT.rtype = null; FILT.winner = null;
       }
       draw();
       window.scrollTo({ top: 0 });
@@ -881,7 +952,7 @@ async function init() {
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
     FILT = { season: null, week: null, month: null, type: null, windows: null,
-             team: null, marquee: false };
+             team: null, marquee: false, rival: null, rtype: null, winner: null };
     draw();
     window.scrollTo({ top: 0 });
   });

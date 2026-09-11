@@ -185,7 +185,9 @@ RIVALS_BY_SPORT = {"CFB": {"194", "127", "87"},   # Ohio State, Michigan State, 
                    "CBB": {"194", "127"}}         # Ohio State, Michigan State
 # Two of them playing each other stays OUT of that view unless the ESPN game id
 # is named here -- "I will have to tell you when to include".
-RIVALS_INCLUDE = set()
+RIVALS_INCLUDE = {
+    "401282786",    # 2021 football: Ohio State 56, Michigan State 7 (his call 2026-09-11)
+}
 
 # NOTE: "Power Four/Five" scopes which CONFERENCE CHAMPIONSHIP games count
 # (see POWER5 and power5_title). It is deliberately NOT a condition on TV

@@ -151,6 +151,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.celebrate{border-color:var(--celeb,#ffcb05);
   box-shadow:0 0 0 1px var(--celebring,#ffcb0544)}
 .row.celebrate:hover{filter:brightness(1.12)}
+/* a Michigan loss: dashed and muted, never mistaken for a grey winner */
+.row.celebrate.mloss{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
 .row.dimmed .nm{font-style:italic}
 .crest{width:21px;height:21px;object-fit:contain;display:block}

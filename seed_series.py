@@ -120,6 +120,10 @@ SERIES = [
     ("401700435", "Home & Home", "CBB 2024-25 North Carolina at Kansas"),
     # a season apart rather than back to back (his call 2026-09-11)
     ("401372032", "Home & Home", "CBB 2021-22 Villanova at UCLA"),
+    # the other leg of a series he ruled, brought in by the new TV rules (2026-09-11)
+    ("401575457", "Home & Home", "CBB 2023-24 Kansas at Indiana"),
+    ("401575804", "Home & Home", "CBB 2023-24 UCLA at Villanova"),
+    ("401707854", "Home & Home", "CBB 2024-25 Tennessee at Illinois"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),
@@ -135,6 +139,8 @@ SERIES = [
     ("401819836", "Neutral & Neutral", "CBB 2025-26 Wisconsin at Brigham Young"),
     ("401403867", "Neutral & Neutral", "CFB 2022    Florida State at Louisiana State"),
     ("401520182", "Neutral & Neutral", "CFB 2023    Louisiana State at Florida State"),
+    # the other leg of a series he ruled, brought in by the new TV rules (2026-09-11)
+    ("401715614", "Neutral & Neutral", "CBB 2024-25 Gonzaga at Connecticut"),
     # --- Home & Neutral
     ("401826785", "Home & Neutral", "CBB 2025-26 Arkansas at Michigan State"),
     ("401752667", "Home & Neutral", "CFB 2025    Auburn at Baylor"),
