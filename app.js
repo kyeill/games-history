@@ -326,14 +326,16 @@ function michCard(g, p) {
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     rankCell(opp) +
-    '<span class="nm">' + esc(where + nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") +
-      (fin && !MDENSE ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+    // the rating rides after the name (his call 2026-09-11); when they do not
+    // both fit, the NAME shortens and the rating stays whole
+    '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
+      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
     // Michigan's score first; no W / L -- the wash, or the dashed italic card of
     // a loss, already says it, and a phone needs the width for the name
     '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
   const mLine = '<div class="tl mm"><img class="crest" loading="lazy" src="' +
-    crest(m) + '" alt="">' + rankCell(m) + '<span class="nm">' +
+    crest(m) + '" alt=""><span class="rk"></span><span class="nm">' +
     esc(mx.note || "") + "</span><span></span></div>";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   const net = esc(primaryNet(g.nets) || "\u2014"), time = fmtTime(g.time);
@@ -344,9 +346,7 @@ function michCard(g, p) {
       '</div><div class="mrow"' + col(p.timeCol) + ">" + time + "</div></div>";
   const uni = (mx.uni || []).map(uniChip);
   const chips = (MDENSE
-    ? [fin ? chip("grey", fin) : "",
-       m.rank ? chip("grey", (playoffGame(g) ? "UM NO. " : "UM #") + m.rank) : "",
-       mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
+    ? [mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
     : uni.concat(p.tags)).filter(Boolean);
   // "[nc1] WEEK 1" -- the number in brackets at the front, lower case like
   // his sheet (his call 2026-09-11)
@@ -369,9 +369,45 @@ function michCard(g, p) {
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
+      // Michigan's rank at the time sits beside the date (his option C)
+      '<span class="hdate">' + (m.rank ? '<span class="hum">UM ' +
+        (playoffGame(g) ? "NO. " : "#") + m.rank + "</span> \u00b7 " : "") +
+      fmtDate(g.date) + "</span></div>" +
     '<div class="teams">' + oppLine + (MDENSE ? "" : mLine) + "</div>" + meta +
     '<div class="tags">' + chips.join("") + "</div></button>";
+}
+
+/* Dividers in the Michigan view (his call 2026-09-11), only when one season
+   is picked: a BYE for each Saturday a football schedule skips, POSTSEASON
+   where the conference title game or tournament begins, and "N WEEKS OFF"
+   before a postseason game after a long wait. Each is a TILE in the grid, so
+   on a desktop it takes one card's slot and three-across stays in step. */
+function michListHtml(list) {
+  const cards = list.map(g => rowHtml(g, false));
+  if (FILT.season == null || list.length < 2) return cards.join("");
+  const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
+  const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
+  const post = g => !!(g.post || g.champ);
+  const tile = t => '<div class="mgap">' + t + "</div>";
+  const out = [cards[0]];
+  for (let i = 1; i < list.length; i++) {
+    const a = list[i - 1], b = list[i];
+    const lo = Math.min(day(a.date), day(b.date)), hi = Math.max(day(a.date), day(b.date));
+    const off = Math.floor((hi - lo) / 7);
+    const gaps = [];
+    if (post(a) !== post(b)) {
+      gaps.push("Postseason" + (hi - lo >= 14 ? " \u00b7 " + off + " weeks off" : ""));
+    } else if (post(a)) {
+      if (hi - lo >= 14) gaps.push(off + " weeks off");
+    } else if (a.sport === "CFB") {
+      for (let d = lo + 4; d <= hi - 4; d++)
+        if (new Date(d * 864e5).getUTCDay() === 6) gaps.push("Bye \u00b7 " + fmtDate(iso(d)));
+      if (SORT !== "asc") gaps.reverse();
+    }
+    gaps.forEach(t => out.push(tile(t)));
+    out.push(cards[i]);
+  }
+  return out.join("");
 }
 
 /* Kyle's teams. ESPN gives a school one id across both sports. */
@@ -793,7 +829,8 @@ function draw() {
     ? (BROWSE === null ? "pick a date range" : list.length + " games")
     : list.length.toLocaleString() + " games";
   document.getElementById("list").innerHTML = list.length
-    ? list.map(g => rowHtml(g, TAB === "browse")).join("")
+    ? (VIEW === "michigan" && TAB !== "browse" ? michListHtml(list)
+      : list.map(g => rowHtml(g, TAB === "browse")).join(""))
     : '<p class="empty">' + (TAB === "browse"
       ? "Pick a start and end date, then Load."
       : "Nothing matches those filters.") + "</p>";

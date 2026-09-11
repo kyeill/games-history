@@ -189,6 +189,17 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
 /* the game number keeps his lower case inside the capitalised header */
 .row.mich .mnum{text-transform:none}
+/* name then rating: the name shortens first, the rating stays whole */
+.row.mich .nm.mnm{display:flex;align-items:baseline;min-width:0}
+.row.mich .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.row.mich .mfin{flex:none}
+/* Michigan's rank beside the date; grey on a loss like every other ranking */
+.row.mich .hum{color:#ffcb05}
+.row.mich.rk-grey .hum{color:var(--muted)}
+/* a bye / postseason tile: one card slot, slim on a phone */
+.mgap{display:flex;align-items:center;justify-content:center;min-height:30px;
+  padding:6px 10px;border:1px dashed #34343b;border-radius:9px;color:#7f98b3;
+  font-size:11.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
 /* Dense: network over time, small, inside one team line -- side by side they
@@ -333,6 +344,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-162507"></script>
+<script src="app.js?v=20260911-163259"></script>
 </body>
 </html>
