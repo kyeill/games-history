@@ -71,8 +71,13 @@ VENUE_METROS = {
 CITY_OVERRIDES = {"Washington": "Washington DC"}
 
 
+# ...except these arenas inside those metros, which read as the city (his
+# call 2026-09-11)
+CITY_NOT_VENUE = {"Credit Union 1 Arena"}
+
+
 def display_city(city, venue=None):
-    if city in VENUE_METROS and venue:
+    if city in VENUE_METROS and venue and venue not in CITY_NOT_VENUE:
         return venue
     return CITY_OVERRIDES.get(city, city)
 

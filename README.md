@@ -425,6 +425,10 @@ to drive the Game Type filter.
 A title game is played somewhere, but the title is the story; otherwise a
 neutral-site game shows its city, which is also what tells you it was neutral
 now that there is no neutral marker. An **OT** note follows where it applies.
+The one exception is basketball's two travelling showcases, Champions Classic and
+CBS Sports Classic, which name the event AND the place as a second chip (his
+call 2026-09-11). Most other one-off event names read as the city instead --
+see `event-overrides.json`.
 
 Between those two sits a fourth case: a **home game played somewhere other
 than the home team's own building**, which shows the VENUE rather than a city

@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-141440";
+const BUILD = "20260911-142005";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -139,6 +139,7 @@ const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
                     "Buy Game": "g-grey" };
 function tagClass(t) { return TAG_CLASS[t] || ""; }
 
+const PLACE_TOO = ["Champions Classic", "CBS Sports Classic"];
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
@@ -179,6 +180,11 @@ function rowHtml(g, browse) {
   } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }
+  // Champions Classic and CBS Sports Classic move every year, so their cards
+  // name the place as a second chip (his call 2026-09-11)
+  if (g.event && !g.stage && PLACE_TOO.indexOf(g.event) > -1 &&
+      (g.offsite || (g.neutral && g.city)))
+    tags.push(chip("champ", g.offsite || g.city));
   myTags(g.id).forEach(t => tags.push(chip("mine " + tagClass(t), t)));
   // overtime underlines the winning score rather than adding a chip
 

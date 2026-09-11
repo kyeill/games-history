@@ -139,6 +139,7 @@ const TAG_CLASS = { "Big Noon Kickoff": "g-yellow", "College GameDay": "g-red",
                     "Buy Game": "g-grey" };
 function tagClass(t) { return TAG_CLASS[t] || ""; }
 
+const PLACE_TOO = ["Champions Classic", "CBS Sports Classic"];
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
@@ -179,6 +180,11 @@ function rowHtml(g, browse) {
   } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }
+  // Champions Classic and CBS Sports Classic move every year, so their cards
+  // name the place as a second chip (his call 2026-09-11)
+  if (g.event && !g.stage && PLACE_TOO.indexOf(g.event) > -1 &&
+      (g.offsite || (g.neutral && g.city)))
+    tags.push(chip("champ", g.offsite || g.city));
   myTags(g.id).forEach(t => tags.push(chip("mine " + tagClass(t), t)));
   // overtime underlines the winning score rather than adding a chip
 

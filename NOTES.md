@@ -52,6 +52,18 @@ Orleans. An `event-overrides.json` entry forces the name whatever the count;
 "CBS Sports Classic" is there now (which also names the 2021 edition, a single
 game after the COVID cancellation).
 
+**Most one-off event names read better as the city** (his review of every
+basketball chip, 2026-09-11). `event-overrides.json` now forces the city for
+PK80, Phil Knight Invitational and Legacy, the Basketball Hall of Fame London
+Showcase, Milwaukee Hoops Showdown, Orlando Classic, Legends of Basketball
+Showcase, Las Vegas Clash, Holiday Hoopsgiving, Hall of Fame Tip-Off and the
+CBS Sports Thanksgiving Classic. Champions Classic and CBS Sports Classic keep
+their name AND add the place as a second chip (`PLACE_TOO` in app.js), since
+both move every year. The New York / Los Angeles / Chicago arena rule has one
+exception, `rules.CITY_NOT_VENUE`: Credit Union 1 Arena reads Chicago. A
+game with an event forced to the city still shows the ARENA when that city is
+one of those three metros -- the Thanksgiving Classic reads United Center.
+
 **Rank 99 means unranked**, not 99th. `curatedRank.current` is 99 for everyone
 outside the poll, and the ranks are the poll on the day of the game.
 
