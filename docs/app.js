@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-161400";
+const BUILD = "20260911-162507";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -348,8 +348,10 @@ function michCard(g, p) {
        m.rank ? chip("grey", (playoffGame(g) ? "UM NO. " : "UM #") + m.rank) : "",
        mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
     : uni.concat(p.tags)).filter(Boolean);
+  // "[nc1] WEEK 1" -- the number in brackets at the front, lower case like
+  // his sheet (his call 2026-09-11)
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
-    (mx.num ? esc(mx.num) + " \u00b7 " : "") + p.when;
+    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when;
   let cls = " mich" + (MDENSE ? " mdense" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +

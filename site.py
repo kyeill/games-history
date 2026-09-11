@@ -214,6 +214,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .mfin{margin-left:6px;font-size:12px;font-weight:400;
   color:var(--muted);font-style:normal}
 .row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
+/* the game number keeps his lower case inside the capitalised header */
+.row.mich .mnum{text-transform:none}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
 /* Dense: network over time, small, inside one team line -- side by side they

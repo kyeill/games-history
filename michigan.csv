@@ -1,18 +1,18 @@
 ﻿game_id,sport,season,date,opponent,emoji,border,caps,jersey,pants,accessories,uniform,note
-401520162,CFB,2023,2023-09-02,East Carolina,,,Y,,,,,
-401520202,CFB,2023,2023-09-09,Unlv,,,Y,,,,,
-401520232,CFB,2023,2023-09-16,Bowling Green,,,Y,,,,,
-401520260,CFB,2023,2023-09-23,Rutgers,,,Y,,,,,B1G East
-401520286,CFB,2023,2023-09-30,Nebraska,,,Y,,,,,B1G Crossover
-401520303,CFB,2023,2023-10-07,Minnesota,,,Y,,,,,
-401520321,CFB,2023,2023-10-14,Indiana,,,Y,,,,,B1G East
-401520340,CFB,2023,2023-10-21,Michigan State,🏈,,Y,,,,,B1G East
-401520368,CFB,2023,2023-11-04,Purdue,,,Y,,,,,
-401520394,CFB,2023,2023-11-11,Penn State,⭐,,Y,,,,,B1G East
-401520410,CFB,2023,2023-11-18,Maryland,,,Y,,,,,B1G East
-401520434,CFB,2023,2023-11-25,Ohio State,〽️,,Y,,,,,B1G East
-401539480,CFB,2023,2023-12-02,Iowa,🏆,,Y,,,,,
-401551786,CFB,2023,2024-01-01,Alabama,〽️,,Y,,,,,
+401520162,CFB,2023,2023-09-02,East Carolina,,,Y,Maize,Blue,Blue,,
+401520202,CFB,2023,2023-09-09,Unlv,,,Y,Maize,Blue,White,,
+401520232,CFB,2023,2023-09-16,Bowling Green,,,Y,Blue,Blue,Blue,,
+401520260,CFB,2023,2023-09-23,Rutgers,,,Y,Maize,Blue,Maize,,B1G East
+401520286,CFB,2023,2023-09-30,Nebraska,,,Y,White,Maize,White,,B1G Crossover
+401520303,CFB,2023,2023-10-07,Minnesota,,,Y,White,White,White,,
+401520321,CFB,2023,2023-10-14,Indiana,,,Y,Blue,Blue,Maize,,B1G East
+401520340,CFB,2023,2023-10-21,Michigan State,🏈,,Y,White,Blue,Blue,,B1G East
+401520368,CFB,2023,2023-11-04,Purdue,,,Y,Blue,Blue,White,,
+401520394,CFB,2023,2023-11-11,Penn State,⭐,,Y,White,Maize,Maize,,B1G East
+401520410,CFB,2023,2023-11-18,Maryland,,,Y,White,Blue,Blue,,B1G East
+401520434,CFB,2023,2023-11-25,Ohio State,〽️,,Y,Blue,Blue,Blue,,B1G East
+401539480,CFB,2023,2023-12-02,Iowa,🏆,,Y,Blue,Maize,White,,
+401551786,CFB,2023,2024-01-01,Alabama,〽️,,Y,Blue,Blue,Blue,,
 401551789,CFB,2023,2024-01-08,Washington,🏆,,Y,,,,,
 401826083,CBB,2025-26,2025-11-03,Oakland,,,,,,,,
 401817529,CBB,2025-26,2025-11-11,Wake Forest,,,,,,,,

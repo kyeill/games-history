@@ -841,14 +841,16 @@ def harvest():
                     keep[-1]["michigan"] = True
                     keep[-1]["mx"] = {k: v for k, v in mx.items() if v}
     keep.sort(key=lambda g: (g["date"], g["time"]))
-    # football game numbers for the Michigan view, as his sheet writes them:
-    # NC 1-3 for the non-conference games, B1G 1-9 for the conference ones
+    # game numbers for the Michigan view, as his sheet writes them (his call
+    # 2026-09-11, both sports): nc1, nc2 ... for non-conference games and g1,
+    # g2 ... for conference games, regular season only -- no number for a
+    # conference championship or tournament game or the postseason
     count = collections.Counter()
     for g in keep:
-        if g.get("michigan") and g["sport"] == "CFB" and not g["post"] and not g["champ"]:
-            key = (g["season"], len({t["conf"] for t in g["teams"]}) == 1)
+        if g.get("michigan") and not g["post"] and not g["champ"]:
+            key = (g["sport"], g["season"], len({t["conf"] for t in g["teams"]}) == 1)
             count[key] += 1
-            g["mx"]["num"] = ("B1G %d" if key[1] else "NC %d") % count[key]
+            g["mx"]["num"] = ("g%d" if key[2] else "nc%d") % count[key]
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf
