@@ -344,18 +344,24 @@ not on a Saturday: "WEEK 1 (THU)".
 
 **Michigan** is a fourth view on each tab -- a TRIAL (his call 2026-09-11),
 2023 football and 2025-26 basketball only for now. One card per Michigan game,
-every game that season: the same card frame, but ONE team line, the opponent,
-with its rank at the time, how far it went -- [Semis] in the CFP or NCAA
-Tournament, [#13] for a final AP ranking, or his SP+ / KenPom rank as (73+) --
-and the score from Michigan's side (34-17, no W or L -- a loss is the dashed,
-italic card). That rating and Michigan's own rank at the time sit together at
-the bottom right of the card: after the name they cut names off on a phone,
-and beside the date they wrapped the long tournament headers. A Dense /
-Compact button switches layouts: Compact adds a second line with his note;
-Dense moves the note into the chips and stacks the network over the time.
-With one season picked, tiles mark each football BYE and the start of the
-POSTSEASON, solid-bordered and in team-name type; each takes one card slot, so the
-desktop's three-across stays in step. All Years hides them. Headers lead with the game number in
+every game that season, in four rows. The HEADER: his emoji, the game number in
+brackets ([nc1] non-conference, [g1] conference), the week or stage -- and at
+the right all the TV information (network, time) with the date. The TEAM LINE,
+full width: the opponent's rank at the time, "at" / "vs.", the name ("^" marks
+last season's national champion), then how it finished -- [Semis] in the CFP or
+NCAA Tournament, [#13] for a final AP ranking, or his SP+ / KenPom as (73+) --
+and the score from Michigan's side (34-17, no W or L). The UNIFORM ROW: his
+jersey / pants / accessories chips, and Michigan's rank at the time in a maize
+box at the far right, under the score. The BOTTOM ROW: every other detail --
+his note, the place, the tags. A postseason win, or a win over Ohio State,
+Michigan State or Notre Dame, washes the whole card in the opponent's colour;
+a loss is dashed and muted. His details come from two spreadsheets read by
+`harvest.py`: `michigan.csv` (per game: emoji, border colour, caps Y/N, jersey /
+pants / accessories or one basketball uniform, note) and `ratings.csv` (per
+opponent per season: SP+ or KenPom). With one season picked, tiles mark each
+football BYE and the start of the POSTSEASON, solid-bordered in team-name type;
+each takes one card slot, so the desktop's three-across stays in step. All
+Years hides them. Headers lead with the game number in
 brackets, both sports: [nc1] for non-conference, [g1] for conference games. Losses are dashed and muted. His own details come
 from two spreadsheets in the repo, read by `harvest.py`: `michigan.csv` (per
 game: emoji, border colour, caps Y/N, jersey / pants / accessories or one

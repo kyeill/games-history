@@ -12,9 +12,6 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
-// the Michigan view's density switch, remembered on this device (dense by default)
-let MDENSE = true;
-try { MDENSE = localStorage.getItem("gh_mdense") !== "0"; } catch (e) { }
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null };
 
@@ -295,8 +292,8 @@ function rowHtml(g, browse) {
    the same frame as every other card: the header (his emoji and the NC / B1G
    game number in front), then ONE team line -- the opponent, with its rank at
    the time, its playoff finish [Semis] or final rank [#13] or his SP+/KenPom
-   (73+), and the result from Michigan's side. Compact adds a Michigan line
-   (Michigan's rank and his note); Dense folds those into the chips instead.
+   (73+), and the score from Michigan's side. Then a uniform row with
+   Michigan's rank in a maize box, and a bottom row of every other detail.
    His own columns come from michigan.csv via harvest: emoji, border, caps,
    uniform and note. */
 const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#f2f2f0",
@@ -321,46 +318,39 @@ function michCard(g, p) {
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
   const fin = mx.finish ? "[" + mx.finish + "]" : mx.final ? "[#" + mx.final + "]"
     : mx.rating ? "(" + mx.rating + "+)" : "";
-  const rankCell = t => '<span class="rk">' +
-    (t.rank ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>";
-  const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
-    '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
-    rankCell(opp) +
-    '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span></span>" +
-    // Michigan's score first; no W / L -- the wash, or the dashed italic card of
-    // a loss, already says it, and a phone needs the width for the name
-    '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
-  const mLine = '<div class="tl mm"><img class="crest" loading="lazy" src="' +
-    crest(m) + '" alt=""><span class="rk"></span><span class="nm">' +
-    esc(mx.note || "") + "</span><span></span></div>";
   const col = c => (c ? ' style="color:' + c + '"' : "");
-  const net = esc(primaryNet(g.nets) || "\u2014"), time = fmtTime(g.time);
-  const meta = MDENSE
-    ? '<div class="meta"><div class="mrow mstack"><span' + col(p.netCol) + ">" + net +
-      "</span><span" + col(p.timeCol) + ">" + time + "</span></div></div>"
-    : '<div class="meta"><div class="mrow"' + col(p.netCol) + ">" + net +
-      '</div><div class="mrow"' + col(p.timeCol) + ">" + time + "</div></div>";
-  const uni = (mx.uni || []).map(uniChip);
-  const chips = (MDENSE
-    ? [mx.note ? chip("grey", mx.note) : ""].concat(uni, p.tags)
-    : uni.concat(p.tags)).filter(Boolean);
-  // "[nc1] WEEK 1" -- the number in brackets at the front, lower case like
-  // his sheet (his call 2026-09-11)
+  // HEADER: his emoji, the game number and the week or stage at the left; ALL
+  // the TV information with the date at the right (his call 2026-09-11), which
+  // frees the full width below for the opponent
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
     (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when;
-  let cls = " mich" + (MDENSE ? " mdense" : "") + (lost ? " dimmed" : "") +
+  const tv = '<span class="mtv"><span' + col(p.netCol) + ">" +
+    esc(primaryNet(g.nets) || "\u2014") + "</span> <span" + col(p.timeCol) + ">" +
+    fmtTime(g.time) + "</span></span>";
+  // TEAM LINE: rank, name, "^" for last season's champion, the rating right
+  // after the name (the name shortens first), Michigan's score first
+  const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
+    '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
+    '<span class="rk">' + (opp.rank ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    "</span>" +
+    '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
+      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+    '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
+  // UNIFORM ROW: his jersey / pants / accessories, and Michigan's rank in a
+  // maize box at the far right, under the score (his call 2026-09-11)
+  const uniRow = (mx.uni || []).map(uniChip).join("") +
+    (m.rank ? '<span class="mrank">' + (playoffGame(g) ? "NO. " : "#") + m.rank +
+      "</span>" : "");
+  // BOTTOM ROW: every other detail -- his note, the place, the tags
+  const details = [mx.note ? chip("grey", mx.note) : ""].concat(p.tags).filter(Boolean);
+  // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
+  // washes the WHOLE card in the opponent's colour instead of its name line
+  const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
+  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     (playoffGame(g) ? " rk-no" : "");
-  // The opponent's rating and Michigan's rank at the time share the BOTTOM
-  // RIGHT of the card (his call 2026-09-11). After the name they cut names off
-  // on a phone; beside the date they wrapped the long tournament headers.
-  const side = (fin || m.rank) ? '<span class="mside">' +
-    (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") +
-    (fin && m.rank ? " \u00b7 " : "") +
-    (m.rank ? '<span class="hum">UM ' + (playoffGame(g) ? "NO. " : "#") + m.rank +
-      "</span>" : "") + "</span>" : "";
   // his border colour when he gives one; otherwise a loss is dashed and muted
   const bc = michColour(mx.border);
   let ring = "";
@@ -374,9 +364,11 @@ function michCard(g, p) {
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
-    '<div class="teams">' + oppLine + (MDENSE ? "" : mLine) + "</div>" + meta +
-    '<div class="tags">' + chips.join("") + side + "</div></button>";
+      '<span class="mhr">' + tv + '<span class="hdate">' + fmtDate(g.date) +
+      "</span></span></div>" +
+    '<div class="teams">' + oppLine + "</div>" +
+    '<div class="muni">' + uniRow + "</div>" +
+    '<div class="tags">' + details.join("") + "</div></button>";
 }
 
 /* Dividers in the Michigan view (his call 2026-09-11), only when one season
@@ -633,9 +625,9 @@ function filterChips() {
   let h = group("Year", select("season", "All Years",
     viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
-  // MICHIGAN (trial, 2026-09-11): Year, the density switch and the sort
+  // MICHIGAN (trial, 2026-09-11): Year and the sort
   if (VIEW === "michigan")
-    return h + group("", densityButton() + sortButton());
+    return h + group("", sortButton());
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
   // Marquee
@@ -793,12 +785,6 @@ function rivalsBorder(g) {
 function postButton() {
   return '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
     '">Postseason</button>';
-}
-
-// Michigan view: the button names the layout it is showing
-function densityButton() {
-  return '<button class="f" data-act="dense">' + (MDENSE ? "Dense" : "Compact") +
-    "</button>";
 }
 
 function sortButton() {
@@ -1118,9 +1104,6 @@ async function init() {
       FILT.marquee = !FILT.marquee;
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
-    } else if (b.dataset.act === "dense") {
-      MDENSE = !MDENSE;
-      try { localStorage.setItem("gh_mdense", MDENSE ? "1" : "0"); } catch (e) { }
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }

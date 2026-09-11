@@ -711,7 +711,15 @@ at 390px, none at 430px. In the header beside the date, the long NCAA
 Tournament headers wrapped to two lines under 430px. He moved both to the
 bottom right of the card (`.mside`, pushed right inside the chip row), which
 costs neither the name nor the header any width. Divider tiles: solid border,
-team-name type size, and no "weeks off" (his calls).
+team-name type size, and no "weeks off" (his calls). Then (same day) he moved
+ALL the TV information into the header beside the date, which drops the card's
+meta column entirely (`.row.mich` is one column: sport / teams / muni / tags)
+and gives the team line the full width -- so the rating went back after the
+name. Michigan's rank became a navy-on-maize box at the far right of the
+uniform row (`.mrank`, margin-right 6px so it sits under the score, whose line
+carries 6px of right padding). The Dense / Compact switch is gone: with the
+rows fixed there was nothing left for it to move. A postseason win or a win
+over a rival washes the whole card (`.mwash`) instead of the name line.
 
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
 (orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`

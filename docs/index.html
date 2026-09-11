@@ -183,22 +183,36 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-mine.g-red{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
 .t-mine.g-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-grey{background:#2c2c31;border-color:#414147;color:#bcbcb7}
-/* MICHIGAN view (trial, 2026-09-11): one opponent line, then Michigan's own */
-.row.mich .mfin{margin-left:6px;font-size:12px;font-weight:400;
-  color:var(--muted);font-style:normal}
-.row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
-/* the game number keeps his lower case inside the capitalised header */
+/* MICHIGAN view (trial, 2026-09-11): the TV information in the header, one
+   opponent line across the full width, a uniform row with Michigan's rank at
+   its far right, and every other detail in the bottom row */
+.row.mich{grid-template-columns:1fr;grid-template-areas:"sport" "teams" "muni" "tags"}
+.row.mich .sport{flex-wrap:wrap;row-gap:2px}
+.row.mich .mhr{margin-left:auto;display:flex;align-items:baseline;gap:10px;
+  white-space:nowrap}
+.row.mich .mtv{font-size:12.5px;font-weight:500;letter-spacing:0;
+  text-transform:none;color:var(--ink)}
 .row.mich .mnum{text-transform:none}
+.row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
 /* name then rating: the name shortens first, the rating stays whole */
 .row.mich .nm.mnm{display:flex;align-items:baseline;min-width:0}
 .row.mich .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.row.mich .mfin{flex:none}
-/* bottom right: the opponent's rating, then Michigan's rank (grey on a loss) */
-.row.mich .mside{margin-left:auto;font-size:12.5px;font-weight:500;
-  color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
-.row.mich .mside .mfin{margin-left:0}
-.row.mich .hum{color:#ffcb05}
-.row.mich.rk-grey .hum{color:var(--muted)}
+.row.mich .mfin{flex:none;margin-left:6px;font-size:12px;font-weight:400;
+  color:var(--muted);font-style:normal}
+.row.mich .muni{grid-area:muni;display:flex;flex-wrap:wrap;gap:5px;
+  align-items:center;margin-top:8px}
+.row.mich .muni:empty{display:none}
+/* Michigan's rank: navy on maize, far right under the score; muted on a loss */
+.row.mich .mrank{margin-left:auto;margin-right:6px;background:#ffcb05;color:#00274c;
+  font-size:12.5px;font-weight:700;padding:1px 7px;border-radius:4px;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.row.mich.dimmed .mrank{background:#3a3a40;color:#b4b4ae}
+/* a postseason win or a win over a rival washes the whole card */
+.row.mich.mwash{background:var(--winwash)}
+.row.mich.mwash .tl.won{background:transparent}
+.t-uni{background:#2c2c31;border-color:#414147;color:#d6d6d1}
+.t-uni i{display:inline-block;width:9px;height:9px;border-radius:2px;
+  margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px #55555c}
 /* a bye / postseason tile: one card slot, slim on a phone */
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;
   padding:6px 10px;border:1px solid var(--line);border-radius:9px;color:#9fb6cf;
@@ -347,6 +361,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-163835"></script>
+<script src="app.js?v=20260911-164417"></script>
 </body>
 </html>
