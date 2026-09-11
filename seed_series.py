@@ -124,6 +124,16 @@ SERIES = [
     ("401575457", "Home & Home", "CBB 2023-24 Kansas at Indiana"),
     ("401575804", "Home & Home", "CBB 2023-24 UCLA at Villanova"),
     ("401707854", "Home & Home", "CBB 2024-25 Tennessee at Illinois"),
+    # his rulings on the games the new TV rules brought in (2026-09-11)
+    ("401577603", "Home & Home", "CBB 2023-24 Notre Dame at Marquette"),
+    ("401577597", "Home & Home", "CBB 2023-24 Alabama at Creighton"),
+    ("401715468", "Home & Home", "CBB 2024-25 Notre Dame at Georgetown"),
+    ("401812794", "Home & Home", "CBB 2025-26 Texas at Connecticut"),
+    ("401817514", "Home & Home", "CBB 2025-26 Maryland at Virginia"),
+    ("401372112", "Home & Home", "CBB 2021-22 Arizona at Illinois"),
+    # the other leg of a series he ruled, brought in by Rivals (2026-09-11)
+    ("401520233", "Home & Home", "CFB 2023    Washington at Michigan State"),
+    ("401575510", "Home & Home", "CBB 2023-24 Texas A&M at Ohio State"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),
@@ -141,10 +151,16 @@ SERIES = [
     ("401520182", "Neutral & Neutral", "CFB 2023    Louisiana State at Florida State"),
     # the other leg of a series he ruled, brought in by the new TV rules (2026-09-11)
     ("401715614", "Neutral & Neutral", "CBB 2024-25 Gonzaga at Connecticut"),
+    # his rulings on the games the new TV rules brought in (2026-09-11)
+    ("401812266", "Neutral & Neutral", "CBB 2025-26 Arizona at Alabama"),
+    ("401823567", "Neutral & Neutral", "CBB 2025-26 Wisconsin at Villanova"),
     # --- Home & Neutral
     ("401826785", "Home & Neutral", "CBB 2025-26 Arkansas at Michigan State"),
     ("401752667", "Home & Neutral", "CFB 2025    Auburn at Baylor"),
     ("401856636", "Home & Neutral", "CFB 2026    Baylor at Auburn"),
+    # his rulings on the games the new TV rules brought in (2026-09-11)
+    ("401827208", "Home & Neutral", "CBB 2025-26 Indiana at Kentucky"),
+    ("401856766", "Home & Neutral", "CFB 2026    North Carolina at Texas Christian"),
 ]
 
 ANNUAL = [
@@ -161,6 +177,8 @@ ANNUAL = [
     ("CBB", "142", "2305", "Missouri / Kansas"),
     ("CFB", "264", "265", "Washington / Washington State"),
     ("CFB", "204", "2483", "Oregon State / Oregon"),
+    ("CBB", "183", "46", "Syracuse / Georgetown"),
+    ("CBB", "164", "2550", "Rutgers / Seton Hall"),
 ]
 
 # An annual series that only began in a given season (his call 2026-09-11).
@@ -181,6 +199,10 @@ NOT_SERIES = [
     ("CFB", "221", "87", "Pittsburgh / Notre Dame", "a season apart; he ignores it"),
     ("CBB", "239", "2250", "Baylor / Gonzaga", "a season apart; he ignores it"),
     ("CBB", "150", "356", "Duke / Illinois", "a season apart; he ignores it"),
+    ("CBB", "57", "201", "Florida / Oklahoma", "he rejects the home & neutral reading"),
+    ("CBB", "2050", "282", "Ball State / Indiana State", "he does not count it as annual"),
+    ("CBB", "2287", "2050", "Illinois State / Ball State", "three straight; skipped"),
+    ("CBB", "2641", "150", "Texas Tech / Duke", "the same neutral site both years; skipped"),
 ]
 
 BUY_GAMES = [
