@@ -256,6 +256,9 @@ function rowHtml(g, browse) {
     // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
     // looked like a rival loss to a black-and-gold winner such as Iowa
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
+    // ranking colour (his call 2026-09-11), every view: a Michigan loss greys
+    // the rankings; otherwise an upset paints them Sports Daily's orange
+    ((michTeam(g) && !michTeam(g).win) ? " rk-mloss" : isUpset(g) ? " rk-upset" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -302,6 +305,11 @@ function bigViewAllows(g) {
 }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
+// An upset: a ranked team lost to an unranked or a worse-ranked team.
+function isUpset(g) {
+  const w = g.teams.find(t => t.win), l = g.teams.find(t => !t.win);
+  return !!(w && l && l.rank && (!w.rank || w.rank > l.rank));
+}
 
 /* A result he does not want to relive: a rival won, or Michigan lost. Both
    team lines go italic. */

@@ -159,6 +159,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
 .rk:not(:empty)::before{content:"#"}
+/* rankings: orange on an upset (Sports Daily's accent), grey when Michigan lost */
+.row.rk-upset .rk{color:var(--accent)}
+.row.rk-mloss .rk{color:var(--muted)}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
 /* overtime: the winning score is underlined, instead of an OT chip */

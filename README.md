@@ -333,6 +333,12 @@ Notre Dame football against an ACC team from 2014 on is never tagged Home &
 Home, Neutral & Neutral or Home & Neutral (his call 2026-09-11): the ACC
 scheduling agreement makes those return trips a rotation, not a series.
 
+**Rankings change colour** (his call 2026-09-11), on every tab. On an upset --
+a ranked team beaten by an unranked or worse-ranked one -- both rankings turn
+the orange Sports Daily uses for an upset in progress (#e0834f). On any game
+Michigan lost they turn grey instead, even when it was also an upset. Every
+other game keeps the usual blue.
+
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
 Kyle chose it over washing the whole row, which turns a long list into a colour

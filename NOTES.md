@@ -688,6 +688,14 @@ NBC sit under it -- but #005ae4 replaced #1c4469, which measured **1.64:1** and
 was genuinely invisible. Measure any new tint before shipping it; the card is
 dark and dark blues vanish.
 
+**Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
+(orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-mloss` (grey, `--muted`
+#9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. A Michigan
+loss is tested first, so an upset Michigan suffered reads grey. The upset test
+is by rank alone (`isUpset` in app.js: the loser ranked, the winner unranked or
+worse-ranked) -- deliberately NOT the Key Games type, which files a game once
+and would miss upsets it filed as Top 10 Games or Ranked Big Ten.
+
 **ESPN sometimes records a network game with only its STREAMING feed.**
 Texas A&M at Florida (2024-09-14) reads "ESPN+, ESPN3" and nothing else -- a
 weather delay, and `geoBroadcasts` is empty too, so nothing in ESPN's data
