@@ -241,6 +241,15 @@ and Michigan State in basketball; leaving it restores the season and team a
 normal view opens on. The Year dropdown lists only the seasons the current view
 can show.
 
+**What else reaches Rivals** (his calls 2026-09-11): every loss to Michigan,
+in both sports and whatever else is true of the game -- Notre Dame basketball
+included, though its other games count only in the NCAA Tournament -- and any
+rival loss in a series he has tagged (Home & Home, Neutral & Neutral, Home &
+Neutral), which is how plain losses such as Oklahoma at Ohio State (2017) and
+Northeastern at Michigan State (2016-17) arrive. The series tags now reach back
+to 2014 for rival losses. Where ESPN forgot a ranking on an old game, that
+week's AP poll supplies it. Rounds are spelled out: Sweet Sixteen, Elite Eight.
+
 **Rivals has its own filters** (his call 2026-09-11): Rival (far left), Year
 and Winner, plus a Postseason button -- off shows every game, pressed shows only
 the CFP and the NCAA Tournament. No week, month, game type, TV window, team or

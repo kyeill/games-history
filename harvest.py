@@ -4,10 +4,11 @@ Past games never change, so this runs once per new week of games -- there is
 no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
-import collections, datetime as dt, json, os, sys
+import collections, datetime as dt, json, os, re, sys
 from zoneinfo import ZoneInfo
 import requests
 import rules
+import seed_series
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "cache")
@@ -155,6 +156,41 @@ def events(code, y):
         seen = set()
         ev = [x for x in ev if not (x["id"] in seen or seen.add(x["id"]))]
     return ev
+
+
+POLLS = os.path.join(CACHE, "polls")
+CORE = "https://sports.core.api.espn.com/v2/sports"
+POLL_PATHS = {"CFB": "football/leagues/college-football",
+              "CBB": "basketball/leagues/mens-college-basketball"}
+
+
+def ap_ranks(code, y, week):
+    """That week's AP poll as {team id: rank}, cached under cache/polls/.
+
+    ESPN's scoreboard sometimes forgets a ranking on an old game -- Oklahoma #5
+    at Ohio State #2 in 2017 reads unranked on both sides -- and the core API's
+    week-by-week AP poll does not. Basketball polls are filed under the year
+    the season ends. A poll is cached once it has ranks or its season is over.
+    """
+    season = y if code == "CFB" else y + 1
+    path = os.path.join(POLLS, "%s-%d-w%02d.json" % (code.lower(), season, week))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))
+    ranks = {}
+    try:
+        r = requests.get("%s/%s/seasons/%d/types/2/weeks/%d/rankings/1"
+                         % (CORE, POLL_PATHS[code], season, week), timeout=30)
+        if r.status_code == 200:
+            for t in r.json().get("ranks") or []:
+                m = re.search(r"/teams/([0-9]+)", (t.get("team") or {}).get("$ref", ""))
+                if m:
+                    ranks[m.group(1)] = t.get("current")
+    except requests.RequestException:
+        return {}
+    if ranks or season_over(code, y):
+        os.makedirs(POLLS, exist_ok=True)
+        json.dump(ranks, open(path, "w", encoding="utf-8"))
+    return ranks
 
 
 def rank_of(c):
@@ -377,6 +413,18 @@ def harvest():
     latest_conf = {}          # (sport, team id) -> (date, conference id)
     overrides = load_overrides()
     extras = load_extras()
+    # A rival loss in a series he ruled (seed_series.SERIES) or tagged from his
+    # phone reaches Rivals whatever else is true of it -- before this, a plain
+    # home and home loss such as Oklahoma at Ohio State (2017) never did.
+    series_ids = {gid for gid, _tag, _label in seed_series.SERIES}
+    try:
+        for gid, entry in json.load(open(os.path.join(HERE, "docs", "tags.json"),
+                                         encoding="utf-8")).items():
+            if set(entry.get("tags") or []) & {"Home & Home", "Neutral & Neutral",
+                                               "Home & Neutral"}:
+                series_ids.add(gid)
+    except (OSError, ValueError):
+        pass
     shows = show_games()
     ev_overrides = load_event_overrides()
     for code in ("CFB", "CBB"):
@@ -407,8 +455,10 @@ def harvest():
                 # meeting only counts when rules.RIVALS_INCLUDE names the game.
                 stype = (x.get("season") or {}).get("type")
                 rivals_here = rules.RIVALS_BY_SPORT[code]
-                # Notre Dame basketball counts only in the NCAA Tournament
-                if rules.is_ncaa_tournament(
+                # Notre Dame basketball counts only in the NCAA Tournament --
+                # or against Michigan, whose every win over a rival counts
+                michigan_won = any(k["team"]["id"] == "130" and k.get("winner") for k in cs)
+                if michigan_won or rules.is_ncaa_tournament(
                         stype, [n.get("headline") for n in (c.get("notes") or [])]):
                     rivals_here = rivals_here | rules.RIVALS_NCAA_ONLY.get(code, set())
                 rival_loss = (
@@ -437,6 +487,13 @@ def harvest():
                             d, str(k["team"].get("conferenceId")))
                 nets = set(networks(c))
                 ranks = [rank_of(k) for k in cs]
+                # a rival loss with no ranking on either side asks that week's
+                # AP poll, because ESPN drops some old rankings (see ap_ranks)
+                ap = {}
+                if rival_loss and stype == 2 and not any(ranks):
+                    wk_no = (x.get("week") or {}).get("number")
+                    if wk_no:
+                        ap = ap_ranks(code, y, wk_no)
                 confs = [str(k["team"].get("conferenceId")) for k in cs]
                 win = [k for k in cs if k.get("winner")]
                 lose = [k for k in cs if not k.get("winner")]
@@ -556,7 +613,10 @@ def harvest():
                 # site, or sat in a Marquee window. (The home & home family is
                 # checked in the app, since those tags live in tags.json.)
                 rivals = rival_loss and bool(
-                    postseason or tourney_round or any(ranks) or c.get("neutralSite")
+                    michigan_won                         # every loss to Michigan (his call)
+                    or x["id"] in series_ids             # a home and home, and the like
+                    or postseason or tourney_round or any(ranks) or c.get("neutralSite")
+                    or any(ap.get(k["team"]["id"]) for k in cs)
                     or rules.is_marquee(code, nets, d, slots, big_ten=(bt in confs),
                                         tourney=tourney))
                 if not normal and not rivals:
@@ -589,7 +649,8 @@ def harvest():
                                       "color": t.get("color"),
                                       "alt": t.get("alternateColor")}
                     side.append({"id": t["id"], "score": int(k["score"]),
-                                 "rank": rank_of(k), "win": bool(k.get("winner")),
+                                 "rank": rank_of(k) or (ap.get(t["id"]) if rivals_only else None),
+                                 "win": bool(k.get("winner")),
                                  "home": k.get("homeAway") == "home",
                                  "conf": str(t.get("conferenceId"))})
                 v = c.get("venue") or {}

@@ -134,6 +134,17 @@ SERIES = [
     # the other leg of a series he ruled, brought in by Rivals (2026-09-11)
     ("401520233", "Home & Home", "CFB 2023    Washington at Michigan State"),
     ("401575510", "Home & Home", "CBB 2023-24 Texas A&M at Ohio State"),
+    # Rivals losses before 2021, from a scan of every rival loss since 2014 (2026-09-11)
+    ("400816805", "Home & Home", "CBB 2015-16 Ohio State at Connecticut"),
+    ("400915070", "Home & Home", "CBB 2016-17 Northeastern at Michigan State"),
+    ("400547953", "Home & Home", "CFB 2014    Michigan State at Oregon"),
+    ("400547826", "Home & Home", "CFB 2014    Virginia Tech at Ohio State"),
+    ("400868946", "Home & Home", "CFB 2016    Notre Dame at Texas"),
+    ("400934502", "Home & Home", "CFB 2017    Oklahoma at Ohio State"),
+    ("400934581", "Home & Home", "CFB 2017    Notre Dame at Miami"),
+    ("400868955", "Home & Home", "CFB 2016    Virginia Tech at Notre Dame"),
+    ("400933845", "Home & Home", "CFB 2017    Georgia at Notre Dame"),
+    ("401012727", "Home & Home", "CFB 2018    Michigan State at Arizona State"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),
@@ -161,6 +172,8 @@ SERIES = [
     # his rulings on the games the new TV rules brought in (2026-09-11)
     ("401827208", "Home & Neutral", "CBB 2025-26 Indiana at Kentucky"),
     ("401856766", "Home & Neutral", "CFB 2026    North Carolina at Texas Christian"),
+    # Rivals losses before 2021, from a scan of every rival loss since 2014 (2026-09-11)
+    ("400548302", "Home & Neutral", "CFB 2014    Notre Dame at Arizona State"),
 ]
 
 ANNUAL = [

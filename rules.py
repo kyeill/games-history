@@ -335,7 +335,7 @@ def cbb_showcase(headlines):
 ROUND_NAMES = (("first four", "First Four"), ("1st round", "Round 1"),
                ("first round", "Round 1"), ("2nd round", "Round 2"),
                ("second round", "Round 2"), ("3rd round", "Round 3"),
-               ("sweet 16", "Sweet 16"), ("elite 8", "Elite 8"),
+               ("sweet 16", "Sweet Sixteen"), ("elite 8", "Elite Eight"),
                ("final four", "Final Four"), ("quarterfinal", "Quarters"),
                ("semifinal", "Semis"), ("championship", "Championship"),
                ("final", "Championship"))

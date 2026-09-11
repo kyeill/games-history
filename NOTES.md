@@ -472,6 +472,25 @@ and a bowl or CFP game has no week, so its block is its date -- and the string
 "2025-15" sorts after "2025-12-31". The Big Ten title game landed ahead of the
 CFP quarterfinal played three weeks later. Rivals orders by true date instead.
 
+**ESPN drops some old rankings; the AP poll does not.** Oklahoma #5 at Ohio
+State #2 (2017) and Michigan State #16 at Northwestern (2017) both read
+unranked on ESPN's scoreboard (curatedRank 99 on both sides), so neither
+reached Rivals. ESPN's core API serves the AP poll by season and week
+(.../seasons/S/types/2/weeks/W/rankings/1, with basketball filed under the year
+the season ends), and `harvest.ap_ranks` asks it when a rival loss has no
+ranking at all. Measured across every rival loss since 2014 it matters for only
+three games, so it is used for Rivals alone and never rewrites Key Games ranks.
+
+**The series scan could not see Rivals history.** It judged only games already
+in the archive, from 2019. A Rivals home and home before that, or a plain loss
+that no other rule brought in, was invisible twice over: never scanned, and
+never harvested. The fix works from both ends -- a scan of every rival loss
+since 2014 against the full schedules plus the filtered rival caches back to
+2013 (which found every pair he named: Michigan State-Arizona State, Ohio
+State-Oklahoma, Notre Dame against Georgia, Miami and Texas, Ohio State-Virginia
+Tech), and harvest keeping any rival loss whose id is in seed_series.SERIES or
+carries a series tag in tags.json.
+
 **A game kept only for Rivals must not leak into the other views.** Harvest
 drops postseason games at the top of its loop and non-final conference
 tournament rounds near the bottom. A rival's loss in either is now kept, and
