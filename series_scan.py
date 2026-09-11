@@ -382,7 +382,7 @@ def main():
             lines += ["", "== %s  (%d) ==" % (cls, len(items))]
             for k, v in items:
                 legs = sorted(v, key=lambda q: q["date"])
-                done = ("   (ruled out)" if (k[1], k[2]) in ruled_out
+                done = ("   (ruled out)" if (k[1], k[2]) in ruled_out or nd_acc(k, legs)
                         else "" if untagged(legs) else "   (already tagged)")
                 lines.append("  %s / %s%s" % (nm(legs[0]["away"], legs[0]["aloc"]),
                                               nm(legs[0]["home"], legs[0]["hloc"]), done))
