@@ -145,6 +145,13 @@ SERIES = [
     ("400868955", "Home & Home", "CFB 2016    Virginia Tech at Notre Dame"),
     ("400933845", "Home & Home", "CFB 2017    Georgia at Notre Dame"),
     ("401012727", "Home & Home", "CFB 2018    Michigan State at Arizona State"),
+    # rival losses from 2019 on that the first Rivals scan missed (2026-09-11)
+    ("401715410", "Home & Home", "CBB 2024-25 Pittsburgh at Ohio State"),
+    ("401817447", "Home & Home", "CBB 2025-26 Ohio State at Pittsburgh"),
+    ("401110800", "Home & Home", "CFB 2019    Notre Dame at Georgia"),
+    ("401112227", "Home & Home", "CFB 2019    Notre Dame at Michigan"),
+    ("401112214", "Home & Home", "CFB 2019    Arizona State at Michigan State"),
+    ("401628490", "Home & Home", "CFB 2024    Michigan State at Boston College"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),

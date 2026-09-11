@@ -444,6 +444,24 @@ Dame, Notre Dame-Navy): otherwise an untagged pair looks like an open question
 forever, and a seeder run strips any series tag its games already carry --
 which is how Notre Dame-Navy's four Annual tags came off.
 
+**series_scan records carry NO winner.** `load_all()` keeps teams, venue and
+conference but not who won, so a check that picks rival LOSSES out of them
+finds none from 2019 on -- only the 2013-2020 rival caches, which keep the raw
+competitors, ever produced a loss. The fix is to read `winner` from the same
+cached schedules via `load_season()`. Done right (2026-09-11), it turned up six
+untagged rival-loss legs, now Home & Home in `seed_series.SERIES`: Pittsburgh
+at Ohio State (2024-25) and Ohio State at Pittsburgh (2025-26) in basketball;
+Notre Dame at Georgia, Notre Dame at Michigan and Arizona State at Michigan
+State (all 2019) and Michigan State at Boston College (2024) in football. Three
+of those were not in the archive at all; the series tag is what brought them
+into Rivals.
+
+**The scan reaches one season apart, no further.** A home & home stretched
+wider reads as two one-offs: LSU at UCLA (2021) and UCLA at LSU (2024) is the
+clearest case. The non-conference review list of 2026-09-11 prints every other
+meeting of the pair beside each "one-off" so a longer gap can be spotted by
+eye rather than widening the rule.
+
 **Annual is by pair, and counts NON-CONFERENCE meetings only.** It maintains
 itself: Washington-Washington State 2026 was tagged as soon as the pair was
 listed (his call 2026-09-11, "as is Oregon-Oregon State"). But both pairs were
@@ -639,6 +657,19 @@ a dozen 2023 fixtures. **Both games he reported missing were WEATHER DELAYED**:
 USC at Purdue reads 6:45pm because of the delay, and Texas A&M at Florida lost
 its network entirely. Those are `window-overrides.json` entries, not rule
 changes. Read a missing game as a data problem before widening a rule.
+
+**Seven tabbed games have NO network at all, and ESPN has none to give.**
+Checked 2026-09-11: the scoreboard's `broadcasts`, `geoBroadcasts` and
+`broadcast` are empty, and the per-game summary endpoint is empty too. Five are
+Rivals-only basketball and football (Butler-Ohio State at the 2017 PK80,
+Wisconsin-Ohio State 2019-03-10, Michigan State at Wisconsin football
+2019-10-12, Florida-Ohio State at the 2021 Fort Myers Tip-Off, Iowa-Ohio State
+2022-02-19); one is on TV Windows (Indiana State-Ball State, 2023 Indy Classic)
+and one on Key Games (Ole Miss-Purdue, 2024-11-29). The card just shows no
+network. `window-overrides.json` cannot help -- it sets windows, not networks
+-- so a fix would be a new network-override file. Separately, 244 games carry
+only networks outside `NET_PRIORITY`; they still display, because the primary
+network falls back to the first one listed.
 
 **An override re-files a game; an EXTRA only files it.** `window-overrides.json`
 replaces a game's windows, and the header follows them. `window-extras.json`
