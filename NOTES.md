@@ -704,6 +704,15 @@ weeks/3. His sheet keeps uniforms, borders and caps as cell FORMATTING, so
 they come from `michigan.csv`, not an import. Printing the emoji to the Windows
 console raises UnicodeEncodeError -- set PYTHONIOENCODING=utf-8; the data is fine.
 
+**Where the Michigan view puts the rating and Michigan rank** (measured on the
+live site, 2026-09-11). After the opponent name, the name gave way on small
+phones: 5 of 15 football and 16 of 40 basketball names cut at 375px, 2 and 4
+at 390px, none at 430px. In the header beside the date, the long NCAA
+Tournament headers wrapped to two lines under 430px. He moved both to the
+bottom right of the card (`.mside`, pushed right inside the chip row), which
+costs neither the name nor the header any width. Divider tiles: solid border,
+team-name type size, and no "weeks off" (his calls).
+
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
 (orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`
 #9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. Grey is

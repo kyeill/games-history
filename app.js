@@ -326,11 +326,8 @@ function michCard(g, p) {
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     rankCell(opp) +
-    // the rating rides after the name (his call 2026-09-11); when they do not
-    // both fit, the NAME shortens and the rating stays whole
     '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
-      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span></span>" +
     // Michigan's score first; no W / L -- the wash, or the dashed italic card of
     // a loss, already says it, and a phone needs the width for the name
     '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
@@ -356,6 +353,14 @@ function michCard(g, p) {
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     (playoffGame(g) ? " rk-no" : "");
+  // The opponent's rating and Michigan's rank at the time share the BOTTOM
+  // RIGHT of the card (his call 2026-09-11). After the name they cut names off
+  // on a phone; beside the date they wrapped the long tournament headers.
+  const side = (fin || m.rank) ? '<span class="mside">' +
+    (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") +
+    (fin && m.rank ? " \u00b7 " : "") +
+    (m.rank ? '<span class="hum">UM ' + (playoffGame(g) ? "NO. " : "#") + m.rank +
+      "</span>" : "") + "</span>" : "";
   // his border colour when he gives one; otherwise a loss is dashed and muted
   const bc = michColour(mx.border);
   let ring = "";
@@ -369,18 +374,15 @@ function michCard(g, p) {
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      // Michigan's rank at the time sits beside the date (his option C)
-      '<span class="hdate">' + (m.rank ? '<span class="hum">UM ' +
-        (playoffGame(g) ? "NO. " : "#") + m.rank + "</span> \u00b7 " : "") +
-      fmtDate(g.date) + "</span></div>" +
+      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
     '<div class="teams">' + oppLine + (MDENSE ? "" : mLine) + "</div>" + meta +
-    '<div class="tags">' + chips.join("") + "</div></button>";
+    '<div class="tags">' + chips.join("") + side + "</div></button>";
 }
 
 /* Dividers in the Michigan view (his call 2026-09-11), only when one season
-   is picked: a BYE for each Saturday a football schedule skips, POSTSEASON
-   where the conference title game or tournament begins, and "N WEEKS OFF"
-   before a postseason game after a long wait. Each is a TILE in the grid, so
+   is picked: a BYE for each Saturday a football schedule skips, and
+   POSTSEASON where the conference title game or tournament begins. Each is a
+   TILE in the grid, so
    on a desktop it takes one card's slot and three-across stays in step. */
 function michListHtml(list) {
   const cards = list.map(g => rowHtml(g, false));
@@ -393,13 +395,10 @@ function michListHtml(list) {
   for (let i = 1; i < list.length; i++) {
     const a = list[i - 1], b = list[i];
     const lo = Math.min(day(a.date), day(b.date)), hi = Math.max(day(a.date), day(b.date));
-    const off = Math.floor((hi - lo) / 7);
     const gaps = [];
     if (post(a) !== post(b)) {
-      gaps.push("Postseason" + (hi - lo >= 14 ? " \u00b7 " + off + " weeks off" : ""));
-    } else if (post(a)) {
-      if (hi - lo >= 14) gaps.push(off + " weeks off");
-    } else if (a.sport === "CFB") {
+      gaps.push("Postseason");
+    } else if (!post(a) && a.sport === "CFB") {
       for (let d = lo + 4; d <= hi - 4; d++)
         if (new Date(d * 864e5).getUTCDay() === 6) gaps.push("Bye \u00b7 " + fmtDate(iso(d)));
       if (SORT !== "asc") gaps.reverse();

@@ -346,14 +346,15 @@ not on a Saturday: "WEEK 1 (THU)".
 2023 football and 2025-26 basketball only for now. One card per Michigan game,
 every game that season: the same card frame, but ONE team line, the opponent,
 with its rank at the time, how far it went -- [Semis] in the CFP or NCAA
-Tournament, [#13] for a final AP ranking, or his SP+ / KenPom rank as (73+) right
-after the name (the name shortens first when both do not fit) -- and the score
-from Michigan's side (34-17, no W or L -- a loss is the dashed, italic card).
-Michigan's own rank at the time sits in the header beside the date. A Dense /
+Tournament, [#13] for a final AP ranking, or his SP+ / KenPom rank as (73+) --
+and the score from Michigan's side (34-17, no W or L -- a loss is the dashed,
+italic card). That rating and Michigan's own rank at the time sit together at
+the bottom right of the card: after the name they cut names off on a phone,
+and beside the date they wrapped the long tournament headers. A Dense /
 Compact button switches layouts: Compact adds a second line with his note;
 Dense moves the note into the chips and stacks the network over the time.
-With one season picked, tiles mark each football BYE, the start of the
-POSTSEASON and any long wait (4 WEEKS OFF); each takes one card slot, so the
+With one season picked, tiles mark each football BYE and the start of the
+POSTSEASON, solid-bordered and in team-name type; each takes one card slot, so the
 desktop's three-across stays in step. All Years hides them. Headers lead with the game number in
 brackets, both sports: [nc1] for non-conference, [g1] for conference games. Losses are dashed and muted. His own details come
 from two spreadsheets in the repo, read by `harvest.py`: `michigan.csv` (per
