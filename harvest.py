@@ -15,6 +15,9 @@ OUT = os.path.join(HERE, "output")
 ET = ZoneInfo("America/New_York")
 BASE = "https://site.api.espn.com/apis/site/v2/sports"
 SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
+# Rivals reaches further back (his call 2026-09-11), for his rivals only --
+# see rival_events
+RIVAL_SEASONS = list(range(2014, 2021))
 
 
 def season_over(code, y):
@@ -60,14 +63,72 @@ def cbb_range(d, e, keep, tag=""):
     got = fetch(sport, {"dates": "%s-%s" % (d.strftime("%Y%m%d"), e.strftime("%Y%m%d")),
                         "groups": grp, "limit": 1000},
                 "cbb-%s%s" % (d.strftime("%Y%m%d"), tag), keep).get("events", [])
+    # A week that CROSSES from regular season into postseason is cut short the
+    # same way: ESPN returns only its regular-season days (the seasontype
+    # parameter does not change that), which lost every NCAA game in the week
+    # of 13 March 2016 and 14 March 2021. So when the newest game returned is
+    # earlier than the last day asked for, the rest is asked one day at a time.
     if got:
-        return got
-    out, day = [], d
+        last = max(dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                   .replace(tzinfo=dt.timezone.utc).astimezone(ET).date()
+                   for x in got if x.get("date"))
+        if last >= e:
+            return got
+        start = last
+    else:
+        start = d
+    out, seen, day = list(got), {x.get("id") for x in got}, start
     while day <= e:
-        out += fetch(sport, {"dates": day.strftime("%Y%m%d"), "groups": grp, "limit": 1000},
-                     "cbb-day-%s%s" % (day.strftime("%Y%m%d"), tag), keep).get("events", [])
+        for x in fetch(sport, {"dates": day.strftime("%Y%m%d"), "groups": grp, "limit": 1000},
+                       "cbb-day-%s%s" % (day.strftime("%Y%m%d"), tag), keep).get("events", []):
+            if x.get("id") not in seen:
+                seen.add(x.get("id"))
+                out.append(x)
         day += dt.timedelta(days=1)
     return out
+
+
+def rival_events(code, y):
+    """Every game Ohio State, Michigan State or Notre Dame (football) played in a
+    season BEFORE the archive, for the Rivals view.
+
+    The whole scoreboard is fetched but only those games are cached, as
+    cache/rivals-SPORT-SEASON.json, so seven old seasons cost kilobytes in the
+    Drive-synced cache rather than gigabytes. Football is fetched in three
+    ranges, because a whole season runs close to the 1,000-event cap. ESPN
+    occasionally returns an event with no id; those are skipped.
+    """
+    path = os.path.join(CACHE, "rivals-%s-%d.json" % (code.lower(), y))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))["events"]
+    sport, grp = SPORTS[code]
+    wanted = rules.RIVALS_BY_SPORT[code]
+    ev = []
+    if code == "CFB":
+        for rng in ("%d0801-%d0930" % (y, y), "%d1001-%d1130" % (y, y),
+                    "%d1201-%d0131" % (y, y + 1)):
+            got = fetch(sport, {"dates": rng, "groups": grp, "limit": 1000}, "x",
+                        cacheable=False).get("events", [])
+            if len(got) >= 1000:
+                print("  WARN: %s hit the 1000 cap" % rng, file=sys.stderr)
+            ev += got
+    else:
+        d, end = dt.date(y, 11, 1), dt.date(y + 1, 4, 10)
+        while d < end:
+            e = min(d + dt.timedelta(days=6), end)
+            ev += cbb_range(d, e, False)
+            d = e + dt.timedelta(days=1)
+    seen, keep = set(), []
+    for x in ev:
+        cs = (x.get("competitions") or [{}])[0].get("competitors") or []
+        if not x.get("id") or x["id"] in seen:
+            continue
+        if any((k.get("team") or {}).get("id") in wanted for k in cs):
+            seen.add(x["id"])
+            keep.append(x)
+    if season_over(code, y):
+        json.dump({"events": keep}, open(path, "w", encoding="utf-8"))
+    return keep
 
 
 def events(code, y):
@@ -320,8 +381,10 @@ def harvest():
     ev_overrides = load_event_overrides()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
-        for y in SEASONS:
-            evs = events(code, y)
+        for y in RIVAL_SEASONS + SEASONS:
+            # before the archive, only games his rivals played -- for Rivals alone
+            archive_era = y in SEASONS
+            evs = events(code, y) if archive_era else rival_events(code, y)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
@@ -455,8 +518,17 @@ def harvest():
                 # Being a conference-tournament game is NOT a qualification on
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.
+                # Basketball events he wants every year, and football
+                # neutral-site kickoffs in August and September (his calls
+                # 2026-09-11): on TV Windows whatever the network or time
+                showcase = (code == "CBB" and stype == 2
+                            and rules.cbb_showcase(heads))
+                kickoff = (code == "CFB" and stype == 2 and rules.cfb_neutral_kickoff(
+                    d, y, bool(c.get("neutralSite")),
+                    [(k["team"]["id"], str(k["team"].get("conferenceId"))) for k in cs]))
                 normal = bool(slots or gtype or title or black_friday or show
-                              or opener or x["id"] in overrides or x["id"] in extras)
+                              or opener or showcase or kickoff
+                              or x["id"] in overrides or x["id"] in extras)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
                 # 2026-09-09). ESPN publishes no rankings for tournament games
@@ -473,7 +545,7 @@ def harvest():
                 # when a show broadcast from it -- he does not want postseason
                 # under Big Noon or GameDay, and the 2024 Mountain West
                 # Championship is the case that tests it.
-                if (tourney_round and not title) or postseason:
+                if (tourney_round and not title) or postseason or not archive_era:
                     normal = False
                 # A rival's loss counts for Rivals when it was postseason or a
                 # conference tournament, had a ranked team, was at a neutral
@@ -490,6 +562,7 @@ def harvest():
                 rivals_only = not normal
                 if rivals_only:
                     slots, gtype, black_friday, show, opener = set(), None, False, False, False
+                    showcase = kickoff = False
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.
                 if title:
@@ -544,6 +617,12 @@ def harvest():
                     "event": event, "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
+                    "rivals_only": rivals_only,
+                    "showcase": showcase, "kickoff": kickoff,
+                    # the header of a game that is an EVENT: "Fiesta Bowl",
+                    # "CFP | Quarters", "NCAA | Round 1", "Big Ten | Championship"
+                    "stage": rules.stage_label(code, stype, heads, conf=conf,
+                                               month=d.month, season=y),
                 })
     keep.sort(key=lambda g: (g["date"], g["time"]))
     for (code, tid), (_, conf) in latest_conf.items():

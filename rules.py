@@ -111,6 +111,8 @@ def is_marquee(sport, nets, d, slots, big_ten=False, tourney=False):
         return False          # a conference tournament belongs to no package
     if sport == "CFB":
         return any(w in CFB_MARQUEE for w in slots)
+    if d.month not in (1, 2, 3):
+        return False          # basketball Marquee stays January-March (his call)
     day, t = DOW[d.weekday()], _mins(d)
     if "FOX" in nets and (day == "Fri" or (day == "Sat" and t >= 19 * 60)):
         return True           # FOX Friday and FOX Primetime, Big Ten or not
@@ -279,6 +281,148 @@ def cfb_opener(nets, d, week, week0=False, big_ten=False, ranked=False,
     return big_ten or ranked or notre_dame
 
 
+CFB_POWER = {"1", "4", "5", "8", "9"}    # ACC, Big 12, Big Ten, SEC, Pac-12
+
+
+def cfb_neutral_kickoff(d, season, neutral, teams):
+    """An August or September neutral-site football game between two power
+    teams, or with a Big Ten team against anyone (his call 2026-09-11).
+
+    `teams` is [(team id, conference id), ...]. Power is the Power Five through
+    2023 and the Power Four from 2024, when the Pac-12 stopped counting; Notre
+    Dame counts as power. A conference game qualifies too -- Arkansas-Texas A&M
+    in Arlington is exactly this kind of game.
+    """
+    if not neutral or d.month not in (8, 9):
+        return False
+    power = CFB_POWER if season <= 2023 else CFB_POWER - {"9"}
+    return (all(tid == NOTRE_DAME or conf in power for tid, conf in teams)
+            or any(conf == BIG_TEN["CFB"] for _tid, conf in teams))
+
+
+# Basketball events he wants every year, whatever the network or tip time (his
+# call 2026-09-11). Matched inside ESPN's note headline, so a sponsor around the
+# name ("State Farm Champions Classic") does not matter. Diamond Cup is a future
+# event, listed ahead of its first edition.
+CBB_SHOWCASE_EVENTS = ("Champions Classic", "Jimmy V Classic", "CBS Sports Classic",
+                       "Jumpman Invitational", "Indy Classic", "Diamond Cup")
+
+
+def cbb_showcase(headlines):
+    text = " ".join(headlines).lower()
+    return any(e.lower() in text for e in CBB_SHOWCASE_EVENTS)
+
+
+# ---------------------------------------------------------------- stage labels
+# His header patterns for games that are an EVENT rather than a week
+# (2026-09-11): "FIESTA BOWL (SAT)", "CFP | QUARTERS (WED)", "NCAA | ROUND 1
+# (THU)", and the conference in front of a championship game or tournament
+# round. stage_label returns the part before the day; the app adds the day.
+
+# checked in order: "final four" before "final", "semifinal" before "final"
+ROUND_NAMES = (("first four", "First Four"), ("1st round", "Round 1"),
+               ("first round", "Round 1"), ("2nd round", "Round 2"),
+               ("second round", "Round 2"), ("3rd round", "Round 3"),
+               ("sweet 16", "Sweet 16"), ("elite 8", "Elite 8"),
+               ("final four", "Final Four"), ("quarterfinal", "Quarters"),
+               ("semifinal", "Semis"), ("championship", "Championship"),
+               ("final", "Championship"))
+
+# Bowls whose own name survives the sponsor ("Vrbo Fiesta Bowl" -> "Fiesta
+# Bowl"). A bowl NAMED for its sponsor ("Guaranteed Rate Bowl") is kept whole.
+BOWL_NAMES = ("Rose", "Sugar", "Orange", "Cotton", "Fiesta", "Peach", "Citrus",
+              "Gator", "Pinstripe", "Music City", "Las Vegas", "Sun", "Alamo",
+              "LA", "Holiday", "Liberty", "Texas", "Armed Forces", "Birmingham",
+              "Military", "Independence", "First Responder", "Hawaii",
+              "Boca Raton", "New Mexico", "Frisco", "Camellia", "Myrtle Beach",
+              "Fenway", "Arizona", "Gasparilla", "Potato", "Motor City",
+              "Heart of Dallas", "Poinsettia", "Belk", "New Orleans", "Cure",
+              "Celebration", "Bahamas", "St. Petersburg", "Russell Athletic",
+              "Foster Farms")
+
+
+def _round(text):
+    for part in reversed([p.strip() for p in text.split(" - ")]):
+        low = part.lower()
+        for key, name in ROUND_NAMES:
+            if key in low:
+                return name
+    return None
+
+
+def bowl_name(text):
+    head = text.split(" - ")[0]
+    low = head.lower()
+    for b in sorted(BOWL_NAMES, key=len, reverse=True):
+        if (b + " bowl").lower() in low:
+            return b + " Bowl"
+    i = head.find(" Bowl")
+    return head[:i + 5] if i >= 0 else head
+
+
+def _cbb_postseason_event(part):
+    low = part.lower()
+    if "basketball championship" in low:
+        return "NCAA"
+    if low.startswith("nit"):
+        return "NIT"
+    if "cbi" in low:
+        return "CBI"
+    if "crown" in low:
+        return "Crown"
+    if low == "cit" or low.startswith("cit "):
+        return "CIT"
+    if "basketball classic" in low:
+        return "Basketball Classic"
+    return part
+
+
+# Before the 12-team CFP, a semifinal was played in a bowl and ESPN headlined
+# it as that bowl alone ("Goodyear Cotton Bowl Classic"), so it would read as an
+# ordinary bowl. The semifinal hosts rotated on a fixed schedule, by season.
+CFP_SEMIFINAL_BOWLS = {2014: ("Rose", "Sugar"), 2015: ("Orange", "Cotton"),
+                       2016: ("Fiesta", "Peach"), 2017: ("Rose", "Sugar"),
+                       2018: ("Orange", "Cotton"), 2019: ("Fiesta", "Peach"),
+                       2020: ("Rose", "Sugar"), 2021: ("Orange", "Cotton"),
+                       2022: ("Fiesta", "Peach"), 2023: ("Rose", "Sugar")}
+
+# Until 2016 the NCAA tournament called the First Four the 1st round, so the
+# rounds read one higher than they do now. The 2014-15 season is the only one
+# in the data that used those names.
+NCAA_OLD_ROUNDS = {"Round 1": "First Four", "Round 2": "Round 1", "Round 3": "Round 2"}
+
+
+def stage_label(sport, season_type, headlines, conf=None, month=None, season=None):
+    """The event and round of a postseason, conference-championship or
+    conference-tournament game: "Fiesta Bowl", "CFP | Quarters", "NCAA | Round
+    1", "Big Ten | Championship". None for any other game."""
+    heads = [h for h in headlines if h]
+    if not heads:
+        return None
+    text = heads[0]
+    rnd = _round(text)
+    if sport == "CFB":
+        if season_type == 3:
+            low = text.lower()
+            if "college football playoff" in low or low.startswith("cfp"):
+                return "CFP | " + (rnd or "Playoff")
+            bowl = bowl_name(text)
+            if bowl in [b + " Bowl" for b in CFP_SEMIFINAL_BOWLS.get(season, ())]:
+                return "CFP | Semis"
+            return bowl
+        if conf and is_championship(heads):
+            return conf + " | Championship"
+        return None
+    if season_type == 3:
+        event = _cbb_postseason_event(text.split(" - ")[0])
+        if event == "NCAA" and season is not None and season <= 2014:
+            rnd = NCAA_OLD_ROUNDS.get(rnd, rnd)
+        return event + (" | " + rnd if rnd else "")
+    if conf and is_championship(heads) and month in (3, 4):
+        return conf + " | " + (rnd or "Championship")
+    return None
+
+
 def cfb_black_friday(nets, d, season, big_ten=False):
     """Black Friday football -- in the archive and in Marquee, but with NO
     window label.
@@ -300,20 +444,24 @@ def cfb_black_friday(nets, d, season, big_ten=False):
 
 
 def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
-    """Basketball's windows -- **January to March only** (his call: the
-    November-December non-conference slate is not what he is browsing for).
+    """Basketball's windows -- **November through March** (his call
+    2026-09-11, widening January-March). Big Monday and Super Tuesday stay
+    January to March: they are conference-season slots, and he left the
+    November and December Tuesdays out.
 
     The four broadcast networks are "Weekend" windows. A FOX or CBS Saturday
     game before 7pm needs a Big Ten team, since those early slots are
     otherwise filler.
     """
-    if d.month not in (1, 2, 3):
+    if d.month not in (11, 12, 1, 2, 3):
         return set()
+    conference_season = d.month in (1, 2, 3)
     day, t = DOW[d.weekday()], _mins(d)
     out = set()
     # Big Monday and Super Tuesday may carry SEVERAL games a night, unlike
     # ESPN Saturday -- his call. The bracket is 6:00 to 9:30pm.
-    if "ESPN" in nets and day in ("Mon", "Tue") and 18 * 60 <= t <= 21 * 60 + 30:
+    if (conference_season and "ESPN" in nets and day in ("Mon", "Tue")
+            and 18 * 60 <= t <= 21 * 60 + 30):
         out.add("Big Monday" if day == "Mon" else "Super Tuesday")
     # ESPN Saturday is every ESPN game tipping between 6:00 and 9:30pm (his
     # call 2026-09-10, widening it from the single latest game). Only the

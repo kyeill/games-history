@@ -362,6 +362,41 @@ files without deleting them. An EMPTY week is detectable; a PARTIAL one would
 not be, and nothing checks for that. Found by comparing every cached week with
 live day-by-day counts (2026-09-11).
 
+**A week that crosses into the postseason comes back half empty.** A CBB
+range query answers with ONE season phase: a week starting in conference
+tournament play returns only its regular-season days, so the week of 13 March
+2016 ended at 13 March and lost Michigan State against Middle Tennessee, and
+the week of 14 March 2021 lost Michigan State-UCLA and Ohio State-Oral
+Roberts. The seasontype parameter does not change the answer; single-day
+requests do return the games. Unlike an empty week this one is not empty, so
+the empty-week fallback never fired. `cbb_range` now compares the newest game
+returned with the last day asked for and fetches the rest one day at a time.
+Checked on six boundary weeks, 2016 to 2026.
+
+**Rivals history is fetched whole but cached filtered.** 2014 to 2020 exist
+only for Rivals, so `harvest.rival_events` keeps just the games Ohio State,
+Michigan State or Notre Dame played, as cache/rivals-SPORT-SEASON.json --
+kilobytes, where full scoreboards for seven seasons would add hundreds of
+megabytes to the Drive-synced cache. Two traps on the way: a whole football
+season sits close to the 1,000-event cap, so it is fetched in three ranges, and
+ESPN occasionally returns an event with no id at all, which crashed the first
+run. Every game from those seasons is `rivals_only`, and the app keeps
+`rivals_only` games out of TV Windows, Key Games, their Year lists and the
+newest-season default.
+
+**Stage labels read the headline from the END.** A CFP headline can carry a
+suffix ("College Football Playoff Quarterfinal at the Allstate Sugar Bowl -
+Rescheduled from Jan 1"), and an NCAA headline puts the round last ("Men's
+Basketball Championship - South Region - 1st Round"), so the round is taken
+from the last part that names one. Order matters inside a part: final four and
+semifinal must be tried before final, or a Final Four reads as a Championship.
+The CFP test runs before the bowl name, because CFP games are played in bowls.
+
+**Bash heredocs choke on apostrophes here.** An inline Python script with an
+odd number of apostrophes fails to parse before anything runs ("unexpected EOF
+while looking for matching quote"), even inside a quoted heredoc. Scripts that
+need apostrophes go into a file first.
+
 **ESPN has no week 0.** Week 0 games are numbered week 1 -- and so are the
 bowls -- so `week_zero_ids` finds them by date: the regular-season week-1 games
 played before the main Week 1 weekend, whose Saturday carries the most week-1

@@ -203,6 +203,15 @@ stretch, weeknights included. Conference tournaments are never Marquee in
 either sport. Because it is now its own flag (`mq` on each game) it **stacks**
 with the TV window dropdown instead of pretending to be it.
 
+**More games reach TV Windows** (his calls 2026-09-11). Basketball windows
+run November to March, except Big Monday and Super Tuesday, which stay
+conference-season slots; basketball Marquee stays January to March. Five
+basketball events are in every year whatever the network or time: Champions
+Classic, Jimmy V Classic, CBS Sports Classic, Jumpman Invitational and Indy
+Classic, with Diamond Cup listed for when it starts. In football, any August or
+September neutral-site game between two power teams (Power Five through 2023,
+Power Four from 2024, Notre Dame counted) or with a Big Ten team.
+
 **Week 0 and the non-Saturday Week 1 games sit on the TV tab under their week
 alone** (his call 2026-09-11). The card reads `WEEK 0` or `WEEK 1` and nothing
 else, because they belong to no window: a Week 0 noon kick on FOX is not FOX
@@ -226,6 +235,11 @@ the archive at all, so harvest keeps a rival's loss in one ONLY for this view:
 such a game carries no window and no game type, which keeps it off TV Windows
 and Key Games. Harvest decides every criterion except the series tags, which
 the app checks because they live in tags.json.
+Rivals reaches back to 2014 (2014-15 in basketball) for those three teams
+alone, and opens on All Years, Newest First, with Ohio State chosen in football
+and Michigan State in basketball; leaving it restores the season and team a
+normal view opens on. The Year dropdown lists only the seasons the current view
+can show.
 
 **Week and Month are the same idea for the two sports** — the coarse cut
 through a season. Football thinks in numbered weeks and basketball does not,
@@ -334,6 +348,15 @@ Only **one network** is shown. ESPN lists simulcasts alongside the broadcaster
 the majors explicitly; alphabetical order would not do it (BTN would beat FOX).
 The full list stays in the data, and the slot rules still read all of it, which
 is what lets a "NBC, Peacock" game match the NBC window.
+
+**A game that is an EVENT reads its stage in the header** (his call
+2026-09-11): `FIESTA BOWL (SAT)`, `CFP | QUARTERS (WED)`, `NCAA | ROUND 1 (THU)`,
+`BIG TEN | CHAMPIONSHIP (SAT)`, `BIG TEN | QUARTERS (FRI)`. The chip then shows
+the location instead of the event name. `rules.stage_label` builds it from the
+ESPN note headline: the sponsor comes off a bowl name (Vrbo Fiesta Bowl becomes
+Fiesta Bowl) unless the bowl is named for its sponsor (Guaranteed Rate Bowl),
+and rounds are normalised -- 1st Round to Round 1, Quarterfinal to Quarters,
+Semifinal to Semis, Final to Championship.
 
 **Card colour follows the broadcast.** On football the three marquee windows
 each have a colour (`rules.HEADER_TINT`), and it paints the header, the

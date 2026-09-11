@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-111421";
+const BUILD = "20260911-115441";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -161,11 +161,12 @@ function rowHtml(g, browse) {
   // One blue chip, in priority order: conference championship, then a named
   // event (SEC Quarterfinals, Battle 4 Atlantis), then a home game played
   // away from the home team's own building, then the neutral-site city.
-  if (g.champ) {
+  // a game whose header already names the event shows the LOCATION instead
+  if (g.champ && !g.stage) {
     const r = g.round || "";
     tags.push(chip("champ", g.champ + " " +
       (r.indexOf(" - ") > -1 ? r.split(" - ").pop() : "Championship")));
-  } else if (g.event) {
+  } else if (g.event && !g.stage) {
     tags.push(chip("champ", g.event));
   } else if (g.offsite) {
     // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
@@ -201,7 +202,11 @@ function rowHtml(g, browse) {
                  Thu: "Thursday", Fri: "Friday", Sat: "Saturday",
                  Sun: "Sunday" };
   let when;
-  if (g.sport === "CFB") {
+  if (g.stage) {
+    // an EVENT rather than a week (his call 2026-09-11): "FIESTA BOWL (SAT)",
+    // "CFP | QUARTERS (WED)", "NCAA | ROUND 1 (THU)", "BIG TEN | CHAMPIONSHIP"
+    when = esc(g.stage) + " (" + esc(g.dow) + ")";
+  } else if (g.sport === "CFB") {
     // Week 0 is a real week, so test for a MISSING week, not a falsy one
     const hasWeek = g.week != null;
     when = (hasWeek ? '<span class="wk">Week ' + g.week + "</span>" : "") +
@@ -322,19 +327,20 @@ function visible() {
   // Key Games needs a game TYPE. Being a conference-tournament game is not
   // itself a qualification -- an ACC first-rounder between unranked teams has
   // no business here, and every championship game carries a type anyway.
-  list = list.filter(g => VIEW === "tv"
-    ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener)
-    : VIEW === "rivals" ? rivalsAllows(g)
-    : (g.type && bigViewAllows(g)));
-  // Basketball's TV tab is JANUARY TO MARCH (his standing rule, and his call
-  // again 2026-09-10 for Marquee). The window rules already enforce it, but a
-  // College GameDay game rides along on `show` with no window of its own --
-  // two November games were reaching Marquee that way. Key Games still has
-  // every month.
+  list = list.filter(g => VIEW === "rivals" ? rivalsAllows(g)
+    : g.rivals_only ? false
+    : VIEW === "tv"
+      ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
+         || g.showcase || g.kickoff)
+      : (g.type && bigViewAllows(g)));
+  // Basketball TV Windows run November to March now (his call 2026-09-11),
+  // because the windows themselves reach into November and December. A game
+  // with NO window of its own -- a College GameDay ride-along -- still has to
+  // be January to March, which is what kept two November shows out before.
   if (VIEW === "tv" && SPORT_OF[TAB] === "CBB") {
     list = list.filter(g => {
       const m = +g.date.slice(5, 7);
-      return m >= 1 && m <= 3;
+      return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase;
     });
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
@@ -379,7 +385,8 @@ function visible() {
 // sports, and basketball's newest one is empty for months -- 2026-27 has no
 // games until November -- so the overall max opened the tab on nothing.
 function latestSeason() {
-  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB]).map(g => g.season);
+  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only)
+    .map(g => g.season);
   if (own.length) return Math.max.apply(null, own);
   return SEASONS.length ? Math.max.apply(null, SEASONS) : null;
 }
@@ -430,8 +437,12 @@ function filterChips() {
         (String(current) === String(p[1]) ? " selected" : "") + ">" +
         esc(p[0]) + "</option>").join("") + "</select>";
 
+  // only the seasons this view can show: Rivals reaches back to 2014, the
+  // other views start with the archive
+  const viewSeasons = Array.from(new Set(GAMES.filter(g => g.sport === sport &&
+    (VIEW === "rivals" ? rivalsAllows(g) : !g.rivals_only)).map(g => g.season)));
   let h = group("Year", select("season", "All Years",
-    SEASONS.slice().sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
+    viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
   // Football is played in numbered weeks; basketball is not. The list follows
   // the season, since week 16 only exists in some years.
@@ -447,16 +458,13 @@ function filterChips() {
       FILT.week));
   }
   // Basketball has no week worth showing, so the month is its equivalent
-  // coarse cut. Like the week list it follows the SEASON, and it also follows
-  // the VIEW -- the TV tab is January to March, so offering November there
-  // would be offering an empty list.
+  // coarse cut. Like the week list it follows the SEASON.
   if (sport === "CBB") {
     const months = new Set();
     GAMES.forEach(g => {
       if (g.sport !== "CBB") return;
       if (FILT.season != null && g.season !== FILT.season) return;
       const m = +g.date.slice(5, 7);
-      if (VIEW === "tv" && (m < 1 || m > 3)) return;
       months.add(m);
     });
     h += group("Month", select("month", "All Months",
@@ -804,14 +812,22 @@ async function init() {
     b.addEventListener("click", e => {
       // the sport does not change, so the filters are still valid -- only the
       // game-type / TV-window pair is view-specific
+      const leaving = VIEW;
       VIEW = e.currentTarget.dataset.view;
       FILT.type = null;
-      // The TV tab is January to March on basketball, so a November chosen
-      // under Key Games would survive the switch and empty the list.
-      if (VIEW === "tv" && FILT.month != null
-          && (FILT.month < 1 || FILT.month > 3)) FILT.month = null;
       FILT.windows = null;
       FILT.marquee = VIEW === "tv";
+      if (VIEW === "rivals") {
+        // his Rivals default (2026-09-11): every season, newest first, opened
+        // on Ohio State in football and Michigan State in basketball
+        FILT.season = null; FILT.week = null; FILT.month = null;
+        FILT.team = SPORT_OF[TAB] === "CFB" ? "194" : "127";
+        SORT = "desc";
+      } else if (leaving === "rivals") {
+        // leaving Rivals puts back the season and team a normal view opens on
+        FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
+        FILT.team = null;
+      }
       draw();
       window.scrollTo({ top: 0 });
     }));
