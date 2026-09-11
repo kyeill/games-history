@@ -23,6 +23,7 @@ re-harvest costs nothing.
 python harvest.py    ESPN -> output/games.json   (apply rules.py; run when a season ends)
 python colors.py     the row-wash colour per team -> output/colors.json
 python seed_series.py  H&H / N&N / H&N / Annual tags -> docs/tags.json (merges)
+python series_scan.py  new series candidates -> output/series_review.txt (review first)
 python site.py       build the app -> docs/  (GitHub Pages serves this)
 python mock.py       the three row treatments Kyle chose from -> output/mockups.html
 ```
@@ -183,7 +184,7 @@ the app rather than the harvest, precisely so TV Windows keeps them.
 | Month | dropdown, **basketball only** | season order (Nov first), following the season and the view |
 | Team | dropdown, alphabetical | 141 of them |
 | Marquee Windows | toggle button | `rules.is_marquee` — a rule, not a window list |
-| Sort | toggle button | Oldest First (default) / Newest First |
+| Sort | toggle button | Newest First (default) / Oldest First |
 
 **Marquee Windows** is the games he plans a weekend around, and as of
 2026-09-10 it is a **rule of its own** rather than a set of windows the button
@@ -227,9 +228,12 @@ for the same reason.
 Years read **2025** on football and **2025-26** on basketball — football is one
 calendar year, basketball straddles two.
 
-**Opening state is not an empty state.** Every tab opens on the newest season
-available (whatever `harvest.py` last pulled), sorted **Oldest First** so a
-season reads as it unfolded. **Newest First walks the blocks backwards but
+**Opening state is not an empty state.** A sport tab opens on its **tab
+default** -- TV Windows, the newest season that has games *in that sport*,
+**Marquee Windows** on, sorted **Newest First** -- and clicking between College
+Football and College Basketball goes back to it (his call 2026-09-11). "In
+that sport" matters: basketball's newest season is empty from spring until
+November. **Newest First walks the blocks backwards but
 reads each one forwards** — week 14, then 13, then 12, and inside a week the
 Thursday game before the Saturday one. A football block is its week;
 basketball has no week, so its block is the date. TV Windows opens with **Marquee Windows** on;
@@ -251,7 +255,9 @@ like Michigan-Wake Forest basketball in Greensboro then Detroit -- **H&N** one
 of each, and **Annual** for a perpetual series like Notre Dame-USC.
 `seed_series.py` writes them into `docs/tags.json`: the first three by game
 id, from a scan he reviewed game by game, and Annual by team pair, so later
-meetings pick it up on their own. 98 games carry one as of 2026-09-11.
+meetings pick it up on their own. 101 games carry one as of 2026-09-11.
+`series_scan.py` finds next season's candidates for review; pairs he has
+ruled out live in `seed_series.NOT_SERIES`, so the scan stops re-asking.
 
 **The row** is variant C of the three mocked, minus the left rail: the winning
 team's line takes a lightened wash of its colour, the loser's line stays plain.
@@ -310,7 +316,9 @@ network and the kickoff time. On basketball the colour is the NETWORK's
 (`rules.NET_TINT`): the network cell always carries it, and on a **Marquee**
 game the header and tip time do too. The date stays muted in both. Football
 games outside those three windows, and basketball games outside Marquee, are
-plain.
+plain. The HEADER keeps its colour only when a Big Ten team is playing (his call
+2026-09-11): Texas-Alabama in FOX Big Noon reads a plain header over a yellow
+FOX and kickoff time.
 
 **Basketball card labels.** A basketball card's header names its slot. FOX
 Friday, FOX Primetime and the three ESPN labels are open to anyone; the
@@ -375,6 +383,9 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `colors.py` | row-wash colour per team |
 | `seed_tags.py` | College GameDay / Big Noon Kickoff tags, merged into `docs/tags.json` |
 | `seed_series.py` | H&H / N&N / H&N / Annual tags, merged into `docs/tags.json` |
+| `series_scan.py` | review tool: finds series candidates for `seed_series.py` |
+| `window-overrides.json` | re-files a game into a window, header and all |
+| `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
 | `logos.py` | ported from sports-daily; measures both crest variants |
 | `site.py` | builds `docs/` — HTML, icons, manifest, service worker |
 | `app.js` | the whole client app; `site.py` fills its `__PLACEHOLDERS__` |

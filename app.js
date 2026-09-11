@@ -25,7 +25,7 @@ let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
-let SORT = "asc";
+let SORT = "desc";   // Newest First is the tab default (his call 2026-09-11)
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
@@ -188,8 +188,12 @@ function rowHtml(g, browse) {
   const tint = g.sport === "CFB" ? HEADER_TINT[label] : null;
   const netTint = g.sport === "CBB" ? NET_TINT[primaryNet(g.nets)] : null;
   const netCol = g.sport === "CFB" ? tint : netTint;
-  const headCol = g.sport === "CFB" ? tint : (g.mq ? netTint : null);
-  const timeCol = headCol;
+  const winCol = g.sport === "CFB" ? tint : (g.mq ? netTint : null);
+  // ...but the HEADER keeps that colour only when a Big Ten team is playing
+  // (his call 2026-09-11). The network and the time keep theirs regardless.
+  const bigTen = g.teams.some(t => t.conf === BIG_TEN[g.sport]);
+  const headCol = bigTen ? winCol : null;
+  const timeCol = winCol;
   const col = c => (c ? ' style="color:' + c + '"' : "");
   const DAYS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
                  Thu: "Thursday", Fri: "Friday", Sat: "Saturday",
@@ -353,12 +357,21 @@ function visible() {
   return list;
 }
 
-// Opening state, not an empty one: newest season always, plus the upset
-// category when the Key Games view is showing. A function declaration, not a
-// const -- init() calls it before this point in the file.
+// The newest season that actually has games in THIS sport. SEASONS spans both
+// sports, and basketball's newest one is empty for months -- 2026-27 has no
+// games until November -- so the overall max opened the tab on nothing.
+function latestSeason() {
+  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB]).map(g => g.season);
+  if (own.length) return Math.max.apply(null, own);
+  return SEASONS.length ? Math.max.apply(null, SEASONS) : null;
+}
+
+// Opening state, not an empty one: the newest season with games, and Marquee
+// on the TV view. A function declaration, not a const -- init() calls it
+// before this point in the file.
 function clearFilters() {
   FILT = {
-    season: SEASONS.length ? Math.max.apply(null, SEASONS) : null,
+    season: latestSeason(),
     type: null,
     windows: null,
     // TV Windows opens on Marquee -- the games he plans a weekend around
@@ -712,8 +725,13 @@ async function init() {
   document.querySelectorAll("nav button").forEach(b =>
     b.addEventListener("click", e => {
       TAB = e.currentTarget.dataset.tab;
-      // CFB and CBB share no game types or TV windows, so a value left over
-      // from the other sport would silently filter everything away
+      // Switching sport goes back to the TAB DEFAULT, not merely clean filters
+      // (his call 2026-09-11): TV Windows, the latest season with games,
+      // Marquee on, Newest First. CFB and CBB share no game types or windows
+      // anyway, so a value left over from the other sport would filter
+      // everything away.
+      VIEW = "tv";
+      SORT = "desc";
       clearFilters();
       draw();
       window.scrollTo({ top: 0 });

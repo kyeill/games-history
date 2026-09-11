@@ -1,0 +1,7 @@
+{
+  "_comment": "Extra TV windows that only FILTER, by ESPN game id. The game shows up when that window is picked and counts toward Marquee, but its card -- header, colours -- is left exactly as the rules drew it. Compare window-overrides.json, which re-files a game completely. Run `python harvest.py && python site.py` after editing.",
+  "_401520435": "Penn State at Michigan State, 2023 Week 13: Black Friday at Ford Field, NBC 7:30pm (his call 2026-09-11)",
+  "401520435": [
+    "NBC Saturday Night"
+  ]
+}

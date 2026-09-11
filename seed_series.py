@@ -23,6 +23,9 @@ ANNUAL is by PAIR instead, because an annual series keeps producing games:
 every regular-season meeting in the archive gets the tag, including ones that
 arrive in a later harvest. Notre Dame-Stanford has none in the archive yet.
 
+NOT_SERIES records the pairs he ruled OUT. It tags nothing; series_scan.py
+reads it so a ruled-out pair stops coming back as a new question.
+
     python seed_series.py            merge into docs/tags.json
     python seed_series.py --dry-run  report only
 """
@@ -98,7 +101,11 @@ SERIES = [
     ("401752677", "H&H", "CFB 2025    Texas at Ohio State"),
     ("401752696", "H&H", "CFB 2025    Wisconsin at Alabama"),
     ("401856660", "H&H", "CFB 2026    Clemson at Louisiana State"),
+    # (2026-09-11) found once the Week 0/1 rule brought a leg into the archive
+    ("401532573", "H&H", "CFB 2023    Oregon State at San José State"),
+    ("401628448", "H&H", "CFB 2024    North Carolina at Minnesota"),
     # --- neutral & neutral
+    ("401403867", "N&N", "CFB 2022    Florida State at Louisiana State"),
     ("401591373", "N&N", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "N&N", "CBB 2024-25 Gonzaga at UCLA"),
     ("401707850", "N&N", "CBB 2024-25 Illinois at Alabama"),
@@ -131,6 +138,12 @@ ANNUAL = [
     ("CFB", "221", "277", "Pittsburgh / West Virginia"),
     ("CBB", "269", "275", "Marquette / Wisconsin"),
     ("CBB", "142", "2305", "Missouri / Kansas"),
+]
+
+NOT_SERIES = [
+    # sport, ESPN team id, ESPN team id, the pair, why he ruled it out
+    ("CFB", "12", "2306", "Arizona / Kansas State", "same conference when played"),
+    ("CFB", "258", "87", "Virginia / Notre Dame", "2019 and 2021 are not consecutive seasons"),
 ]
 
 

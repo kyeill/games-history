@@ -373,7 +373,21 @@ catch 2021's second legs, the published 2026 football and part of the
 * ESPN can list the same HOST both years (Illinois-UConn at MSG, then at
   Gampel flagged neutral), so hosts are compared as well as venues.
 The per-game list is a record of his rulings, not a rule to re-run: a new
-season needs a new scan and a new review. Annual is by pair, so it maintains
+season needs a new scan and a new review. `series_scan.py` is that scan, kept
+in the repo (his call 2026-09-11). It writes output/series_review.txt, marks
+the pairs seed_series.py already covers so only new ones need a ruling, and
+caches the seasons harvest never keeps (the two before the archive, and
+unfinished schedules, re-fetched daily) in the system temp folder rather than
+the Drive-synced cache/.
+
+**A new archive game can complete a series nobody reviewed.** The Week 0/1
+rule brought in Oregon State at San Jose State 2023, North Carolina at
+Minnesota 2024 and the 2022 leg of Florida State-LSU, and each turned out to be
+the missing leg of a clean H&H or of a pair he had already ruled N&N -- so they
+were tagged without a new review. Re-run the scan after any rule change that
+adds games, not just at season end. A pair he rules OUT goes in
+`seed_series.NOT_SERIES` (Arizona-Kansas State, Virginia-Notre Dame);
+otherwise an untagged pair looks like an open question forever. Annual is by pair, so it maintains
 itself -- Navy-Notre Dame 2023 picked up its tag the moment the Week 0 rule
 brought it into the archive.
 
@@ -480,6 +494,11 @@ Football only: basketball has no meaningful week. Week 0 is a real value, so
 every test for a week must be `!= null`: `!g.week` silently dropped Week 0 from
 the dropdown, the card header and the Newest First blocks.
 
+**The newest season is per SPORT.** `SEASONS` covers both sports, and
+basketball's newest one (2026-27) has no games until November, so opening a tab
+on the overall max showed an empty basketball list. `latestSeason()` takes the
+newest season with games in the tab's own sport.
+
 **Header tint contrast against the #1e1e23 card.** FOX #ffcb05 = 10.9:1,
 NBC #0b85c8 = 4.11:1, CBS #005ae4 = 2.83:1. The WCAG floor is 4.5:1, so CBS and
 NBC sit under it -- but #005ae4 replaced #1c4469, which measured **1.64:1** and
@@ -502,6 +521,15 @@ a dozen 2023 fixtures. **Both games he reported missing were WEATHER DELAYED**:
 USC at Purdue reads 6:45pm because of the delay, and Texas A&M at Florida lost
 its network entirely. Those are `window-overrides.json` entries, not rule
 changes. Read a missing game as a data problem before widening a rule.
+
+**An override re-files a game; an EXTRA only files it.** `window-overrides.json`
+replaces a game's windows, and the header follows them. `window-extras.json`
+(2026-09-11) adds a window the game is FILTERED under -- and counted toward
+Marquee -- while the card is still drawn from the windows the rules gave it.
+Penn State at Michigan State, Black Friday 2023 on NBC at 7:30pm, is the one
+case: he wants it under NBC Saturday Night without it reading or colouring
+like one. Harvest decides the header from `card_slots` BEFORE the extras join
+`slots`; do it the other way round and the card changes.
 
 **Conference membership is AS OF THE SEASON, which bites the Black Friday
 rule.** Narrowing Black Friday to "FOX/CBS/NBC with a Big Ten team" drops the

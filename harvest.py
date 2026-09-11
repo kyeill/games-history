@@ -139,6 +139,22 @@ def load_overrides():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def load_extras():
+    """Extra windows that only FILTER -- see window-extras.json.
+
+    Penn State at Michigan State, Black Friday 2023, is the case: an NBC
+    primetime game he wants under NBC Saturday Night and Marquee without its
+    card changing. The extra window joins `slots` (which drives the filter and
+    Marquee) after the header has already been decided from the rule's own.
+    """
+    path = os.path.join(HERE, "window-extras.json")
+    if not os.path.exists(path):
+        return {}
+    raw = json.load(open(path, encoding="utf-8"))
+    return {k: v for k, v in raw.items()
+            if not k.startswith("_") and isinstance(v, list)}
+
+
 def show_games():
     """(sport, date, {team names}) for every game College GameDay or Big Noon
     Kickoff broadcast from. He wants all of them in the archive even when no
@@ -272,6 +288,7 @@ def espn_saturday_ids(evs):
 def harvest():
     keep, teams = [], {}
     overrides = load_overrides()
+    extras = load_extras()
     shows = show_games()
     ev_overrides = load_event_overrides()
     for code in ("CFB", "CBB"):
@@ -392,7 +409,8 @@ def harvest():
                 # its own: it took in 265 early-round basketball games nothing
                 # could reach. A championship game always has a type.
                 if (not slots and not gtype and not title and not black_friday
-                        and not show and not opener and x["id"] not in overrides):
+                        and not show and not opener and x["id"] not in overrides
+                        and x["id"] not in extras):
                     continue
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -419,6 +437,10 @@ def harvest():
                 forced = x["id"] in overrides
                 if forced:
                     slots = set(overrides[x["id"]])
+                # the card is drawn from the slots as the rules left them; an
+                # extra window only adds the game to a filter and to Marquee
+                card_slots = set(slots)
+                slots |= set(extras.get(x["id"], ()))
 
                 side = []
                 for k in cs:
@@ -454,7 +476,7 @@ def harvest():
                     "city": rules.display_city(
                         (v.get("address") or {}).get("city"), v.get("fullName")),
                     "nets": sorted(nets), "teams": side,
-                    "header": (rules.cfb_header(slots, d, forced)
+                    "header": (rules.cfb_header(card_slots, d, forced)
                                if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
