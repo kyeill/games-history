@@ -342,8 +342,9 @@ blue. In the CFP and the NCAA Tournament a ranking reads "NO. 3" rather than
 "#3". Every card shares one ranking column, so team names start in the same place and the last digit of "#10" lines up with "NO. 11". A football header that is only its week names the day when the game is
 not on a Saturday: "WEEK 1 (THU)".
 
-**Michigan** is a fourth view on each tab -- a TRIAL (his call 2026-09-11),
-2023 football and 2025-26 basketball only for now. One card per Michigan game,
+**Michigan** is a fourth view on each tab -- every Michigan game
+from 2011 on (2011-12 in basketball), his call 2026-09-11. It began as a trial
+on 2023 football and 2025-26 basketball. One card per Michigan game,
 every game that season, in three rows. The HEADER: his emoji, the game number
 in brackets ([nc1] non-conference, [g1] conference) and the week or stage; the TV details follow
 a bar -- "[nc1] WEEK 1 | PEACOCK 12:00PM" -- unless a window label already

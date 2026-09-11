@@ -132,6 +132,84 @@ def rival_events(code, y):
     return keep
 
 
+def old_season_events(code, y):
+    """Every game of a season before the archive, straight from the scoreboard.
+    Nothing is cached whole -- those seasons would cost gigabytes in the
+    Drive-synced cache -- so the callers keep only what they need."""
+    sport, grp = SPORTS[code]
+    ev = []
+    if code == "CFB":
+        for rng in ("%d0801-%d0930" % (y, y), "%d1001-%d1130" % (y, y),
+                    "%d1201-%d0131" % (y, y + 1)):
+            got = fetch(sport, {"dates": rng, "groups": grp, "limit": 1000}, "x",
+                        cacheable=False).get("events", [])
+            if len(got) >= 1000:
+                print("  WARN: %s hit the 1000 cap" % rng, file=sys.stderr)
+            ev += got
+    else:
+        d, end = dt.date(y, 11, 1), dt.date(y + 1, 4, 10)
+        while d < end:
+            e = min(d + dt.timedelta(days=6), end)
+            ev += cbb_range(d, e, False)
+            d = e + dt.timedelta(days=1)
+    seen, out = set(), []
+    for x in ev:
+        if x.get("id") and x["id"] not in seen:
+            seen.add(x["id"])
+            out.append(x)
+    return out
+
+
+def michigan_events(code, y):
+    """Every Michigan game in a season before the archive, for the Michigan
+    view, cached as cache/michigan-SPORT-SEASON.json. The same walk keeps that
+    season's postseason for EVERY team as cache/post-SPORT-SEASON.json -- an
+    opponent's CFP or NCAA finish, and last season's champion, need them."""
+    path = os.path.join(CACHE, "michigan-%s-%d.json" % (code.lower(), y))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))["events"]
+    ev = old_season_events(code, y)
+    keep = [x for x in ev
+            if any((k.get("team") or {}).get("id") == rules.MICHIGAN
+                   for k in (x.get("competitions") or [{}])[0].get("competitors") or [])]
+    post = [x for x in ev if (x.get("season") or {}).get("type") == 3]
+    if season_over(code, y):
+        json.dump({"events": keep}, open(path, "w", encoding="utf-8"))
+        json.dump({"events": post}, open(os.path.join(
+            CACHE, "post-%s-%d.json" % (code.lower(), y)), "w", encoding="utf-8"))
+    return keep
+
+
+def postseason_events(code, y):
+    """Every team's postseason games that season: taken from the archive's full
+    schedule from 2021, otherwise from cache/post-SPORT-SEASON.json -- fetched on
+    its own when no Michigan walk has written it (2010, for 2011's champion)."""
+    if y in SEASONS:
+        return [x for x in events(code, y) if (x.get("season") or {}).get("type") == 3]
+    path = os.path.join(CACHE, "post-%s-%d.json" % (code.lower(), y))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))["events"]
+    sport, grp = SPORTS[code]
+    ev = []
+    if code == "CFB":
+        ev = fetch(sport, {"dates": "%d1201-%d0131" % (y, y + 1), "groups": grp,
+                           "limit": 1000}, "x", cacheable=False).get("events", [])
+    else:
+        d, end = dt.date(y + 1, 3, 10), dt.date(y + 1, 4, 10)
+        while d < end:
+            e = min(d + dt.timedelta(days=6), end)
+            ev += cbb_range(d, e, False)
+            d = e + dt.timedelta(days=1)
+    seen, post = set(), []
+    for x in ev:
+        if x.get("id") and x["id"] not in seen and (x.get("season") or {}).get("type") == 3:
+            seen.add(x["id"])
+            post.append(x)
+    if season_over(code, y):
+        json.dump({"events": post}, open(path, "w", encoding="utf-8"))
+    return post
+
+
 def events(code, y):
     """CFB accepts a wide date range; CBB 404s on one and silently caps at
     limit=1000, so it is walked a week at a time."""
@@ -240,6 +318,11 @@ def playoff_finish(code, y, evs):
             continue
         heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
         stage = rules.stage_label(code, 3, heads, season=y) or ""
+        # before the CFP (2011-2013) the title game was the BCS National
+        # Championship, which reads as a bowl
+        if (code == "CFB" and not stage.startswith("CFP")
+                and "national championship" in " ".join(heads).lower()):
+            stage = "CFP | Championship"
         if not (stage.startswith("CFP") or stage.startswith("NCAA Tournament")):
             continue
         rnd = stage.split(" | ")[1] if " | " in stage else ""
@@ -550,10 +633,21 @@ def harvest():
     ratings = load_ratings()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
-        for y in RIVAL_SEASONS + SEASONS:
-            # before the archive, only games his rivals played -- for Rivals alone
+        years = set(RIVAL_SEASONS) | set(SEASONS) | rules.MICHIGAN_SEASONS.get(code, set())
+        for y in sorted(years):
+            # before the archive: his rivals' games from 2014, for Rivals, and
+            # every Michigan game from 2011, for the Michigan view -- one list
             archive_era = y in SEASONS
-            evs = events(code, y) if archive_era else rival_events(code, y)
+            if archive_era:
+                evs = events(code, y)
+            else:
+                evs, ids = [], set()
+                for x in ((rival_events(code, y) if y in RIVAL_SEASONS else []) +
+                          (michigan_events(code, y)
+                           if y in rules.MICHIGAN_SEASONS.get(code, ()) else [])):
+                    if x.get("id") not in ids:
+                        ids.add(x.get("id"))
+                        evs.append(x)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
@@ -562,11 +656,12 @@ def harvest():
             # the Michigan view: opponents' playoff finish and final AP rank this
             # season, and last season's national champion (the "^" in his sheet)
             mich_season = y in rules.MICHIGAN_SEASONS.get(code, ())
-            finish = playoff_finish(code, y, evs) if mich_season else {}
+            finish = (playoff_finish(code, y, postseason_events(code, y))
+                      if mich_season else {})
             final_ap = final_poll(code, y) if mich_season else {}
             reigning = None
-            if mich_season and (y - 1) in SEASONS:
-                last = playoff_finish(code, y - 1, events(code, y - 1))
+            if mich_season:
+                last = playoff_finish(code, y - 1, postseason_events(code, y - 1))
                 reigning = next((t for t, f in last.items() if f == "Champs"), None)
             for x in evs:
                 comps = x.get("competitions") or []
@@ -595,6 +690,10 @@ def harvest():
                     any(k["team"]["id"] in rivals_here and not k.get("winner") for k in cs)
                     and (not all(k["team"]["id"] in rivals_here for k in cs)
                          or x["id"] in rules.RIVALS_INCLUDE))
+                # Rivals reaches back to 2014 only: an older Michigan-view season
+                # must not feed it
+                if not archive_era and y not in RIVAL_SEASONS:
+                    rival_loss = False
                 postseason = stype == 3
                 # bowls / CFP / NCAA are dropped -- unless a rival lost one
                 # a Michigan-view season keeps every Michigan game, bowls and

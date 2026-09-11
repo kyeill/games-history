@@ -731,6 +731,23 @@ contrasts better, whenever the accessories colour is under 3:1 on its box. The r
 column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
 again if the font or size changes.
 
+**The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
+keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
+Ohio State, Michigan State and Notre Dame games, so every season before 2021
+is walked again: `michigan_events` fetches the whole scoreboard, keeps the
+Michigan games as cache/michigan-SPORT-SEASON.json and every team's postseason
+as cache/post-SPORT-SEASON.json (`postseason_events` fetches 2010's on its own,
+for 2011's reigning champion). An opponent's CFP / NCAA finish needs those
+postseason games -- a Michigan-only list would only know the rounds Michigan
+played. Before the CFP the title game is the BCS National Championship, which
+`stage_label` reads as a bowl, so `playoff_finish` treats any "national
+championship" headline as the final. Rivals still starts in 2014: in an older
+season `rival_loss` is forced False, or Michigan's wins over rivals in 2011-2013
+would have reached that view. Neutral-site detection stays honest on these
+partial seasons because `offsite_games` needs a team's four home games before
+calling a venue unusual. Basketball networks are thin in ESPN's data before
+2012-13, so early cards can show no network (accepted, his call).
+
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
 (orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`
 #9a9a95, 5.87:1), set in `rowHtml` for every view including Rivals. Grey is

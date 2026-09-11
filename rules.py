@@ -73,11 +73,12 @@ VENUE_METROS = {
 CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut"}
 
 
-# MICHIGAN view (trial, his call 2026-09-11): every Michigan game in these
-# seasons gets a view of its own -- one opponent per card, with his own
-# details from michigan.csv and ratings.csv. 2011 onward if the trial holds.
+# MICHIGAN view (his call 2026-09-11): every Michigan game from 2011 on (the
+# 2011-12 basketball season on) gets a view of its own -- one opponent per card,
+# with his own details from michigan.csv and ratings.csv. It began as a trial
+# on 2023 football and 2025-26 basketball.
 MICHIGAN = "130"
-MICHIGAN_SEASONS = {"CFB": {2023}, "CBB": {2025}}
+MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026))}
 
 # How far an opponent went in the CFP or the NCAA Tournament, written the way
 # his sheet writes it: [Qtrs], [Semis], [Champs].
