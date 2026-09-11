@@ -720,6 +720,14 @@ uniform row (`.mrank`, margin-right 6px so it sits under the score, whose line
 carries 6px of right padding). The Dense / Compact switch is gone: with the
 rows fixed there was nothing left for it to move. A postseason win or a win
 over a rival washes the whole card (`.mwash`) instead of the name line.
+Then the uniform moved INTO the score and rank boxes (jersey behind the
+score, pants behind Michigan's rank, accessories as the text), Michigan's
+rank moved beside the score, the TV details went into the header only when
+it names no window or stage, and the chips became one row in his order.
+TRAP: an accessories colour equal to its box (Blue / Blue / Blue) would
+print blue on blue -- `ink()` swaps in navy, or maize on navy. The rank
+column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
+again if the font or size changes.
 
 **Ranking colours are a CARD class, not a team one** (2026-09-11): `rk-upset`
 (orange, `--accent` #e0834f, 5.95:1 on the card) or `rk-grey` (grey, `--muted`

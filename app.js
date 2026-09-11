@@ -292,8 +292,8 @@ function rowHtml(g, browse) {
    the same frame as every other card: the header (his emoji and the NC / B1G
    game number in front), then ONE team line -- the opponent, with its rank at
    the time, its playoff finish [Semis] or final rank [#13] or his SP+/KenPom
-   (73+), and the score from Michigan's side. Then a uniform row with
-   Michigan's rank in a maize box, and a bottom row of every other detail.
+   (73+), and the score and Michigan's rank in boxes painted as Michigan's
+   uniform. Then one row of chips.
    His own columns come from michigan.csv via harvest: emoji, border, caps,
    uniform and note. */
 const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#f2f2f0",
@@ -303,10 +303,6 @@ function michColour(v) {
   const s = String(v || "").trim();
   if (/^#?[0-9a-f]{6}$/i.test(s)) return "#" + s.replace("#", "");
   return MICH_COLOURS[s.toLowerCase()] || null;
-}
-function uniChip(v) {
-  return '<span class="tag t-uni"><i style="background:' +
-    (michColour(v) || "#6a6a70") + '"></i>' + esc(v) + "</span>";
 }
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
@@ -319,16 +315,34 @@ function michCard(g, p) {
   const fin = mx.finish ? "[" + mx.finish + "]" : mx.final ? "[#" + mx.final + "]"
     : mx.rating ? "(" + mx.rating + "+)" : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
-  // HEADER: his emoji, the game number and the week or stage at the left; ALL
-  // the TV information with the date at the right (his call 2026-09-11), which
-  // frees the full width below for the opponent
+  // HEADER (his call 2026-09-11): a card whose header already names a window
+  // or a stage shows no TV details at all; a bare one takes them after a pipe,
+  // "[nc1] WEEK 1 | PEACOCK 12:00PM". The date keeps the right.
+  const bare = !g.stage && !g.header;
+  const tv = bare ? ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
+    "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>" : "";
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
-    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when;
-  const tv = '<span class="mtv"><span' + col(p.netCol) + ">" +
-    esc(primaryNet(g.nets) || "\u2014") + "</span> <span" + col(p.timeCol) + ">" +
-    fmtTime(g.time) + "</span></span>";
+    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + p.when + tv;
+  // UNIFORM (his call 2026-09-11): the score box is the jersey, the rank box
+  // the pants, and the accessories colour is the text on both -- unless it
+  // matches its box, when navy (or maize on navy) takes over so the number
+  // stays readable. Basketball's single uniform colours both boxes.
+  const u = (mx.uni || []).map(michColour);
+  const top = u[0] || null;
+  const pants = (u.length >= 3 ? u[1] : u[0]) || null;
+  const acc = u.length >= 3 ? u[2] : null;
+  const ink = bg => (acc && acc !== bg) ? acc
+    : (bg === "#00274c" || bg === "#111114") ? "#ffcb05" : "#00274c";
+  const paint = bg => (bg ? ' style="background:' + bg + ";color:" + ink(bg) + '"' : "");
+  const score = '<span class="sc' + (top ? " mbox" : "") + '"' + paint(top) + ">" +
+    m.score + "-" + opp.score + "</span>";
+  // Michigan's rank at the time, right beside the score (n/a when unranked but
+  // there is a uniform to show)
+  const umText = m.rank ? (playoffGame(g) ? "NO. " : "#") + m.rank : (pants ? "n/a" : "");
+  const umRank = umText ? '<span class="mrank"' + paint(pants) + ">" + umText + "</span>"
+    : "<span></span>";
   // TEAM LINE: rank, name, "^" for last season's champion, the rating right
-  // after the name (the name shortens first), Michigan's score first
+  // after the name (the name shortens first), then the score and Michigan's rank
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' + (opp.rank ? '<span class="rn">' + opp.rank + "</span>" : "") +
@@ -336,14 +350,25 @@ function michCard(g, p) {
     '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
       (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span>" +
-    '<span class="sc">' + m.score + "-" + opp.score + "</span></div>";
-  // UNIFORM ROW: his jersey / pants / accessories, and Michigan's rank in a
-  // maize box at the far right, under the score (his call 2026-09-11)
-  const uniRow = (mx.uni || []).map(uniChip).join("") +
-    (m.rank ? '<span class="mrank">' + (playoffGame(g) ? "NO. " : "#") + m.rank +
-      "</span>" : "");
-  // BOTTOM ROW: every other detail -- his note, the place, the tags
-  const details = [mx.note ? chip("grey", mx.note) : ""].concat(p.tags).filter(Boolean);
+    score + umRank + "</div>";
+  // ONE CHIP ROW, in his order (2026-09-11): location, event, the home & home
+  // family, Big Noon, GameDay, anything else, then his Big Ten note. The two
+  // long show tags carry a short form for trimMichChips.
+  const mine = myTags(g.id);
+  const SERIES_FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral",
+                         "Annual", "Buy Game"];
+  const tagChip = (t, short) => '<span class="tag t-mine ' + tagClass(t) + '"' +
+    (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(t) + "</span>";
+  const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
+  const chips = [];
+  if (place) chips.push(chip("champ", place));
+  if (g.event && !g.stage) chips.push(chip("champ", g.event));
+  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(tagChip(t)));
+  if (mine.indexOf("Big Noon Kickoff") > -1) chips.push(tagChip("Big Noon Kickoff", "Big Noon"));
+  if (mine.indexOf("College GameDay") > -1) chips.push(tagChip("College GameDay", "GameDay"));
+  mine.filter(t => SERIES_FAMILY.indexOf(t) < 0 && t !== "Big Noon Kickoff" &&
+    t !== "College GameDay").forEach(t => chips.push(tagChip(t)));
+  if (mx.note) chips.push(chip("grey", mx.note));
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its name line
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
@@ -364,12 +389,34 @@ function michCard(g, p) {
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      '<span class="mhr">' + tv + '<span class="hdate">' + fmtDate(g.date) +
-      "</span></span></div>" +
+      '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
-    '<div class="muni">' + uniRow + "</div>" +
-    '<div class="tags">' + details.join("") + "</div></button>";
+    '<div class="tags">' + chips.join("") + "</div></button>";
 }
+
+// A Michigan chip row that runs onto a second line trims its long show tags --
+// "Big Noon Kickoff" to "Big Noon", "College GameDay" to "GameDay" (his call
+// 2026-09-11). Re-run after every draw and when the window changes size.
+function trimMichChips() {
+  document.querySelectorAll(".row.mich .tags").forEach(row => {
+    const shorts = row.querySelectorAll("[data-short]");
+    if (!shorts.length) return;
+    shorts.forEach(s => { if (s.dataset.full) s.textContent = s.dataset.full; });
+    const first = row.firstElementChild;
+    const wrapped = () => Array.prototype.some.call(row.children,
+      c => c.offsetTop > first.offsetTop + 2);
+    if (!wrapped()) return;
+    shorts.forEach(s => {
+      if (!s.dataset.full) s.dataset.full = s.textContent;
+      s.textContent = s.dataset.short;
+    });
+  });
+}
+let MICH_RESIZE = null;
+window.addEventListener("resize", () => {
+  clearTimeout(MICH_RESIZE);
+  MICH_RESIZE = setTimeout(() => { if (VIEW === "michigan") trimMichChips(); }, 150);
+});
 
 /* Dividers in the Michigan view (his call 2026-09-11), only when one season
    is picked: a BYE for each Saturday a football schedule skips, and
@@ -819,6 +866,7 @@ function draw() {
     : '<p class="empty">' + (TAB === "browse"
       ? "Pick a start and end date, then Load."
       : "Nothing matches those filters.") + "</p>";
+  if (VIEW === "michigan" && TAB !== "browse") trimMichChips();
   drawSync();
 }
 

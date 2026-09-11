@@ -344,18 +344,23 @@ not on a Saturday: "WEEK 1 (THU)".
 
 **Michigan** is a fourth view on each tab -- a TRIAL (his call 2026-09-11),
 2023 football and 2025-26 basketball only for now. One card per Michigan game,
-every game that season, in four rows. The HEADER: his emoji, the game number in
-brackets ([nc1] non-conference, [g1] conference), the week or stage -- and at
-the right all the TV information (network, time) with the date. The TEAM LINE,
-full width: the opponent's rank at the time, "at" / "vs.", the name ("^" marks
-last season's national champion), then how it finished -- [Semis] in the CFP or
-NCAA Tournament, [#13] for a final AP ranking, or his SP+ / KenPom as (73+) --
-and the score from Michigan's side (34-17, no W or L). The UNIFORM ROW: his
-jersey / pants / accessories chips, and Michigan's rank at the time in a maize
-box at the far right, under the score. The BOTTOM ROW: every other detail --
-his note, the place, the tags. A postseason win, or a win over Ohio State,
-Michigan State or Notre Dame, washes the whole card in the opponent's colour;
-a loss is dashed and muted. His details come from two spreadsheets read by
+every game that season, in three rows. The HEADER: his emoji, the game number
+in brackets ([nc1] non-conference, [g1] conference) and the week or stage; a
+header that names no window or stage adds the TV details after a pipe --
+"[nc1] WEEK 1 | PEACOCK 12:00PM" -- and one that does shows none. The date sits
+at the right. The TEAM LINE: the opponent's rank at the time (the column is
+just wide enough for "NO. 16"), "at" / "vs.", the name ("^" marks last season's
+national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
+[#13] for a final AP ranking, or his SP+ / KenPom as (73+) -- then the score
+from Michigan's side and Michigan's rank at the time. Those two boxes are
+Michigan's uniform: the score in the jersey colour, the rank in the pants
+colour, the accessories colour as the text (navy or maize instead when it would
+vanish into its box). ONE CHIP ROW, in his order: location, event, the home &
+home family, Big Noon, GameDay, anything else, his Big Ten note -- "Big Noon
+Kickoff" and "College GameDay" shorten to "Big Noon" and "GameDay" when the row
+would run onto a second line. A postseason win, or a win over Ohio State,
+Michigan State or Notre Dame, washes the whole card in the opponent's colour; a
+loss is dashed and muted. His details come from two spreadsheets read by
 `harvest.py`: `michigan.csv` (per game: emoji, border colour, caps Y/N, jersey /
 pants / accessories or one basketball uniform, note) and `ratings.csv` (per
 opponent per season: SP+ or KenPom). With one season picked, tiles mark each
