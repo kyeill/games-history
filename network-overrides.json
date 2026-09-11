@@ -1,0 +1,24 @@
+{
+  "_comment": "Networks for games ESPN records with NO broadcast at all -- the scoreboard and the game summary are both empty. Game id -> network names as ESPN writes them (FOX, CBS, ESPN, FS1, BTN, Peacock). Used only when ESPN lists nothing, and read BEFORE the window rules run, so a network here can place a game in a window. From him, 2026-09-11. Run `python harvest.py && python site.py` afterwards.",
+  "401000999": [
+    "ESPN"
+  ],
+  "401082563": [
+    "CBS"
+  ],
+  "401112217": [
+    "BTN"
+  ],
+  "401376643": [
+    "FS1"
+  ],
+  "401414550": [
+    "FOX"
+  ],
+  "401588605": [
+    "Peacock"
+  ],
+  "401731040": [
+    "FOX"
+  ]
+}

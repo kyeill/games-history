@@ -152,6 +152,9 @@ SERIES = [
     ("401112227", "Home & Home", "CFB 2019    Notre Dame at Michigan"),
     ("401112214", "Home & Home", "CFB 2019    Arizona State at Michigan State"),
     ("401628490", "Home & Home", "CFB 2024    Michigan State at Boston College"),
+    # three seasons apart, found by the non-conference review (2026-09-11)
+    ("401281948", "Home & Home", "CFB 2021    Louisiana State at UCLA"),
+    ("401628365", "Home & Home", "CFB 2024    UCLA at Louisiana State"),
     # --- Neutral & Neutral
     ("401591373", "Neutral & Neutral", "CBB 2023-24 Connecticut at Gonzaga"),
     ("401710007", "Neutral & Neutral", "CBB 2024-25 Gonzaga at UCLA"),
@@ -223,6 +226,11 @@ NOT_SERIES = [
     ("CBB", "2050", "282", "Ball State / Indiana State", "he does not count it as annual"),
     ("CBB", "2287", "2050", "Illinois State / Ball State", "three straight; skipped"),
     ("CBB", "2641", "150", "Texas Tech / Duke", "the same neutral site both years; skipped"),
+    # from the non-conference review, 2026-09-11
+    ("CFB", "61", "228", "Georgia / Clemson", "Charlotte 2021, Atlanta 2024: not a series"),
+    ("CBB", "150", "127", "Duke / Michigan State", "Duke at Michigan State 2025-26 is not a first leg"),
+    ("CBB", "258", "194", "Virginia / Ohio State", "Nashville 2026 is not a first leg"),
+    ("CBB", "277", "194", "West Virginia / Ohio State", "Cleveland 2019, 2023, 2025: not a series"),
 ]
 
 BUY_GAMES = [

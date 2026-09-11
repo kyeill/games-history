@@ -686,9 +686,14 @@ Rivals-only basketball and football (Butler-Ohio State at the 2017 PK80,
 Wisconsin-Ohio State 2019-03-10, Michigan State at Wisconsin football
 2019-10-12, Florida-Ohio State at the 2021 Fort Myers Tip-Off, Iowa-Ohio State
 2022-02-19); one is on TV Windows (Indiana State-Ball State, 2023 Indy Classic)
-and one on Key Games (Ole Miss-Purdue, 2024-11-29). The card just shows no
-network. `window-overrides.json` cannot help -- it sets windows, not networks
--- so a fix would be a new network-override file. Separately, 244 games carry
+and one on Key Games (Ole Miss-Purdue, 2024-11-29). He supplied all seven
+networks, which now live in `network-overrides.json` (game id -> networks),
+used only when ESPN lists none and read BEFORE the window rules -- so a
+network there can place a game in a window. It did twice: Iowa at Ohio State
+(2022-02-19, FOX) became FOX Saturday and Marquee and left Rivals-only for TV
+Windows, and Ole Miss-Purdue (2024-11-29, FOX) joined FOX Weekend.
+`window-overrides.json` could not have done this -- it sets windows, not
+networks. Separately, 244 games carry
 only networks outside `NET_PRIORITY`; they still display, because the primary
 network falls back to the first one listed.
 

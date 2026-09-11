@@ -472,6 +472,7 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `series_scan.py` | review tool: finds series candidates for `seed_series.py` |
 | `window-overrides.json` | re-files a game into a window, header and all |
 | `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
+| `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
 | `event-overrides.json` | a clean name for a basketball event chip (sponsor and capitals stripped), or null for the city; matched case-blind |
 | `logos.py` | ported from sports-daily; measures both crest variants |
 | `site.py` | builds `docs/` — HTML, icons, manifest, service worker |

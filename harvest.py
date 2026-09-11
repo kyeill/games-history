@@ -262,6 +262,18 @@ def load_overrides():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def load_network_overrides():
+    """Networks for games ESPN records with NO broadcast at all -- see
+    network-overrides.json. Seven games, checked 2026-09-11: the scoreboard's
+    broadcasts and the game summary are both empty, so he supplied them."""
+    path = os.path.join(HERE, "network-overrides.json")
+    if not os.path.exists(path):
+        return {}
+    raw = json.load(open(path, encoding="utf-8"))
+    return {k: v for k, v in raw.items()
+            if not k.startswith("_") and isinstance(v, list)}
+
+
 def load_extras():
     """Extra windows that only FILTER -- see window-extras.json.
 
@@ -415,6 +427,7 @@ def harvest():
     latest_conf = {}          # (sport, team id) -> (date, conference id)
     overrides = load_overrides()
     extras = load_extras()
+    net_overrides = load_network_overrides()
     # A rival loss in a series he ruled (seed_series.SERIES) or tagged from his
     # phone reaches Rivals whatever else is true of it -- before this, a plain
     # home and home loss such as Oklahoma at Ohio State (2017) never did.
@@ -487,7 +500,9 @@ def harvest():
                     if prev is None or d >= prev[0]:
                         latest_conf[(code, k["team"]["id"])] = (
                             d, str(k["team"].get("conferenceId")))
-                nets = set(networks(c))
+                # ESPN's networks, or his when ESPN has none at all -- filled
+                # before the window rules, so they judge the real network
+                nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
                 ranks = [rank_of(k) for k in cs]
                 # a rival loss with no ranking on either side asks that week's
                 # AP poll, because ESPN drops some old rankings (see ap_ranks)
