@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-231249";
+const BUILD = "20260911-231614";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -510,9 +510,16 @@ function michCard(g, p) {
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
   // card starts and the seed follows it.
-  // ONLY his own border colour lights the frame (his call 2026-09-11): a loss
-  // carries no border of its own here, the muting alone says it
-  const bc = michColour(mx.border);
+  // A FINAL takes a border of its own (his call 2026-09-11): the Big Ten
+  // Tournament final in Big Ten blue, the NCAA final in NCAA blue. It marks the
+  // GAME, not the result, so it lights on a loss too -- the 2013 and 2018 NCAA
+  // finals, the 2014 / 2019 / 2026 Big Ten finals. Nothing else borders itself:
+  // an ordinary loss still carries no frame, the muting alone says it. His own
+  // border column in michigan.csv wins over both.
+  const st = g.stage || "";
+  const finalRing = st === "Big Ten Tournament | Championship" ? "#0088ce"
+    : st === "NCAA Tournament | Championship" ? "#005eb8" : null;
+  const bc = michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {
     cls += " celebrate";

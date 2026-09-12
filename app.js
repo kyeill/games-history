@@ -510,9 +510,16 @@ function michCard(g, p) {
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
   // card starts and the seed follows it.
-  // ONLY his own border colour lights the frame (his call 2026-09-11): a loss
-  // carries no border of its own here, the muting alone says it
-  const bc = michColour(mx.border);
+  // A FINAL takes a border of its own (his call 2026-09-11): the Big Ten
+  // Tournament final in Big Ten blue, the NCAA final in NCAA blue. It marks the
+  // GAME, not the result, so it lights on a loss too -- the 2013 and 2018 NCAA
+  // finals, the 2014 / 2019 / 2026 Big Ten finals. Nothing else borders itself:
+  // an ordinary loss still carries no frame, the muting alone says it. His own
+  // border column in michigan.csv wins over both.
+  const st = g.stage || "";
+  const finalRing = st === "Big Ten Tournament | Championship" ? "#0088ce"
+    : st === "NCAA Tournament | Championship" ? "#005eb8" : null;
+  const bc = michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {
     cls += " celebrate";

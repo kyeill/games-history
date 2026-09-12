@@ -423,6 +423,10 @@ there.)
 | a rival won | none | *italic* |
 | nobody's team | none | upright |
 
+A **final** carries its own border: the Big Ten Tournament final in Big Ten
+blue `#0088ce`, the NCAA final in NCAA blue `#005eb8`, on a loss as well as a
+win.
+
 (On the **Michigan view** the whole card washes in the opponent colour for a
 postseason or rival win -- but a **Big Ten Tournament** win washes only in a
 year the tournament was won, 2016-17 / 2017-18 / 2024-25, or against a rival.)

@@ -781,6 +781,12 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**The FINALS carry their own border** (his call 2026-09-11): the Big Ten
+Tournament final in Big Ten blue #0088ce, the NCAA final in NCAA blue #005eb8.
+Unlike the wash, the border marks the GAME rather than the result, so it lights
+on a loss as well -- six Big Ten finals and three NCAA finals, of which four
+are losses. His `border` column still overrides it per game.
+
 **A BIG TEN TOURNAMENT win washes the card only in a title year** (his call
 2026-09-11), or against a rival. Every other postseason win still washes. The
 point is that the wash should mark a CHAMPIONSHIP, not a quarterfinal: eleven
