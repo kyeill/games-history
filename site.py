@@ -246,7 +246,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    inline-block is not decorated by its ancestor */
 .row.mich .mcaret{margin-left:1px;font-style:normal;font-weight:600;
   display:inline-block;text-decoration:none}
-.row.mich .tl{grid-template-columns:minmax(0,1fr) auto auto;column-gap:6px;
+.row.mich .tl{grid-template-columns:minmax(0,1fr) auto;column-gap:6px;
   padding:0;margin-left:0;background:none}
 /* the stripe: crest, a rank column that holds exactly "NO. 16" (35.4px
    measured in Source Sans 3), then the name and rating. It stops before the
@@ -291,8 +291,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   min-width:0;padding-left:57px}
 /* both boxes finish at the card content edge (his call 2026-09-11): the team
    line keeps the base padding, so it is zeroed here for the score to reach it */
-.row.mich .tl{padding:0;margin-right:0}
-.row.mich .teams{padding-right:0;margin-right:0}
 .row.mich .tags.mdets{padding-right:0}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}

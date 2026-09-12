@@ -781,6 +781,12 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**TRAP: an emptied grid track still takes its gap.** When the rank box left the
+team line, `.row.mich .tl` kept three columns and the score stopped 7px short of
+the card edge -- the 0px track plus its 6px gap -- while the rank box, alone in
+its own row, reached the edge. Measure `gridTemplateColumns` when two things
+that should share an edge do not.
+
 **Michigan's rank moved to the THIRD ROW** (his call 2026-09-11): under the
 score, the same width as it, the number centred, which gives a row that would
 otherwise hold one lonely rating (five 2023 cards) a right edge. With the rank
