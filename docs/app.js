@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-205623";
+const BUILD = "20260911-205936";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -299,7 +299,7 @@ function rowHtml(g, browse) {
    uniform. Then one row of chips.
    His own columns come from michigan.csv via harvest: emoji, border, caps,
    uniform and note. */
-const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#f2f2f0",
+const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#ffffff",
   gold: "#c28c19", grey: "#8a8a92", gray: "#8a8a92", black: "#111114",
   red: "#c8102e", green: "#1d7a3a", navy: "#00274c" };
 function michColour(v) {
@@ -352,7 +352,7 @@ function michCard(g, p) {
     return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-  const WHITE = "#f2f2f0";
+  const WHITE = "#ffffff";
   const toHsl = hex => {
     const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
     const hi = Math.max(r, g, b), lo = Math.min(r, g, b), l = (hi + lo) / 2;
@@ -407,7 +407,7 @@ function michCard(g, p) {
   // still showing the pants colour when there is one
   const umRank = (m.rank || pants)
     ? '<span class="mrank"' + paint(pants) + ">" +
-      (m.rank ? String(m.rank) : "") + "</span>"
+      (m.rank ? (playoffGame(g) ? String(m.rank) : "#" + m.rank) : "") + "</span>"
     : "<span></span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)

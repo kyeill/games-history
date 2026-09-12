@@ -176,7 +176,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    box is the width of the rank column it replaces, with the digits right
    aligned and the column itself dropped -- so both names on a card start
    together, and in the same place as on every non-postseason card. */
-.rkin{color:var(--rank);font-weight:600;font-variant-numeric:tabular-nums;
+.rkin{color:var(--rank);font-size:12.5px;font-weight:600;
+  font-variant-numeric:tabular-nums;
   display:inline-block;min-width:20px;text-align:right;margin-right:8px}
 .row.rk-no .rk{display:none}
 .row.rk-no .tl{grid-template-columns:22px minmax(0,1fr) auto}

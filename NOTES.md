@@ -747,7 +747,10 @@ card). The seed box (`.rkin`) is the width of the rank column it replaces with
 the digits right aligned, and `.row.rk-no` drops the column itself, so a
 two-digit seed and a one-digit seed still start their names together and in
 line with every non-postseason card. Michigan's own rank shows no "#", and both
-Michigan boxes hold their widest reading (6.6ch for 121-108, 2ch for a rank)
+Michigan boxes hold their widest reading. The box colours are the OFFICIAL
+ones and never shift (maize #ffcb05, blue #00274c, white #ffffff); only the
+text moves. The hash stays on Michigan rank except a CFP or NCAA seed, and the
+inline seed takes the ranking size, not the name size (6.6ch for 121-108, 2ch for a rank)
 via tabular figures (7.2ch, measured: 121-108 needs 50.5px of the 6.6ch box's
 50.5px, too close to trust).
 
