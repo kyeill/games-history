@@ -781,6 +781,11 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**The opponent finish moved OFF the name line** (his call 2026-09-11): it cut
+long names short, so the finish or rating now leads the DETAIL ROW, which is
+itself plain grey text in the header style -- no chip backgrounds -- with a
+thin bar between items.
+
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
 Ohio State, Michigan State and Notre Dame games, so every season before 2021

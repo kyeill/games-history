@@ -365,7 +365,8 @@ football). A colour stripe runs
 from the crest through the rating and stops before those two boxes, which
 share one height and type size and are Michigan's uniform: the score in the jersey colour, the rank in the pants
 colour, the accessories colour as the text (navy or maize instead when it would
-vanish into its box). ONE CHIP ROW, in his order: location, event, the home &
+vanish into its box). ONE DETAIL ROW in the header style -- plain grey text,
+no chips -- in his order: the finish or rating, location, event, the home &
 home family, Big Noon, GameDay, anything else, his Big Ten note -- "Big Noon
 Kickoff" and "College GameDay" shorten to "Big Noon" and "GameDay" when the row
 would run onto a second line. A postseason win, or a win over Ohio State,

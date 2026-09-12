@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-214025";
+const BUILD = "20260911-214931";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -426,27 +426,28 @@ function michCard(g, p) {
     '<span class="nm mnm"><span class="mn">' + esc(where) +
       (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
       esc(nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
-      (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span></span>" +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span></span>" +
     score + umRank + "</div>";
-  // ONE CHIP ROW, in his order (2026-09-11): location, event, the home & home
-  // family, Big Noon, GameDay, anything else, then his Big Ten note. The two
-  // long show tags carry a short form for trimMichChips.
+  // ONE DETAIL ROW, plain grey text in the header style rather than chips (his
+  // call 2026-09-11), in his order: the finish or rating, the location, the
+  // event, the home & home family, Big Noon, GameDay, anything else, his Big
+  // Ten note. The two long show tags carry a short form for trimMichChips.
   const mine = myTags(g.id);
   const SERIES_FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral",
                          "Annual", "Buy Game"];
-  const tagChip = (t, short) => '<span class="tag t-mine ' + tagClass(t) + '"' +
-    (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(t) + "</span>";
+  const bit = (s, short) => '<span class="mdet"' +
+    (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   const chips = [];
-  if (place) chips.push(chip("champ", place));
-  if (g.event && !g.stage) chips.push(chip("champ", g.event));
-  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(tagChip(t)));
-  if (mine.indexOf("Big Noon Kickoff") > -1) chips.push(tagChip("Big Noon Kickoff", "Big Noon"));
-  if (mine.indexOf("College GameDay") > -1) chips.push(tagChip("College GameDay", "GameDay"));
+  if (fin) chips.push(bit(fin));
+  if (place) chips.push(bit(place));
+  if (g.event && !g.stage) chips.push(bit(g.event));
+  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(bit(t)));
+  if (mine.indexOf("Big Noon Kickoff") > -1) chips.push(bit("Big Noon Kickoff", "Big Noon"));
+  if (mine.indexOf("College GameDay") > -1) chips.push(bit("College GameDay", "GameDay"));
   mine.filter(t => SERIES_FAMILY.indexOf(t) < 0 && t !== "Big Noon Kickoff" &&
-    t !== "College GameDay").forEach(t => chips.push(tagChip(t)));
-  if (mx.note) chips.push(chip("grey", mx.note));
+    t !== "College GameDay").forEach(t => chips.push(bit(t)));
+  if (mx.note) chips.push(bit(mx.note));
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
@@ -472,7 +473,8 @@ function michCard(g, p) {
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
       '<span class="hdate">' + right + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
-    '<div class="tags">' + chips.join("") + "</div></button>";
+    '<div class="tags mdets">' +
+      chips.join('<span class="msep">|</span>') + "</div></button>";
 }
 
 // A Michigan chip row that runs onto a second line trims its long show tags --
