@@ -289,9 +289,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   text-transform:none;color:var(--muted);margin-top:5px}
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
   min-width:0;padding-left:57px}
-/* both boxes finish at the card content edge (his call 2026-09-11) */
-.row.mich .tl{padding-right:0}
-.row.mich .mstripe{margin-right:0}
+/* both boxes finish at the card content edge (his call 2026-09-11): the team
+   line keeps the base padding, so it is zeroed here for the score to reach it */
+.row.mich .tl{padding:0;margin-right:0}
+.row.mich .teams{padding-right:0;margin-right:0}
 .row.mich .tags.mdets{padding-right:0}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}
