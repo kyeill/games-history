@@ -200,6 +200,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    the view is a record of what was on, not a scoreboard of their results. One
    that beat Michigan is struck through as well: line, no weight. */
 .row.flatwin .tl.won .nm{font-weight:400}
+/* ...and in a MICHIGAN LOSS on that view the scores lose their bold as well
+   (his call 2026-09-12), both of them. struck means Michigan lost; flatwin is
+   only ever set on TV Windows -- so the two together name exactly that card,
+   and the same loss keeps its bold scores on Key Games and Rivals. */
+.row.struck.flatwin .sc{font-weight:400}
 /* overtime: the winning score is underlined, instead of an OT chip */
 .row.ot .tl.won .sc{text-decoration:underline;text-underline-offset:3px;
   text-decoration-thickness:2px}
