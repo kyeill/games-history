@@ -343,6 +343,18 @@ def playoff_finish(code, y, evs):
     return out
 
 
+def load_game_overrides():
+    """game-overrides.json -- per-game facts ESPN gets wrong or omits, by game
+    id. Understood keys: "city" (the neutral-site chip) and "event" (the
+    showcase name). event-overrides.json cannot reach these games: it is keyed
+    on the ESPN event NAME, which for them is null (his call 2026-09-11)."""
+    path = os.path.join(HERE, "game-overrides.json")
+    if not os.path.exists(path):
+        return {}
+    raw = json.load(open(path, encoding="utf-8"))
+    return {k: v for k, v in raw.items() if not k.startswith("_")}
+
+
 def load_michigan_sheet():
     """michigan.csv -- his own details for the Michigan view, by ESPN game id:
     the highlight emoji, a border colour, capitals (Y/N), the uniform (jersey,
@@ -665,6 +677,7 @@ def harvest():
         pass
     shows = show_games()
     ev_overrides = load_event_overrides()
+    game_over = load_game_overrides()
     mich_sheet = load_michigan_sheet()
     ratings = load_ratings()
     seeds = load_seeds()
@@ -952,14 +965,16 @@ def harvest():
                                            big_ten=(bt in confs),
                                            tourney=tourney),
                     "offsite": offsite.get(x["id"]),
-                    "city": rules.display_city(
-                        (v.get("address") or {}).get("city"), v.get("fullName")),
+                    "city": (game_over.get(x["id"], {}).get("city")
+                             or rules.display_city(
+                                 (v.get("address") or {}).get("city"), v.get("fullName"))),
                     "nets": sorted(nets), "teams": side,
                     "header": (rules.cfb_header(card_slots, d, forced)
                                if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
-                    "event": event, "bfri": black_friday, "suffix": suffix,
+                    "event": (game_over.get(x["id"], {}).get("event") or event),
+                    "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
                     "rivals_only": rivals_only,
@@ -985,13 +1000,21 @@ def harvest():
     # game numbers for the Michigan view, as his sheet writes them (his call
     # 2026-09-11, both sports): nc1, nc2 ... for non-conference games and g1,
     # g2 ... for conference games, regular season only -- no number for a
-    # conference championship or tournament game or the postseason
+    # conference championship or tournament game or the postseason. A
+    # non-conference game against a POWER team, or Notre Dame, capitalises its
+    # prefix -- NC3 -- so the games that matter stand out from the buy games.
     count = collections.Counter()
     for g in keep:
         if g.get("michigan") and not g["post"] and not g["champ"]:
             key = (g["sport"], g["season"], len({t["conf"] for t in g["teams"]}) == 1)
             count[key] += 1
-            g["mx"]["num"] = ("g%d" if key[2] else "nc%d") % count[key]
+            if key[2]:
+                g["mx"]["num"] = "g%d" % count[key]
+            else:
+                opp = next((t for t in g["teams"] if t["id"] != rules.MICHIGAN), None)
+                big = opp is not None and rules.nc_power(
+                    g["sport"], g["season"], opp["id"], opp.get("conf"))
+                g["mx"]["num"] = ("NC%d" if big else "nc%d") % count[key]
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf

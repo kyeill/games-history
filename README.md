@@ -347,7 +347,8 @@ first (his call 2026-09-11) -- every Michigan game
 from 2011 on (2011-12 in basketball), his call 2026-09-11. It began as a trial
 on 2023 football and 2025-26 basketball. One card per Michigan game,
 every game that season, in three rows. The HEADER: his emoji, the game number
-in brackets ([nc1] non-conference, [g1] conference) and the week or stage; the TV details follow
+in brackets ([nc1] non-conference, [NC1] when that opponent is a power-four /
+five / six team or Notre Dame, [g1] conference) and the week or stage; the TV details follow
 a bar -- "[nc1] WEEK 1 | PEACOCK 12:00PM" -- unless a window label already
 fills the header. A stage card drops its own bar and the word "Tournament",
 takes the TV details after the bar, and puts its day beside the date: "2026
@@ -547,7 +548,8 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `series_scan.py` | review tool: finds series candidates for `seed_series.py` |
 | `window-overrides.json` | re-files a game into a window, header and all |
 | `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
-| `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
+| `game-overrides.json` (per-game city / event where ESPN has none, by game
+id), `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
 | `michigan.csv` | his per-game details for the Michigan view: emoji, border, caps, uniform, note (open in Excel or Sheets; keep it CSV UTF-8) |
 | `ratings.csv` | his final SP+ / KenPom rank for each opponent, per season, for the Michigan view |
 | `event-overrides.json` | a clean name for a basketball event chip (sponsor and capitals stripped), or null for the city; matched case-blind |

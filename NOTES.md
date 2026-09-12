@@ -781,6 +781,21 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**game-overrides.json reaches a game event-overrides cannot** (2026-09-11).
+The 2012 Alabama game in Arlington carries NO city, venue or event from ESPN,
+and the 2017 Florida game carries the city but no event -- and
+`event-overrides.json` is keyed on the ESPN event NAME, which is null for both,
+so it can never match them. The new file is keyed by GAME ID, like
+`network-overrides.json`, and forces `city` and `event`.
+
+**A non-conference game against a POWER team capitalises its number** (his
+call 2026-09-11): NC3, not nc3 -- power four / five / six by season, plus Notre
+Dame, which is independent in football. The pools are ESPN conference IDS and
+they differ by sport: football 1/4/5/8/9, basketball 2/4/7/8/21/23. The Pac-12
+(9 and 21) leaves the pool from 2024. TRAP: ESPN's per-game conference is not
+always the one the team held that season -- San Diego State 2011 is stamped
+Pac-12 though it was Mountain West -- so NC_CONF_WRONG excludes it by hand.
+
 **The team line CENTRES, it does not sit on a baseline** (his call
 2026-09-11). A baseline was tried first and looked wrong: the rank (12.5px),
 the name (15px) and the finish (12px) are three type sizes, so a shared

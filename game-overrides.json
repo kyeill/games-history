@@ -1,0 +1,5 @@
+{
+  "_comment": "Per-GAME fixes for facts ESPN records wrongly or not at all, keyed by game id. Unlike event-overrides.json (keyed by ESPN's event NAME) this reaches a game whose event name is null. Keys understood: \"city\" (the neutral-site location chip) and \"event\" (the showcase name beside it). From him, 2026-09-11. Run `python harvest.py && python site.py` afterwards.",
+  "322450333": {"city": "Arlington", "event": "Cowboys Classic"},
+  "400933830": {"city": "Arlington", "event": "Advocare Classic"}
+}

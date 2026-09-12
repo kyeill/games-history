@@ -318,6 +318,29 @@ def cfb_opener(nets, d, week, week0=False, big_ten=False, ranked=False,
 
 
 CFB_POWER = {"1", "4", "5", "8", "9"}    # ACC, Big 12, Big Ten, SEC, Pac-12
+# The same pools by ESPN CONFERENCE ID, per sport, for the NC / nc test below.
+# Basketball has six: ACC 2, Big East 4, Big Ten 7, Big 12 8, Pac-12 21, SEC 23.
+POWER_CONF_IDS = {"CFB": CFB_POWER, "CBB": {"2", "4", "7", "8", "21", "23"}}
+PAC12_ID = {"CFB": "9", "CBB": "21"}
+# ESPN stamps a handful of old games with a conference the team did not hold
+# that season. San Diego State was MOUNTAIN WEST in 2011, never Pac-12, so the
+# id alone would capitalise that game wrongly (his call 2026-09-11).
+NC_CONF_WRONG = {("CFB", 2011, "21")}
+
+
+def nc_power(sport, season, opp_id, conf):
+    """True when a NON-CONFERENCE opponent is a power-conference team, or Notre
+    Dame, so the Michigan game number reads "NC3" rather than "nc3" (his call
+    2026-09-11). The Pac-12 leaves the pool from 2024, when it broke up, which
+    is what makes it Power Four in football and Power Five in basketball."""
+    if opp_id == NOTRE_DAME:
+        return True
+    if (sport, season, opp_id) in NC_CONF_WRONG:
+        return False
+    pool = set(POWER_CONF_IDS[sport])
+    if season >= 2024:
+        pool.discard(PAC12_ID[sport])
+    return conf in pool
 
 
 def cfb_neutral_kickoff(d, season, neutral, teams):
