@@ -724,10 +724,15 @@ Then the uniform moved INTO the score and rank boxes (jersey behind the
 score, pants behind Michigan's rank, accessories as the text), Michigan's
 rank moved beside the score, the TV details went into the header only when
 it names no window or stage, and the chips became one row in his order.
-TRAP: an accessories colour can vanish into its box -- blue on blue, and
-white on maize, which the first cut missed because it only tested for an
-exact match (UNLV 2023). `ink()` now swaps in navy or maize, whichever
-contrasts better, whenever the accessories colour is under 3:1 on its box. The rank
+TRAP: an accessories colour can vanish into its box -- blue on blue, white on
+maize -- and he wants those pairings anyway. `ink()` therefore keeps the HUE
+and moves LIGHTNESS until the text reads 3:1 on its box: maize on maize is the
+lightest gold that works (#8f7100, fine 0.01 steps so it stops as soon as it
+crosses), blue on blue a lighter blue (#0076e5, coarser 0.05 steps -- he liked
+that one). WHITE is exempt by his call 2026-09-11: the school palette shows
+unshifted, so a white box takes maize or blue and a maize or blue box takes
+white; white on white alone would vanish, so it reads blue. That leaves the
+two maize-and-white pairings at 1.36:1, faint on purpose. The rank
 column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
 again if the font or size changes.
 
