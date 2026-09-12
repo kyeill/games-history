@@ -381,7 +381,7 @@ function michCard(g, p) {
     // WHITE keeps the school palette (his call 2026-09-11): maize or blue on a
     // white box, white on a maize or blue one, with no shifting -- white on
     // white alone would vanish, so that reads blue
-    if (fg === WHITE && bg === WHITE) return "#00274c";
+    if (fg === WHITE && bg === WHITE) return "#b4b4ae";
     if (fg === WHITE) return fg;
     if (bg === WHITE) {
       // maize on white reads faint, so it goes a touch darker (his call
@@ -453,10 +453,10 @@ function michCard(g, p) {
   let cls = " mich mich-" + g.sport.toLowerCase() +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
-    (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
-    // a seeded game -- the CFP, the NCAA Tournament, or one of his conference
-    // tournament seeds -- drops the rank column, the seed riding with the name
-    (seedGame(g) ? " rk-no" : "");
+    (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
+  // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
+  // game, empty (his call 2026-09-11), so the vs. starts where every other
+  // card starts and the seed follows it.
   // his border colour when he gives one; otherwise a loss is dashed and muted
   const bc = michColour(mx.border);
   let ring = "";
