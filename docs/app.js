@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260912-080341";
+const BUILD = "20260912-080827";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -645,14 +645,13 @@ function struck(g) {
   const m = michTeam(g);
   return !!(m && !m.win);
 }
-// ...and on TV WINDOWS a rival win is not even BOLD (his call 2026-09-12).
-// Only there: Rivals exists to show exactly these games, and Key Games is his
-// own reading list. A rival that beat MICHIGAN keeps its bold -- that card is
-// already struck through, and unbolding it as well would read as an accident.
+// ...and on TV WINDOWS a rival win is not even BOLD (his calls 2026-09-12).
+// EVERY rival win, Michigan games included: one that beat him reads struck
+// through AND unbolded. Only this view needs the rule -- Key Games and Rivals
+// never carry a rival win in the first place. A non-rival that beat Michigan
+// keeps its bold: the rule is about THEM, not about the defeat.
 function flatWin(g) {
   if (VIEW !== "tv") return false;
-  const m = michTeam(g);
-  if (m) return false;
   return g.teams.some(t => isRival(t) && t.win);
 }
 
