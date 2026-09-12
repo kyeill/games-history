@@ -791,7 +791,7 @@ long names short, so the finish or rating now leads the DETAIL ROW, which is
 itself plain grey text in the header style -- no chip backgrounds -- with a
 bar between items in the header's own colour, in proper case with no brackets
 or parentheses (his calls). The row is indented 29px -- the crest plus its gap --
-so it starts under the ranking column, and a CFP or NCAA card leaves the
+so it starts under the first letter of the team name (57px at 390px, measured), and a CFP or NCAA card leaves the
 opponent finish out, the header already naming the round. TRAP: taking the finish out of the name line also took the stripe's
 CLOSING tag with it, which dropped the score and rank boxes inside the stripe
 and wrapped them onto a second line.

@@ -285,13 +285,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* the third row: his details at the left, Michigan's rank box at the right,
    under the score and the same width as it (his call 2026-09-11) */
 .row.mich .tags.mdets{display:grid;grid-template-columns:minmax(0,1fr) auto;
-  gap:6px;align-items:center;font-size:13px;font-weight:400;letter-spacing:.02em;
-  text-transform:none;color:var(--muted)}
+  gap:6px;align-items:center;font-size:13px;font-weight:400;letter-spacing:.05em;
+  text-transform:none;color:var(--muted);margin-top:5px}
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
-  min-width:0;padding-left:29px}
-/* the team line pads 6px on the right, so the rank box matches it to share the
-   score box right edge exactly */
-.row.mich .tags.mdets{padding-right:6px}
+  min-width:0;padding-left:57px}
+/* both boxes finish at the card content edge (his call 2026-09-11) */
+.row.mich .tl{padding-right:0}
+.row.mich .mstripe{margin-right:0}
+.row.mich .tags.mdets{padding-right:0}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}
 /* a bye / postseason tile: one card slot, slim on a phone */
