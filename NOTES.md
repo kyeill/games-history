@@ -781,6 +781,15 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**Football finals are the CFP COMMITTEE RANKINGS from 2014** (his call
+2026-09-11), the AP poll only through 2013. ESPN type 21 ("Playoff Committee
+Rankings") runs 2014 onward; 2013 and earlier carry only AP (1), coaches (2)
+and the BCS standings (3). The two differ on 48 of Michigan opponents since
+2014 -- Ohio State 2024 is AP 1 but CFP 6 -- because the committee stops before
+the bowls while the AP poll votes after them. The CFP cache is a separate file
+per season so an AP final saved earlier is never served in its place.
+Basketball stays on AP.
+
 **One height for the stripe and both boxes** (his call 2026-09-11): 26px, set
 on all three, with the stripe vertical padding dropped so border-box leaves the
 whole 26px to content. Matching heights is what makes the score line up with

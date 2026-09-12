@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-223409";
+const BUILD = "20260911-224446";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -334,7 +334,8 @@ function michCard(g, p) {
     when += tvBits;
   }
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
-    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
+    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when +
+    ' | <span class="hdate">' + right + "</span>";
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
   // ON maize and blue ON blue, which cannot be read as the same value, so the
@@ -465,20 +466,17 @@ function michCard(g, p) {
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
   // card starts and the seed follows it.
-  // his border colour when he gives one; otherwise a loss is dashed and muted
+  // ONLY his own border colour lights the frame (his call 2026-09-11): a loss
+  // carries no border of its own here, the muting alone says it
   const bc = michColour(mx.border);
   let ring = "";
   if (bc) {
     cls += " celebrate";
     ring = ";--celeb:" + bc + ";--celebring:" + bc + "44";
-  } else if (lost) {
-    cls += " celebrate";
-    ring = ";--celeb:#5a5a62";
   }
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
-    '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
-      '<span class="hdate">' + right + "</span></div>" +
+    '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets"><span class="mdl">' +
       chips.join('<span class="msep">|</span>') + "</span>" + umRank +

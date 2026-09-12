@@ -272,20 +272,28 @@ def ap_ranks(code, y, week):
 
 
 def final_poll(code, y):
-    """The season's FINAL AP poll as {team id: rank}, cached under cache/polls/.
+    """The season's FINAL poll as {team id: rank}, cached under cache/polls/.
 
     ESPN lists a season's polls in order and the final one comes last: football
     2023 ends on "Final Rankings" (types/3/weeks/1), basketball 2025-26 on a
     postseason week 3 -- so take the last entry rather than guessing its week.
     """
     season = y if code == "CFB" else y + 1
-    path = os.path.join(POLLS, "%s-%d-final.json" % (code.lower(), season))
+    # FOOTBALL TAKES THE AP POLL THROUGH 2013 AND THE CFP COMMITTEE RANKINGS
+    # FROM 2014 (his call 2026-09-11). ESPN calls type 21 "Playoff Committee
+    # Rankings" and carries it for every season from 2014 on; 2013 and earlier
+    # have only the AP poll (type 1), the coaches poll and the BCS standings.
+    # Basketball stays on the AP poll throughout. The CFP cache is its own file
+    # so an AP final saved earlier is never served in its place.
+    kind = 21 if code == "CFB" and y >= 2014 else 1
+    path = os.path.join(POLLS, "%s-%d-final%s.json"
+                        % (code.lower(), season, "-cfp" if kind == 21 else ""))
     if os.path.exists(path):
         return json.load(open(path, encoding="utf-8"))
     ranks = {}
     try:
-        r = requests.get("%s/%s/seasons/%d/rankings/1" % (CORE, POLL_PATHS[code], season),
-                         timeout=30)
+        r = requests.get("%s/%s/seasons/%d/rankings/%d"
+                         % (CORE, POLL_PATHS[code], season, kind), timeout=30)
         refs = ([x.get("$ref") for x in (r.json().get("rankings") or [])]
                 if r.status_code == 200 else [])
         if refs:

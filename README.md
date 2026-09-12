@@ -351,9 +351,12 @@ in brackets ([nc1] non-conference, [g1] conference) and the week or stage; the T
 a bar -- "[nc1] WEEK 1 | PEACOCK 12:00PM" -- unless a window label already
 fills the header. A stage card drops its own bar and the word "Tournament",
 takes the TV details after the bar, and puts its day beside the date: "2026
-NCAA ROUND 1 | CBS 7:30PM" with "THU 3/19/26" at the right. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name ("^" marks last season's
+NCAA ROUND 1 | CBS 7:30PM | THU 3/19/26". The DATE is piped onto the end of
+the header in the header style (his call 2026-09-11), not pinned to the right
+edge, on both sports. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
-[#13] for a final AP ranking, or his SP+ / KenPom as (73+) -- then the score
+[#13] for a final ranking -- the CFP committee rankings
+from 2014, the AP poll through 2013, basketball always AP, or his SP+ / KenPom as (73+) -- then the score
 from Michigan's side. Michigan's own rank sits on the THIRD row, under the
 score and the same width as it, centred: "No. 1" in the CFP or the NCAA
 Tournament, a bare seed in a conference tournament, "#3" otherwise, a dash when
@@ -405,6 +408,10 @@ colouring the winner would celebrate a rival.
 |---|---|---|
 | Michigan won | maize `#ffcb05` | upright |
 | Michigan lost | grey `#5a5a62` | *italic* |
+
+(On the **Michigan view** a loss carries NO border at all -- his call
+2026-09-11. Only a border colour he gives in `michigan.csv` lights the frame
+there.)
 | a rival lost to anyone else | the winner's colour | upright |
 | two rivals played each other | none | *italic* |
 | a rival won | none | *italic* |

@@ -386,9 +386,18 @@ def _round(text):
     return None
 
 
+# His own short name for a bowl whose full title is unwieldy (his call
+# 2026-09-11). Matched case-blind against the headline, so it holds whether
+# ESPN shouts the name or not.
+BOWL_SHORT = {"buffalo wild wings bowl": "BWW Bowl"}
+
+
 def bowl_name(text):
     head = text.split(" - ")[0]
     low = head.lower()
+    for key, short in BOWL_SHORT.items():
+        if key in low:
+            return short
     for b in sorted(BOWL_NAMES, key=len, reverse=True):
         if (b + " bowl").lower() in low:
             return b + " Bowl"
