@@ -281,8 +281,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.mwash .tl.won .mstripe{background:transparent}
 /* the detail row reads like the header -- plain grey text, no chips (his call
    2026-09-11): finish, location, event, series, shows, his Big Ten note */
-.row.mich .tags.mdets{gap:7px;font-size:13px;font-weight:400;letter-spacing:.05em;
-  text-transform:uppercase;color:var(--muted)}
+.row.mich .tags.mdets{gap:7px;font-size:13px;font-weight:400;letter-spacing:.02em;
+  text-transform:none;color:var(--muted)}
 .row.mich .msep{color:#3f3f47}
 /* a bye / postseason tile: one card slot, slim on a phone */
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;

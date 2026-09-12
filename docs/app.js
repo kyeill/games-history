@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-214931";
+const BUILD = "20260911-215425";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -315,8 +315,8 @@ function michCard(g, p) {
     : teamName(opp, g.sport, g.season);
   if (mx.caps === "Y") nm = nm.toUpperCase();
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
-  const fin = mx.finish ? "[" + mx.finish + "]" : mx.final ? "[#" + mx.final + "]"
-    : mx.rating ? "(" + mx.rating + "+)" : "";
+  const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
+    : mx.rating ? mx.rating + "+" : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
   // | PEACOCK 12:00PM" -- unless a window label already fills the header. A
@@ -426,7 +426,8 @@ function michCard(g, p) {
     '<span class="nm mnm"><span class="mn">' + esc(where) +
       (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
       esc(nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span></span>" +
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") +
+      "</span></span></span>" +
     score + umRank + "</div>";
   // ONE DETAIL ROW, plain grey text in the header style rather than chips (his
   // call 2026-09-11), in his order: the finish or rating, the location, the
