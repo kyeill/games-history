@@ -440,7 +440,7 @@ function michCard(g, p) {
     (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   const chips = [];
-  if (fin) chips.push(bit(fin));
+  if (fin && !playoffGame(g)) chips.push(bit(fin));
   if (place) chips.push(bit(place));
   if (g.event && !g.stage) chips.push(bit(g.event));
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(bit(t)));

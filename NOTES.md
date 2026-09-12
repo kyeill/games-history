@@ -784,8 +784,10 @@ it instead, because their names have no vs. in front.
 **The opponent finish moved OFF the name line** (his call 2026-09-11): it cut
 long names short, so the finish or rating now leads the DETAIL ROW, which is
 itself plain grey text in the header style -- no chip backgrounds -- with a
-thin bar between items, in proper case with no brackets or parentheses (his
-call). TRAP: taking the finish out of the name line also took the stripe's
+bar between items in the header's own colour, in proper case with no brackets
+or parentheses (his calls). The row is indented 29px -- the crest plus its gap --
+so it starts under the ranking column, and a CFP or NCAA card leaves the
+opponent finish out, the header already naming the round. TRAP: taking the finish out of the name line also took the stripe's
 CLOSING tag with it, which dropped the score and rank boxes inside the stripe
 and wrapped them onto a second line.
 

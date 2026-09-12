@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-215603";
+const BUILD = "20260911-215953";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -440,7 +440,7 @@ function michCard(g, p) {
     (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   const chips = [];
-  if (fin) chips.push(bit(fin));
+  if (fin && !playoffGame(g)) chips.push(bit(fin));
   if (place) chips.push(bit(place));
   if (g.event && !g.stage) chips.push(bit(g.event));
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(bit(t)));
