@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-203148";
+const BUILD = "20260911-203647";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -373,7 +373,14 @@ function michCard(g, p) {
     // white box, white on a maize or blue one, with no shifting -- white on
     // white alone would vanish, so that reads blue
     if (fg === WHITE && bg === WHITE) return "#00274c";
-    if (fg === WHITE || bg === WHITE) return fg;
+    if (fg === WHITE) return fg;
+    if (bg === WHITE) {
+      // maize on white reads faint, so it goes a touch darker (his call
+      // 2026-09-11); blue on white already stands out and is left alone
+      if (ratio(fg, bg) >= 3) return fg;
+      const w = toHsl(fg);
+      return toHex(w.h, w.s, Math.max(0, w.l - 0.1));
+    }
     if (ratio(fg, bg) >= 3) return fg;
     // a light box darkens the text in fine steps, so maize on maize stops at
     // the LIGHTEST gold that still reads (his call); a dark box lightens faster

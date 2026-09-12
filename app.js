@@ -373,7 +373,14 @@ function michCard(g, p) {
     // white box, white on a maize or blue one, with no shifting -- white on
     // white alone would vanish, so that reads blue
     if (fg === WHITE && bg === WHITE) return "#00274c";
-    if (fg === WHITE || bg === WHITE) return fg;
+    if (fg === WHITE) return fg;
+    if (bg === WHITE) {
+      // maize on white reads faint, so it goes a touch darker (his call
+      // 2026-09-11); blue on white already stands out and is left alone
+      if (ratio(fg, bg) >= 3) return fg;
+      const w = toHsl(fg);
+      return toHex(w.h, w.s, Math.max(0, w.l - 0.1));
+    }
     if (ratio(fg, bg) >= 3) return fg;
     // a light box darkens the text in fine steps, so maize on maize stops at
     // the LIGHTEST gold that still reads (his call); a dark box lightens faster

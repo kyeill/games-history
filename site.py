@@ -159,6 +159,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
 .rk:not(:empty)::before{content:"#"}
+/* the ranking sits on the NAME's baseline, not its own box centre (his call
+   2026-09-11): centring two different type sizes left the digits about 1px
+   high. Crest and score keep the centre. */
+.tl .rk,.tl .nm{align-self:baseline}
 /* rankings: orange on an upset (Sports Daily's accent); grey when Michigan
    lost or Ohio State / Michigan State / Notre Dame won */
 .row.rk-upset .rk{color:var(--accent)}

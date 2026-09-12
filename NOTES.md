@@ -735,6 +735,10 @@ white; white on white alone would vanish, so it reads blue. That leaves the
 two maize-and-white pairings at 1.36:1, faint on purpose. The rank
 column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
 again if the font or size changes.
+RANKINGS SIT ON THE NAME'S BASELINE (`.tl .rk,.tl .nm{align-self:baseline}`,
+every view): grid centring put the 12.5px digits about 1.07px above the 15.5px
+name's baseline, which reads as not lining up. The crest and the score keep the
+box centre.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
