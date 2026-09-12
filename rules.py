@@ -36,7 +36,8 @@ NAME_OVERRIDES = {
     "BYU": "Brigham Young", "LSU": "Louisiana State",
     "SMU": "Southern Methodist", "TCU": "Texas Christian",
     "UCF": "Central Florida", "USF": "South Florida",
-    "USC": "Southern Cal", "UNLV": "Unlv", "UConn": "Connecticut",
+    "USC": "Southern California", "UNLV": "Unlv", "UConn": "Connecticut",
+    "App State": "Appalachian State",
 }
 
 

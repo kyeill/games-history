@@ -781,6 +781,11 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**The team line CENTRES, it does not sit on a baseline** (his call
+2026-09-11). A baseline was tried first and looked wrong: the rank (12.5px),
+the name (15px) and the finish (12px) are three type sizes, so a shared
+baseline made them read as three different heights. Centring them settles it.
+
 **Football finals are the CFP COMMITTEE RANKINGS from 2014** (his call
 2026-09-11), the AP poll only through 2013. ESPN type 21 ("Playoff Committee
 Rankings") runs 2014 onward; 2013 and earlier carry only AP (1), coaches (2)
