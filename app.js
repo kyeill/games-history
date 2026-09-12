@@ -265,7 +265,7 @@ function rowHtml(g, browse) {
   }
   return '<button class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
-    (g.ot ? " ot" : "") +
+    (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
@@ -644,6 +644,16 @@ function dimmed(g) {
 function struck(g) {
   const m = michTeam(g);
   return !!(m && !m.win);
+}
+// ...and on TV WINDOWS a rival win is not even BOLD (his call 2026-09-12).
+// Only there: Rivals exists to show exactly these games, and Key Games is his
+// own reading list. A rival that beat MICHIGAN keeps its bold -- that card is
+// already struck through, and unbolding it as well would read as an accident.
+function flatWin(g) {
+  if (VIEW !== "tv") return false;
+  const m = michTeam(g);
+  if (m) return false;
+  return g.teams.some(t => isRival(t) && t.win);
 }
 
 function celebrated(g) {

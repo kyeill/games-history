@@ -169,6 +169,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.rk-grey .rkin{color:var(--muted)}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
+/* on TV Windows a rival win carries no bold either (his call 2026-09-12) --
+   the view is a record of what was on, not a scoreboard of their results */
+.row.flatwin .tl.won .nm{font-weight:400}
 /* overtime: the winning score is underlined, instead of an OT chip */
 .row.ot .tl.won .sc{text-decoration:underline;text-underline-offset:3px;
   text-decoration-thickness:2px}
@@ -429,6 +432,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260912-075048"></script>
+<script src="app.js?v=20260912-080341"></script>
 </body>
 </html>
