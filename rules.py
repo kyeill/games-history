@@ -268,7 +268,18 @@ def cfb_slots(nets, d, season, team_ids=(), conf_ids=(), fox_friday_dates=()):
     return out
 
 
-def cfb_header(slots, d, forced=False):
+# 2023 is the ONE season CBS held both packages: its last SEC year and its
+# first Big Ten year. Weeks 1-2 are genuinely Big Ten (Ohio State, Michigan-
+# UNLV) and weeks 3-13 are all SEC -- Georgia, Alabama, Tennessee, Auburn,
+# Texas A&M, eleven games without a Big Ten team. So the 3:30 window reads
+# "SEC on CBS" across those weeks (his call 2026-09-12). A one-off: no other
+# season splits this way, which is why it is a literal season/week test and
+# not a rule.
+SEC_ON_CBS = {"season": 2023, "window": "CBS B1G Time", "weeks": (3, 13),
+              "label": "SEC on CBS"}
+
+
+def cfb_header(slots, d, forced=False, season=None, week=None):
     """The label after the date on a football card.
 
     It is USUALLY the window's own name, but ABC is the exception: the window
@@ -279,6 +290,10 @@ def cfb_header(slots, d, forced=False):
     """
     named = [w for w in CFB_WINDOWS if w in slots and w != "ABC Saturday"]
     if named:
+        s = SEC_ON_CBS
+        if (season == s["season"] and named[0] == s["window"]
+                and week is not None and s["weeks"][0] <= week <= s["weeks"][1]):
+            return s["label"]
         return named[0]
     if "ABC Saturday" not in slots:
         return None

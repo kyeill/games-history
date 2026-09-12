@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260912-074329";
+const BUILD = "20260912-075048";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -264,7 +264,8 @@ function rowHtml(g, browse) {
     ring = c ? [c, c + "44"] : null;
   }
   return '<button class="row' + (flag ? " celebrate" : "") +
-    (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
+    (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
+    (g.ot ? " ot" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
@@ -636,6 +637,14 @@ function dimmed(g) {
   const m = michTeam(g);
   return (m && !m.win) || g.teams.some(t => isRival(t) && t.win);
 }
+// The STRIKETHROUGH is narrower than dimmed (his call 2026-09-12): it marks a
+// team that beat MICHIGAN, nothing else. A rival beating anybody else still
+// greys the rankings -- that is dimmed doing its job -- but the winner is not
+// struck through, because it never beat him. 112 games stop being struck.
+function struck(g) {
+  const m = michTeam(g);
+  return !!(m && !m.win);
+}
 
 function celebrated(g) {
   const m = michTeam(g);
@@ -868,17 +877,25 @@ function filterChips() {
         .map(m => [MONTHS[m - 1], m]),
       FILT.month));
   }
-  h += group("Game type", select("type", "All Game Types",
-    order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
-  // The dropdown holds ONE window; Marquee Windows sets three at once, and
-  // while it is on the dropdown falls back to its "All" label.
-  const one = (FILT.windows && FILT.windows.length === 1) ? FILT.windows[0] : "";
-  // some windows are deliberately absent from the dropdown -- the games keep
-  // the window and still show under "All TV Windows"
-  const hidden = HIDDEN_WINDOWS[sport] || [];
-  h += group("TV window", select("window", "All TV Windows",
-    order.windows.filter(w => windows.has(w) && hidden.indexOf(w) < 0)
-      .map(w => [w, w]), one));
+  // Each view drops the dropdown it has no use for (his call 2026-09-12):
+  // TV WINDOWS is already a cut by window, so Game Type would cross two
+  // unrelated axes; KEY GAMES is a cut by game type, so the TV window would.
+  // The FILTER still exists -- only the control goes -- so clearFilters keeps
+  // working and a value set on the other view is cleared on the way in.
+  if (VIEW !== "tv")
+    h += group("Game type", select("type", "All Game Types",
+      order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
+  if (VIEW !== "big") {
+    // The dropdown holds ONE window; Marquee Windows sets three at once, and
+    // while it is on the dropdown falls back to its "All" label.
+    const one = (FILT.windows && FILT.windows.length === 1) ? FILT.windows[0] : "";
+    // some windows are deliberately absent from the dropdown -- the games keep
+    // the window and still show under "All TV Windows"
+    const hidden = HIDDEN_WINDOWS[sport] || [];
+    h += group("TV window", select("window", "All TV Windows",
+      order.windows.filter(w => windows.has(w) && hidden.indexOf(w) < 0)
+        .map(w => [w, w]), one));
+  }
   // not "order": that name already holds the game-type / window sequence above
   // only teams that would return games under the other filters
   const teamList = teamOrder(sport, teamsIn(visibleWithout("team"),

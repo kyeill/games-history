@@ -947,6 +947,12 @@ def harvest():
                                  "seed": (seeds.get((code, y, t["id"]))
                                           if seeded else None)})
                 v = c.get("venue") or {}
+                # the week this game belongs to -- None in the postseason, 0
+                # for a Week 0 game ESPN numbers as 1. Computed ONCE here so
+                # the card and the header cannot disagree.
+                week_no = (None if postseason
+                           else 0 if x["id"] in wk0
+                           else (x.get("week") or {}).get("number"))
                 keep.append({
                     "id": x["id"], "sport": code, "season": y,
                     "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
@@ -957,9 +963,7 @@ def harvest():
                     # has one too but it means nothing to a viewer, so only
                     # football displays it.
                     # ...and ESPN numbers Week 0 as week 1; see week_zero_ids
-                    "week": (None if postseason
-                             else 0 if x["id"] in wk0
-                             else (x.get("week") or {}).get("number")),
+                    "week": week_no,
                     "venue": v.get("fullName"),
                     "mq": (not rivals_only) and rules.is_marquee(code, nets, d, slots,
                                            big_ten=(bt in confs),
@@ -969,7 +973,8 @@ def harvest():
                              or rules.display_city(
                                  (v.get("address") or {}).get("city"), v.get("fullName"))),
                     "nets": sorted(nets), "teams": side,
-                    "header": (rules.cfb_header(card_slots, d, forced)
+                    "header": (rules.cfb_header(card_slots, d, forced,
+                                                season=y, week=week_no)
                                if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,

@@ -157,7 +157,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a rival won, or Michigan lost: both team lines go italic */
 /* a rival won, or Michigan lost: the WINNER's name is struck through -- no
    italics anywhere any more (his call 2026-09-11) */
-.row.dimmed .tl.won .nm,.row.mich.dimmed .mn{font-style:normal;
+/* only a team that beat MICHIGAN is struck through (his call 2026-09-12) --
+   a rival beating anyone else still greys the rankings, but is not struck */
+.row.struck .tl.won .nm,.row.mich.dimmed .mn{font-style:normal;
   text-decoration:line-through;text-decoration-thickness:1.5px}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 /* the ranking is CENTRED in its column (his call 2026-09-11), so a one-digit
