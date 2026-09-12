@@ -288,7 +288,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   gap:6px;align-items:center;font-size:13px;font-weight:400;letter-spacing:.02em;
   text-transform:none;color:var(--muted)}
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
-  min-width:0;padding-left:36px}
+  min-width:0;padding-left:65px}
 /* the team line pads 6px on the right, so the rank box matches it to share the
    score box right edge exactly */
 .row.mich .tags.mdets{padding-right:6px}
