@@ -326,16 +326,18 @@ function michCard(g, p) {
   if (g.stage) {
     const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
     when = year + esc(g.stage.replace(" Tournament", "").replace(" | ", " ")) + tvBits;
-    right = esc(g.dow) + " " + right;
+    right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
   } else if (!g.header) {
     when += tvBits;
   }
   const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
     (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
-  // UNIFORM (his call 2026-09-11): the score box is the jersey, the rank box
-  // the pants, and the accessories colour is the text on both -- unless it is
-  // too faint on its box (under 3:1 contrast: blue on blue, white on maize),
-  // when navy or maize takes over, whichever reads better. Basketball's single
+  // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
+  // the pants, and the accessories colour is the text on both. He wants maize
+  // ON maize and blue ON blue, which cannot be read as the same value, so the
+  // text KEEPS ITS HUE and moves in lightness until it reads (3:1) -- maize on
+  // maize becomes a deep gold, blue on blue a lighter blue. Only a colour that
+  // still cannot get there falls back to navy or maize. Basketball's single
   // uniform colours both boxes.
   const u = (mx.uni || []).map(michColour);
   const top = u[0] || null;
@@ -347,7 +349,36 @@ function michCard(g, p) {
     return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
-  const ink = bg => (acc && ratio(acc, bg) >= 3) ? acc
+  const toHsl = hex => {
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const hi = Math.max(r, g, b), lo = Math.min(r, g, b), l = (hi + lo) / 2;
+    if (hi === lo) return { h: 0, s: 0, l: l };
+    const d = hi - lo;
+    const s = l > 0.5 ? d / (2 - hi - lo) : d / (hi + lo);
+    const h = hi === r ? ((g - b) / d + (g < b ? 6 : 0))
+      : hi === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    return { h: h / 6, s: s, l: l };
+  };
+  const toHex = (h, s, l) => {
+    const f = n => {
+      const k = (n + h * 12) % 12, a = s * Math.min(l, 1 - l);
+      const v = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1));
+      return Math.round(v * 255).toString(16).padStart(2, "0");
+    };
+    return "#" + f(0) + f(8) + f(4);
+  };
+  const readable = (fg, bg) => {
+    if (ratio(fg, bg) >= 3) return fg;
+    const c = toHsl(fg), darken = lum(bg) > 0.18;
+    for (let i = 1; i <= 20; i++) {
+      const l = darken ? c.l - i * 0.05 : c.l + i * 0.05;
+      if (l < 0 || l > 1) break;
+      const cand = toHex(c.h, c.s, l);
+      if (ratio(cand, bg) >= 3) return cand;
+    }
+    return ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
+  };
+  const ink = bg => acc ? readable(acc, bg)
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = bg => (bg ? ' style="background:' + bg + ";color:" + ink(bg) + '"' : "");
   // the two boxes share one height and one type size (his call)

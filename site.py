@@ -217,6 +217,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich{grid-template-columns:1fr;grid-template-areas:"sport" "teams" "tags"}
 .row.mich .sport{flex-wrap:wrap;row-gap:2px}
 .row.mich .mnum{text-transform:none}
+/* the day beside a stage card's date goes up in capitals (his call) */
+.row.mich .hdow{text-transform:uppercase}
 .row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
 .row.mich .tl{grid-template-columns:minmax(0,1fr) auto auto;column-gap:6px;
   padding:0;margin-left:0;background:none}
