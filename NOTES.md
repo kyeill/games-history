@@ -735,10 +735,14 @@ white; white on white alone would vanish, so it reads blue. That leaves the
 two maize-and-white pairings at 1.36:1, faint on purpose. The rank
 column is 36px because "NO. 16" measures 35.4px in Source Sans 3; measure
 again if the font or size changes.
-RANKINGS SIT ON THE NAME'S BASELINE (`.tl .rk,.tl .nm{align-self:baseline}`,
-every view): grid centring put the 12.5px digits about 1.07px above the 15.5px
-name's baseline, which reads as not lining up. The crest and the score keep the
-box centre.
+RANKINGS line up on their VISUAL MIDDLE with the name: the shared baseline was
+tried first (grid centring left the 12.5px digits 1.07px above the 15.5px
+name's baseline) and he preferred the middle, so `.tl` simply centres every
+cell. A postseason SEED now reads in FRONT of the name (`.rkin`, "vs. 2
+WASHINGTON") rather than "NO. 2" in the column, so the rank column is 20px --
+"#25" -- in every view, and the whole team line shifts left. The team that BEAT
+Michigan is struck through (`.row.umloss`), not italic; italics still mark a
+rival's win.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only

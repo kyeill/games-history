@@ -350,11 +350,12 @@ in brackets ([nc1] non-conference, [g1] conference) and the week or stage; the T
 a bar -- "[nc1] WEEK 1 | PEACOCK 12:00PM" -- unless a window label already
 fills the header. A stage card drops its own bar and the word "Tournament",
 takes the TV details after the bar, and puts its day beside the date: "2026
-NCAA ROUND 1 | CBS 7:30PM" with "THU 3/19/26" at the right. The TEAM LINE: the opponent's rank at the time (the column is
-just wide enough for "NO. 16"), "at" / "vs.", the name ("^" marks last season's
+NCAA ROUND 1 | CBS 7:30PM" with "THU 3/19/26" at the right. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 [#13] for a final AP ranking, or his SP+ / KenPom as (73+) -- then the score
-from Michigan's side and Michigan's rank at the time (blank when unranked). A colour stripe runs
+from Michigan's side and Michigan's rank at the time (blank when unranked). A
+postseason SEED reads in front of the name instead -- "vs. 2 WASHINGTON" -- in
+the ranking's colours. A colour stripe runs
 from the crest through the rating and stops before those two boxes, which
 share one height and type size and are Michigan's uniform: the score in the jersey colour, the rank in the pants
 colour, the accessories colour as the text (navy or maize instead when it would

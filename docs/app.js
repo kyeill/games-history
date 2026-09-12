@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-203647";
+const BUILD = "20260911-204613";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -149,14 +149,17 @@ const PLACE_TOO = ["Champions Classic", "CBS Sports Classic"];
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
-function teamLine(t, sport, season) {
+function teamLine(t, sport, season, seed) {
+  // A postseason SEED reads in front of the name instead of in the rank column
+  // (his call 2026-09-11): "2 WASHINGTON", not "NO. 2". The column then only
+  // ever holds a poll ranking, so it is as narrow as "#25".
+  const inline = seed && t.rank
+    ? '<span class="rkin">' + t.rank + "</span> " : "";
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
-    // the number sits in its own box so a playoff seed can hold two digits'
-    // width ("NO. 2" leaves the room "NO. 11" needs)
-    '<span class="rk">' + (t.rank ? '<span class="rn">' + t.rank + "</span>" : "") +
-    "</span>" +
-    '<span class="nm">' + esc(teamName(t, sport, season)) + "</span>" +
+    '<span class="rk">' +
+    (t.rank && !seed ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
+    '<span class="nm">' + inline + esc(teamName(t, sport, season)) + "</span>" +
     '<span class="sc">' + t.score + "</span></div>";
 }
 
@@ -265,6 +268,9 @@ function rowHtml(g, browse) {
     // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
     // looked like a rival loss to a black-and-gold winner such as Iowa
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
+    // the team that beat Michigan is struck through, every view (his call
+    // 2026-09-11), which is why this one is not tied to the dashed border
+    ((michTeam(g) && !michTeam(g).win) ? " umloss" : "") +
     // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
@@ -279,8 +285,8 @@ function rowHtml(g, browse) {
     '<div class="sport"' + col(headCol) + ">" +
       "<span>" + when + mark + "</span>" +
       '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
-    '<div class="teams">' + teamLine(away, g.sport, g.season) +
-      teamLine(home, g.sport, g.season) + "</div>" +
+    '<div class="teams">' + teamLine(away, g.sport, g.season, playoffGame(g)) +
+      teamLine(home, g.sport, g.season, playoffGame(g)) + "</div>" +
     // network on the away team's line, time on the home team's
     '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
@@ -404,15 +410,18 @@ function michCard(g, p) {
   // still showing the pants colour when there is one
   const umRank = (m.rank || pants)
     ? '<span class="mrank"' + paint(pants) + ">" +
-      (m.rank ? (playoffGame(g) ? "NO. " : "#") + m.rank : "") + "</span>"
+      (m.rank ? "#" + m.rank : "") + "</span>"
     : "<span></span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
-    '<span class="rk">' + (opp.rank ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    '<span class="rk">' +
+    (opp.rank && !playoffGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
     "</span>" +
-    '<span class="nm mnm"><span class="mn">' + esc(where + nm) +
+    '<span class="nm mnm"><span class="mn">' + esc(where) +
+      (playoffGame(g) && opp.rank ? '<span class="rkin">' + opp.rank + "</span> " : "") +
+      esc(nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
       (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span></span>" +
     score + umRank + "</div>";
@@ -437,7 +446,7 @@ function michCard(g, p) {
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
-  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
+  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed umloss" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     (playoffGame(g) ? " rk-no" : "");

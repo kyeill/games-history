@@ -133,14 +133,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    right, where it lines up with the network and time in the column below. */
 .sport{grid-area:sport;display:flex;align-items:baseline;
   justify-content:space-between;gap:10px;
-  font-size:11.5px;font-weight:500;letter-spacing:.05em;
+  font-size:13px;font-weight:400;letter-spacing:.05em;
   text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-.hdate{flex:none;font-size:13px;font-weight:500;letter-spacing:0;
+.hdate{flex:none;font-size:13px;font-weight:400;letter-spacing:0;
   text-transform:none;color:var(--muted);font-variant-numeric:tabular-nums}
 /* the week takes the header's colour, tinted or plain -- no orange of its own
    (his call: an untinted header should read entirely plain) */
 .teams{grid-area:teams;display:flex;flex-direction:column;gap:3px}
-.tl{display:grid;grid-template-columns:22px 44px 1fr auto;align-items:center;
+.tl{display:grid;grid-template-columns:22px 20px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 7px;margin-left:-7px;border-radius:5px}
 .tl.won{background:var(--winwash)}
 /* A coloured border marks a result he wants to see: Michigan won (maize), or a
@@ -155,14 +155,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.celebrate.mloss{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
 .row.dimmed .nm{font-style:italic}
+/* the team that BEAT Michigan is struck through instead (his call 2026-09-11) */
+.row.umloss .tl.won .nm,.row.mich.umloss .mn{font-style:normal;
+  text-decoration:line-through;text-decoration-thickness:1.5px}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
 .rk:not(:empty)::before{content:"#"}
-/* the ranking sits on the NAME's baseline, not its own box centre (his call
-   2026-09-11): centring two different type sizes left the digits about 1px
-   high. Crest and score keep the centre. */
-.tl .rk,.tl .nm{align-self:baseline}
+/* the ranking lines up on its VISUAL MIDDLE with the name (his call
+   2026-09-11, after trying the shared baseline) -- .tl centres every cell */
 /* rankings: orange on an upset (Sports Daily's accent); grey when Michigan
    lost or Ohio State / Michigan State / Notre Dame won */
 .row.rk-upset .rk{color:var(--accent)}
@@ -171,8 +172,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    card shares the 44px rank column, so names start in one place and the last
    digit of "#10" and "NO. 11" line up; a playoff seed holds two digits' width,
    so "NO." never moves and "NO. 2" just leaves room after the number */
-.row.rk-no .rk:not(:empty)::before{content:"NO. "}
-.row.rk-no .rn{display:inline-block;min-width:2ch;text-align:left}
+/* a postseason seed reads in front of the name, in the ranking's colours */
+.rkin{color:var(--rank);font-weight:600;font-variant-numeric:tabular-nums}
+.row.rk-upset .rkin{color:var(--accent)}
+.row.rk-grey .rkin{color:var(--muted)}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl.won .nm{font-weight:600}
 /* overtime: the winning score is underlined, instead of an OT chip */
@@ -223,13 +226,13 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .mnum{text-transform:none}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
-.row.mich .mcaret{margin-left:1px;color:#ffcb05;font-style:normal;font-weight:600}
+.row.mich .mcaret{margin-left:1px;font-style:normal;font-weight:600}
 .row.mich .tl{grid-template-columns:minmax(0,1fr) auto auto;column-gap:6px;
   padding:0;margin-left:0;background:none}
 /* the stripe: crest, a rank column that holds exactly "NO. 16" (35.4px
    measured in Source Sans 3), then the name and rating. It stops before the
    boxes (his call). */
-.row.mich .mstripe{display:grid;grid-template-columns:22px 36px minmax(0,1fr);
+.row.mich .mstripe{display:grid;grid-template-columns:22px 20px minmax(0,1fr);
   column-gap:7px;align-items:center;min-width:0;padding:2px 6px 2px 7px;
   margin-left:-7px;border-radius:5px}
 .row.mich .tl.won .mstripe{background:var(--winwash)}
