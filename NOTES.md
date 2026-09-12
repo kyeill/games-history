@@ -777,7 +777,8 @@ were blue), so `michigan.csv` carries `score_bg`, `score_font`, `rank_bg` and
 run on top: the same colour on itself shifts in lightness, maize on white
 darkens a touch, white on maize stays white, white on white reads a light grey (#b4b4ae, 2.3:1)
 rather than navy. A Michigan card keeps its rank column on a seeded game, empty,
-so the vs. starts where it starts on every other card; the other views collapse
+so the vs. starts where it starts on every other card, and in that view the
+seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive

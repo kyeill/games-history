@@ -184,8 +184,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   display:inline-block;min-width:20px;text-align:right;margin-right:8px}
 .row.rk-no .rk{display:none}
 .row.rk-no .tl{grid-template-columns:22px minmax(0,1fr) auto}
-/* in the Michigan view the seed reads at the NAME's size (his call) */
-.row.mich .rkin{margin-right:7px;font-size:inherit}
+/* In the Michigan view the seed is just another character in the line (his
+   call 2026-09-11): the name size, no box, no padding -- "vs. 4 ALABAMA". The
+   other views keep the fixed, right-aligned box, which is what lines their two
+   stacked names up. */
+.row.mich .rkin{display:inline;min-width:0;margin-right:0;font-size:inherit;
+  text-align:inherit}
 .row.rk-upset .rkin{color:var(--accent)}
 .row.rk-grey .rkin{color:var(--muted)}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
