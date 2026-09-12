@@ -242,7 +242,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* the date is piped onto the end of the header rather than pinned to the right
    edge (his call 2026-09-11), so it takes the header style: same size, same
    colour, uppercase, same letter-spacing. Tabular figures stay. */
-.row.mich .hdate{text-transform:uppercase;letter-spacing:.05em;padding-right:0}
+.row.mich .hdate{text-transform:uppercase;letter-spacing:.05em;padding-right:0;
+  color:inherit}
 .row.mich .mnum{text-transform:none}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
