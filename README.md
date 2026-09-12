@@ -356,9 +356,9 @@ NCAA ROUND 1 | CBS 7:30PM | THU 3/19/26". The DATE is piped onto the end of
 the header in the header style (his call 2026-09-11), not pinned to the right
 edge, on both sports. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name, in Proper Case unless it is a WIN inside one of his
 championship scopes, which capitalises it -- football 2021 and 2022 Big Ten
-opponents, football 2023 every game, basketball 2013-14 and 2025-26 conference
+opponents, football 2023 every game, basketball 2013-14 conference
 regular season, basketball 2016-17 / 2017-18 / 2024-25 Big Ten Tournament, and
-basketball 2025-26 NCAA Tournament ("^" marks last season's
+basketball 2025-26 every game except the Big Ten Tournament ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 [#13] for a final ranking -- the CFP committee rankings
 from 2014, the AP poll through 2013, basketball always AP, or his SP+ / KenPom as (73+) -- then the score
@@ -423,9 +423,9 @@ there.)
 | a rival won | none | *italic* |
 | nobody's team | none | upright |
 
-A **final** carries its own border: the Big Ten Tournament final in Big Ten
-blue `#0088ce`, the NCAA final in NCAA blue `#005eb8`, on a loss as well as a
-win.
+A **final won** carries its own border: the Big Ten Tournament final in Big Ten
+blue `#0088ce`, the NCAA final in NCAA blue `#005eb8`, the CFP title game in
+CFP gold `#c28c19`. Wins only -- reaching a final is not winning one.
 
 (On the **Michigan view** the whole card washes in the opponent colour for a
 postseason or rival win -- but a **Big Ten Tournament** win washes only in a

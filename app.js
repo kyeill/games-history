@@ -313,16 +313,18 @@ function michColour(v) {
    ordinary season, which the other views would otherwise capitalise.
      CFB 2021, 2022  Big Ten champions   -> Big Ten opponents
      CFB 2023        national champions  -> every game
-     CBB 2013, 2025  Big Ten regular season title -> conference regular season
+     CBB 2025        NCAA champions      -> every game EXCEPT the Big Ten
+                     Tournament, which it did not win (his call 2026-09-11):
+                     conference, non-conference and NCAA alike
+     CBB 2013        Big Ten regular season title -> conference regular season
      CBB 2016, 2017, 2024  Big Ten Tournament title -> those tournament games
-     CBB 2025        NCAA champions      -> NCAA Tournament games
    2013-14 won the regular season but LOST the tournament final, so its
    tournament games stay Proper Case. */
 const CAPS_ALL = {CFB: [2023]};
+const CAPS_ALL_NO_BTT = {CBB: [2025]};
 const CAPS_B1G_OPP = {CFB: [2021, 2022]};
-const CAPS_CONF_REG = {CBB: [2013, 2025]};
+const CAPS_CONF_REG = {CBB: [2013]};
 const CAPS_B1G_TOURN = {CBB: [2016, 2017, 2024]};
-const CAPS_NCAA = {CBB: [2025]};
 
 function inList(map, g) {
   return (map[g.sport] || []).indexOf(g.season) > -1;
@@ -331,11 +333,12 @@ function michCaps(g, opp, won) {
   if (!won) return false;
   if (inList(CAPS_ALL, g)) return true;
   const stage = g.stage || "";
+  // every win but the tournament it did not win
+  if (inList(CAPS_ALL_NO_BTT, g)) return stage.indexOf("Big Ten Tournament") !== 0;
   if (inList(CAPS_B1G_OPP, g) && opp.conf === BIG_TEN[g.sport]) return true;
   // the conference regular season: a Big Ten game that is not the tournament
   if (inList(CAPS_CONF_REG, g) && opp.conf === BIG_TEN[g.sport] && !stage && !g.post) return true;
   if (inList(CAPS_B1G_TOURN, g) && stage.indexOf("Big Ten Tournament") === 0) return true;
-  if (inList(CAPS_NCAA, g) && stage.indexOf("NCAA Tournament") === 0) return true;
   return false;
 }
 
@@ -510,15 +513,17 @@ function michCard(g, p) {
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
   // card starts and the seed follows it.
-  // A FINAL takes a border of its own (his call 2026-09-11): the Big Ten
-  // Tournament final in Big Ten blue, the NCAA final in NCAA blue. It marks the
-  // GAME, not the result, so it lights on a loss too -- the 2013 and 2018 NCAA
-  // finals, the 2014 / 2019 / 2026 Big Ten finals. Nothing else borders itself:
-  // an ordinary loss still carries no frame, the muting alone says it. His own
-  // border column in michigan.csv wins over both.
+  // A FINAL WON takes a border of its own (his calls 2026-09-11): the Big Ten
+  // Tournament final in Big Ten blue, the NCAA final in NCAA blue, the CFP
+  // title game in CFP gold. WINS ONLY -- reaching a final is not winning one,
+  // so the 2013 and 2018 NCAA finals and the 2014 / 2019 / 2026 Big Ten finals
+  // carry no frame. Nothing else borders itself either: an ordinary loss goes
+  // unframed, the muting alone says it. His border column still wins over all.
   const st = g.stage || "";
-  const finalRing = st === "Big Ten Tournament | Championship" ? "#0088ce"
-    : st === "NCAA Tournament | Championship" ? "#005eb8" : null;
+  const finalRing = lost ? null
+    : st === "Big Ten Tournament | Championship" ? "#0088ce"
+    : st === "NCAA Tournament | Championship" ? "#005eb8"
+    : st === "CFP | Championship" ? "#c28c19" : null;
   const bc = michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {

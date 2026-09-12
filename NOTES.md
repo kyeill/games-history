@@ -781,11 +781,13 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
-**The FINALS carry their own border** (his call 2026-09-11): the Big Ten
-Tournament final in Big Ten blue #0088ce, the NCAA final in NCAA blue #005eb8.
-Unlike the wash, the border marks the GAME rather than the result, so it lights
-on a loss as well -- six Big Ten finals and three NCAA finals, of which four
-are losses. His `border` column still overrides it per game.
+**A FINAL WON carries its own border** (his calls 2026-09-11): the Big Ten
+Tournament final in Big Ten blue #0088ce, the NCAA final in NCAA blue #005eb8,
+the CFP title game in CFP gold #c28c19. WINS ONLY -- the border marks winning a
+final, not reaching one, so the four defeats (2013 and 2018 NCAA, 2014 and 2019
+and 2026 Big Ten) go unframed. Five games carry it: Wisconsin 2017, Purdue
+2018, Wisconsin 2025, Connecticut 2026, and Washington 2024 in gold. His
+border column still overrides it per game.
 
 **A BIG TEN TOURNAMENT win washes the card only in a title year** (his call
 2026-09-11), or against a rival. Every other postseason win still washes. The
@@ -801,8 +803,9 @@ Proper Case is now the DEFAULT in the Michigan view: the Big Ten rule that
 capitalises conference opponents on every other view deliberately does NOT
 reach this one, so `teamName` is called with a null sport here. The scopes are
 the ones that actually won the title -- CFB 2021 and 2022 Big Ten opponents,
-CFB 2023 every game, CBB 2013-14 and 2025-26 conference regular season, CBB
-2016-17 / 2017-18 / 2024-25 Big Ten Tournament, CBB 2025-26 NCAA Tournament --
+CFB 2023 every game, CBB 2013-14 conference regular season, CBB 2016-17 /
+2017-18 / 2024-25 Big Ten Tournament, and CBB 2025-26 EVERY game except the
+Big Ten Tournament it did not win (non-conference included, his call) --
 and a LOSS never capitalises, so the 2014 tournament final and the CFP semis
 read Proper Case. 85 games capitalise, 639 do not.
 
