@@ -159,8 +159,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.dimmed .tl.won .nm,.row.mich.dimmed .mn{font-style:normal;
   text-decoration:line-through;text-decoration-thickness:1.5px}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
+/* the ranking is CENTRED in its column (his call 2026-09-11), so a one-digit
+   ranking sits under the middle of a two-digit one rather than hard right */
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
-  font-variant-numeric:tabular-nums;text-align:right}
+  font-variant-numeric:tabular-nums;text-align:center}
 .rk:not(:empty)::before{content:"#"}
 /* the ranking lines up on its VISUAL MIDDLE with the name (his call
    2026-09-11, after trying the shared baseline) -- .tl centres every cell */
