@@ -444,7 +444,9 @@ function michCard(g, p) {
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
-    (playoffGame(g) ? " rk-no" : "");
+    // a seeded game -- the CFP, the NCAA Tournament, or one of his conference
+    // tournament seeds -- drops the rank column, the seed riding with the name
+    (seedGame(g) ? " rk-no" : "");
   // his border colour when he gives one; otherwise a loss is dashed and muted
   const bc = michColour(mx.border);
   let ring = "";
