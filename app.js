@@ -268,9 +268,6 @@ function rowHtml(g, browse) {
     // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
     // looked like a rival loss to a black-and-gold winner such as Iowa
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
-    // the team that beat Michigan is struck through, every view (his call
-    // 2026-09-11), which is why this one is not tied to the dashed border
-    ((michTeam(g) && !michTeam(g).win) ? " umloss" : "") +
     // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
@@ -410,7 +407,7 @@ function michCard(g, p) {
   // still showing the pants colour when there is one
   const umRank = (m.rank || pants)
     ? '<span class="mrank"' + paint(pants) + ">" +
-      (m.rank ? "#" + m.rank : "") + "</span>"
+      (m.rank ? String(m.rank) : "") + "</span>"
     : "<span></span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
@@ -446,7 +443,7 @@ function michCard(g, p) {
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
-  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed umloss" : "") +
+  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     (playoffGame(g) ? " rk-no" : "");

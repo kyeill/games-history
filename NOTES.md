@@ -740,9 +740,15 @@ tried first (grid centring left the 12.5px digits 1.07px above the 15.5px
 name's baseline) and he preferred the middle, so `.tl` simply centres every
 cell. A postseason SEED now reads in FRONT of the name (`.rkin`, "vs. 2
 WASHINGTON") rather than "NO. 2" in the column, so the rank column is 20px --
-"#25" -- in every view, and the whole team line shifts left. The team that BEAT
-Michigan is struck through (`.row.umloss`), not italic; italics still mark a
-rival's win.
+"#25" -- in every view, and the whole team line shifts left. ITALICS ARE GONE from every view (his call 2026-09-11): on a card `dimmed()`
+marks -- a rival won, or Michigan lost -- the WINNER's name is struck through
+instead (`.row.dimmed .tl.won .nm`, and `.row.mich.dimmed .mn` for the one-team
+card). The seed box (`.rkin`) is the width of the rank column it replaces with
+the digits right aligned, and `.row.rk-no` drops the column itself, so a
+two-digit seed and a one-digit seed still start their names together and in
+line with every non-postseason card. Michigan's own rank shows no "#", and both
+Michigan boxes hold their widest reading (6.6ch for 121-108, 2ch for a rank)
+via tabular figures.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only

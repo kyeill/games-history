@@ -154,9 +154,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a Michigan loss: dashed and muted, never mistaken for a grey winner */
 .row.celebrate.mloss{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
-.row.dimmed .nm{font-style:italic}
-/* the team that BEAT Michigan is struck through instead (his call 2026-09-11) */
-.row.umloss .tl.won .nm,.row.mich.umloss .mn{font-style:normal;
+/* a rival won, or Michigan lost: the WINNER's name is struck through -- no
+   italics anywhere any more (his call 2026-09-11) */
+.row.dimmed .tl.won .nm,.row.mich.dimmed .mn{font-style:normal;
   text-decoration:line-through;text-decoration-thickness:1.5px}
 .crest{width:21px;height:21px;object-fit:contain;display:block}
 .rk{color:var(--rank);font-size:12.5px;font-weight:600;
@@ -172,8 +172,17 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    card shares the 44px rank column, so names start in one place and the last
    digit of "#10" and "NO. 11" line up; a playoff seed holds two digits' width,
    so "NO." never moves and "NO. 2" just leaves room after the number */
-/* a postseason seed reads in front of the name, in the ranking's colours */
-.rkin{color:var(--rank);font-weight:600;font-variant-numeric:tabular-nums}
+/* A postseason seed reads in front of the name, in the ranking's colours. Its
+   box is the width of the rank column it replaces, with the digits right
+   aligned and the column itself dropped -- so both names on a card start
+   together, and in the same place as on every non-postseason card. */
+.rkin{color:var(--rank);font-weight:600;font-variant-numeric:tabular-nums;
+  display:inline-block;min-width:20px;text-align:right;margin-right:8px}
+.row.rk-no .rk{display:none}
+.row.rk-no .tl{grid-template-columns:22px minmax(0,1fr) auto}
+.row.mich .rkin{margin-right:7px}
+.row.mich.rk-no .tl{grid-template-columns:minmax(0,1fr) auto auto}
+.row.mich.rk-no .mstripe{grid-template-columns:22px minmax(0,1fr)}
 .row.rk-upset .rkin{color:var(--accent)}
 .row.rk-grey .rkin{color:var(--muted)}
 .nm{font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -243,11 +252,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   color:var(--muted);font-style:normal}
 /* the score (jersey) and Michigan's rank (pants): one height, one type size;
    the accessories colour is the text (inline styles) */
+/* both boxes are sized for their widest reading (his call 2026-09-11): the
+   score for 121-108, the rank for two digits. Tabular figures make 1ch a
+   digit, so the widths hold whatever the numbers are. */
 .row.mich .sc.mbox,.row.mich .mrank{display:inline-flex;align-items:center;
   justify-content:center;box-sizing:border-box;height:24px;padding:0 8px;
   border-radius:4px;font-size:14.5px;font-weight:700;
-  font-variant-numeric:tabular-nums;white-space:nowrap;min-width:0}
-.row.mich .mrank{min-width:34px;background:#ffcb05;color:#00274c}
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.row.mich .sc.mbox{min-width:calc(6.6ch + 16px)}
+.row.mich .mrank{min-width:calc(2ch + 16px);background:#ffcb05;color:#00274c}
 .row.mich.dimmed .mrank{background:#3a3a40;color:#b4b4ae}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
