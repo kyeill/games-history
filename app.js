@@ -493,8 +493,16 @@ function michCard(g, p) {
     t !== "College GameDay").forEach(t => chips.push(bit(t)));
   if (mx.note) chips.push(bit(mx.note));
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
-  // washes the WHOLE card in the opponent's colour instead of its stripe
-  const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
+  // washes the WHOLE card in the opponent's colour instead of its stripe.
+  // A BIG TEN TOURNAMENT win is the exception (his call 2026-09-11): it only
+  // washes in a year the tournament was actually WON -- the same three seasons
+  // that capitalise -- or when the opponent is a rival. A run that ended short
+  // of the title is a win, not a championship, so it keeps its stripe.
+  const btt = (g.stage || "").indexOf("Big Ten Tournament") === 0;
+  const rival = RIVALS.indexOf(opp.id) > -1;
+  const bigWin = !lost && (btt
+    ? (inList(CAPS_B1G_TOURN, g) || rival)
+    : !!(g.post || g.champ || rival));
   let cls = " mich mich-" + g.sport.toLowerCase() +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +

@@ -423,6 +423,10 @@ there.)
 | a rival won | none | *italic* |
 | nobody's team | none | upright |
 
+(On the **Michigan view** the whole card washes in the opponent colour for a
+postseason or rival win -- but a **Big Ten Tournament** win washes only in a
+year the tournament was won, 2016-17 / 2017-18 / 2024-25, or against a rival.)
+
 **A coloured border flags a result he wants to see: Michigan won, or a rival
 lost.** A full maize box was tried first and was too loud, so the frame carries
 the flag and the winner's line keeps its own wash. A Michigan win is maize; a

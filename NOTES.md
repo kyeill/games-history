@@ -781,6 +781,15 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**A BIG TEN TOURNAMENT win washes the card only in a title year** (his call
+2026-09-11), or against a rival. Every other postseason win still washes. The
+point is that the wash should mark a CHAMPIONSHIP, not a quarterfinal: eleven
+cards lose it -- runs that ended short of the title, like the 2018-19 win over
+Minnesota or the 2025-26 semifinal over Wisconsin -- while the three title runs
+(2016-17, 2017-18, 2024-25) keep every game washed. Rival wins are exempt and
+keep the wash whatever the year: Ohio State 2014, Michigan State 2018, Ohio
+State 2026. It reuses CAPS_B1G_TOURN, so the seasons stay in ONE list.
+
 **CAPITALS MARK A CHAMPIONSHIP, and only on a win** (his list 2026-09-11).
 Proper Case is now the DEFAULT in the Michigan view: the Big Ten rule that
 capitalises conference opponents on every other view deliberately does NOT
