@@ -781,6 +781,13 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**One height for the stripe and both boxes** (his call 2026-09-11): 26px, set
+on all three, with the stripe vertical padding dropped so border-box leaves the
+whole 26px to content. Matching heights is what makes the score line up with
+the highlight top and bottom -- the boxes were 24px against a 26.5px stripe.
+The DATE stops at the box padding edge (8px), not the card edge: the numbers
+below it are centred in their boxes and never reach the edge themselves.
+
 **TRAP: an emptied grid track still takes its gap.** When the rank box left the
 team line, `.row.mich .tl` kept three columns and the score stopped 7px short of
 the card edge -- the 0px track plus its 6px gap -- while the rank box, alone in

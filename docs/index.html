@@ -212,6 +212,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    score and Michigan's rank in uniform-coloured boxes -- and one chip row */
 .row.mich{grid-template-columns:1fr;grid-template-areas:"sport" "teams" "tags"}
 .row.mich .sport{flex-wrap:wrap;row-gap:2px}
+/* the date sits above the score box, whose number is centred and so never
+   reaches the card edge. The date stops at the box padding edge instead, which
+   is a fixed landmark, and the two read as one column. */
+.row.mich .hdate{padding-right:8px}
 .row.mich .mnum{text-transform:none}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
@@ -224,9 +228,13 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* the stripe: crest, a rank column that holds exactly "NO. 16" (35.4px
    measured in Source Sans 3), then the name and rating. It stops before the
    boxes (his call). */
+/* ONE HEIGHT, 26px, for the stripe and both boxes (his call 2026-09-11), so
+   the score lines up with the highlight top and bottom. The stripe carries no
+   vertical padding: with border-box the 26px is all content, and the tallest
+   thing in it (the name line, 22.5px) still centres with room. */
 .row.mich .mstripe{display:grid;grid-template-columns:22px 20px minmax(0,1fr);
-  column-gap:7px;align-items:center;min-width:0;padding:2px 6px 2px 7px;
-  margin-left:-7px;border-radius:5px}
+  column-gap:7px;align-items:center;min-width:0;height:26px;
+  padding:0 6px 0 7px;margin-left:-7px;border-radius:5px}
 .row.mich .tl.won .mstripe{background:var(--winwash)}
 /* name then rating: the name shortens first, the rating stays whole */
 /* every piece of the team line centres against the name (his call
@@ -242,7 +250,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    which stretched a 2ch box). Tabular figures make 1ch a
    digit, so the widths hold whatever the numbers are. */
 .row.mich .sc.mbox,.row.mich .mrank{display:inline-flex;align-items:center;
-  justify-content:center;box-sizing:border-box;height:24px;padding:0 8px;
+  justify-content:center;box-sizing:border-box;height:26px;padding:0 8px;
   border-radius:4px;font-size:14.5px;font-weight:700;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
@@ -415,6 +423,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-222024"></script>
+<script src="app.js?v=20260911-223409"></script>
 </body>
 </html>
