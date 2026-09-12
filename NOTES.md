@@ -751,8 +751,9 @@ Michigan boxes hold their widest reading. The box colours are the OFFICIAL
 ones and never shift (maize #ffcb05, blue #00274c, white #ffffff); only the
 text moves. The hash stays on Michigan rank except a CFP or NCAA seed, and the
 inline seed takes the ranking size, not the name size (6.6ch for 121-108, 2ch for a rank)
-via tabular figures (7.2ch, measured: 121-108 needs 50.5px of the 6.6ch box's
-50.5px, too close to trust).
+via tabular figures (7.2ch, measured: 121-108 needs 50.5px of the 6.6ch box
+at 50.5px, too close to trust). The rank box is 3ch: #25 measured 39px and
+stretched the 2ch box, so every rank box now holds one width.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only

@@ -254,14 +254,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* the score (jersey) and Michigan's rank (pants): one height, one type size;
    the accessories colour is the text (inline styles) */
 /* both boxes are sized for their widest reading (his call 2026-09-11): the
-   score for 121-108, the rank for two digits. Tabular figures make 1ch a
+   score for 121-108, the rank for a hash and two digits (#25 measured 39px,
+   which stretched a 2ch box). Tabular figures make 1ch a
    digit, so the widths hold whatever the numbers are. */
 .row.mich .sc.mbox,.row.mich .mrank{display:inline-flex;align-items:center;
   justify-content:center;box-sizing:border-box;height:24px;padding:0 8px;
   border-radius:4px;font-size:14.5px;font-weight:700;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
-.row.mich .mrank{min-width:calc(2ch + 16px);background:#ffcb05;color:#00274c}
+.row.mich .mrank{min-width:calc(3ch + 16px);background:#ffcb05;color:#00274c}
 .row.mich.dimmed .mrank{background:#3a3a40;color:#b4b4ae}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
