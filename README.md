@@ -372,7 +372,9 @@ would run onto a second line. A postseason win, or a win over Ohio State,
 Michigan State or Notre Dame, washes the whole card in the opponent's colour; a
 loss is dashed and muted. His details come from two spreadsheets read by
 `harvest.py`: `michigan.csv` (per game: emoji, border colour, caps Y/N, jersey /
-pants / accessories or one basketball uniform, note) and `ratings.csv` (per
+pants / accessories or one basketball uniform, note, and the box colours
+themselves -- score background and font, rank background and font -- which win
+over the uniform when he gives them) and `ratings.csv` (per
 opponent per season: SP+ or KenPom). With one season picked, tiles mark each
 football BYE and the start of the POSTSEASON, solid-bordered in team-name type;
 each takes one card slot, so the desktop's three-across stays in step. All

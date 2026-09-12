@@ -769,6 +769,14 @@ column, so those cards keep the column and stay in line with every other card.
 Only a CFP or NCAA card drops the column, because there ESPN's number is the
 seed itself and no ranking is left to show.
 
+**His BOX COLOURS are their own columns** (2026-09-11). The uniform gave a
+first cut -- jersey behind the score, pants behind the rank -- but his real
+cards do not follow it (Maryland 2023 is white on both boxes though its pants
+were blue), so `michigan.csv` carries `score_bg`, `score_font`, `rank_bg` and
+`rank_font`, and they win wherever they are filled. The readability rules still
+run on top: the same colour on itself shifts in lightness, maize on white
+darkens a touch, white on maize stays white, white on white reads blue.
+
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
 Ohio State, Michigan State and Notre Dame games, so every season before 2021

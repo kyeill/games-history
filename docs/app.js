@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-212742";
+const BUILD = "20260911-213129";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -342,10 +342,16 @@ function michCard(g, p) {
   // maize becomes a deep gold, blue on blue a lighter blue. Only a colour that
   // still cannot get there falls back to navy or maize. Basketball's single
   // uniform colours both boxes.
-  const u = (mx.uni || []).map(michColour);
-  const top = u[0] || null;
-  const pants = (u.length >= 3 ? u[1] : u[0]) || null;
-  const acc = u.length >= 3 ? u[2] : null;
+  // His box colours (michigan.csv: score_bg / score_font, rank_bg / rank_font)
+  // win when he gives them -- they do not always follow the uniform. Otherwise
+  // the uniform paints them: jersey behind the score, pants behind the rank,
+  // accessories as the text on both.
+  const u = (mx.uni || []).map(michColour), bx = mx.box || {};
+  const top = michColour(bx.score_bg) || u[0] || null;
+  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || null;
+  const uniAcc = u.length >= 3 ? u[2] : null;
+  const scoreInk = michColour(bx.score_font) || uniAcc;
+  const rankInk = michColour(bx.rank_font) || uniAcc;
   const lum = hex => {
     const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
       .map(x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4));
@@ -397,17 +403,18 @@ function michCard(g, p) {
     }
     return ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   };
-  const ink = bg => acc ? readable(acc, bg)
+  const ink = (bg, fg) => fg ? readable(fg, bg)
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
-  const paint = bg => (bg ? ' style="background:' + bg + ";color:" + ink(bg) + '"' : "");
+  const paint = (bg, fg) => (bg ? ' style="background:' + bg + ";color:" +
+    ink(bg, fg) + '"' : "");
   // the two boxes share one height and one type size (his call)
-  const score = '<span class="sc mbox"' + paint(top) + ">" + m.score + "-" + opp.score +
-    "</span>";
+  const score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" + m.score + "-" +
+    opp.score + "</span>";
   // Michigan's rank at the time beside the score. The box is ALWAYS there and
   // always coloured (his call 2026-09-11) -- empty when Michigan is unranked --
   // and a seed shows without the hash.
   const umSeed = seedOf(g, m);
-  const umRank = '<span class="mrank"' + paint(pants) + ">" +
+  const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" +
     (umSeed != null ? String(umSeed) : m.rank ? "#" + m.rank : "\u2013") + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)

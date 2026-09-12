@@ -352,8 +352,13 @@ def load_michigan_sheet():
 
             def cell(k):
                 return (row.get(k) or "").strip()
+            # his own box colours win over the uniform when he gives them:
+            # score background / font, rank background / font
+            box = {k: cell(k) for k in ("score_bg", "score_font", "rank_bg", "rank_font")
+                   if cell(k)}
             e = {"emoji": cell("emoji"), "border": cell("border"),
                  "caps": cell("caps").upper()[:1], "note": cell("note"),
+                 "box": box,
                  "uni": [cell(k) for k in ("jersey", "pants", "accessories", "uniform")
                          if cell(k)]}
             out[gid] = {k: v for k, v in e.items() if v}
