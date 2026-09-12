@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-230312";
+const BUILD = "20260911-230837";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -307,13 +307,49 @@ function michColour(v) {
   if (/^#?[0-9a-f]{6}$/i.test(s)) return "#" + s.replace("#", "");
   return MICH_COLOURS[s.toLowerCase()] || null;
 }
+/* HIS CHAMPIONSHIP SEASONS (his list 2026-09-11). An opponent name goes up in
+   CAPITALS only on a WIN, and only inside the scope that won the title --
+   everything else reads Proper Case, including Big Ten opponents in an
+   ordinary season, which the other views would otherwise capitalise.
+     CFB 2021, 2022  Big Ten champions   -> Big Ten opponents
+     CFB 2023        national champions  -> every game
+     CBB 2013, 2025  Big Ten regular season title -> conference regular season
+     CBB 2016, 2017, 2024  Big Ten Tournament title -> those tournament games
+     CBB 2025        NCAA champions      -> NCAA Tournament games
+   2013-14 won the regular season but LOST the tournament final, so its
+   tournament games stay Proper Case. */
+const CAPS_ALL = {CFB: [2023]};
+const CAPS_B1G_OPP = {CFB: [2021, 2022]};
+const CAPS_CONF_REG = {CBB: [2013, 2025]};
+const CAPS_B1G_TOURN = {CBB: [2016, 2017, 2024]};
+const CAPS_NCAA = {CBB: [2025]};
+
+function inList(map, g) {
+  return (map[g.sport] || []).indexOf(g.season) > -1;
+}
+function michCaps(g, opp, won) {
+  if (!won) return false;
+  if (inList(CAPS_ALL, g)) return true;
+  const stage = g.stage || "";
+  if (inList(CAPS_B1G_OPP, g) && opp.conf === BIG_TEN[g.sport]) return true;
+  // the conference regular season: a Big Ten game that is not the tournament
+  if (inList(CAPS_CONF_REG, g) && opp.conf === BIG_TEN[g.sport] && !stage && !g.post) return true;
+  if (inList(CAPS_B1G_TOURN, g) && stage.indexOf("Big Ten Tournament") === 0) return true;
+  if (inList(CAPS_NCAA, g) && stage.indexOf("NCAA Tournament") === 0) return true;
+  return false;
+}
+
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
   const mx = g.mx || {}, lost = !m.win;
-  // his caps column wins; left blank, the Big Ten rule of every other view holds
-  let nm = mx.caps === "N" ? teamName(opp, null, g.season)
-    : teamName(opp, g.sport, g.season);
-  if (mx.caps === "Y") nm = nm.toUpperCase();
+  // Proper Case is the DEFAULT here (his call 2026-09-11) -- the Big Ten rule
+  // of the other views does not reach this one -- and his championship scopes
+  // put a win in capitals. The caps column still forces either way by hand.
+  let nm = teamName(opp, null, g.season);
+  const caps = mx.caps === "Y" ? true
+    : mx.caps === "N" ? false
+    : michCaps(g, opp, !lost);
+  if (caps) nm = nm.toUpperCase();
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
   const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
     : mx.rating ? mx.rating + "+" : "";

@@ -354,7 +354,11 @@ fills the header. A stage card drops its own bar and the word "Tournament",
 takes the TV details after the bar, and puts its day beside the date: "2026
 NCAA ROUND 1 | CBS 7:30PM | THU 3/19/26". The DATE is piped onto the end of
 the header in the header style (his call 2026-09-11), not pinned to the right
-edge, on both sports. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name ("^" marks last season's
+edge, on both sports. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name, in Proper Case unless it is a WIN inside one of his
+championship scopes, which capitalises it -- football 2021 and 2022 Big Ten
+opponents, football 2023 every game, basketball 2013-14 and 2025-26 conference
+regular season, basketball 2016-17 / 2017-18 / 2024-25 Big Ten Tournament, and
+basketball 2025-26 NCAA Tournament ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 [#13] for a final ranking -- the CFP committee rankings
 from 2014, the AP poll through 2013, basketball always AP, or his SP+ / KenPom as (73+) -- then the score
@@ -382,7 +386,8 @@ Kickoff" and "College GameDay" shorten to "Big Noon" and "GameDay" when the row
 would run onto a second line. A postseason win, or a win over Ohio State,
 Michigan State or Notre Dame, washes the whole card in the opponent's colour; a
 loss is dashed and muted. His details come from two spreadsheets read by
-`harvest.py`: `michigan.csv` (per game: emoji, border colour, caps Y/N, jersey /
+`harvest.py`: `michigan.csv` (per game: emoji, border colour, caps Y/N as a
+manual OVERRIDE of the championship rule below, jersey /
 pants / accessories or one basketball uniform, note, and the box colours
 themselves -- score background and font, rank background and font -- which win
 over the uniform when he gives them) and `ratings.csv` (per
@@ -550,7 +555,7 @@ picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 | `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
 | `game-overrides.json` (per-game city / event where ESPN has none, by game
 id), `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
-| `michigan.csv` | his per-game details for the Michigan view: emoji, border, caps, uniform, note (open in Excel or Sheets; keep it CSV UTF-8) |
+| `michigan.csv` | his per-game details for the Michigan view: emoji, border, caps (an override -- the championship rule decides by default), uniform, note (open in Excel or Sheets; keep it CSV UTF-8) |
 | `ratings.csv` | his final SP+ / KenPom rank for each opponent, per season, for the Michigan view |
 | `event-overrides.json` | a clean name for a basketball event chip (sponsor and capitals stripped), or null for the city; matched case-blind |
 | `logos.py` | ported from sports-daily; measures both crest variants |

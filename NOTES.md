@@ -781,6 +781,23 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**CAPITALS MARK A CHAMPIONSHIP, and only on a win** (his list 2026-09-11).
+Proper Case is now the DEFAULT in the Michigan view: the Big Ten rule that
+capitalises conference opponents on every other view deliberately does NOT
+reach this one, so `teamName` is called with a null sport here. The scopes are
+the ones that actually won the title -- CFB 2021 and 2022 Big Ten opponents,
+CFB 2023 every game, CBB 2013-14 and 2025-26 conference regular season, CBB
+2016-17 / 2017-18 / 2024-25 Big Ten Tournament, CBB 2025-26 NCAA Tournament --
+and a LOSS never capitalises, so the 2014 tournament final and the CFP semis
+read Proper Case. 85 games capitalise, 639 do not.
+
+TRAP: 2013-14 won the Big Ten REGULAR SEASON but lost the tournament final, so
+its tournament games stay Proper Case -- the scope is the title, not the year.
+
+The manual `caps` column in michigan.csv was CLEARED (55 values) because it
+contradicted the rule: it carried Y on 37 of the 40 2025-26 basketball rows,
+non-conference games included. The column still overrides by hand when set.
+
 **game-overrides.json reaches a game event-overrides cannot** (2026-09-11).
 The 2012 Alabama game in Arlington carries NO city, venue or event from ESPN,
 and the 2017 Florida game carries the city but no event -- and
