@@ -781,6 +781,11 @@ so the vs. starts where it starts on every other card, and in that view the
 seed is plain inline text rather than the fixed box the other views use; the other views collapse
 it instead, because their names have no vs. in front.
 
+**Michigan's rank moved to the THIRD ROW** (his call 2026-09-11): under the
+score, the same width as it, the number centred, which gives a row that would
+otherwise hold one lonely rating (five 2023 cards) a right edge. With the rank
+gone from the team line, the opponent's finish went back after the name.
+
 **The opponent finish moved OFF the name line** (his call 2026-09-11): it cut
 long names short, so the finish or rating now leads the DETAIL ROW, which is
 itself plain grey text in the header style -- no chip backgrounds -- with a

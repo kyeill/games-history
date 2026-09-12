@@ -354,8 +354,10 @@ takes the TV details after the bar, and puts its day beside the date: "2026
 NCAA ROUND 1 | CBS 7:30PM" with "THU 3/19/26" at the right. The TEAM LINE: the opponent's rank at the time (a narrow column, "#25" wide), "at" / "vs.", the name ("^" marks last season's
 national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 [#13] for a final AP ranking, or his SP+ / KenPom as (73+) -- then the score
-from Michigan's side and Michigan's rank at the time (blank when unranked). A
-postseason SEED reads in front of the name instead -- "vs. 2 WASHINGTON" -- in
+from Michigan's side. Michigan's own rank sits on the THIRD row, under the
+score and the same width as it, centred: "No. 1" in the CFP or the NCAA
+Tournament, a bare seed in a conference tournament, "#3" otherwise, a dash when
+Michigan was unranked. A postseason SEED reads in front of the opponent's name -- "vs. 2 WASHINGTON" -- in
 the ranking's colours, in a right-aligned box the width of the rank column it
 replaces, so names start in one place on every card. Michigan's rank keeps its hash except on a
 seeded game, where it shows the seed alone, and reads a dash when Michigan was

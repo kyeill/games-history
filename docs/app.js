@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-215953";
+const BUILD = "20260911-220945";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -410,12 +410,15 @@ function michCard(g, p) {
   // the two boxes share one height and one type size (his call)
   const score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" + m.score + "-" +
     opp.score + "</span>";
-  // Michigan's rank at the time beside the score. The box is ALWAYS there and
-  // always coloured (his call 2026-09-11) -- empty when Michigan is unranked --
-  // and a seed shows without the hash.
+  // Michigan's rank sits on the THIRD ROW, under the score and the same width
+  // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
+  // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in
+  // the regular season, and a dash when Michigan was unranked.
   const umSeed = seedOf(g, m);
-  const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" +
-    (umSeed != null ? String(umSeed) : m.rank ? "#" + m.rank : "\u2013") + "</span>";
+  const umText = playoffGame(g) && m.rank ? "No. " + m.rank
+    : umSeed != null ? String(umSeed)
+    : m.rank ? "#" + m.rank : "\u2013";
+  const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
@@ -426,13 +429,17 @@ function michCard(g, p) {
     '<span class="nm mnm"><span class="mn">' + esc(where) +
       (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
       esc(nm) +
-      (mx.reigning ? '<span class="mcaret">^</span>' : "") +
-      "</span></span></span>" +
-    score + umRank + "</div>";
-  // ONE DETAIL ROW, plain grey text in the header style rather than chips (his
-  // call 2026-09-11), in his order: the finish or rating, the location, the
-  // event, the home & home family, Big Noon, GameDay, anything else, his Big
-  // Ten note. The two long show tags carry a short form for trimMichChips.
+      (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
+      // the finish or rating reads after the name again (his call 2026-09-11),
+      // the name giving way first when the two do not fit
+      (fin && !playoffGame(g) ? '<span class="mfin">' + esc(fin) + "</span>" : "") +
+      "</span></span>" +
+    score + "</div>";
+  // THE THIRD ROW: plain grey text in the header style rather than chips (his
+  // call 2026-09-11) -- location, event, the home & home family, Big Noon,
+  // GameDay, anything else, his Big Ten note -- with Michigan's rank box held
+  // to the right, under the score. The two long show tags carry a short form
+  // for trimMichChips.
   const mine = myTags(g.id);
   const SERIES_FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral",
                          "Annual", "Buy Game"];
@@ -440,7 +447,6 @@ function michCard(g, p) {
     (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   const chips = [];
-  if (fin && !playoffGame(g)) chips.push(bit(fin));
   if (place) chips.push(bit(place));
   if (g.event && !g.stage) chips.push(bit(g.event));
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(bit(t)));
@@ -474,8 +480,9 @@ function michCard(g, p) {
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span>" +
       '<span class="hdate">' + right + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
-    '<div class="tags mdets">' +
-      chips.join('<span class="msep">|</span>') + "</div></button>";
+    '<div class="tags mdets"><span class="mdl">' +
+      chips.join('<span class="msep">|</span>') + "</span>" + umRank +
+    "</div></button>";
 }
 
 // A Michigan chip row that runs onto a second line trims its long show tags --

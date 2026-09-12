@@ -248,14 +248,20 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
 /* football never reaches three digits, so its score box is narrower */
 .row.mich.mich-cfb .sc.mbox{min-width:calc(5.4ch + 16px)}
-.row.mich .mrank{min-width:calc(3ch + 16px);background:#ffcb05;color:#00274c}
+.row.mich .mrank{min-width:calc(7.2ch + 16px);background:#ffcb05;color:#00274c}
+.row.mich.mich-cfb .mrank{min-width:calc(5.4ch + 16px)}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
 .row.mich.mwash .tl.won .mstripe{background:transparent}
 /* the detail row reads like the header -- plain grey text, no chips (his call
    2026-09-11): finish, location, event, series, shows, his Big Ten note */
-.row.mich .tags.mdets{gap:7px;font-size:13px;font-weight:400;letter-spacing:.02em;
-  text-transform:none;color:var(--muted);padding-left:29px}
+/* the third row: his details at the left, Michigan's rank box at the right,
+   under the score and the same width as it (his call 2026-09-11) */
+.row.mich .tags.mdets{display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:6px;align-items:center;font-size:13px;font-weight:400;letter-spacing:.02em;
+  text-transform:none;color:var(--muted)}
+.row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+  min-width:0;padding-left:29px}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}
 /* a bye / postseason tile: one card slot, slim on a phone */
@@ -406,6 +412,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-215953"></script>
+<script src="app.js?v=20260911-220945"></script>
 </body>
 </html>
