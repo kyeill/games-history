@@ -755,6 +755,16 @@ via tabular figures (7.2ch, measured: 121-108 needs 50.5px of the 6.6ch box
 at 50.5px, too close to trust). The rank box is 3ch: #25 measured 39px and
 stretched the 2ch box, so every rank box now holds one width.
 
+**Conference-tournament SEEDS come from him, not ESPN** (2026-09-11). ESPN's
+ranking field is the SEED in the NCAA Tournament but the AP POLL in a
+conference tournament -- checked in the scoreboard, the game summary, the core
+API competitors, the tournament resource and its seasons; the bracket endpoint
+404s. So `seeds.csv` (sport, season, team id, seed) feeds `load_seeds`, harvest
+attaches a `seed` to each side of a Big Ten Tournament game, and the app shows
+a seed wherever one exists (`seedOf`), with no hash, the way the CFP and NCAA
+cards already read. 51 Big Ten Tournament games sit on the tabs and 74
+team-seasons cover them.
+
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
 Ohio State, Michigan State and Notre Dame games, so every season before 2021

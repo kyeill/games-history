@@ -360,6 +360,29 @@ def load_michigan_sheet():
     return out
 
 
+def load_seeds():
+    """seeds.csv -- his conference-tournament seeds, by (sport, season, team id).
+    ESPN carries none: its ranking field holds the AP poll for a conference
+    tournament (it IS the seed only in the NCAA Tournament), checked across the
+    scoreboard, the summary, the core competitors and the tournament resource
+    on 2026-09-11."""
+    path = os.path.join(HERE, "seeds.csv")
+    if not os.path.exists(path):
+        return {}
+    out = {}
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        for row in csv.DictReader(f):
+            v = (row.get("seed") or "").strip()
+            if not v:
+                continue
+            try:
+                out[((row.get("sport") or "").strip(), int(row.get("season")),
+                     (row.get("team_id") or "").strip())] = int(v)
+            except (TypeError, ValueError):
+                continue
+    return out
+
+
 def load_ratings():
     """ratings.csv -- his final SP+ (football) or KenPom (basketball) rank for
     each opponent, by (sport, season, team id)."""
@@ -631,6 +654,7 @@ def harvest():
     ev_overrides = load_event_overrides()
     mich_sheet = load_michigan_sheet()
     ratings = load_ratings()
+    seeds = load_seeds()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         years = set(RIVAL_SEASONS) | set(SEASONS) | rules.MICHIGAN_SEASONS.get(code, set())
@@ -876,6 +900,10 @@ def harvest():
                 card_slots = set(slots)
                 slots |= set(extras.get(x["id"], ()))
 
+                stage_txt = rules.stage_label(code, stype, heads, conf=conf,
+                                              month=d.month, season=y)
+                # his seeds ride on conference-tournament games only
+                seeded = bool(stage_txt and stage_txt.startswith("Big Ten Tournament"))
                 side = []
                 for k in cs:
                     t = k["team"]
@@ -889,7 +917,9 @@ def harvest():
                                  "rank": rank_of(k) or (ap.get(t["id"]) if rivals_only else None),
                                  "win": bool(k.get("winner")),
                                  "home": k.get("homeAway") == "home",
-                                 "conf": str(t.get("conferenceId"))})
+                                 "conf": str(t.get("conferenceId")),
+                                 "seed": (seeds.get((code, y, t["id"]))
+                                          if seeded else None)})
                 v = c.get("venue") or {}
                 keep.append({
                     "id": x["id"], "sport": code, "season": y,
@@ -927,8 +957,7 @@ def harvest():
                     # the header of a game that is an EVENT: "Fiesta Bowl",
                     # "College Football Playoff | Quarters", "NCAA Tournament |
                     # Round 1", "Big Ten Tournament | Semis", "Big Ten Championship"
-                    "stage": rules.stage_label(code, stype, heads, conf=conf,
-                                               month=d.month, season=y),
+                    "stage": stage_txt,
                 })
                 if mich:
                     opp = next(k["team"]["id"] for k in cs

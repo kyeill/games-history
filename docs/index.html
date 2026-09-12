@@ -124,8 +124,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.celebrate{border-color:var(--celeb,#ffcb05);
   box-shadow:0 0 0 1px var(--celebring,#ffcb0544)}
 .row.celebrate:hover{filter:brightness(1.12)}
-/* a Michigan loss: dashed and muted, never mistaken for a grey winner */
-.row.celebrate.mloss{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
 /* a rival won, or Michigan lost: the WINNER's name is struck through -- no
    italics anywhere any more (his call 2026-09-11) */
@@ -156,7 +154,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   display:inline-block;min-width:20px;text-align:right;margin-right:8px}
 .row.rk-no .rk{display:none}
 .row.rk-no .tl{grid-template-columns:22px minmax(0,1fr) auto}
-.row.mich .rkin{margin-right:7px}
+/* in the Michigan view the seed reads at the NAME's size (his call) */
+.row.mich .rkin{margin-right:7px;font-size:inherit}
 .row.mich.rk-no .tl{grid-template-columns:minmax(0,1fr) auto auto}
 .row.mich.rk-no .mstripe{grid-template-columns:22px minmax(0,1fr)}
 .row.rk-upset .rkin{color:var(--accent)}
@@ -222,7 +221,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   margin-left:-7px;border-radius:5px}
 .row.mich .tl.won .mstripe{background:var(--winwash)}
 /* name then rating: the name shortens first, the rating stays whole */
-.row.mich .nm.mnm{display:flex;align-items:baseline;min-width:0}
+/* every piece of the team line centres against the name (his call
+   2026-09-11): the rating, the seed, the rank */
+.row.mich .nm.mnm{display:flex;align-items:center;min-width:0}
 .row.mich .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .row.mich .mfin{flex:none;margin-left:6px;font-size:12px;font-weight:400;
   color:var(--muted);font-style:normal}
@@ -237,8 +238,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   border-radius:4px;font-size:14.5px;font-weight:700;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
+/* football never reaches three digits, so its score box is narrower */
+.row.mich.mich-cfb .sc.mbox{min-width:calc(5.4ch + 16px)}
 .row.mich .mrank{min-width:calc(3ch + 16px);background:#ffcb05;color:#00274c}
-.row.mich.dimmed .mrank{background:#3a3a40;color:#b4b4ae}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
 .row.mich.mwash .tl.won .mstripe{background:transparent}
@@ -390,6 +392,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260911-210551"></script>
+<script src="app.js?v=20260911-211936"></script>
 </body>
 </html>

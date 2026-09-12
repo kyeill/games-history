@@ -356,8 +356,10 @@ national champion), how it finished -- [Semis] in the CFP or NCAA Tournament,
 from Michigan's side and Michigan's rank at the time (blank when unranked). A
 postseason SEED reads in front of the name instead -- "vs. 2 WASHINGTON" -- in
 the ranking's colours, in a right-aligned box the width of the rank column it
-replaces, so names start in one place on every card. Michigan's rank shows the
-bare number; its box and the score box are sized for their widest readings. A colour stripe runs
+replaces, so names start in one place on every card. Michigan's rank keeps its hash except on a
+seeded game; its box is always there and always coloured, empty when Michigan
+is unranked, and the score box is sized for its widest reading (narrower in
+football). A colour stripe runs
 from the crest through the rating and stops before those two boxes, which
 share one height and type size and are Michigan's uniform: the score in the jersey colour, the rank in the pants
 colour, the accessories colour as the text (navy or maize instead when it would

@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-210551";
+const BUILD = "20260911-211936";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -150,15 +150,15 @@ function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
 function teamLine(t, sport, season, seed) {
-  // A postseason SEED reads in front of the name instead of in the rank column
-  // (his call 2026-09-11): "2 WASHINGTON", not "NO. 2". The column then only
-  // ever holds a poll ranking, so it is as narrow as "#25".
-  const inline = seed && t.rank
-    ? '<span class="rkin">' + t.rank + "</span> " : "";
+  // A SEED reads in front of the name instead of in the rank column (his call
+  // 2026-09-11): "2 WASHINGTON", not "NO. 2". The column then only ever holds a
+  // poll ranking, so it is as narrow as "#25".
+  const inline = seed != null
+    ? '<span class="rkin">' + seed + "</span> " : "";
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
     '<span class="rk">' +
-    (t.rank && !seed ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
+    (t.rank && seed == null ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
     '<span class="nm">' + inline + esc(teamName(t, sport, season)) + "</span>" +
     '<span class="sc">' + t.score + "</span></div>";
 }
@@ -265,15 +265,12 @@ function rowHtml(g, browse) {
   }
   return '<button class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
-    // a Michigan loss is DASHED (his call 2026-09-11): a solid grey border
-    // looked like a rival loss to a black-and-gold winner such as Iowa
-    ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
     // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
-    // the CFP and the NCAA Tournament read "NO. 3", not "#3"
-    (playoffGame(g) ? " rk-no" : "") +
+    // a seeded game drops the rank column: the seed rides with the name
+    (seedGame(g) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -282,8 +279,8 @@ function rowHtml(g, browse) {
     '<div class="sport"' + col(headCol) + ">" +
       "<span>" + when + mark + "</span>" +
       '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
-    '<div class="teams">' + teamLine(away, g.sport, g.season, playoffGame(g)) +
-      teamLine(home, g.sport, g.season, playoffGame(g)) + "</div>" +
+    '<div class="teams">' + teamLine(away, g.sport, g.season, seedOf(g, away)) +
+      teamLine(home, g.sport, g.season, seedOf(g, home)) + "</div>" +
     // network on the away team's line, time on the home team's
     '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
@@ -403,21 +400,21 @@ function michCard(g, p) {
   // the two boxes share one height and one type size (his call)
   const score = '<span class="sc mbox"' + paint(top) + ">" + m.score + "-" + opp.score +
     "</span>";
-  // Michigan's rank at the time beside the score; blank when unranked, the box
-  // still showing the pants colour when there is one
-  const umRank = (m.rank || pants)
-    ? '<span class="mrank"' + paint(pants) + ">" +
-      (m.rank ? (playoffGame(g) ? String(m.rank) : "#" + m.rank) : "") + "</span>"
-    : "<span></span>";
+  // Michigan's rank at the time beside the score. The box is ALWAYS there and
+  // always coloured (his call 2026-09-11) -- empty when Michigan is unranked --
+  // and a seed shows without the hash.
+  const umSeed = seedOf(g, m);
+  const umRank = '<span class="mrank"' + paint(pants) + ">" +
+    (umSeed != null ? String(umSeed) : m.rank ? "#" + m.rank : "") + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
-    (opp.rank && !playoffGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    (opp.rank && seedOf(g, opp) == null ? '<span class="rn">' + opp.rank + "</span>" : "") +
     "</span>" +
     '<span class="nm mnm"><span class="mn">' + esc(where) +
-      (playoffGame(g) && opp.rank ? '<span class="rkin">' + opp.rank + "</span> " : "") +
+      (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
       esc(nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
       (fin ? '<span class="mfin">' + esc(fin) + "</span>" : "") + "</span></span>" +
@@ -443,7 +440,8 @@ function michCard(g, p) {
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe
   const bigWin = !lost && !!(g.post || g.champ || RIVALS.indexOf(opp.id) > -1);
-  let cls = " mich" + (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
+  let cls = " mich mich-" + g.sport.toLowerCase() +
+    (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     (playoffGame(g) ? " rk-no" : "");
@@ -454,7 +452,7 @@ function michCard(g, p) {
     cls += " celebrate";
     ring = ";--celeb:" + bc + ";--celebring:" + bc + "44";
   } else if (lost) {
-    cls += " celebrate mloss";
+    cls += " celebrate";
     ring = ";--celeb:#5a5a62";
   }
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
@@ -880,6 +878,17 @@ function rivalLoser(g) {
 }
 // The Postseason button keeps only the CFP and the NCAA Tournament (his call
 // 2026-09-11) -- not the bowls, the NIT, or the Big Ten title game and tournament
+/* A SEED shows instead of a ranking when ESPN's number IS the seed (the CFP
+   and the NCAA Tournament) or when he has given one (seeds.csv, the Big Ten
+   Tournament -- ESPN only carries the poll there). */
+function seedOf(g, t) {
+  if (t.seed != null) return t.seed;
+  return playoffGame(g) && t.rank ? t.rank : null;
+}
+function seedGame(g) {
+  return g.teams.some(t => seedOf(g, t) != null);
+}
+
 function playoffGame(g) {
   const s = g.stage || "";
   return s.indexOf("CFP") === 0 || s.indexOf("NCAA Tournament") === 0;
