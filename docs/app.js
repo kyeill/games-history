@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-232203";
+const BUILD = "20260911-232507";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -518,13 +518,15 @@ function michCard(g, p) {
   // title game in CFP gold. WINS ONLY -- reaching a final is not winning one,
   // so the 2013 and 2018 NCAA finals and the 2014 / 2019 / 2026 Big Ten finals
   // carry no frame. Nothing else borders itself either: an ordinary loss goes
-  // unframed, the muting alone says it. His border column still wins over all.
+  // unframed, the muting alone says it. A FINAL BEATS HIS BORDER COLUMN (his
+  // call 2026-09-11): gold and blue win over a maize set by hand. On every
+  // other game his column is still the last word.
   const st = g.stage || "";
   const finalRing = lost ? null
     : st === "Big Ten Tournament | Championship" ? "#0088ce"
     : st === "NCAA Tournament | Championship" ? "#005eb8"
     : st === "CFP | Championship" ? "#c28c19" : null;
-  const bc = michColour(mx.border) || finalRing;
+  const bc = finalRing || michColour(mx.border);
   let ring = "";
   if (bc) {
     cls += " celebrate";

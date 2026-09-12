@@ -425,7 +425,8 @@ there.)
 
 A **final won** carries its own border: the Big Ten Tournament final in Big Ten
 blue `#0088ce`, the NCAA final in NCAA blue `#005eb8`, the CFP title game in
-CFP gold `#c28c19`. Wins only -- reaching a final is not winning one.
+CFP gold `#c28c19`. Wins only -- reaching a final is not winning one -- and a
+final outranks the `border` column in `michigan.csv`.
 
 (On the **Michigan view** the whole card washes in the opponent colour for a
 postseason or rival win -- but a **Big Ten Tournament** win washes only in a

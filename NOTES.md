@@ -787,7 +787,10 @@ the CFP title game in CFP gold #c28c19. WINS ONLY -- the border marks winning a
 final, not reaching one, so the four defeats (2013 and 2018 NCAA, 2014 and 2019
 and 2026 Big Ten) go unframed. Five games carry it: Wisconsin 2017, Purdue
 2018, Wisconsin 2025, Connecticut 2026, and Washington 2024 in gold. His
-border column still overrides it per game.
+A FINAL OUTRANKS his border column (his call): the
+2023 Washington row carries maize by hand and still renders gold. Everywhere
+else the column is the last word. TRAP: the first build of the gold rule did
+NOT show, because the column was read first and that row was already maize.
 
 **A BIG TEN TOURNAMENT win washes the card only in a title year** (his call
 2026-09-11), or against a rival. Every other postseason win still washes. The
