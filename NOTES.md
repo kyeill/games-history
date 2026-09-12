@@ -763,7 +763,11 @@ API competitors, the tournament resource and its seasons; the bracket endpoint
 attaches a `seed` to each side of a Big Ten Tournament game, and the app shows
 a seed wherever one exists (`seedOf`), with no hash, the way the CFP and NCAA
 cards already read. 51 Big Ten Tournament games sit on the tabs and 74
-team-seasons cover them.
+team-seasons cover them. A conference-tournament card shows BOTH numbers (his
+call 2026-09-11): his seed in front of the name and the poll ranking in the
+column, so those cards keep the column and stay in line with every other card.
+Only a CFP or NCAA card drops the column, because there ESPN's number is the
+seed itself and no ranking is left to show.
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only

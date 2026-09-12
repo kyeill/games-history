@@ -151,6 +151,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.celebrate{border-color:var(--celeb,#ffcb05);
   box-shadow:0 0 0 1px var(--celebring,#ffcb0544)}
 .row.celebrate:hover{filter:brightness(1.12)}
+/* a Michigan loss on the other views: dashed, never mistaken for a grey
+   winner. The Michigan view keeps a plain frame (his calls 2026-09-11) */
+.row.celebrate.mloss{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
 /* a rival won, or Michigan lost: the WINNER's name is struck through -- no
    italics anywhere any more (his call 2026-09-11) */
@@ -237,7 +240,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .mnum{text-transform:none}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
-.row.mich .mcaret{margin-left:1px;font-style:normal;font-weight:600}
+/* the champion caret never takes the strikethrough (his call): an
+   inline-block is not decorated by its ancestor */
+.row.mich .mcaret{margin-left:1px;font-style:normal;font-weight:600;
+  display:inline-block;text-decoration:none}
 .row.mich .tl{grid-template-columns:minmax(0,1fr) auto auto;column-gap:6px;
   padding:0;margin-left:0;background:none}
 /* the stripe: crest, a rank column that holds exactly "NO. 16" (35.4px
@@ -362,10 +368,10 @@ BODY = """
 </nav>
 
 <div class="viewbar" id="viewbar">
-  <button data-view="tv" aria-selected="true">TV Windows</button>
+  <button data-view="michigan" aria-selected="true">Michigan</button>
+  <button data-view="tv" aria-selected="false">TV Windows</button>
   <button data-view="big" aria-selected="false">Key Games</button>
   <button data-view="rivals" aria-selected="false">Rivals</button>
-  <button data-view="michigan" aria-selected="false">Michigan</button>
 </div>
 
 <div class="daterow" id="daterow" style="display:none">

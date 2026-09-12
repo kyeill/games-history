@@ -6,12 +6,12 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260911-212115";
+const BUILD = "20260911-212742";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
-let BROWSE = null, TAB = "cfb", VIEW = "tv", SHEET = null;
+let BROWSE = null, TAB = "cfb", VIEW = "michigan", SHEET = null;
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null };
 
@@ -149,7 +149,7 @@ const PLACE_TOO = ["Champions Classic", "CBS Sports Classic"];
 function chip(kind, text) {
   return '<span class="tag t-' + kind + '">' + esc(text) + "</span>";
 }
-function teamLine(t, sport, season, seed) {
+function teamLine(t, sport, season, seed, g0) {
   // A SEED reads in front of the name instead of in the rank column (his call
   // 2026-09-11): "2 WASHINGTON", not "NO. 2". The column then only ever holds a
   // poll ranking, so it is as narrow as "#25".
@@ -158,7 +158,7 @@ function teamLine(t, sport, season, seed) {
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
     '<span class="rk">' +
-    (t.rank && seed == null ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
+    (t.rank && !seedGame(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
     '<span class="nm">' + inline + esc(teamName(t, sport, season)) + "</span>" +
     '<span class="sc">' + t.score + "</span></div>";
 }
@@ -265,6 +265,9 @@ function rowHtml(g, browse) {
   }
   return '<button class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (g.ot ? " ot" : "") +
+    // a Michigan loss is DASHED on these views (his call 2026-09-11); the
+    // Michigan view keeps a plain frame
+    ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
     // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
@@ -279,8 +282,8 @@ function rowHtml(g, browse) {
     '<div class="sport"' + col(headCol) + ">" +
       "<span>" + when + mark + "</span>" +
       '<span class="hdate">' + fmtDate(g.date) + "</span></div>" +
-    '<div class="teams">' + teamLine(away, g.sport, g.season, seedOf(g, away)) +
-      teamLine(home, g.sport, g.season, seedOf(g, home)) + "</div>" +
+    '<div class="teams">' + teamLine(away, g.sport, g.season, seedOf(g, away), g) +
+      teamLine(home, g.sport, g.season, seedOf(g, home), g) + "</div>" +
     // network on the away team's line, time on the home team's
     '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
@@ -405,13 +408,13 @@ function michCard(g, p) {
   // and a seed shows without the hash.
   const umSeed = seedOf(g, m);
   const umRank = '<span class="mrank"' + paint(pants) + ">" +
-    (umSeed != null ? String(umSeed) : m.rank ? "#" + m.rank : "") + "</span>";
+    (umSeed != null ? String(umSeed) : m.rank ? "#" + m.rank : "\u2013") + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
   const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
-    (opp.rank && seedOf(g, opp) == null ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
     "</span>" +
     '<span class="nm mnm"><span class="mn">' + esc(where) +
       (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
@@ -887,8 +890,12 @@ function seedOf(g, t) {
   if (t.seed != null) return t.seed;
   return playoffGame(g) && t.rank ? t.rank : null;
 }
+// Only the CFP and the NCAA Tournament drop the rank column: there ESPN's
+// number IS the seed, so there is no ranking left to show. A conference
+// tournament keeps both (his call 2026-09-11) -- his seed by the name, the poll
+// ranking in the column.
 function seedGame(g) {
-  return g.teams.some(t => seedOf(g, t) != null);
+  return playoffGame(g);
 }
 
 function playoffGame(g) {
@@ -1186,12 +1193,11 @@ async function init() {
   document.querySelectorAll("nav button").forEach(b =>
     b.addEventListener("click", e => {
       TAB = e.currentTarget.dataset.tab;
-      // Switching sport goes back to the TAB DEFAULT, not merely clean filters
-      // (his call 2026-09-11): TV Windows, the latest season with games,
-      // Marquee on, Newest First. CFB and CBB share no game types or windows
-      // anyway, so a value left over from the other sport would filter
-      // everything away.
-      VIEW = "tv";
+      // Switching sport goes back to the TAB DEFAULT, not merely clean filters:
+      // the MICHIGAN view (his call 2026-09-11), the latest season with games,
+      // Newest First. CFB and CBB share no game types or windows anyway, so a
+      // value left over from the other sport would filter everything away.
+      VIEW = "michigan";
       SORT = "desc";
       clearFilters();
       draw();
@@ -1217,7 +1223,7 @@ async function init() {
         // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        SORT = "asc";
+        SORT = "desc";
       } else if (leaving === "rivals" || leaving === "michigan") {
         // leaving Rivals or Michigan puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;

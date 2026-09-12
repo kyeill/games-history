@@ -342,7 +342,8 @@ blue. In the CFP and the NCAA Tournament a ranking reads "NO. 3" rather than
 "#3". Every card shares one ranking column, so team names start in the same place and the last digit of "#10" lines up with "NO. 11". A football header that is only its week names the day when the game is
 not on a Saturday: "WEEK 1 (THU)".
 
-**Michigan** is a fourth view on each tab -- every Michigan game
+**Michigan** is the FIRST view on each tab, the one both tabs open on, newest
+first (his call 2026-09-11) -- every Michigan game
 from 2011 on (2011-12 in basketball), his call 2026-09-11. It began as a trial
 on 2023 football and 2025-26 basketball. One card per Michigan game,
 every game that season, in three rows. The HEADER: his emoji, the game number
@@ -357,7 +358,8 @@ from Michigan's side and Michigan's rank at the time (blank when unranked). A
 postseason SEED reads in front of the name instead -- "vs. 2 WASHINGTON" -- in
 the ranking's colours, in a right-aligned box the width of the rank column it
 replaces, so names start in one place on every card. Michigan's rank keeps its hash except on a
-seeded game; its box is always there and always coloured, empty when Michigan
+seeded game, where it shows the seed alone, and reads a dash when Michigan was
+unranked; its box is always there and always coloured, empty when Michigan
 is unranked, and the score box is sized for its widest reading (narrower in
 football). A colour stripe runs
 from the crest through the rating and stops before those two boxes, which
