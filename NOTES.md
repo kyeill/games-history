@@ -748,7 +748,8 @@ the digits right aligned, and `.row.rk-no` drops the column itself, so a
 two-digit seed and a one-digit seed still start their names together and in
 line with every non-postseason card. Michigan's own rank shows no "#", and both
 Michigan boxes hold their widest reading (6.6ch for 121-108, 2ch for a rank)
-via tabular figures.
+via tabular figures (7.2ch, measured: 121-108 needs 50.5px of the 6.6ch box's
+50.5px, too close to trust).
 
 **The Michigan view reaches back to 2011** (loaded 2026-09-11). The archive
 keeps whole seasons only from 2021, and the 2014-2020 Rivals caches hold only
