@@ -349,6 +349,7 @@ function michCard(g, p) {
     return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
   };
   const ratio = (a, b) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+  const WHITE = "#f2f2f0";
   const toHsl = hex => {
     const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
     const hi = Math.max(r, g, b), lo = Math.min(r, g, b), l = (hi + lo) / 2;
@@ -368,10 +369,18 @@ function michCard(g, p) {
     return "#" + f(0) + f(8) + f(4);
   };
   const readable = (fg, bg) => {
+    // WHITE keeps the school palette (his call 2026-09-11): maize or blue on a
+    // white box, white on a maize or blue one, with no shifting -- white on
+    // white alone would vanish, so that reads blue
+    if (fg === WHITE && bg === WHITE) return "#00274c";
+    if (fg === WHITE || bg === WHITE) return fg;
     if (ratio(fg, bg) >= 3) return fg;
+    // a light box darkens the text in fine steps, so maize on maize stops at
+    // the LIGHTEST gold that still reads (his call); a dark box lightens faster
     const c = toHsl(fg), darken = lum(bg) > 0.18;
-    for (let i = 1; i <= 20; i++) {
-      const l = darken ? c.l - i * 0.05 : c.l + i * 0.05;
+    const step = darken ? 0.01 : 0.05;
+    for (let i = 1; i <= 100; i++) {
+      const l = darken ? c.l - i * step : c.l + i * step;
       if (l < 0 || l > 1) break;
       const cand = toHex(c.h, c.s, l);
       if (ratio(cand, bg) >= 3) return cand;
