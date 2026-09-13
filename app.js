@@ -556,9 +556,13 @@ function michCard(g, p) {
   //              text the row already has (his note, tags, the location).
   //   BASKETBALL the whole phrase -- "Maize Out", "Pink Out", "Blue Out" --
   //              with Notes empty, so the phrase is ALSO the text.
-  // nothing else to say on the third row: the date moves down to fill it
-  const dateDown = parts.length === 0;
-  if (dateDown) parts.push({ t: dateText, short: "" });
+  // The date drops to the third row when that row has nothing of its own to
+  // say (his calls 2026-09-13). His Big Ten note alone does not count as
+  // something: "B1G East", "B1G Protect", "B1G Legends" and the rest read
+  // better with the date in front of them -- "9/5/26 | B1G East".
+  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G/i.test(q.t));
+  const dateDown = parts.length === 0 || b1gOnly;
+  if (dateDown) parts.unshift({ t: dateText, short: "" });
   const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";
   const SOLID = { maize: FMAIZE, blue: FBLUE, pink: FPINK };
   const rawFooter = String(mx.footer || "").trim();
