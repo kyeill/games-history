@@ -388,8 +388,11 @@ function michCard(g, p) {
   // the uniform paints them: jersey behind the score, pants behind the rank,
   // accessories as the text on both.
   const u = (mx.uni || []).map(michColour), bx = mx.box || {};
-  const top = michColour(bx.score_bg) || u[0] || null;
-  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || null;
+  // the placeholder until his sheet is filled: a quiet grey, not the maize the
+  // CSS used to default the rank box to
+  const UNSET = "#4a4a52";
+  const top = michColour(bx.score_bg) || u[0] || UNSET;
+  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
   const uniAcc = u.length >= 3 ? u[2] : null;
   const scoreInk = michColour(bx.score_font) || uniAcc;
   const rankInk = michColour(bx.rank_font) || uniAcc;

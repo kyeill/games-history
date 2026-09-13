@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-020634";
+const BUILD = "20260912-224126";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -388,8 +388,11 @@ function michCard(g, p) {
   // the uniform paints them: jersey behind the score, pants behind the rank,
   // accessories as the text on both.
   const u = (mx.uni || []).map(michColour), bx = mx.box || {};
-  const top = michColour(bx.score_bg) || u[0] || null;
-  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || null;
+  // the placeholder until his sheet is filled: a quiet grey, not the maize the
+  // CSS used to default the rank box to
+  const UNSET = "#4a4a52";
+  const top = michColour(bx.score_bg) || u[0] || UNSET;
+  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
   const uniAcc = u.length >= 3 ? u[2] : null;
   const scoreInk = michColour(bx.score_font) || uniAcc;
   const rankInk = michColour(bx.rank_font) || uniAcc;

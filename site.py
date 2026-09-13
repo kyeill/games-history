@@ -301,7 +301,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .sc.mbox.mblank{background:none}
 /* football never reaches three digits, so its score box is narrower */
 .row.mich.mich-cfb .sc.mbox{min-width:calc(5.4ch + 16px)}
-.row.mich .mrank{min-width:calc(7.2ch + 16px);background:#ffcb05;color:#00274c}
+/* no background here any more (his call 2026-09-13): an unfilled box is
+   painted grey inline, so a game with no uniform cannot inherit maize */
+.row.mich .mrank{min-width:calc(7.2ch + 16px)}
 .row.mich.mich-cfb .mrank{min-width:calc(5.4ch + 16px)}
 /* a postseason win or a win over a rival washes the whole card */
 .row.mich.mwash{background:var(--winwash)}
