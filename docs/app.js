@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-174419";
+const BUILD = "20260913-175458";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -490,7 +490,7 @@ function michCard(g, p) {
   // the regular season, and a dash when Michigan was unranked.
   const umSeed = seedOf(g, m);
   const umText = playoffGame(g) && m.rank ? "No. " + m.rank
-    : umSeed != null ? String(umSeed)
+    : umSeed != null ? "No. " + umSeed
     : m.rank ? "#" + m.rank : "\u2013";
   const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
@@ -534,6 +534,8 @@ function michCard(g, p) {
   if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay");
   plainTags(g).filter(t => SERIES_FAMILY.indexOf(t) < 0).forEach(t => bit(t));
   if (mx.note) bit(mx.note);
+  // a game that was called off says so, unless his own note already does
+  if (g.cancelled && !/cancel/i.test(mx.note || "")) bit("Cancelled");
 
   // HIS FOOTER COLUMN (2026-09-13). "maize" paints the whole row maize.
   // "stripe" alternates blue and maize, starting blue: between the PIPES when
@@ -711,7 +713,7 @@ function bigViewAllows(g) {
 // the borders, the capitals, the strikethrough, the grey rankings. Without
 // this a game that has not kicked off reads as a Michigan loss, because
 // "did not win" and "lost" are the same test everywhere else.
-function upcoming(g) { return !!g.upcoming; }
+function upcoming(g) { return !!(g.upcoming || g.cancelled); }
 // A score that does not exist yet must render as NOTHING. Concatenating null
 // into markup prints the word "null", which is how the first upcoming cards
 // went out reading "null null" (2026-09-12).
