@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-150634";
+const BUILD = "20260913-152545";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -372,8 +372,9 @@ function michCard(g, p) {
     : michCaps(g, opp, !lost);
   if (caps) nm = nm.toUpperCase();
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
+  // the rating reads "73+"; a team no system rates reads "DII" as it is
   const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
-    : mx.rating ? mx.rating + "+" : "";
+    : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
   // | PEACOCK 12:00PM" -- unless a window label already fills the header. A

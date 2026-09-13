@@ -372,8 +372,9 @@ function michCard(g, p) {
     : michCaps(g, opp, !lost);
   if (caps) nm = nm.toUpperCase();
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
+  // the rating reads "73+"; a team no system rates reads "DII" as it is
   const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
-    : mx.rating ? mx.rating + "+" : "";
+    : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
   // | PEACOCK 12:00PM" -- unless a window label already fills the header. A

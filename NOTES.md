@@ -2,6 +2,20 @@
 
 Each of these cost a debugging pass or would have. Do not rediscover them.
 
+## The Google Sheet
+
+**gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
+headers are "2025-26", "2024-25" and so on; gviz typed those columns as DATES
+and returned every label EMPTY, except the single cell that happened to be
+text. It looked exactly like a sheet with no headers. `headers=1` in the query
+string settles it -- the first row is headers, no inference. Every sheet fetch
+carries it now (2026-09-13).
+
+**An unknown sheet name silently returns the FIRST tab.** Asking gviz for a
+tab that does not exist does not error -- it answers with the first sheet in
+the workbook, so a typo reads as real data from the wrong place. Check the
+header row matches what that tab should have before trusting a fetch.
+
 ## Upcoming games and the daily build
 
 **An unplayed game reads as a MICHIGAN LOSS unless every result rule guards

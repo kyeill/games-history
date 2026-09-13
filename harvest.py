@@ -5,6 +5,7 @@ no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
 import collections, csv, datetime as dt, io, json, os, re, sys, time
+import unicodedata
 from zoneinfo import ZoneInfo
 import requests
 import rules
@@ -404,7 +405,8 @@ def load_sheet():
     out, used = {}, {}
     for code, tab in SHEET_TABS.items():
         url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
-               "?tqx=out:csv&sheet=%s" % (SHEET_ID, tab.replace(" ", "%20")))
+               "?tqx=out:csv&headers=1&sheet=%s"
+               % (SHEET_ID, tab.replace(" ", "%20")))
         try:
             r = requests.get(url, timeout=60)
             r.raise_for_status()
@@ -538,24 +540,81 @@ def load_seeds():
     return out
 
 
+RATING_TABS = {"CFB": "SP%2B", "CBB": "KP"}
+# his spelling on the left, mine on the right, where the two genuinely differ
+RATING_ALIAS = {
+    "northcarolinastate": "ncstate",
+    "mountstatemarys": "mountstmarys",      # his tab reads "Mount State Mary's"
+}
+
+
+def flat(n):
+    """A team name with everything but letters and digits stripped, accents
+    included -- "San Jose State" and "San Jose State", "Miami OH" and
+    "Miami (OH)" both land in the same place."""
+    n = unicodedata.normalize("NFKD", n or "")
+    n = "".join(c for c in n if not unicodedata.combining(c))
+    key = re.sub(r"[^a-z0-9]", "", n.lower())
+    return RATING_ALIAS.get(key, key)
+
+
+def rating_of(code, season, team_id, teams, ratings, rated_teams):
+    """His rank for that team that season. A team no rating system covers --
+    the Division II and NAIA exhibition opponents -- reads "DII" instead of
+    nothing, so the card says why it is blank (his call 2026-09-13)."""
+    key = flat((teams.get(team_id) or {}).get("short") or "")
+    hit = ratings.get((code, season, key))
+    if hit:
+        return hit
+    if key and code in rated_teams and key not in rated_teams[code]:
+        return "DII"
+    return None
+
+
 def load_ratings():
-    """ratings.csv -- his final SP+ (football) or KenPom (basketball) rank for
-    each opponent, by (sport, season, team id)."""
-    path = os.path.join(HERE, "ratings.csv")
-    if not os.path.exists(path):
-        return {}
-    out = {}
-    with open(path, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            v = (row.get("rating") or "").strip()
-            if not v:
+    """{(sport, season, flat team name): rank} from the SP+ and KP tabs, plus
+    the set of teams each tab KNOWS -- a team missing from the tab entirely is
+    unrated (Division II), which is different from a season he has not filled.
+    """
+    out, known = {}, {}
+    for code, tab in RATING_TABS.items():
+        url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
+               "?tqx=out:csv&headers=1&sheet=%s" % (SHEET_ID, tab))
+        try:
+            r = requests.get(url, timeout=60)
+            r.raise_for_status()
+            rows = list(csv.reader(io.StringIO(r.content.decode("utf-8-sig"))))
+        except (requests.RequestException, ValueError) as e:
+            print("  WARN: could not read the %s tab (%s)" % (tab, e), file=sys.stderr)
+            continue
+        if not rows:
+            continue
+        head = rows[0]
+        # the season each column holds: "2023" for football, "2011-12" for
+        # basketball -- both start with the year the season began
+        cols = {}
+        for i, h in enumerate(head[1:], start=1):
+            h = (h or "").strip()
+            if not h:
                 continue
             try:
-                out[((row.get("sport") or "").strip(), int(row.get("season")),
-                     (row.get("team_id") or "").strip())] = v
-            except (TypeError, ValueError):
+                cols[i] = int(h.split("-")[0])
+            except ValueError:
                 continue
-    return out
+        seen = set()
+        for raw in rows[1:]:
+            if not raw or not (raw[0] or "").strip():
+                continue
+            key = flat(raw[0])
+            seen.add(key)
+            for i, season in cols.items():
+                v = (raw[i] or "").strip() if i < len(raw) else ""
+                if v:
+                    out[(code, season, key)] = v
+        known[code] = seen
+        print("  %s: %d teams, %d ratings" % (tab.replace("%2B", "+"), len(seen),
+                                              sum(1 for k in out if k[0] == code)))
+    return out, known
 
 
 def rank_of(c):
@@ -676,7 +735,7 @@ def load_locations():
     separates the two blocks.
     """
     url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
-           "?tqx=out:csv&sheet=Locations" % SHEET_ID)
+           "?tqx=out:csv&headers=1&sheet=Locations" % SHEET_ID)
     try:
         r = requests.get(url, timeout=60)
         r.raise_for_status()
@@ -845,7 +904,7 @@ def harvest():
     locs = load_locations()
     ev_overrides = load_event_overrides()
     game_over = load_game_overrides()
-    ratings = load_ratings()
+    ratings, rated_teams = load_ratings()
     seeds = load_seeds()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
@@ -1178,7 +1237,8 @@ def harvest():
                                if k["team"]["id"] != rules.MICHIGAN)
                     mx = {"finish": finish.get(opp), "final": final_ap.get(opp),
                           "reigning": opp == reigning,
-                          "rating": ratings.get((code, y, opp))}
+                          "rating": rating_of(code, y, opp, teams,
+                                              ratings, rated_teams)}
                     keep[-1]["michigan"] = True
                     keep[-1]["mx"] = {k: v for k, v in mx.items() if v}
     # UPCOMING GAMES (his call 2026-09-12): today through the coming Sunday,
