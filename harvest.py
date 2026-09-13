@@ -545,6 +545,7 @@ RATING_TABS = {"CFB": "SP%2B", "CBB": "KP"}
 RATING_ALIAS = {
     "northcarolinastate": "ncstate",
     "mountstatemarys": "mountstmarys",      # his tab reads "Mount State Mary's"
+    "iuindy": "iuindianapolis",             # KenPom shortens it; ESPN spells it out
 }
 
 
