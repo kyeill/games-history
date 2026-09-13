@@ -560,7 +560,7 @@ function michCard(g, p) {
   // say (his calls 2026-09-13). His Big Ten note alone does not count as
   // something: "B1G East", "B1G Protect", "B1G Legends" and the rest read
   // better with the date in front of them -- "9/5/26 | B1G East".
-  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G/i.test(q.t));
+  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G /i.test(q.t));
   const dateDown = parts.length === 0 || b1gOnly;
   if (dateDown) parts.unshift({ t: dateText, short: "" });
   const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";

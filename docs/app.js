@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-194934";
+const BUILD = "20260913-195115";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -560,7 +560,7 @@ function michCard(g, p) {
   // say (his calls 2026-09-13). His Big Ten note alone does not count as
   // something: "B1G East", "B1G Protect", "B1G Legends" and the rest read
   // better with the date in front of them -- "9/5/26 | B1G East".
-  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G/i.test(q.t));
+  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G /i.test(q.t));
   const dateDown = parts.length === 0 || b1gOnly;
   if (dateDown) parts.unshift({ t: dateText, short: "" });
   const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";
