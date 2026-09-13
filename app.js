@@ -534,15 +534,26 @@ function michCard(g, p) {
   // the box colours already use.
   // a deep Michigan blue, not the lightened one the boxes use -- it has to
   // read as navy against maize (his call 2026-09-13)
-  const FBLUE = "#003d7a", FMAIZE = "#ffcb05";
-  const mode = String(mx.footer || "").trim().toLowerCase();
+  // His Footer column is used two ways and both are honoured (2026-09-13):
+  //   FOOTBALL   a bare colour word -- "Maize", "Stripe" -- painting whatever
+  //              text the row already has (his note, tags, the location).
+  //   BASKETBALL the whole phrase -- "Maize Out", "Pink Out", "Blue Out" --
+  //              with Notes empty, so the phrase is ALSO the text.
+  const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";
+  const SOLID = { maize: FMAIZE, blue: FBLUE, pink: FPINK };
+  const rawFooter = String(mx.footer || "").trim();
+  const mode = rawFooter.split(/\s+/)[0].toLowerCase();
+  if (rawFooter.indexOf(" ") > -1 &&
+      !parts.some(q => q.t.toLowerCase() === rawFooter.toLowerCase())) {
+    parts.push({ t: rawFooter, short: "" });
+  }
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
     (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
-  if (mode === "maize") {
-    chipHtml = parts.map(p => wrap(p, FMAIZE)).join(SEP);
+  if (SOLID[mode]) {
+    chipHtml = parts.map(p => wrap(p, SOLID[mode])).join(SEP);
   } else if (mode === "stripe" && parts.length > 1) {
     chipHtml = parts.map((p, i) => wrap(p, i % 2 ? FMAIZE : FBLUE)).join(SEP);
   } else if (mode === "stripe" && parts.length === 1) {
