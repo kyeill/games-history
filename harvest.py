@@ -184,63 +184,6 @@ def old_season_events(code, y):
     return out
 
 
-def as_scoreboard(x, code, conf_seen):
-    """A team-schedule event rewritten in scoreboard shape.
-
-    The two endpoints do not agree: the schedule puts the season type under
-    `seasonType` rather than inside `season`, writes the score as an object
-    instead of a string, and omits the team colours and conference id
-    entirely. Left as-is, such an event fails every downstream test -- and
-    worse, WIPES the colours of any team it names, because the loop writes the
-    team record from whatever it is given (2026-09-13).
-    """
-    x = json.loads(json.dumps(x))               # never mutate the cache
-    st = x.get("seasonType") or {}
-    x.setdefault("season", {})
-    x["season"]["type"] = st.get("type", 2)
-    x["season"].setdefault("year", (x.get("season") or {}).get("year"))
-    for c in x.get("competitions") or []:
-        for k in c.get("competitors") or []:
-            k["score"] = ""                     # cancelled: there is no score
-            t = k.get("team") or {}
-            if not t.get("conferenceId"):
-                t["conferenceId"] = conf_seen.get(t.get("id"))
-    return x
-
-
-def michigan_cancelled(code, y):
-    """Michigan games that were CALLED OFF, from the team schedule.
-
-    The scoreboard does not carry them -- nothing at all appears for Michigan
-    on 5 December 2020 -- but the team schedule keeps each one with its date
-    and id, which is the only record of the 2020 COVID season. POSTPONED is
-    left out on purpose: those were replayed, and taking them would double the
-    real game.
-    """
-    path = os.path.join(CACHE, "cancelled-%s-%d.json" % (code.lower(), y))
-    if os.path.exists(path):
-        return json.load(open(path, encoding="utf-8"))["events"]
-    season = y if code == "CFB" else y + 1
-    url = ("https://site.api.espn.com/apis/site/v2/sports/%s/teams/%s/schedule"
-           % (SPORTS[code][0], rules.MICHIGAN))
-    try:
-        r = requests.get(url, params={"season": season}, timeout=60)
-        r.raise_for_status()
-        evs = r.json().get("events") or []
-    except (requests.RequestException, ValueError):
-        return []
-    out = []
-    for x in evs:
-        c = (x.get("competitions") or [{}])[0]
-        stat = (c.get("status") or {}).get("type") or {}
-        if stat.get("name") == "STATUS_CANCELED":
-            out.append(x)
-    if season_over(code, y):
-        os.makedirs(CACHE, exist_ok=True)
-        json.dump({"events": out}, open(path, "w", encoding="utf-8"))
-    return out
-
-
 def michigan_events(code, y):
     """Every Michigan game in a season before the archive, for the Michigan
     view, cached as cache/michigan-SPORT-SEASON.json. The same walk keeps that
@@ -993,9 +936,6 @@ def harvest():
     seeds = load_seeds()
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
-        # every conference id seen this sport, so a cancelled game -- whose
-        # event carries none -- can borrow the right one
-        conf_seen = {}
         years = set(RIVAL_SEASONS) | set(SEASONS) | rules.MICHIGAN_SEASONS.get(code, set())
         for y in sorted(years):
             # before the archive: his rivals' games from 2014, for Rivals, and
@@ -1021,16 +961,6 @@ def harvest():
             mich_season = y in rules.MICHIGAN_SEASONS.get(code, ())
             # a cancelled game reaches the archive only through the team
             # schedule, so it is merged in here rather than found in evs
-            for e in evs:
-                for k in ((e.get("competitions") or [{}])[0].get("competitors") or []):
-                    t = k.get("team") or {}
-                    if t.get("id") and t.get("conferenceId"):
-                        conf_seen[t["id"]] = str(t["conferenceId"])
-            if mich_season:
-                have = {x.get("id") for x in evs}
-                evs = evs + [as_scoreboard(x, code, conf_seen)
-                             for x in michigan_cancelled(code, y)
-                             if x.get("id") and x.get("id") not in have]
             finish = (playoff_finish(code, y, postseason_events(code, y))
                       if mich_season else {})
             final_ap = final_poll(code, y) if mich_season else {}
@@ -1046,18 +976,11 @@ def harvest():
                 cs = c.get("competitors") or []
                 if len(cs) != 2:
                     continue
-                # A CANCELLED MICHIGAN GAME IS KEPT (his call 2026-09-13):
-                # ESPN leaves it on the schedule with its date and id, which is
-                # how the 2020 COVID season is recorded. POSTPONED is NOT kept
-                # -- those were replayed later, so taking them would double the
-                # real game (Illinois 2021, Michigan State and Purdue 2022).
-                stat = (c.get("status") or {}).get("type") or {}
-                cancelled = stat.get("name") == "STATUS_CANCELED"
-                mich_here = any(k["team"]["id"] == rules.MICHIGAN for k in cs)
-                keep_cancelled = cancelled and mich_here and mich_season
-                if not stat.get("completed") and not keep_cancelled:
+                # cancelled games are deliberately NOT kept (his call
+                # 2026-09-13, after seeing them on the cards)
+                if not (c.get("status") or {}).get("type", {}).get("completed"):
                     continue
-                if not keep_cancelled and any(k.get("score") in (None, "") for k in cs):
+                if any(k.get("score") in (None, "") for k in cs):
                     continue
                 # RIVALS (his call 2026-09-11): a game Ohio State or Michigan
                 # State (both sports) or Notre Dame (football) LOST. Two of them
@@ -1293,9 +1216,7 @@ def harvest():
                                       "alt": t.get("alternateColor") or was.get("alt")}
                     if was.get("conf"):
                         teams[t["id"]]["conf"] = was["conf"]
-                    side.append({"id": t["id"],
-                                 "score": (None if keep_cancelled
-                                           else int(k["score"])),
+                    side.append({"id": t["id"], "score": int(k["score"]),
                                  "rank": rank_of(k) or (ap.get(t["id"]) if rivals_only else None),
                                  "win": bool(k.get("winner")),
                                  "home": k.get("homeAway") == "home",
@@ -1339,7 +1260,6 @@ def harvest():
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
                     "rivals_only": rivals_only,
-                "cancelled": keep_cancelled,
                     # a CFP game short of the final is located by its bowl
                     "bowl": (rules.cfp_bowl(stype, heads, season=y)
                              if code == "CFB" else None),
