@@ -533,7 +533,7 @@ function michCard(g, p) {
   // the box colours already use.
   // a deep Michigan blue, not the lightened one the boxes use -- it has to
   // read as navy against maize (his call 2026-09-13)
-  const FBLUE = "#00519e", FMAIZE = "#ffcb05";
+  const FBLUE = "#003d7a", FMAIZE = "#ffcb05";
   const mode = String(mx.footer || "").trim().toLowerCase();
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
