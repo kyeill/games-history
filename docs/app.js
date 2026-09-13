@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-174243";
+const BUILD = "20260913-174419";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -370,7 +370,7 @@ function michCaps(g, opp, won) {
 
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
-  const mx = g.mx || {}, lost = !m.win;
+  const mx = g.mx || {}, lost = !upcoming(g) && !m.win;
   // Proper Case is the DEFAULT here (his call 2026-09-11) -- the Big Ten rule
   // of the other views does not reach this one -- and his championship scopes
   // put a win in capitals. The caps column still forces either way by hand.

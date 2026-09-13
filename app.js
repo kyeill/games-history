@@ -370,7 +370,7 @@ function michCaps(g, opp, won) {
 
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
-  const mx = g.mx || {}, lost = !m.win;
+  const mx = g.mx || {}, lost = !upcoming(g) && !m.win;
   // Proper Case is the DEFAULT here (his call 2026-09-11) -- the Big Ten rule
   // of the other views does not reach this one -- and his championship scopes
   // put a win in capitals. The caps column still forces either way by hand.
