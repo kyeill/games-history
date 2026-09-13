@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-180913";
+const BUILD = "20260913-194452";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -400,8 +400,12 @@ function michCard(g, p) {
     when += tvBits;
   }
   // no emoji in the header any more (his call 2026-09-13)
-  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when +
-    ' | <span class="hdate">' + right + "</span>";
+  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
+  // The DATE goes at the end of the header -- unless the third row would be
+  // empty, in which case it drops down there instead and the header ends
+  // without it (his call 2026-09-13). Decided below, once the footer is known.
+  const headDate = ' | <span class="hdate">' + right + "</span>";
+  const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") + fmtDate(g.date);
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
   // ON maize and blue ON blue, which cannot be read as the same value, so the
@@ -552,6 +556,9 @@ function michCard(g, p) {
   //              text the row already has (his note, tags, the location).
   //   BASKETBALL the whole phrase -- "Maize Out", "Pink Out", "Blue Out" --
   //              with Notes empty, so the phrase is ALSO the text.
+  // nothing else to say on the third row: the date moves down to fill it
+  const dateDown = parts.length === 0;
+  if (dateDown) parts.push({ t: dateText, short: "" });
   const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";
   const SOLID = { maize: FMAIZE, blue: FBLUE, pink: FPINK };
   const rawFooter = String(mx.footer || "").trim();
@@ -622,7 +629,8 @@ function michCard(g, p) {
   }
   return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
-    '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span></div>" +
+    '<div class="sport"' + col(p.headCol) + "><span>" + head +
+      (dateDown ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
       (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
