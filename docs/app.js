@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-134807";
+const BUILD = "20260913-135249";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -494,8 +494,10 @@ function michCard(g, p) {
   const mine = myTags(g.id);
   const SERIES_FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral",
                          "Annual", "Buy Game"];
-  const bit = (s, short) => '<span class="mdet"' +
-    (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
+  const bit = (s, short) => (s === null || s === undefined || !String(s).trim())
+    ? ""
+    : '<span class="mdet"' +
+      (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   const chips = [];
   if (place) chips.push(bit(place));
@@ -550,7 +552,8 @@ function michCard(g, p) {
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
       (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
-      chips.join('<span class="msep">|</span>') + "</span>" + umRank +
+      // blanks drop out entirely, so no stranded separator is ever drawn
+      chips.filter(Boolean).join('<span class="msep">|</span>') + "</span>" + umRank +
     "</div></button>";
 }
 
@@ -558,7 +561,7 @@ function michCard(g, p) {
 // "Big Noon Kickoff" to "Big Noon", "College GameDay" to "GameDay" (his call
 // 2026-09-11). Re-run after every draw and when the window changes size.
 function trimMichChips() {
-  document.querySelectorAll(".row.mich .tags").forEach(row => {
+  document.querySelectorAll(".row.mich .mdl").forEach(row => {
     const shorts = row.querySelectorAll("[data-short]");
     if (!shorts.length) return;
     shorts.forEach(s => { if (s.dataset.full) s.textContent = s.dataset.full; });
