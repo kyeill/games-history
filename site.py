@@ -296,6 +296,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   border-radius:4px;font-size:14.5px;font-weight:700;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
+/* an unplayed game: the box keeps its size so the card does not jump, but
+   carries no colour and no number (his call 2026-09-12) */
+.row.mich .sc.mbox.mblank{background:none}
 /* football never reaches three digits, so its score box is narrower */
 .row.mich.mich-cfb .sc.mbox{min-width:calc(5.4ch + 16px)}
 .row.mich .mrank{min-width:calc(7.2ch + 16px);background:#ffcb05;color:#00274c}

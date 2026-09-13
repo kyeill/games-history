@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260912-214554";
+const BUILD = "20260912-214903";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -160,7 +160,7 @@ function teamLine(t, sport, season, seed, g0) {
     '<span class="rk">' +
     (t.rank && !seedGame(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
     '<span class="nm">' + inline + esc(teamName(t, sport, season)) + "</span>" +
-    '<span class="sc">' + t.score + "</span></div>";
+    '<span class="sc">' + scoreText(t.score) + "</span></div>";
 }
 
 function rowHtml(g, browse) {
@@ -449,8 +449,12 @@ function michCard(g, p) {
   const paint = (bg, fg) => (bg ? ' style="background:' + bg + ";color:" +
     ink(bg, fg) + '"' : "");
   // the two boxes share one height and one type size (his call)
-  const score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" + m.score + "-" +
-    opp.score + "</span>";
+  // an unplayed game shows an EMPTY box -- no score, and no uniform colour
+  // behind it either (his call 2026-09-12)
+  const score = upcoming(g)
+    ? '<span class="sc mbox mblank"></span>'
+    : '<span class="sc mbox"' + paint(top, scoreInk) + ">" + m.score + "-" +
+      opp.score + "</span>";
   // Michigan's rank sits on the THIRD ROW, under the score and the same width
   // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
   // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in
@@ -629,6 +633,10 @@ function bigViewAllows(g) {
 // this a game that has not kicked off reads as a Michigan loss, because
 // "did not win" and "lost" are the same test everywhere else.
 function upcoming(g) { return !!g.upcoming; }
+// A score that does not exist yet must render as NOTHING. Concatenating null
+// into markup prints the word "null", which is how the first upcoming cards
+// went out reading "null null" (2026-09-12).
+function scoreText(v) { return (v === null || v === undefined) ? "" : v; }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
 // An upset: a ranked team lost to an unranked or a worse-ranked team.
@@ -1092,8 +1100,8 @@ function openSheet(id) {
     teamName(g.teams[1], g.sport, g.season) + (g.neutral ? " vs " : " at ") +
     teamName(g.teams[0], g.sport, g.season);
   document.getElementById("sh-sub").textContent =
-    g.dow + " " + g.date + "  ·  " + g.teams[1].score + "–" +
-    g.teams[0].score + "  ·  " +
+    g.dow + " " + g.date + "  ·  " + scoreText(g.teams[1].score) + "–" +
+    scoreText(g.teams[0].score) + "  ·  " +
     (primaryNet(g.nets) || "no network listed");
   document.getElementById("sh-tags").innerHTML = known.map(t =>
     '<button class="f" aria-pressed="' + (mine.indexOf(t) > -1) +
