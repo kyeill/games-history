@@ -25,7 +25,15 @@ let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
-let SORT = "desc";   // Newest First is the tab default (his call 2026-09-11)
+// THE DEFAULT SORT FOLLOWS THE DEVICE (his call 2026-09-13): a phone opens
+// Newest First, because the newest game is what he checks; a desktop opens
+// Oldest First, where the whole season reads down the page in order. The
+// button still flips it either way, and every "back to the default" below
+// asks this rather than assuming.
+function defaultSort() {
+  return (window.innerWidth || 0) >= 900 ? "asc" : "desc";
+}
+let SORT = defaultSort();
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
@@ -1402,7 +1410,7 @@ async function init() {
       // Newest First. CFB and CBB share no game types or windows anyway, so a
       // value left over from the other sport would filter everything away.
       VIEW = "michigan";
-      SORT = "desc";
+      SORT = defaultSort();
       clearFilters();
       draw();
       window.scrollTo({ top: 0 });
@@ -1422,17 +1430,17 @@ async function init() {
         FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
         FILT.post = false; FILT.winner = null;
-        SORT = "desc";
+        SORT = defaultSort();
       } else if (VIEW === "michigan") {
         // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        SORT = "desc";
+        SORT = defaultSort();
       } else if (leaving === "rivals" || leaving === "michigan") {
         // leaving Rivals or Michigan puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        if (leaving === "michigan") SORT = "desc";
+        if (leaving === "michigan") SORT = defaultSort();
       }
       draw();
       window.scrollTo({ top: 0 });

@@ -517,26 +517,53 @@ def upcoming_events(code, start, end):
     return out
 
 
+def seed_of(seeds, season, team):
+    """His seed for that team that season, matched on either the full ESPN
+    name or the location -- his tab writes "Michigan State Spartans"."""
+    for key in (team.get("displayName"), team.get("location")):
+        if key:
+            hit = seeds.get((season, flat(key)))
+            if hit:
+                return hit
+    return None
+
+
 def load_seeds():
-    """seeds.csv -- his conference-tournament seeds, by (sport, season, team id).
-    ESPN carries none: its ranking field holds the AP poll for a conference
-    tournament (it IS the seed only in the NCAA Tournament), checked across the
-    scoreboard, the summary, the core competitors and the tournament resource
-    on 2026-09-11."""
-    path = os.path.join(HERE, "seeds.csv")
-    if not os.path.exists(path):
+    """His BTT tab -- Year, Team, Seed -- as {(season, flat name): seed}.
+
+    ESPN carries no conference-tournament seed (its ranking field there is the
+    AP poll), so these are his. The tab names teams in full ("Michigan State
+    Spartans"), which is why the lookup tries the display name as well as the
+    location.
+    """
+    url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
+           "?tqx=out:csv&headers=1&sheet=BTT" % SHEET_ID)
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        rows = list(csv.reader(io.StringIO(r.content.decode("utf-8-sig"))))
+    except (requests.RequestException, ValueError) as e:
+        print("  WARN: could not read the BTT tab (%s)" % e, file=sys.stderr)
+        return {}
+    if not rows:
+        return {}
+    head = [(h or "").strip().lower() for h in rows[0]]
+    try:
+        yi, ti, si = head.index("year"), head.index("team"), head.index("seed")
+    except ValueError:
+        print("  WARN: the BTT tab needs Year, Team and Seed", file=sys.stderr)
         return {}
     out = {}
-    with open(path, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            v = (row.get("seed") or "").strip()
-            if not v:
-                continue
-            try:
-                out[((row.get("sport") or "").strip(), int(row.get("season")),
-                     (row.get("team_id") or "").strip())] = int(v)
-            except (TypeError, ValueError):
-                continue
+    for raw in rows[1:]:
+        cell = lambda i: (raw[i] or "").strip() if i < len(raw) else ""
+        year, team, seed = cell(yi), cell(ti), cell(si)
+        if not (year and team and seed):
+            continue
+        try:
+            out[(int(year.split("-")[0]), flat(team))] = int(seed)
+        except ValueError:
+            continue
+    print("  BTT: %d seeds" % len(out))
     return out
 
 
@@ -1185,7 +1212,7 @@ def harvest():
                                  "win": bool(k.get("winner")),
                                  "home": k.get("homeAway") == "home",
                                  "conf": str(t.get("conferenceId")),
-                                 "seed": (seeds.get((code, y, t["id"]))
+                                 "seed": (seed_of(seeds, y, t)
                                           if seeded else None)})
                 v = c.get("venue") or {}
                 # the week this game belongs to -- None in the postseason, 0
