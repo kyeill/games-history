@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-143641";
+const BUILD = "20260913-144400";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -555,7 +555,13 @@ function michCard(g, p) {
     : st === "Big Ten Tournament | Championship" ? "#0088ce"
     : st === "NCAA Tournament | Championship" ? "#005eb8"
     : st === "CFP | Championship" ? "#c28c19" : null;
-  const bc = michColour(mx.border) || finalRing;
+  // "Opponent" in his Border column means THEIR colour (his call 2026-09-13),
+  // brightened the way a rival-loss border is on the other views -- the card
+  // wash is the same colour lightened toward the page, so the border reads as
+  // the deeper version of it.
+  const bword = String(mx.border || "").trim().toLowerCase();
+  const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
+    : michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {
     cls += " celebrate";

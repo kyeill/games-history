@@ -659,6 +659,13 @@ def _shift_day(iso, days):
     return (dt.date(y, m, d) + dt.timedelta(days=days)).isoformat()
 
 
+def norm(n):
+    """A team name flattened for matching, so his sheet and ESPN agree --
+    "UConn" and "Connecticut", "USC" and "Southern Cal". Lifted out of the
+    retired tag-seeding script (2026-09-13)."""
+    return rules.display_name(n or "").lower().replace(".", "").strip()
+
+
 def load_locations():
     """His Locations tab: where the two shows broadcast from, by date.
 
@@ -699,24 +706,6 @@ def load_locations():
                 if who:
                     out.setdefault((code, day), {})[tag] = who
     print("  locations: %d show-days" % len(out))
-    return out
-
-
-def show_games():
-    """(sport, date, {team names}) for every game College GameDay or Big Noon
-    Kickoff broadcast from. He wants all of them in the archive even when no
-    window rule reaches them -- 24 of the 50 stragglers are ESPN games, and
-    neither sport has a general ESPN window.
-
-    The tables live in seed_tags.py, which is also what writes the tags, so
-    there is one list rather than two that can drift.
-    """
-    import seed_tags
-    out = set()
-    for _tag, sport, rows in seed_tags.TABLES:
-        for date, visitor, host in rows:
-            out.add((sport, date,
-                     frozenset({seed_tags.norm(visitor), seed_tags.norm(host)})))
     return out
 
 
@@ -997,8 +986,7 @@ def harvest():
                 title = rules.is_title_game(code, conf, head)
                 # a show broadcast from this game? match either side of the
                 # date, since a late kickoff shifts the Eastern one
-                import seed_tags as _st
-                names = frozenset(_st.norm(k["team"].get("location") or "")
+                names = frozenset(norm(k["team"].get("location") or "")
                                   for k in cs)
                 # A show ADMITS a game to TV Windows (it feeds `normal`, and
                 # `normal` is what keeps a game out of rivals_only). His tab
@@ -1006,7 +994,7 @@ def harvest():
                 # grow past 2021 (his call 2026-09-13) -- so the flag is held
                 # to the archive era. Older show games still get the CHIP.
                 show = archive_era and any(
-                    names & {_st.norm(v) for v in locs.get((code, dd), {}).values()}
+                    names & {norm(v) for v in locs.get((code, dd), {}).values()}
                     for dd in (d.date().isoformat(),
                                (d.date() - dt.timedelta(days=1)).isoformat(),
                                (d.date() + dt.timedelta(days=1)).isoformat()))
@@ -1402,18 +1390,17 @@ def harvest():
     # HIS LOCATIONS TAB decides which games carry a show chip (2026-09-13).
     # One host name per date is enough: no team plays twice in a day. A late
     # kickoff shifts the Eastern date, so the day either side is tried too.
-    import seed_tags as _st
     by_date = {}
     for g in keep:
         by_date.setdefault((g["sport"], g["date"]), []).append(g)
     hit = miss = 0
     for (code, day), shows in sorted(locs.items()):
         for tag, who in shows.items():
-            want = _st.norm(who)
+            want = norm(who)
             found = None
             for probe in (day, _shift_day(day, -1), _shift_day(day, 1)):
                 for g in by_date.get((code, probe), []):
-                    if any(_st.norm((teams.get(t["id"]) or {}).get("short") or "")
+                    if any(norm((teams.get(t["id"]) or {}).get("short") or "")
                            == want for t in g["teams"]):
                         found = g
                         break

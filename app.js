@@ -555,7 +555,13 @@ function michCard(g, p) {
     : st === "Big Ten Tournament | Championship" ? "#0088ce"
     : st === "NCAA Tournament | Championship" ? "#005eb8"
     : st === "CFP | Championship" ? "#c28c19" : null;
-  const bc = michColour(mx.border) || finalRing;
+  // "Opponent" in his Border column means THEIR colour (his call 2026-09-13),
+  // brightened the way a rival-loss border is on the other views -- the card
+  // wash is the same colour lightened toward the page, so the border reads as
+  // the deeper version of it.
+  const bword = String(mx.border || "").trim().toLowerCase();
+  const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
+    : michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {
     cls += " celebrate";
