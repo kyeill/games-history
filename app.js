@@ -528,9 +528,9 @@ function michCard(g, p) {
   // The footer is collected as PARTS first, so his Footer column can colour
   // them (2026-09-13). A blank contributes nothing -- no span, no separator.
   const parts = [];
-  const bit = (s, short) => {
+  const bit = (s, short, his) => {
     if (s === null || s === undefined || !String(s).trim()) return "";
-    parts.push({ t: String(s), short: short || "" });
+    parts.push({ t: String(s), short: short || "", his: !!his });
     return true;                      // the array below only counts entries
   };
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
@@ -542,7 +542,7 @@ function michCard(g, p) {
   if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon");
   if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay");
   plainTags(g).filter(t => SERIES_FAMILY.indexOf(t) < 0).forEach(t => bit(t));
-  if (mx.note) bit(mx.note);
+  if (mx.note) bit(mx.note, "", true);
 
   // HIS FOOTER COLUMN (2026-09-13). "maize" paints the whole row maize.
   // "stripe" alternates blue and maize, starting blue: between the PIPES when
@@ -556,21 +556,21 @@ function michCard(g, p) {
   //              text the row already has (his note, tags, the location).
   //   BASKETBALL the whole phrase -- "Maize Out", "Pink Out", "Blue Out" --
   //              with Notes empty, so the phrase is ALSO the text.
-  // The date drops to the third row when that row has nothing of its own to
-  // say (his calls 2026-09-13). His Big Ten note alone does not count as
-  // something: "B1G East", "B1G Protect", "B1G Legends" and the rest read
-  // better with the date in front of them -- "9/5/26 | B1G East".
-  const b1gOnly = parts.length > 0 && parts.every(q => /^B1G /i.test(q.t));
-  const dateDown = parts.length === 0 || b1gOnly;
-  if (dateDown) parts.unshift({ t: dateText, short: "" });
   const FBLUE = "#003d7a", FMAIZE = "#ffcb05", FPINK = "#fd1272";
   const SOLID = { maize: FMAIZE, blue: FBLUE, pink: FPINK };
   const rawFooter = String(mx.footer || "").trim();
   const mode = rawFooter.split(/\s+/)[0].toLowerCase();
   if (rawFooter.indexOf(" ") > -1 &&
       !parts.some(q => q.t.toLowerCase() === rawFooter.toLowerCase())) {
-    parts.push({ t: rawFooter, short: "" });
+    parts.push({ t: rawFooter, short: "", his: true });
   }
+  // THE DATE DROPS TO THE THIRD ROW when nothing there is the card's own
+  // (his call 2026-09-13): his Notes read fine after a date -- "9/23/23 |
+  // B1G East" -- but a location, a show or a series tag is worth the row on
+  // its own, and then the date stays up in the header. An empty row counts as
+  // nothing, so the date fills it.
+  const dateDown = parts.every(q => q.his);
+  if (dateDown) parts.unshift({ t: dateText, short: "", his: false });
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
     (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";
