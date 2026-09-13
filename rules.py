@@ -284,9 +284,10 @@ def cfb_header(slots, d, forced=False, season=None, week=None):
 
     It is USUALLY the window's own name, but ABC is the exception: the window
     holds every Saturday ABC game while the label reads "ABC Primetime" only
-    for a 7-8pm kick, and nothing at all otherwise. `forced` covers a game
-    placed by hand in window-overrides.json -- the Clemson-LSU weather delay
-    is recorded at its 9:40pm restart but was scheduled in primetime.
+    for a 7-9pm kick (his call 2026-09-13, widened from 7-8pm), and nothing at
+    all otherwise. `forced` covers a game placed by hand in
+    window-overrides.json -- the Clemson-LSU weather delay is recorded at its
+    9:40pm restart but was scheduled in primetime.
     """
     named = [w for w in CFB_WINDOWS if w in slots and w != "ABC Saturday"]
     if named:
@@ -298,7 +299,7 @@ def cfb_header(slots, d, forced=False, season=None, week=None):
     if "ABC Saturday" not in slots:
         return None
     t = _mins(d)
-    return "ABC Primetime" if (forced or 19 * 60 <= t <= 20 * 60) else None
+    return "ABC Primetime" if (forced or 19 * 60 <= t <= 21 * 60) else None
 
 
 BROADCAST = {"FOX", "CBS", "NBC", "ABC"}

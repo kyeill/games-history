@@ -837,7 +837,11 @@ def harvest():
                             d, str(k["team"].get("conferenceId")))
                 # ESPN's networks, or his when ESPN has none at all -- filled
                 # before the window rules, so they judge the real network
-                nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
+                # HIS network wins outright (his call 2026-09-13): ESPN had
+                # Oregon-Oklahoma State on Disney+/ESPNEWS when it was on ESPN,
+                # and a fill-only override could never correct that -- it only
+                # applied when ESPN listed nothing at all.
+                nets = set(net_overrides.get(x["id"], ())) or set(networks(c))
                 ranks = [rank_of(k) for k in cs]
                 # a rival loss with no ranking on either side asks that week's
                 # AP poll, because ESPN drops some old rankings (see ap_ranks)
@@ -980,7 +984,13 @@ def harvest():
                 # whatever would put it on TV Windows or Key Games
                 rivals_only = not normal
                 if rivals_only:
-                    slots, gtype, black_friday, show, opener = set(), None, False, False, False
+                    # FOX Big Noon and ABC Primetime still LABEL these cards
+                    # (his call 2026-09-13): a 2019 Michigan game at noon on
+                    # FOX reads "FOX BIG NOON" on the Michigan view. Keeping
+                    # the window name does not admit the game to TV Windows or
+                    # Key Games -- `rivals_only` is what bars it there.
+                    slots = slots & {"FOX Big Noon", "ABC Saturday"}
+                    gtype, black_friday, show, opener = None, False, False, False
                     showcase = kickoff = False
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.

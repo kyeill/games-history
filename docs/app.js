@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-101136";
+const BUILD = "20260913-124410";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -670,10 +670,16 @@ function struck(g) {
 // reads struck through and unbolded, rival or not. Only this view needs the
 // rule -- Key Games and Rivals never carry either case.
 function flatWin(g) {
-  if (VIEW !== "tv" || upcoming(g)) return false;
+  if (upcoming(g)) return false;
+  const rivalWon = g.teams.some(t => isRival(t) && t.win);
+  // RIVALS shows their losses, so a rival WINNING there is the rare case (two
+  // of them meeting, mostly) -- and it should not read as a triumph either
+  // (his call 2026-09-13)
+  if (VIEW === "rivals") return rivalWon;
+  if (VIEW !== "tv") return false;
   const m = michTeam(g);
   if (m && !m.win) return true;
-  return g.teams.some(t => isRival(t) && t.win);
+  return rivalWon;
 }
 
 function celebrated(g) {
@@ -786,8 +792,17 @@ function visible() {
   const chron = (a, b) => (a.date !== b.date)
     ? a.date.localeCompare(b.date)
     : (a.time !== b.time ? a.time.localeCompare(b.time) : rank(a) - rank(b));
+  // KEY GAMES and RIVALS do not block at all (his call 2026-09-13): Newest
+  // First means the LATEST KICKOFF first, so a night game leads the day it was
+  // played. Only the date and time reverse -- the network tiebreak still reads
+  // in his order, so two games at the same minute keep FOX ahead of ESPN.
+  const flatSort = VIEW === "big" || VIEW === "rivals";
+  const chronDesc = (a, b) => (a.date !== b.date)
+    ? b.date.localeCompare(a.date)
+    : (a.time !== b.time ? b.time.localeCompare(a.time) : rank(a) - rank(b));
   list.sort((a, b) => {
     if (SORT === "asc") return chron(a, b);
+    if (flatSort) return chronDesc(a, b);
     const ba = block(a), bb = block(b);
     return ba === bb ? chron(a, b) : bb.localeCompare(ba);
   });
