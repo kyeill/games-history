@@ -244,17 +244,19 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    the score lines up with the highlight top and bottom. The stripe carries no
    vertical padding: with border-box the 26px is all content, and the tallest
    thing in it (the name line, 22.5px) still centres with room. */
-/* EVERY piece of the team line centres vertically (his call 2026-09-11): the
-   crest, the rank, the name, the finish. They are three different type sizes,
-   and on a shared baseline that read as three different heights. */
+/* The RANK and the RATING sit on the name's baseline (his call 2026-09-13),
+   so the bottoms line up rather than the middles -- the smaller type then
+   reads as sitting under the name rather than floating beside it. The crest
+   has no baseline, so it keeps to the centre. */
 .row.mich .mstripe{display:grid;grid-template-columns:22px 20px minmax(0,1fr);
-  column-gap:7px;align-items:center;min-width:0;height:26px;
+  column-gap:7px;align-items:baseline;min-width:0;height:26px;
   padding:0 6px 0 7px;margin-left:-7px;border-radius:5px}
+.row.mich .mstripe .crest{align-self:center}
 .row.mich .tl.won .mstripe{background:var(--winwash)}
 /* name then rating: the name shortens first, the rating stays whole */
 /* every piece of the team line centres against the name (his call
    2026-09-11): the rating, the seed, the rank */
-.row.mich .nm.mnm{display:flex;align-items:center;min-width:0}
+.row.mich .nm.mnm{display:flex;align-items:baseline;min-width:0}
 .row.mich .mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .row.mich .mfin{flex:none;margin-left:6px;font-size:12px;font-weight:400;
   color:var(--muted);font-style:normal}
@@ -266,7 +268,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    digit, so the widths hold whatever the numbers are. */
 .row.mich .sc.mbox,.row.mich .mrank{display:inline-flex;align-items:center;
   justify-content:center;box-sizing:border-box;height:26px;padding:0 8px;
-  border-radius:4px;font-size:14.5px;font-weight:700;
+  border-radius:4px;font-size:14.5px;font-weight:400;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
 /* an unplayed game: the box keeps its size so the card does not jump, but
@@ -451,6 +453,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260913-145340"></script>
+<script src="app.js?v=20260913-145811"></script>
 </body>
 </html>
