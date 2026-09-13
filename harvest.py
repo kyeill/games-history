@@ -4,7 +4,7 @@ Past games never change, so this runs once per new week of games -- there is
 no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
-import collections, csv, datetime as dt, json, os, re, sys, time
+import collections, csv, datetime as dt, io, json, os, re, sys, time
 from zoneinfo import ZoneInfo
 import requests
 import rules
@@ -364,6 +364,80 @@ def playoff_finish(code, y, evs):
             else:
                 out[k["team"]["id"]] = rules.FINISH_SHORT.get(rnd, rnd or "Playoff")
     return out
+
+
+SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
+SHEET_TABS = {"CFB": "Michigan CFB", "CBB": "Michigan CBB"}
+
+
+def sheet_season(sport, year):
+    """His Year column: "2023" for football, "2011-12" for basketball."""
+    year = (year or "").strip()
+    if not year:
+        return None
+    try:
+        return int(year.split("-")[0])
+    except ValueError:
+        return None
+
+
+def sheet_date(s):
+    """His Date column, M/D/YY."""
+    try:
+        m, d, y = (s or "").strip().split("/")
+        y = "20" + y if len(y) == 2 else y
+        return "%s-%02d-%02d" % (y, int(m), int(d))
+    except (ValueError, AttributeError):
+        return None
+
+
+def load_sheet():
+    """His Google Sheet, read straight from its published CSV so the 6am cloud
+    build picks up whatever he filled in overnight -- no download, no file.
+
+    Returns {(sport, season, date): row} plus, per (sport, season), which
+    COLUMNS he has actually used. That last part matters: a season he has not
+    reached yet must keep the rules it has now rather than silently losing its
+    capitals and washes, so absence only means "off" once he has marked that
+    season at all.
+    """
+    out, used = {}, {}
+    for code, tab in SHEET_TABS.items():
+        url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
+               "?tqx=out:csv&sheet=%s" % (SHEET_ID, tab.replace(" ", "%20")))
+        try:
+            r = requests.get(url, timeout=60)
+            r.raise_for_status()
+            body = r.content.decode("utf-8-sig")
+        except requests.RequestException as e:
+            print("  WARN: could not read the %s tab (%s)" % (tab, e), file=sys.stderr)
+            continue
+        rows = list(csv.reader(io.StringIO(body)))
+        if not rows:
+            continue
+        for raw in rows[1:]:
+            cell = lambda i: (raw[i] or "").strip() if i < len(raw) else ""
+            season, date = sheet_season(code, cell(0)), sheet_date(cell(1))
+            if season is None or date is None:
+                continue
+            key = (code, season, date)
+            out[key] = {
+                "name": cell(2), "attended": bool(cell(3)),
+                "shade": bool(cell(4)), "border": cell(5),
+                "box": {"score_bg": cell(6), "score_font": cell(7),
+                        "rank_bg": cell(8), "rank_font": cell(9)},
+            }
+            flags = used.setdefault((code, season), set())
+            if cell(3):
+                flags.add("attended")
+            if cell(4):
+                flags.add("shade")
+            if cell(5):
+                flags.add("border")
+            if any(cell(i) for i in range(6, 10)):
+                flags.add("box")
+    print("  sheet: %d rows across %d season-sports" % (len(out), len(used)))
+    return out, used
 
 
 def load_game_overrides():
@@ -1171,6 +1245,42 @@ def harvest():
             added += 1
     print("  %d upcoming games (%s to %s)" % (added, start, end))
 
+    # ESPN RECORDS A FEW GAMES TWICE, under two event ids -- Michigan-
+    # Pittsburgh on 2012-11-21 and Michigan-West Virginia on 2012-12-15, each
+    # with identical date, tip and score. They were double-counted and threw
+    # the game numbers off by two from that point in 2012-13. The copies carry
+    # DIFFERENT details (one has the networks, the other the event or venue),
+    # so they are merged rather than dropped, and the id that his tags.json
+    # already knows is the one kept (2026-09-13).
+    tagged = set()
+    tpath = os.path.join(HERE, "docs", "tags.json")
+    if os.path.exists(tpath):
+        tagged = set(json.load(open(tpath, encoding="utf-8")))
+    seen, merged = {}, 0
+    deduped = []
+    for g in keep:
+        sig = (g["sport"], g["date"], g["time"],
+               frozenset(t["id"] for t in g["teams"]))
+        if sig not in seen:
+            seen[sig] = g
+            deduped.append(g)
+            continue
+        first = seen[sig]
+        # the richer copy of each field wins; a tagged id beats an untagged one
+        if g["id"] in tagged and first["id"] not in tagged:
+            first["id"], g["id"] = g["id"], first["id"]
+        for k, v in g.items():
+            if k in ("id", "teams", "mx"):
+                continue
+            if not first.get(k) and v:
+                first[k] = v
+        if g.get("nets") and len(g["nets"]) > len(first.get("nets") or []):
+            first["nets"] = g["nets"]
+        merged += 1
+    if merged:
+        print("  merged %d duplicate game(s) ESPN listed twice" % merged)
+    keep = deduped
+
     keep.sort(key=lambda g: (g["date"], g["time"]))
     # game numbers for the Michigan view, as his sheet writes them (his call
     # 2026-09-11, both sports): nc1, nc2 ... for non-conference games and g1,
@@ -1190,6 +1300,64 @@ def harvest():
                 big = opp is not None and rules.nc_power(
                     g["sport"], g["season"], opp["id"], opp.get("conf"))
                 g["mx"]["num"] = ("NC%d" if big else "nc%d") % count[key]
+    # HIS SHEET, laid over the top (2026-09-13). Per FIELD, and per season: a
+    # column he has not touched for that season leaves the existing rule alone,
+    # so basketball keeps its capitals and washes until he marks them.
+    sheet, sheet_used = load_sheet()
+
+    def sheet_case(g):
+        """His column C as a CASE instruction, or None when it says nothing.
+
+        Only meaningful where MY name is not itself an acronym: "UNLV" against
+        my "Unlv" is a real signal, "UCLA" against my "UCLA" is not -- ESPN
+        writes those in capitals whatever he intends.
+        """
+        row = sheet.get((g["sport"], g["season"], g["date"]))
+        if not row:
+            return None
+        opp = next(t["id"] for t in g["teams"] if t["id"] != rules.MICHIGAN)
+        mine = (teams.get(opp) or {}).get("short") or ""
+        if not mine or mine == mine.upper():
+            return None
+        core = re.sub(r"^(at |vs\. )", "", row["name"]).strip()
+        letters = [c for c in core if c.isalpha()]
+        if not letters:
+            return None
+        return "Y" if all(c.isupper() for c in letters) else "N"
+
+    # CAPITALS ARE PER SEASON, like every other column: a season he has not
+    # marked keeps the rules it has (the championship scopes in app.js).
+    # Without this gate every unmarked row read as "not capitals" and the
+    # basketball seasons lost all 85 of theirs (caught 2026-09-13).
+    caps_seasons = {(g["sport"], g["season"]) for g in keep
+                    if g.get("michigan") and sheet_case(g) == "Y"}
+    hits = 0
+    for g in keep:
+        if not g.get("michigan"):
+            continue
+        row = sheet.get((g["sport"], g["season"], g["date"]))
+        if not row:
+            continue
+        hits += 1
+        flags = sheet_used.get((g["sport"], g["season"]), set())
+        mx = g.setdefault("mx", {})
+        if (g["sport"], g["season"]) in caps_seasons:
+            case = sheet_case(g)
+            if case:
+                mx["caps"] = case
+        if "attended" in flags:
+            mx["attended"] = row["attended"]
+        if "shade" in flags:
+            mx["shade"] = row["shade"]
+        if "border" in flags:
+            mx["border"] = row["border"]
+        if "box" in flags:
+            box = {k: v for k, v in row["box"].items() if v}
+            if box:
+                mx["box"] = box
+        g["mx"] = {k: v for k, v in mx.items() if v not in (None, "", {}, [])}
+    print("  sheet matched %d Michigan games" % hits)
+
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf

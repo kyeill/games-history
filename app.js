@@ -300,7 +300,10 @@ function rowHtml(g, browse) {
    uniform. Then one row of chips.
    His own columns come from michigan.csv via harvest: emoji, border, caps,
    uniform and note. */
+// his own words for a border, from the sheet: B1G is the conference blue,
+// CFP the playoff gold (2026-09-13)
 const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#ffffff",
+  b1g: "#0088ce", cfp: "#c28c19",
   gold: "#c28c19", grey: "#8a8a92", gray: "#8a8a92", black: "#111114",
   red: "#c8102e", green: "#1d7a3a", navy: "#00274c" };
 function michColour(v) {
@@ -373,8 +376,8 @@ function michCard(g, p) {
   } else if (!g.header) {
     when += tvBits;
   }
-  const head = (mx.emoji ? esc(mx.emoji) + " " : "") +
-    (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when +
+  // no emoji in the header any more (his call 2026-09-13)
+  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when +
     ' | <span class="hdate">' + right + "</span>";
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
@@ -511,9 +514,10 @@ function michCard(g, p) {
   // of the title is a win, not a championship, so it keeps its stripe.
   const btt = (g.stage || "").indexOf("Big Ten Tournament") === 0;
   const rival = RIVALS.indexOf(opp.id) > -1;
-  const bigWin = !lost && (btt
-    ? (inList(CAPS_B1G_TOURN, g) || rival)
-    : !!(g.post || g.champ || rival));
+  const bigWin = mx.shade !== undefined ? !!mx.shade
+    : !lost && (btt
+      ? (inList(CAPS_B1G_TOURN, g) || rival)
+      : !!(g.post || g.champ || rival));
   let cls = " mich mich-" + g.sport.toLowerCase() +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +
@@ -534,7 +538,7 @@ function michCard(g, p) {
     : st === "Big Ten Tournament | Championship" ? "#0088ce"
     : st === "NCAA Tournament | Championship" ? "#005eb8"
     : st === "CFP | Championship" ? "#c28c19" : null;
-  const bc = finalRing || michColour(mx.border);
+  const bc = michColour(mx.border) || finalRing;
   let ring = "";
   if (bc) {
     cls += " celebrate";
@@ -544,7 +548,8 @@ function michCard(g, p) {
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
-    '<div class="tags mdets"><span class="mdl">' +
+    '<div class="tags mdets">' +
+      (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
       chips.join('<span class="msep">|</span>') + "</span>" + umRank +
     "</div></button>";
 }

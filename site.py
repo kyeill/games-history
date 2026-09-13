@@ -315,6 +315,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .tags.mdets{display:grid;grid-template-columns:minmax(0,1fr) auto;
   gap:6px;align-items:center;font-size:13px;font-weight:400;letter-spacing:.05em;
   text-transform:none;color:var(--muted);margin-top:5px}
+/* HE WAS THERE (his call 2026-09-13): a maize asterisk under the crest, on
+   the third row, grey when Michigan lost. Absolutely placed so it cannot
+   disturb the detail text or the rank box beside it. */
+.row.mich .tags.mdets{position:relative}
+.row.mich .mstar{position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:22px;text-align:center;color:#ffcb05;font-weight:700;font-size:16px;
+  line-height:1}
+.row.mich.dimmed .mstar{color:#8a8a92}
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
   min-width:0;padding-left:57px}
 /* both boxes finish at the card content edge (his call 2026-09-11): the team
