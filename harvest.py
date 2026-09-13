@@ -4,7 +4,7 @@ Past games never change, so this runs once per new week of games -- there is
 no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
-import collections, csv, datetime as dt, json, os, re, sys
+import collections, csv, datetime as dt, json, os, re, sys, time
 from zoneinfo import ZoneInfo
 import requests
 import rules
@@ -35,14 +35,37 @@ SPORTS = {"CFB": ("football/college-football", "80"),
           "CBB": ("basketball/mens-college-basketball", "50")}
 
 
+def get_json(url, params=None, timeout=60, tries=4):
+    """ESPN, with RETRIES. A single flaky answer must not end a run: the first
+    cloud build died on one 504 out of ~300 requests, four minutes in, with a
+    cold cache (2026-09-13). Only transient failures are retried -- a 5xx, a
+    timeout, a dropped connection -- and the wait doubles each time. A 404 is
+    real and raises at once."""
+    wait = 2
+    for attempt in range(tries):
+        try:
+            r = requests.get(url, params=params, timeout=timeout)
+            if r.status_code >= 500:
+                raise requests.HTTPError("%d from ESPN" % r.status_code, response=r)
+            r.raise_for_status()
+            return r.json()
+        except (requests.Timeout, requests.ConnectionError, requests.HTTPError) as e:
+            status = getattr(getattr(e, "response", None), "status_code", None)
+            last = attempt == tries - 1
+            if last or (status is not None and status < 500):
+                raise
+            print("  retry %d/%d after %s" % (attempt + 1, tries - 1, e),
+                  file=sys.stderr)
+            time.sleep(wait)
+            wait *= 2
+
+
 def fetch(sport, params, key, cacheable=True):
     os.makedirs(CACHE, exist_ok=True)
     p = os.path.join(CACHE, key + ".json")
     if cacheable and os.path.exists(p):
         return json.load(open(p, encoding="utf-8"))
-    r = requests.get(f"{BASE}/{sport}/scoreboard", params=params, timeout=60)
-    r.raise_for_status()
-    d = r.json()
+    d = get_json(f"{BASE}/{sport}/scoreboard", params=params)
     if cacheable:
         json.dump(d, open(p, "w", encoding="utf-8"))
     return d

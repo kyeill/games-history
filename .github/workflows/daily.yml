@@ -50,8 +50,9 @@ jobs:
       # the daily run only pulls the CURRENT season plus the upcoming week.
       # Without it every run would re-download fifteen years from ESPN.
       - name: Restore the ESPN cache
+        id: cache
         if: steps.clock.outputs.go == 'yes'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: cache
           key: espn-cache-${{ github.run_id }}
@@ -91,3 +92,13 @@ jobs:
           # someone may have tagged a game from the page while this ran
           git pull --rebase --autostash origin main
           git push origin HEAD:main
+
+      # ALWAYS save, even if harvest failed partway: a cold run that dies on
+      # one bad ESPN response must not throw away the 300 files it did fetch
+      # (2026-09-13).
+      - name: Save the ESPN cache
+        if: always() && steps.clock.outputs.go == 'yes'
+        uses: actions/cache/save@v4
+        with:
+          path: cache
+          key: espn-cache-${{ github.run_id }}
