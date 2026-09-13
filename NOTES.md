@@ -11,6 +11,13 @@ strikethrough, the unbolding and a score box of undefined-undefined. `upcoming`
 in app.js is the guard, and dimmed / struck / flatWin / celebrated / isUpset /
 michCaps all defer to it. Add a new result rule, add it there too.
 
+**A missing score prints the WORD "null".** The score cell was
+`'<span class="sc">' + t.score + "</span>"`, and JavaScript is happy to
+concatenate null into markup -- so the first upcoming cards shipped reading
+"null null" in both score cells. `scoreText()` guards it now, and michCard
+renders an empty uncoloured box instead of "null-null". Anywhere a score is
+interpolated needs the same guard; the tag sheet had it too.
+
 **Upcoming games need no filtering out of Key Games or Rivals.** Key Games
 requires a game TYPE -- an upset cannot be known before kickoff -- and Rivals
 requires a rival LOSS. Both exclude an unplayed game for free.
