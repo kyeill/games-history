@@ -654,6 +654,54 @@ def load_extras():
             if not k.startswith("_") and isinstance(v, list)}
 
 
+def _shift_day(iso, days):
+    y, m, d = (int(v) for v in iso.split("-"))
+    return (dt.date(y, m, d) + dt.timedelta(days=days)).isoformat()
+
+
+def load_locations():
+    """His Locations tab: where the two shows broadcast from, by date.
+
+    Football sits in the first block (Date, Big Noon Kickoff, College GameDay)
+    and basketball in the second, after a blank column (Date, College GameDay).
+    Read by HEADER, like every other tab, and the blank column is what
+    separates the two blocks.
+    """
+    url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
+           "?tqx=out:csv&sheet=Locations" % SHEET_ID)
+    try:
+        r = requests.get(url, timeout=60)
+        r.raise_for_status()
+        rows = list(csv.reader(io.StringIO(r.content.decode("utf-8-sig"))))
+    except (requests.RequestException, ValueError) as e:
+        print("  WARN: could not read the Locations tab (%s)" % e, file=sys.stderr)
+        return {}
+    if not rows:
+        return {}
+    head = [(h or "").strip().lower() for h in rows[0]]
+    # the blank column splits football from basketball
+    split = next((i for i, h in enumerate(head) if not h), len(head))
+    blocks = [("CFB", 0, split), ("CBB", split + 1, len(head))]
+    out = {}
+    for code, lo, hi in blocks:
+        cols = {head[i]: i for i in range(lo, min(hi, len(head))) if head[i]}
+        if "date" not in cols:
+            continue
+        for raw in rows[1:]:
+            get = lambda label: ((raw[cols[label]] or "").strip()
+                                 if label in cols and cols[label] < len(raw) else "")
+            day = sheet_date(get("date"))
+            if not day:
+                continue
+            for label, tag in (("big noon kickoff", "Big Noon Kickoff"),
+                               ("college gameday", "College GameDay")):
+                who = get(label)
+                if who:
+                    out.setdefault((code, day), {})[tag] = who
+    print("  locations: %d show-days" % len(out))
+    return out
+
+
 def show_games():
     """(sport, date, {team names}) for every game College GameDay or Big Noon
     Kickoff broadcast from. He wants all of them in the archive even when no
@@ -804,7 +852,7 @@ def harvest():
                 series_ids.add(gid)
     except (OSError, ValueError):
         pass
-    shows = show_games()
+    locs = load_locations()
     ev_overrides = load_event_overrides()
     game_over = load_game_overrides()
     ratings = load_ratings()
@@ -952,10 +1000,16 @@ def harvest():
                 import seed_tags as _st
                 names = frozenset(_st.norm(k["team"].get("location") or "")
                                   for k in cs)
-                show = any((code, dd, names) in shows for dd in (
-                    d.date().isoformat(),
-                    (d.date() - dt.timedelta(days=1)).isoformat(),
-                    (d.date() + dt.timedelta(days=1)).isoformat()))
+                # A show ADMITS a game to TV Windows (it feeds `normal`, and
+                # `normal` is what keeps a game out of rivals_only). His tab
+                # covers every season back to 2011, but TV Windows must not
+                # grow past 2021 (his call 2026-09-13) -- so the flag is held
+                # to the archive era. Older show games still get the CHIP.
+                show = archive_era and any(
+                    names & {_st.norm(v) for v in locs.get((code, dd), {}).values()}
+                    for dd in (d.date().isoformat(),
+                               (d.date() - dt.timedelta(days=1)).isoformat(),
+                               (d.date() + dt.timedelta(days=1)).isoformat()))
                 # A championship game outside the Power Four/Five keeps no TV
                 # window -- the Mountain West title game is not "FOX Friday".
                 # Football only: a Big East tournament game on FOX genuinely is
@@ -1344,6 +1398,36 @@ def harvest():
                 mx["box"] = box
         g["mx"] = {k: v for k, v in mx.items() if v not in (None, "", {}, [])}
     print("  sheet matched %d Michigan games" % hits)
+
+    # HIS LOCATIONS TAB decides which games carry a show chip (2026-09-13).
+    # One host name per date is enough: no team plays twice in a day. A late
+    # kickoff shifts the Eastern date, so the day either side is tried too.
+    import seed_tags as _st
+    by_date = {}
+    for g in keep:
+        by_date.setdefault((g["sport"], g["date"]), []).append(g)
+    hit = miss = 0
+    for (code, day), shows in sorted(locs.items()):
+        for tag, who in shows.items():
+            want = _st.norm(who)
+            found = None
+            for probe in (day, _shift_day(day, -1), _shift_day(day, 1)):
+                for g in by_date.get((code, probe), []):
+                    if any(_st.norm((teams.get(t["id"]) or {}).get("short") or "")
+                           == want for t in g["teams"]):
+                        found = g
+                        break
+                if found:
+                    break
+            # he does not want the shows on postseason games
+            if found is None or found.get("post") or found.get("champ"):
+                miss += 1
+                continue
+            found.setdefault("shows", [])
+            if tag not in found["shows"]:
+                found["shows"].append(tag)
+            hit += 1
+    print("  locations matched %d shows (%d unmatched or postseason)" % (hit, miss))
 
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
