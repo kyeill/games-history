@@ -385,6 +385,51 @@ def load_michigan_sheet():
     return out
 
 
+def upcoming_window(today=None):
+    """Today through the COMING SUNDAY, in Eastern time (his call 2026-09-12).
+
+    Monday gives six days ahead; Sunday gives just Sunday itself. The daily
+    6am build is what keeps this moving -- yesterday is gone by the time it
+    runs, so the window never holds a game that has already been played.
+    """
+    today = today or dt.datetime.now(ET).date()
+    return today, today + dt.timedelta(days=(6 - today.weekday()) % 7)
+
+
+def upcoming_season(code, d):
+    """Which SEASON a date belongs to. Football is one calendar year from
+    August; basketball straddles two, so January to June belongs to the year
+    before. Without this an upcoming game lands in the wrong season and the
+    Year filter hides it."""
+    if code == "CFB":
+        return d.year if d.month >= 8 else d.year - 1
+    return d.year if d.month >= 7 else d.year - 1
+
+
+def upcoming_events(code, start, end):
+    """Scheduled games in the window, straight from ESPN and NEVER cached --
+    kickoff times and networks are announced piecemeal, which is half the
+    reason for the daily run."""
+    sport, grp = SPORTS[code]
+    out, seen = [], set()
+    d = start
+    while d <= end:
+        e = min(d + dt.timedelta(days=6), end)
+        try:
+            got = fetch(sport, {"dates": "%s-%s" % (d.strftime("%Y%m%d"),
+                                                    e.strftime("%Y%m%d")),
+                                "groups": grp, "limit": 1000},
+                        "upcoming", cacheable=False).get("events", [])
+        except requests.RequestException:
+            got = []
+        for x in got:
+            if x.get("id") and x["id"] not in seen:
+                seen.add(x["id"])
+                out.append(x)
+        d = e + dt.timedelta(days=1)
+    return out
+
+
 def load_seeds():
     """seeds.csv -- his conference-tournament seeds, by (sport, season, team id).
     ESPN carries none: its ranking field holds the AP poll for a conference
@@ -1001,6 +1046,98 @@ def harvest():
                     mx.update(mich_sheet.get(x["id"], {}))
                     keep[-1]["michigan"] = True
                     keep[-1]["mx"] = {k: v for k, v in mx.items() if v}
+    # UPCOMING GAMES (his call 2026-09-12): today through the coming Sunday,
+    # on the TV Windows and Michigan views only. They carry no score and no
+    # winner, so every result rule in the app has to step around them -- see
+    # `upcoming` in app.js. Key Games and Rivals exclude them for free: Key
+    # Games needs a game TYPE (an upset cannot be known before kickoff) and
+    # Rivals needs a rival LOSS.
+    start, end = upcoming_window()
+    have = {g["id"] for g in keep}
+    added = 0
+    for code in ("CFB", "CBB"):
+        y = upcoming_season(code, start)
+        if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
+            continue
+        for x in upcoming_events(code, start, end):
+            if x.get("id") in have:
+                continue
+            comps = x.get("competitions") or []
+            if not comps:
+                continue
+            c = comps[0]
+            cs = c.get("competitors") or []
+            if len(cs) != 2:
+                continue
+            # anything finished is the archive's business, not this window
+            if (c.get("status") or {}).get("type", {}).get("completed"):
+                continue
+            try:
+                d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                     .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+            except (KeyError, ValueError):
+                continue
+            if not (start <= d.date() <= end):
+                continue
+            nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
+            side = []
+            for k in cs:
+                t = k.get("team") or {}
+                if not t.get("id"):
+                    break
+                r = (k.get("curatedRank") or {}).get("current")
+                teams.setdefault(t["id"], {
+                    "name": t.get("displayName"),
+                    "short": rules.display_name(
+                        t.get("location") or t.get("displayName") or t["id"]),
+                    "abbr": t.get("abbreviation"),
+                    "color": t.get("color"), "alt": t.get("alternateColor")})
+                side.append({"id": t["id"], "score": None,
+                             "rank": r if r and r != 99 else None,
+                             "win": False, "home": k.get("homeAway") == "home",
+                             "conf": str(t.get("conferenceId")), "seed": None})
+            if len(side) != 2:
+                continue
+            mich = any(s["id"] == rules.MICHIGAN for s in side)
+            heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
+            wk = (x.get("week") or {}).get("number")
+            bt_code = rules.BIG_TEN[code]
+            confs = [s["conf"] for s in side]
+            ids = {s["id"] for s in side}
+            ranked = any(s["rank"] for s in side)
+            if code == "CFB":
+                slots = rules.cfb_slots(nets, d, y, ids, set(confs))
+            else:
+                slots = rules.cbb_slots(nets, d, all(q == bt_code for q in confs),
+                                        ranked, bt_code in confs)
+            if not slots and not mich:
+                continue          # nothing to show it under on TV Windows
+            v = c.get("venue") or {}
+            keep.append({
+                "id": x["id"], "sport": code, "season": y,
+                "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
+                "time": d.strftime("%H:%M"), "neutral": bool(c.get("neutralSite")),
+                "nets": sorted(nets), "teams": side, "week": wk,
+                "slots": sorted(slots), "type": None, "champ": None,
+                "round": (heads[0] if heads else None), "title": False,
+                "header": (rules.cfb_header(sorted(slots), d, season=y, week=wk)
+                           if code == "CFB" else None),
+                "venue": v.get("fullName"),
+                "city": rules.display_city((v.get("address") or {}).get("city"),
+                                           v.get("fullName")),
+                "post": False, "event": None, "bowl": None, "offsite": None,
+                "stage": None, "ot": False, "mq": False, "show": None,
+                "showcase": False, "opener": False, "bfri": False,
+                "kickoff": False, "suffix": None, "rivals": False,
+                "rivals_only": False, "rival_loss": False, "big": [],
+                "upcoming": True,
+                "michigan": mich, "mx": {} if mich else None})
+            if not mich:
+                keep[-1].pop("mx", None)
+                keep[-1].pop("michigan", None)
+            added += 1
+    print("  %d upcoming games (%s to %s)" % (added, start, end))
+
     keep.sort(key=lambda g: (g["date"], g["time"]))
     # game numbers for the Michigan view, as his sheet writes them (his call
     # 2026-09-11, both sports): nc1, nc2 ... for non-conference games and g1,

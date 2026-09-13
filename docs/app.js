@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260912-082157";
+const BUILD = "20260912-214554";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -331,7 +331,7 @@ function inList(map, g) {
   return (map[g.sport] || []).indexOf(g.season) > -1;
 }
 function michCaps(g, opp, won) {
-  if (!won) return false;
+  if (!won || upcoming(g)) return false;
   if (inList(CAPS_ALL, g)) return true;
   const stage = g.stage || "";
   // every win but the tournament it did not win
@@ -623,10 +623,17 @@ function bigViewAllows(g) {
   if (mich && !mich.win) return false;
   return !g.teams.some(t => RIVALS.indexOf(t.id) > -1 && t.win);
 }
+// NOT PLAYED YET (his call 2026-09-12). An upcoming game has no score and no
+// winner, so every rule that reads a RESULT has to step around it: the washes,
+// the borders, the capitals, the strikethrough, the grey rankings. Without
+// this a game that has not kicked off reads as a Michigan loss, because
+// "did not win" and "lost" are the same test everywhere else.
+function upcoming(g) { return !!g.upcoming; }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
 // An upset: a ranked team lost to an unranked or a worse-ranked team.
 function isUpset(g) {
+  if (upcoming(g)) return false;
   const w = g.teams.find(t => t.win), l = g.teams.find(t => !t.win);
   return !!(w && l && l.rank && (!w.rank || w.rank > l.rank));
 }
@@ -634,6 +641,7 @@ function isUpset(g) {
 /* A result he does not want to relive: a rival won, or Michigan lost. Both
    team lines go italic. */
 function dimmed(g) {
+  if (upcoming(g)) return false;
   const m = michTeam(g);
   return (m && !m.win) || g.teams.some(t => isRival(t) && t.win);
 }
@@ -642,6 +650,7 @@ function dimmed(g) {
 // greys the rankings -- that is dimmed doing its job -- but the winner is not
 // struck through, because it never beat him. 112 games stop being struck.
 function struck(g) {
+  if (upcoming(g)) return false;
   const m = michTeam(g);
   return !!(m && !m.win);
 }
@@ -650,13 +659,14 @@ function struck(g) {
 // reads struck through and unbolded, rival or not. Only this view needs the
 // rule -- Key Games and Rivals never carry either case.
 function flatWin(g) {
-  if (VIEW !== "tv") return false;
+  if (VIEW !== "tv" || upcoming(g)) return false;
   const m = michTeam(g);
   if (m && !m.win) return true;
   return g.teams.some(t => isRival(t) && t.win);
 }
 
 function celebrated(g) {
+  if (upcoming(g)) return false;
   const m = michTeam(g);
   if (m) return true;                       // maize for a win, grey for a loss
   // Two rivals playing each other cancel out -- one of them had to win, and

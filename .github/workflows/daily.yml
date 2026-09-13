@@ -1,0 +1,93 @@
+name: Daily build
+
+# 6am EASTERN, every day (his call 2026-09-12). GitHub schedules in UTC only,
+# so this fires at both 10:00 and 11:00 UTC and the job itself bails unless it
+# is really 6am in New York -- that keeps one run a day across daylight saving
+# instead of drifting an hour twice a year.
+on:
+  schedule:
+    - cron: "0 10 * * *"
+    - cron: "0 11 * * *"
+  workflow_dispatch:          # the Run workflow button, any time
+
+permissions:
+  contents: write             # the job commits the rebuilt site
+
+concurrency:
+  group: daily-build
+  cancel-in-progress: false   # never let two builds race to push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Is it 6am in New York?
+        id: clock
+        run: |
+          hour=$(TZ=America/New_York date +%H)
+          echo "New York hour: $hour"
+          if [ "$hour" != "06" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "not 6am -- skipping"
+            echo "go=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=yes" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.clock.outputs.go == 'yes'
+
+      - uses: actions/setup-python@v5
+        if: steps.clock.outputs.go == 'yes'
+        with:
+          python-version: "3.12"
+
+      - name: Install requests
+        if: steps.clock.outputs.go == 'yes'
+        run: pip install requests
+
+      # THE CACHE IS THE WHOLE POINT. Finished seasons are written to cache/
+      # and never re-fetched (harvest's season_over gate), so with this restored
+      # the daily run only pulls the CURRENT season plus the upcoming week.
+      # Without it every run would re-download fifteen years from ESPN.
+      - name: Restore the ESPN cache
+        if: steps.clock.outputs.go == 'yes'
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: espn-cache-${{ github.run_id }}
+          restore-keys: |
+            espn-cache-
+
+      - name: Harvest
+        if: steps.clock.outputs.go == 'yes'
+        run: python harvest.py
+
+      # new teams get a wash colour without being asked for (his standing
+      # question, settled 2026-09-12)
+      - name: Refresh colours
+        if: steps.clock.outputs.go == 'yes'
+        run: python colors.py --write
+
+      - name: Build the site
+        if: steps.clock.outputs.go == 'yes'
+        run: python site.py
+
+      # docs/tags.json is the app's own shared state, written from the page
+      # through the GitHub API. The build never touches it and neither does
+      # this commit -- it is deliberately NOT in the add list below.
+      - name: Commit and push
+        if: steps.clock.outputs.go == 'yes'
+        run: |
+          git config user.name "games-history bot"
+          git config user.email "actions@github.com"
+          git add docs/app.js docs/games.json docs/colors.json docs/crests.json \
+                  docs/index.html docs/sw.js docs/manifest.webmanifest \
+                  output/colors.json output/crests.json || true
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+            exit 0
+          fi
+          git commit -m "Daily build $(TZ=America/New_York date '+%Y-%m-%d %H:%M %Z')"
+          # someone may have tagged a game from the page while this ran
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main

@@ -2,6 +2,41 @@
 
 Each of these cost a debugging pass or would have. Do not rediscover them.
 
+## Upcoming games and the daily build
+
+**An unplayed game reads as a MICHIGAN LOSS unless every result rule guards
+against it** (2026-09-12). Everywhere in the app "did not win" and "lost" are
+the same test, so a game with no winner picked up the dimming, the
+strikethrough, the unbolding and a score box of undefined-undefined. `upcoming`
+in app.js is the guard, and dimmed / struck / flatWin / celebrated / isUpset /
+michCaps all defer to it. Add a new result rule, add it there too.
+
+**Upcoming games need no filtering out of Key Games or Rivals.** Key Games
+requires a game TYPE -- an upset cannot be known before kickoff -- and Rivals
+requires a rival LOSS. Both exclude an unplayed game for free.
+
+**A game with no TV window is dropped from the upcoming set** unless Michigan
+is playing: TV Windows has nothing to file it under. On a Saturday in
+September that is most of the slate -- 34 of 36 unfinished games were ESPN+,
+MW+ or similar.
+
+**The cloud build lives or dies on cache/.** Finished seasons are written there
+and never re-fetched (`season_over`), so with the Actions cache restored a
+daily run pulls only the current season and the upcoming week. Without it every
+run would re-download fifteen years from ESPN.
+
+**output/ is gitignored but two files inside it are not.** `colors.json` and
+`crests.json` are copied into docs/ by site.py, so a runner starting with an
+empty output/ would crash the build. `.gitignore` therefore ignores `output/*`
+and re-includes those two -- a directory-level `output/` ignore CANNOT be
+undone by a negation inside it.
+
+**The daily job must never commit docs/tags.json.** It is the app's own shared
+state, written from the page through the GitHub API, so a scheduled push could
+overwrite a tag added from a phone minutes earlier. site.py already refuses to
+rewrite it once it exists; the workflow simply leaves it out of `git add` and
+rebases before pushing.
+
 ## ESPN data
 
 **Sponsor names are inside the championship headline, and the suffix moves

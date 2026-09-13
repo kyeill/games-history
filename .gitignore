@@ -1,3 +1,9 @@
 cache/
 __pycache__/
-output/
+# output/ is generated, but two small files must ride along for the cloud
+# build: a runner starts with an empty output/ and site.py copies both into
+# docs/. crests.json also saves measuring 189 crests over the network on a
+# cold run (his call 2026-09-12).
+output/*
+!output/colors.json
+!output/crests.json

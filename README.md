@@ -550,6 +550,24 @@ near-black primary falls back to ESPN's alternate**, because nine schools
 return `#000000` and every one of them would wash to the same grey. That rule
 picks up Iowa's gold `#fcd116` on its own, which is what sports-daily uses.
 
+## Upcoming games and the daily build
+
+Games that have NOT been played are harvested for a window running **today
+through the coming Sunday**, in Eastern time, and marked `upcoming`. They show
+on **TV Windows and the Michigan view only**, carry no score and take none of
+the result styling -- no wash, no border, no capitals, no strikethrough. A game
+with no TV window is skipped unless Michigan is playing it.
+
+`.github/workflows/daily.yml` rebuilds the site at **6am Eastern every day**,
+which is what keeps that window moving and what brings in last night's finals,
+the game types that depend on results (an upset is only knowable afterwards)
+and the kickoff times and networks announced since. GitHub schedules in UTC, so
+the job fires at 10:00 and 11:00 UTC and exits unless it is really 6am in New
+York -- one run a day, across daylight saving.
+
+It restores `cache/` from the Actions cache first, so it re-fetches only the
+current season and the upcoming week rather than the whole archive.
+
 ## Files
 
 | file | what it does |
