@@ -531,7 +531,9 @@ function michCard(g, p) {
   // there is more than one piece, and word by word when there is only one.
   // Michigan navy would vanish on this card, so the blue is the lightened one
   // the box colours already use.
-  const FBLUE = "#0076e5", FMAIZE = "#ffcb05";
+  // a deep Michigan blue, not the lightened one the boxes use -- it has to
+  // read as navy against maize (his call 2026-09-13)
+  const FBLUE = "#00519e", FMAIZE = "#ffcb05";
   const mode = String(mx.footer || "").trim().toLowerCase();
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '"' : "") +

@@ -276,8 +276,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    reads as sitting under the name rather than floating beside it. The crest
    has no baseline, so it keeps to the centre. */
 .row.mich .mstripe{display:grid;grid-template-columns:22px 20px minmax(0,1fr);
-  column-gap:7px;align-items:baseline;min-width:0;height:26px;
-  padding:0 6px 0 7px;margin-left:-7px;border-radius:5px}
+  column-gap:7px;align-items:baseline;align-content:center;min-width:0;
+  height:26px;padding:0 6px 0 7px;margin-left:-7px;border-radius:5px}
 .row.mich .mstripe .crest{align-self:center}
 .row.mich .tl.won .mstripe{background:var(--winwash)}
 /* name then rating: the name shortens first, the rating stays whole */
