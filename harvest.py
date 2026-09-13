@@ -415,26 +415,43 @@ def load_sheet():
         rows = list(csv.reader(io.StringIO(body)))
         if not rows:
             continue
+        # COLUMNS ARE FOUND BY NAME, never by position (2026-09-13): he adds
+        # columns as he goes, and reading G-J by index would silently put box
+        # colours in the wrong fields the moment anything shifts. Only the
+        # block before the first BLANK header is his -- everything past it is
+        # his own working area, which repeats these very names.
+        head = rows[0]
+        stop = next((i for i, h in enumerate(head) if not (h or "").strip()), len(head))
+        col = {}
+        for i, h in enumerate(head[:stop]):
+            key = (h or "").strip().lower()
+            if key and key not in col:          # FIRST wins, never the copy
+                col[key] = i
+        need = ("year", "date", "opponent")
+        if not all(k in col for k in need):
+            print("  WARN: %s is missing one of Year/Date/Opponent" % tab, file=sys.stderr)
+            continue
         for raw in rows[1:]:
-            cell = lambda i: (raw[i] or "").strip() if i < len(raw) else ""
-            season, date = sheet_season(code, cell(0)), sheet_date(cell(1))
+            def cell(label):
+                i = col.get(label)
+                return (raw[i] or "").strip() if i is not None and i < len(raw) else ""
+            season, date = sheet_season(code, cell("year")), sheet_date(cell("date"))
             if season is None or date is None:
                 continue
-            key = (code, season, date)
-            out[key] = {
-                "name": cell(2), "attended": bool(cell(3)),
-                "shade": bool(cell(4)), "border": cell(5),
-                "box": {"score_bg": cell(6), "score_font": cell(7),
-                        "rank_bg": cell(8), "rank_font": cell(9)},
+            box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
+                   "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
+            out[(code, season, date)] = {
+                "name": cell("opponent"), "attended": bool(cell("attended")),
+                "shade": bool(cell("shade")), "border": cell("border"),
+                "note": cell("notes") or cell("note"), "box": box,
             }
             flags = used.setdefault((code, season), set())
-            if cell(3):
-                flags.add("attended")
-            if cell(4):
-                flags.add("shade")
-            if cell(5):
-                flags.add("border")
-            if any(cell(i) for i in range(6, 10)):
+            for label, flag in (("attended", "attended"), ("shade", "shade"),
+                                ("border", "border"), ("notes", "note"),
+                                ("note", "note")):
+                if cell(label):
+                    flags.add(flag)
+            if any(box.values()):
                 flags.add("box")
     print("  sheet: %d rows across %d season-sports" % (len(out), len(used)))
     return out, used
@@ -450,36 +467,6 @@ def load_game_overrides():
         return {}
     raw = json.load(open(path, encoding="utf-8"))
     return {k: v for k, v in raw.items() if not k.startswith("_")}
-
-
-def load_michigan_sheet():
-    """michigan.csv -- his own details for the Michigan view, by ESPN game id:
-    the highlight emoji, a border colour, capitals (Y/N), the uniform (jersey,
-    pants, accessories in football; one uniform in basketball) and a note on
-    why the game was played. Blank cells mean "nothing to add"."""
-    path = os.path.join(HERE, "michigan.csv")
-    if not os.path.exists(path):
-        return {}
-    out = {}
-    with open(path, encoding="utf-8-sig", newline="") as f:
-        for row in csv.DictReader(f):
-            gid = (row.get("game_id") or "").strip()
-            if not gid:
-                continue
-
-            def cell(k):
-                return (row.get(k) or "").strip()
-            # his own box colours win over the uniform when he gives them:
-            # score background / font, rank background / font
-            box = {k: cell(k) for k in ("score_bg", "score_font", "rank_bg", "rank_font")
-                   if cell(k)}
-            e = {"emoji": cell("emoji"), "border": cell("border"),
-                 "caps": cell("caps").upper()[:1], "note": cell("note"),
-                 "box": box,
-                 "uni": [cell(k) for k in ("jersey", "pants", "accessories", "uniform")
-                         if cell(k)]}
-            out[gid] = {k: v for k, v in e.items() if v}
-    return out
 
 
 def upcoming_window(today=None):
@@ -820,7 +807,6 @@ def harvest():
     shows = show_games()
     ev_overrides = load_event_overrides()
     game_over = load_game_overrides()
-    mich_sheet = load_michigan_sheet()
     ratings = load_ratings()
     seeds = load_seeds()
     for code in ("CFB", "CBB"):
@@ -1150,7 +1136,6 @@ def harvest():
                     mx = {"finish": finish.get(opp), "final": final_ap.get(opp),
                           "reigning": opp == reigning,
                           "rating": ratings.get((code, y, opp))}
-                    mx.update(mich_sheet.get(x["id"], {}))
                     keep[-1]["michigan"] = True
                     keep[-1]["mx"] = {k: v for k, v in mx.items() if v}
     # UPCOMING GAMES (his call 2026-09-12): today through the coming Sunday,
@@ -1351,6 +1336,8 @@ def harvest():
             mx["shade"] = row["shade"]
         if "border" in flags:
             mx["border"] = row["border"]
+        if "note" in flags:
+            mx["note"] = row["note"]
         if "box" in flags:
             box = {k: v for k, v in row["box"].items() if v}
             if box:
