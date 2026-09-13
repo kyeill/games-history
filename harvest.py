@@ -443,12 +443,13 @@ def load_sheet():
             out[(code, season, date)] = {
                 "name": cell("opponent"), "attended": bool(cell("attended")),
                 "shade": bool(cell("shade")), "border": cell("border"),
-                "note": cell("notes") or cell("note"), "box": box,
+                "note": cell("notes") or cell("note"),
+                "footer": cell("footer"), "box": box,
             }
             flags = used.setdefault((code, season), set())
             for label, flag in (("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
-                                ("note", "note")):
+                                ("note", "note"), ("footer", "footer")):
                 if cell(label):
                     flags.add(flag)
             if any(box.values()):
@@ -1380,6 +1381,8 @@ def harvest():
             mx["border"] = row["border"]
         if "note" in flags:
             mx["note"] = row["note"]
+        if "footer" in flags:
+            mx["footer"] = row["footer"]
         if "box" in flags:
             box = {k: v for k, v in row["box"].items() if v}
             if box:

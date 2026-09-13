@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-144400";
+const BUILD = "20260913-145340";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -508,21 +508,47 @@ function michCard(g, p) {
   const mine = myTags(g.id);
   const SERIES_FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral",
                          "Annual", "Buy Game"];
-  const bit = (s, short) => (s === null || s === undefined || !String(s).trim())
-    ? ""
-    : '<span class="mdet"' +
-      (short ? ' data-short="' + esc(short) + '"' : "") + ">" + esc(s) + "</span>";
+  // The footer is collected as PARTS first, so his Footer column can colour
+  // them (2026-09-13). A blank contributes nothing -- no span, no separator.
+  const parts = [];
+  const bit = (s, short) => {
+    if (s === null || s === undefined || !String(s).trim()) return "";
+    parts.push({ t: String(s), short: short || "" });
+    return true;                      // the array below only counts entries
+  };
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
-  const chips = [];
-  if (place) chips.push(bit(place));
-  if (g.event && !g.stage) chips.push(bit(g.event));
-  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => chips.push(bit(t)));
+  if (place) bit(place);
+  if (g.event && !g.stage) bit(g.event);
+  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1).forEach(t => bit(t));
   const shows = showsOf(g);
-  if (shows.indexOf("Big Noon Kickoff") > -1) chips.push(bit("Big Noon Kickoff", "Big Noon"));
-  if (shows.indexOf("College GameDay") > -1) chips.push(bit("College GameDay", "GameDay"));
-  plainTags(g).filter(t => SERIES_FAMILY.indexOf(t) < 0)
-    .forEach(t => chips.push(bit(t)));
-  if (mx.note) chips.push(bit(mx.note));
+  if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon");
+  if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay");
+  plainTags(g).filter(t => SERIES_FAMILY.indexOf(t) < 0).forEach(t => bit(t));
+  if (mx.note) bit(mx.note);
+
+  // HIS FOOTER COLUMN (2026-09-13). "maize" paints the whole row maize.
+  // "stripe" alternates blue and maize, starting blue: between the PIPES when
+  // there is more than one piece, and word by word when there is only one.
+  // Michigan navy would vanish on this card, so the blue is the lightened one
+  // the box colours already use.
+  const FBLUE = "#0076e5", FMAIZE = "#ffcb05";
+  const mode = String(mx.footer || "").trim().toLowerCase();
+  const wrap = (p, colour) => '<span class="mdet"' +
+    (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
+    (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";
+  const SEP = '<span class="msep">|</span>';
+  let chipHtml;
+  if (mode === "maize") {
+    chipHtml = parts.map(p => wrap(p, FMAIZE)).join(SEP);
+  } else if (mode === "stripe" && parts.length > 1) {
+    chipHtml = parts.map((p, i) => wrap(p, i % 2 ? FMAIZE : FBLUE)).join(SEP);
+  } else if (mode === "stripe" && parts.length === 1) {
+    chipHtml = '<span class="mdet">' + parts[0].t.split(/\s+/)
+      .map((w, i) => '<span style="color:' + (i % 2 ? FMAIZE : FBLUE) + '">' +
+        esc(w) + "</span>").join(" ") + "</span>";
+  } else {
+    chipHtml = parts.map(p => wrap(p)).join(SEP);
+  }
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe.
   // A BIG TEN TOURNAMENT win is the exception (his call 2026-09-11): it only
@@ -573,8 +599,7 @@ function michCard(g, p) {
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
       (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
-      // blanks drop out entirely, so no stranded separator is ever drawn
-      chips.filter(Boolean).join('<span class="msep">|</span>') + "</span>" + umRank +
+      chipHtml + "</span>" + umRank +
     "</div></button>";
 }
 
