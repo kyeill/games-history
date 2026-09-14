@@ -91,7 +91,10 @@ FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2"
 
 # ...except these arenas inside those metros, which read as the city (his
 # call 2026-09-11)
-CITY_NOT_VENUE = {"Credit Union 1 Arena"}
+# ...and BARCLAYS CENTER, which he wants read as Brooklyn wherever it turns up
+# (2026-09-14) -- ESPN already calls the city Brooklyn, so dropping the venue
+# substitution is the whole fix
+CITY_NOT_VENUE = {"Credit Union 1 Arena", "Barclays Center"}
 
 # The 2021 NCAA Tournament was played entirely in Indiana, so those cards carry
 # venues rather than cities -- in the short form he uses (his call 2026-09-14).

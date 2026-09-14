@@ -44,10 +44,23 @@ header holds ONE span, so it has to be measured by HEIGHT against the line box.
 **CONTRACT AS FEW PIECES AS POSSIBLE.** `trimMichChips` used to apply every
 short form the moment a row wrapped, which left "LCA | N&N" on a card with room
 for "Little Caesars Arena | N&N" (his catch 2026-09-14). It now shortens one
-piece at a time, from the END, re-checking after each: the TV time goes first
-and the leading location last. The header works the same way -- "NCAA
-TOURNAMENT" falls back to "NCAA" on the five cards that need it and stays
-spelled out on the other thirty-odd.
+piece at a time, re-checking after each, IN HIS ORDER OF PREFERENCE
+(`data-trim` on each piece, lowest first):
+
+  1. the two shows      College GameDay -> GameDay
+  2. the series tags    Home & Home -> H&H
+  3. the location       Madison Square Garden -> MSG
+  4. the TV time        ESPN2 9:30pm -> ESPN2
+
+The DATE has no short form at all, so it can never be given up. The header
+works the same way -- "NCAA TOURNAMENT" falls back to "NCAA" on the handful of
+cards that need it and stays spelled out everywhere else.
+
+Because the trim is measured on the DEVICE, a card sitting exactly on the limit
+may contract on one screen and not on another: the 2026 NCAA championship
+header has slack ZERO, so it stays spelled out on his phone and contracts in a
+402px emulation. That is the mechanism working, not a bug -- do not "fix" it by
+hardcoding either form.
 
 **WHERE THE EVENT NAME ALREADY CARRIES THE CITY, the city goes** (2026-09-14):
 the Cowboys Classic was always in Arlington and the Jumpman Invitational always

@@ -593,37 +593,43 @@ function michCard(g, p) {
   // The footer is collected as PARTS first, so his Footer column can colour
   // them (2026-09-13). A blank contributes nothing -- no span, no separator.
   const parts = [];
-  const bit = (s, short, his) => {
+  // THE ORDER PIECES GIVE WAY IN (his call 2026-09-14), lowest first. He reads
+  // the date and the network as facts and the rest as labels, so a show name
+  // shortens long before a location does.
+  //   1 the two shows      College GameDay -> GameDay
+  //   2 the series tags    Home & Home -> H&H
+  //   3 the location       Madison Square Garden -> MSG
+  //   4 the TV time        ESPN2 9:30pm -> ESPN2
+  // The DATE carries no short form at all, so it can never be given up.
+  const bit = (s, short, his, pri) => {
     if (s === null || s === undefined || !String(s).trim()) return "";
-    parts.push({ t: String(s), short: short || "", his: !!his });
+    parts.push({ t: String(s), short: short || "", his: !!his, pri: pri || 5 });
     return true;                      // the array below only counts entries
   };
   // the two venue names long enough to push the row onto a second line (his
   // call 2026-09-13); the short form appears only when it has to
   const PLACE_SHORT = { "Madison Square Garden": "MSG",
-                        "Little Caesars Arena": "LCA",
-                        "Barclays Center": "Brooklyn" };
+                        "Little Caesars Arena": "LCA" };
   if (bigStage) {
     // the date leads and the TV details follow it -- the reverse of an
     // ordinary card, where both sit up in the header (his call 2026-09-13)
     bit(dateText);
-    bit(tvTxt, netTxt);
+    bit(tvTxt, netTxt, false, 4);
   } else if (mteCard) {
     // the location leads on an MTE, and the date comes last
-    if (place) bit(place, PLACE_SHORT[place]);
-    // when the row wraps the TIME is what goes -- the network is the part he
-    // reads (2026-09-13)
-    bit(tvTxt, netTxt);
+    if (place) bit(place, PLACE_SHORT[place], false, 3);
+    // the network is the part he reads, so only the TIME goes (2026-09-13)
+    bit(tvTxt, netTxt, false, 4);
     bit(dateText);
   } else if (place) {
-    bit(place, PLACE_SHORT[place]);
+    bit(place, PLACE_SHORT[place], false, 3);
   }
   if (g.event && !g.stage && !mteCard) bit(g.event);
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1)
-    .forEach(t => bit(t, SERIES_SHORT[t]));
+    .forEach(t => bit(t, SERIES_SHORT[t], false, 2));
   const shows = showsOf(g);
-  if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon");
-  if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay");
+  if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon", false, 1);
+  if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay", false, 1);
   plainTags(g).filter(t => SERIES_FAMILY.indexOf(t) < 0).forEach(t => bit(t));
   if (mx.note) bit(mx.note, "", true);
 
@@ -659,7 +665,7 @@ function michCard(g, p) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
   const wrap = (p, colour) => '<span class="mdet"' +
-    (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
+    (p.short ? ' data-short="' + esc(p.short) + '" data-trim="' + (p.pri || 5) + '"' : "") +
     (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
@@ -777,10 +783,11 @@ function trimMichChips() {
     if (!wrapped()) return;
     // AS FEW PIECES AS POSSIBLE (his call 2026-09-14). Shortening everything
     // the moment a row wrapped left "LCA | N&N" on a card with room for
-    // "Little Caesars Arena | N&N". One at a time from the END instead,
-    // checking after each -- the leading location says the most, so it is the
-    // last to give way, and the TV time the first.
-    for (let i = shorts.length - 1; i >= 0; i--) {
+    // "Little Caesars Arena | N&N". One at a time instead, checking after
+    // each, and in HIS order of preference -- see `bit` for the numbers. Ties
+    // keep the order they were written in.
+    shorts.sort((a, b) => (+a.dataset.trim || 5) - (+b.dataset.trim || 5));
+    for (let i = 0; i < shorts.length; i++) {
       const s = shorts[i];
       if (!s.dataset.full) s.dataset.full = s.textContent;
       s.textContent = s.dataset.short;
