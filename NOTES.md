@@ -163,6 +163,18 @@ ever go missing, the answer is in the Case column, not in the code.
 This RETIRED the inference described below, which had to guess from whether his
 opponent cell was written in capitals and got it wrong twice. Keep the history:
 
+**ON THIS CARD A HEADER COLOUR IS ALL OR NOTHING** (2026-09-14). Elsewhere the
+network cell carries the network's tint on its own; here that read as an
+accident rather than a signal, so whatever colour the card earns paints the
+WHOLE header -- and it no longer waits on a Big Ten team. Only the four
+broadcast networks have a tint (ABC, CBS, FOX, NBC), which is why 75 of 530
+basketball cards colour and the ESPN and BTN games do not.
+
+**AND THE TIME ALWAYS SHOWS HERE.** A window label names its own network, so
+TV Windows leaves the time off as implied; this view appends it to the back of
+the label instead -- "FOX FRIDAY 8:00PM", "WEEK 2 | FOX BIG NOON 12:00PM".
+Measured after: no header or footer wraps in either sport.
+
 **THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
 #8a8a92 goes on a preseason-tournament game (dashed on a loss) and now on any
 NCAA Tournament or CFP WIN where his Border column is blank -- 14 NCAA games

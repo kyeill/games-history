@@ -277,10 +277,16 @@ function rowHtml(g, browse) {
   } else {
     when = esc(label || DAYS[g.dow] || g.dow);
   }
-  // the Michigan view draws its own card from the same header and chips
-  if (VIEW === "michigan" && !browse)
-    return michCard(g, { tags: tags, when: when, headCol: headCol,
-                         netCol: netCol, timeCol: timeCol });
+  // the Michigan view draws its own card from the same header and chips.
+  // THERE A COLOUR IS ALL OR NOTHING (his call 2026-09-14): the network alone
+  // being tinted -- which is what a non-Marquee game used to get -- read as an
+  // accident rather than a signal, so whatever colour the card earns paints
+  // the whole header. It does not wait on a Big Ten team either.
+  if (VIEW === "michigan" && !browse) {
+    const one = winCol || netCol;
+    return michCard(g, { tags: tags, when: when, headCol: one,
+                         netCol: one, timeCol: one });
+  }
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
   let flag = celebrated(g);
@@ -473,6 +479,11 @@ function michCard(g, p) {
     // dropping them there lost the network and the time (his catch
     // 2026-09-13)
     when += tvBits;
+  } else {
+    // ...and where the label DOES name the network, the time still has to be
+    // here (his call 2026-09-14), appended to the back of it -- TV Windows
+    // leaves it out because the window implies it; this view never does.
+    when += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   }
   // no emoji in the header any more (his call 2026-09-13)
   const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
