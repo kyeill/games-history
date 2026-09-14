@@ -37,7 +37,11 @@ NAME_OVERRIDES = {
     "SMU": "Southern Methodist", "TCU": "Texas Christian",
     "UCF": "Central Florida", "USF": "South Florida",
     "USC": "Southern California", "UNLV": "Unlv", "UConn": "Connecticut",
-    "App State": "Appalachian State",
+    "App State": "Appalachian State", "VCU": "Virginia Commonwealth",
+    # ...and these join UNLV in Proper case (his call 2026-09-14). ALL CAPS is
+    # his marking for a win in a capitalised season, so an acronym wearing them
+    # is ambiguous -- these read as ordinary words instead.
+    "UTEP": "Utep", "NJIT": "Njit",
 }
 
 

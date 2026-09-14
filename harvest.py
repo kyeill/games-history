@@ -1493,6 +1493,14 @@ def harvest():
         letters = [c for c in core if c.isalpha()]
         if not letters:
             return None
+        # ...and the same question about HIS cell: where he wrote the school's
+        # ACRONYM he wrote a NAME, not a case. Spelling VCU out as "Virginia
+        # Commonwealth" made my side ordinary, at which point his "VCU" started
+        # reading as a demand for capitals (caught 2026-09-14).
+        espn = (teams.get(opp) or {}).get("name") or ""
+        head = espn.split(" ")[0]
+        if head.isalpha() and head.isupper() and core.upper() == head:
+            return None
         return "Y" if all(c.isupper() for c in letters) else "N"
 
     # CAPITALS ARE PER SEASON, like every other column: a season he has not

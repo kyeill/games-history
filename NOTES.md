@@ -145,6 +145,23 @@ out, in the header and the third row alike; every other date stays in slashes.
 Three games in the archive fall on it, two of them wins. I first read "a win
 on 9/21" as every win and spelled out all of them -- it means that DAY.
 
+**THE ACRONYM TRAP RUNS BOTH WAYS.** ALL CAPS is his marking for a win in a
+capitalised season, so a school whose name IS an acronym is ambiguous, and
+`sheet_case` has to tell a name from a case. It first asked only whether MY
+display name was an acronym -- "UNLV" against my "Unlv" is a real instruction,
+"UCLA" against my "UCLA" is not. Spelling VCU out as "Virginia Commonwealth"
+(2026-09-14) made my side ordinary, at which point his "VCU" read as a demand
+for capitals and the card came back VIRGINIA COMMONWEALTH. The guard now also
+asks about HIS cell: where he wrote the school's ACRONYM -- matched against the
+first word of ESPN's displayName -- he wrote a NAME, not a case. Ten rows are
+suppressed this way (UCLA x6, VCU x2, NJIT, UNLV) and none of them lost a
+capital that mattered: the 2023 UNLV game still capitalises through `CAPS_ALL`
+in app.js, which does not consult the sheet at all.
+
+His call on the five that were left: VCU spells out; Utep, Njit, Unlv and Ucla
+stay in Proper case, and UCLA still goes up in capitals in the Big Ten years
+like every other Big Ten team.
+
 **THE TEAM FILTER ON THE MICHIGAN VIEWS LISTS THE OPPONENTS**, not the teams
 (2026-09-14). Michigan plays in every game there, so it is deleted from the
 option list, and the rivals are passed to `teamOrder` as the pins. It carries
