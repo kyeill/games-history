@@ -90,10 +90,11 @@ function isHidden(id) { return !!eff(id).hide; }
 function isAdded(id) { return !!eff(id).add; }
 
 /* ---------- rendering --------------------------------------------------- */
-function fmtDate(d) {
-  // "2025-09-06" -> "9/6/25"
+function fmtDate(d, full) {
+  // "2025-09-06" -> "9/6/25", or "9/6/2025" when `full` -- the Michigan views
+  // spell the year out (his call 2026-09-14); the denser views do not
   return String(+d.slice(5, 7)) + "/" + String(+d.slice(8, 10)) + "/" +
-    d.slice(2, 4);
+    (full ? d.slice(0, 4) : d.slice(2, 4));
 }
 function fmtTime(t) {
   const p = t.split(":"), h = +p[0] % 12 || 12;
@@ -378,7 +379,7 @@ function michCard(g, p) {
   const shownDate = sept21Win
     ? MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
       (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
-    : fmtDate(g.date);
+    : fmtDate(g.date, true);
   let when = p.when, right = shownDate;
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
@@ -889,7 +890,7 @@ function michListHtml(list) {
     } else if (!post(a)) {
       for (let d = lo + 4; d <= hi - 4; d++)
         if (new Date(d * 864e5).getUTCDay() === 6)
-          gaps.push("Bye Week (" + fmtDate(iso(d)) + ")");
+          gaps.push("Bye Week (" + fmtDate(iso(d), true) + ")");
       if (SORT !== "asc") gaps.reverse();
     }
     gaps.forEach(t => out.push(tile(t)));
