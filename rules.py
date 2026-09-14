@@ -588,7 +588,8 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
     return out
 
 
-def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False):
+def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
+                      both_big_ten=False):
     """The label on a basketball card. Not a window -- the cards carry no
     window chips at all -- just a name for the slot.
 
@@ -596,11 +597,16 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False):
     added 2026-09-10 are NOT: they need a Big Ten team, because that is what
     he is browsing for and ABC will put any two teams on a Saturday.
     """
+    if tourney:
+        return None          # a conference tournament is not a TV slot
+    # A DECEMBER CONFERENCE GAME says so (his call 2026-09-13): the Big Ten
+    # plays a handful before the new year and they read as ordinary
+    # non-conference filler otherwise -- "DECEMBER SATURDAY", not "SATURDAY".
+    if d.month == 12:
+        return ("December " + DAY_FULL[d.weekday()]) if both_big_ten else None
     if d.month not in (1, 2, 3):
         return None
     day, t = DOW[d.weekday()], _mins(d)
-    if tourney:
-        return None          # a conference tournament is not a TV slot
     if "FOX" in nets and day == "Fri":
         return "FOX Friday"
     if "FOX" in nets and day == "Sat" and t >= 19 * 60:
