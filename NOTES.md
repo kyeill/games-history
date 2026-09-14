@@ -32,7 +32,9 @@ the Cowboys Classic was always in Arlington and the Jumpman Invitational always
 in Charlotte, so printing both wrapped the row for nothing. Those four games
 carry `"city": ""` in game-overrides.json. After that the only Michigan card
 that still wraps is 2025 Week 14, whose three tags (Big Noon, GameDay, B1G
-Protect) are all already at their short forms.
+Protect) are all already at their short forms -- and that one wraps ONLY on
+a phone; at a 378px desktop card it sits on one line. Measure both widths
+before calling a card broken.
 
 The tournament shape covers the Big Ten Tournament, the NCAA Tournament, the
 NIT, the CFP and the Big Ten Championship -- `bigStage` in `michCard`. The
@@ -50,7 +52,7 @@ eight-team bracket, two means a four-team one:
 | games | won so far | round |
 | --- | --- | --- |
 | 3 | game 1 | `Quarters`, then `Semis`, then `Final` / `3rd Place` |
-| 3 | lost game 1 | `Quarters`, then `Con`, then `5th Place` / `7th Place` |
+| 3 | lost game 1 | `Quarters`, then `Consolation`, then `5th Place` / `7th Place` |
 | 2 | -- | `Semis`, then `Final` / `3rd Place` |
 
 The label names THE GAME, not the finish: Michigan lost the 2023 Battle 4

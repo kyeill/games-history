@@ -1540,7 +1540,7 @@ def harvest():
             # not a bracket -- the only such event he has played
             pool = "Players Era" in (games[0].get("event") or "")
             rounds = ["Game 1" if pool else "Quarters",
-                      "Game 2" if pool else ("Semis" if won[0] else "Con"),
+                      "Game 2" if pool else ("Semis" if won[0] else "Consolation"),
                       "Final" if won[0] and won[1]
                       else "3rd Place" if won[0]
                       else "5th Place" if won[1] else "7th Place"]
