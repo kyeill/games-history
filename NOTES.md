@@ -16,9 +16,9 @@ the place go UP, the date and the TV details come DOWN:
 
 The MTE LOCATION sits in the header BESIDE ITS EVENT, with the round last
 (2026-09-14) -- the opposite way round from a tournament card, where the round
-belongs to the tournament's own name and the location closes the line. This is
-what leaves, which is what leaves the
-third row able to spell the network, the time and the date out in full -- no
+belongs to the tournament's own name and the location closes the line. Moving
+it up there is what leaves the third row able to spell the network, the time
+and the date out in full -- no
 MTE footer trims anything now. Only six events need a location at all: the NIT
 Tip-Off, the Legends Classic, the 2K Classic, the Hall of Fame Tip-Off, the
 Roman Main Event and the Players Era Festival. The rest say where they are in
