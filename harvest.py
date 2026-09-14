@@ -1247,8 +1247,9 @@ def harvest():
                                            big_ten=(bt in confs),
                                            tourney=tourney),
                     "offsite": offsite.get(x["id"]),
-                    "city": (game_over.get(x["id"], {}).get("city")
-                             or rules.display_city(
+                    "city": (game_over[x["id"]]["city"]
+                             if "city" in game_over.get(x["id"], {})
+                             else rules.display_city(
                                  (v.get("address") or {}).get("city"), v.get("fullName"))),
                     "nets": sorted(nets), "teams": side,
                     "header": (rules.cfb_header(card_slots, d, forced,
@@ -1256,7 +1257,10 @@ def harvest():
                                if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
-                    "event": (game_over.get(x["id"], {}).get("event") or event),
+                    # an override KEY that is present wins even when empty --
+                    # "" means show nothing, which `or` could not express
+                    "event": (game_over[x["id"]]["event"]
+                              if "event" in game_over.get(x["id"], {}) else event),
                     "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,

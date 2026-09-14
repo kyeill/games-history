@@ -1,5 +1,177 @@
 {
   "_comment": "Per-GAME fixes for facts ESPN records wrongly or not at all, keyed by game id. Unlike event-overrides.json (keyed by ESPN's event NAME) this reaches a game whose event name is null. Keys understood: \"city\" (the neutral-site location chip) and \"event\" (the showcase name beside it). From him, 2026-09-11. Run `python harvest.py && python site.py` afterwards.",
-  "322450333": {"city": "Arlington", "event": "Cowboys Classic"},
-  "400933830": {"city": "Arlington", "event": "Advocare Classic"}
+  "322450333": {
+    "city": "Arlington",
+    "event": "Cowboys Classic"
+  },
+  "400933830": {
+    "city": "Arlington",
+    "event": "Advocare Classic"
+  },
+  "313180130": {
+    "event": "Maui on the Mainland"
+  },
+  "313210130": {
+    "event": "Maui on the Mainland"
+  },
+  "313250235": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "313260150": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "313270026": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "323170130": {
+    "event": "NIT Tip-Off"
+  },
+  "323180130": {
+    "event": "NIT Tip-Off"
+  },
+  "323260221": {
+    "event": "NIT Tip-Off",
+    "city": ""
+  },
+  "323280130": {
+    "event": "NIT Tip-Off",
+    "city": ""
+  },
+  "400502928": {
+    "event": "Puerto Rico Tip-Off",
+    "city": ""
+  },
+  "400518717": {
+    "event": "Puerto Rico Tip-Off",
+    "city": ""
+  },
+  "400518935": {
+    "event": "Puerto Rico Tip-Off",
+    "city": ""
+  },
+  "400827676": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "400853989": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "400854122": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "400986333": {
+    "event": "Maui on the Mainland"
+  },
+  "400986374": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "401000094": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "401000097": {
+    "event": "Maui Invitational",
+    "city": ""
+  },
+  "401082446": {
+    "event": "Hall of Fame Tip-Off"
+  },
+  "401082447": {
+    "event": "Hall of Fame Tip-Off"
+  },
+  "401082449": {
+    "event": "Hall of Fame Tip-Off",
+    "city": "CT"
+  },
+  "401096969": {
+    "event": "Hall of Fame Tip-Off",
+    "city": "CT"
+  },
+  "401166090": {
+    "event": "Battle 4 Atlantis"
+  },
+  "401169633": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401183482": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401183484": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401580924": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401581522": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401581525": {
+    "event": "Battle 4 Atlantis",
+    "city": "Bahamas"
+  },
+  "401706905": {
+    "event": "Fort Myers Tip-Off - Beach Div",
+    "city": ""
+  },
+  "401729802": {
+    "event": "Fort Myers Tip-Off - Beach Div",
+    "city": ""
+  },
+  "313330258": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "323320130": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "400502708": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "400587813": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "400809404": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "400915046": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "400986105": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "401082451": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "401168235": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "401369947": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "401479675": {
+    "event": "Big Ten/ACC Challenge"
+  },
+  "401082448": {
+    "event": "Gavitt Games"
+  },
+  "401166058": {
+    "event": "Gavitt Games"
+  },
+  "401372019": {
+    "event": "Gavitt Games"
+  },
+  "401574571": {
+    "event": "Gavitt Games",
+    "city": ""
+  }
 }
