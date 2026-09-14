@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-112713";
+const BUILD = "20260914-113132";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -830,7 +830,13 @@ function michListHtml(list) {
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
   const post = g => !!(g.post || g.champ);
-  const tile = t => '<div class="mgap">' + t + "</div>";
+  // each tile wears its tournament's colour -- the same three the championship
+  // rings use (his call 2026-09-14)
+  const TILE_CLASS = { "Big Ten Tournament": "g-b1g",
+                       "NCAA Tournament": "g-ncaa",
+                       "Postseason": "g-cfp" };
+  const tile = t => '<div class="mgap' +
+    (TILE_CLASS[t] ? " " + TILE_CLASS[t] : "") + '">' + t + "</div>";
   // WHICH TOURNAMENT A BASKETBALL GAME BELONGS TO (his call 2026-09-14), or ""
   // for the regular season, which needs no label of its own.
   const phase = g => {

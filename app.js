@@ -830,7 +830,13 @@ function michListHtml(list) {
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
   const post = g => !!(g.post || g.champ);
-  const tile = t => '<div class="mgap">' + t + "</div>";
+  // each tile wears its tournament's colour -- the same three the championship
+  // rings use (his call 2026-09-14)
+  const TILE_CLASS = { "Big Ten Tournament": "g-b1g",
+                       "NCAA Tournament": "g-ncaa",
+                       "Postseason": "g-cfp" };
+  const tile = t => '<div class="mgap' +
+    (TILE_CLASS[t] ? " " + TILE_CLASS[t] : "") + '">' + t + "</div>";
   // WHICH TOURNAMENT A BASKETBALL GAME BELONGS TO (his call 2026-09-14), or ""
   // for the regular season, which needs no label of its own.
   const phase = g => {
