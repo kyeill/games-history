@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-200514";
+const BUILD = "20260913-201248";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -401,7 +401,11 @@ function michCard(g, p) {
     const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
     when = year + esc(g.stage.replace(" Tournament", "").replace(" | ", " ")) + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
-  } else if (!g.header) {
+  } else if (!g.header || /^December /.test(g.header)) {
+    // a window label already names its network ("FOX PRIMETIME"), so the TV
+    // details are left off -- but "DECEMBER SATURDAY" names nothing, and
+    // dropping them there lost the network and the time (his catch
+    // 2026-09-13)
     when += tvBits;
   }
   // no emoji in the header any more (his call 2026-09-13)
@@ -586,9 +590,18 @@ function michCard(g, p) {
   } else if (mode === "stripe" && parts.length > 1) {
     chipHtml = parts.map((p, i) => wrap(p, i % 2 ? FMAIZE : FBLUE)).join(SEP);
   } else if (mode === "stripe" && parts.length === 1) {
-    chipHtml = '<span class="mdet">' + parts[0].t.split(/\s+/)
-      .map((w, i) => '<span style="color:' + (i % 2 ? FMAIZE : FBLUE) + '">' +
-        esc(w) + "</span>").join(" ") + "</span>";
+    // more than one word alternates word by word; a single run -- a date on
+    // its own -- alternates by CHARACTER instead, digits blue and the slashes
+    // maize, so "9/21/24" still stripes (his call 2026-09-13)
+    const only = parts[0].t;
+    const spaced = only.indexOf(" ") > -1;
+    const runs = spaced
+      ? only.split(/\s+/).map((w, i) => [w, i % 2 ? FMAIZE : FBLUE])
+      : only.split(/(\d+)/).filter(Boolean)
+          .map(s => [s, /\d/.test(s) ? FBLUE : FMAIZE]);
+    chipHtml = '<span class="mdet">' + runs
+      .map(r => '<span style="color:' + r[1] + '">' + esc(r[0]) + "</span>")
+      .join(spaced ? " " : "") + "</span>";
   } else {
     chipHtml = parts.map(p => wrap(p)).join(SEP);
   }
