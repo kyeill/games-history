@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-201248";
+const BUILD = "20260913-201549";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -414,7 +414,12 @@ function michCard(g, p) {
   // empty, in which case it drops down there instead and the header ends
   // without it (his call 2026-09-13). Decided below, once the footer is known.
   const headDate = ' | <span class="hdate">' + right + "</span>";
-  const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") + fmtDate(g.date);
+  // A WIN SPELLS THE DATE OUT (his call 2026-09-13): "Sep 21, 2024" rather
+  // than "9/21/24", so the third row of a win reads differently from a loss.
+  const longDate = MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
+    (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4);
+  const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") +
+    (lost || upcoming(g) ? fmtDate(g.date) : longDate);
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
   // ON maize and blue ON blue, which cannot be read as the same value, so the
