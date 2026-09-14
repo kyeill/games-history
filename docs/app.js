@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-105103";
+const BUILD = "20260914-105952";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -740,11 +740,17 @@ function michCard(g, p) {
   // wash is the same colour lightened toward the page, so the border reads as
   // the deeper version of it.
   const bword = String(mx.border || "").trim().toLowerCase();
+  // A WIN IN THE NCAA TOURNAMENT OR THE CFP takes the same grey frame as a
+  // preseason tournament when he has given no border of his own (his call
+  // 2026-09-14). The championship rings above still beat it, so a title win
+  // keeps its blue or its gold; a LOSS stays unframed, the muting says it.
+  const bigTourneyWin = !lost && !upcoming(g) &&
+    (st.indexOf("NCAA Tournament") === 0 || st.indexOf("CFP") === 0);
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
-      (g.preseason ? "#8a8a92" : null);
+      (g.preseason || bigTourneyWin ? "#8a8a92" : null);
   if (g.preseason && lost) cls += " predash";
   let ring = "";
   if (bc) {

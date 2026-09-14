@@ -163,6 +163,19 @@ ever go missing, the answer is in the Case column, not in the code.
 This RETIRED the inference described below, which had to guess from whether his
 opponent cell was written in capitals and got it wrong twice. Keep the history:
 
+**THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
+#8a8a92 goes on a preseason-tournament game (dashed on a loss) and now on any
+NCAA Tournament or CFP WIN where his Border column is blank -- 14 NCAA games
+today, no CFP ones, since both CFP wins already carry a border of his. The
+order is: "Opponent" first, then his own colour, then the championship rings
+(Big Ten blue, NCAA blue, CFP gold), then this grey. A LOSS stays unframed.
+
+**THE ^ IS DERIVED, NOT TYPED.** It marks an opponent that won the national
+title the season before, worked out in harvest from the previous season's
+playoff finish -- he does not need to supply it. Five games carry it: Alabama
+2012, Ohio State 2015, North Carolina 2017-18, Villanova 2018-19, Ohio State
+2025.
+
 **THE ACRONYM TRAP RAN BOTH WAYS.** ALL CAPS is his marking for a win in a
 capitalised season, so a school whose name IS an acronym is ambiguous, and
 `sheet_case` has to tell a name from a case. It first asked only whether MY
