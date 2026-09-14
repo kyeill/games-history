@@ -1542,6 +1542,50 @@ def harvest():
     print("  %d preseason-tournament games across %d seasons"
           % (n, sum(1 for v in pre.values() if len(v) > 1)))
 
+    # THE SERIES TAG (his call 2026-09-14), worked out rather than typed: two
+    # meetings in CONSECUTIVE seasons that the two schools arranged between
+    # them. A conference opponent is annual, a tournament meeting is the
+    # bracket's doing, an MTE is the event's, and a Big Ten/ACC Challenge or
+    # Gavitt game is the leagues' -- none of those is a series, and he tags
+    # none of them. tags.json still overrides this per game.
+    cand = collections.defaultdict(list)
+    for g in keep:
+        if not g.get("michigan") or g.get("stage") or g.get("preseason"):
+            continue
+        if g.get("event"):
+            continue
+        opp = next((s for s in g["teams"] if s["id"] != rules.MICHIGAN), None)
+        if not opp or opp.get("conf") == rules.BIG_TEN[g["sport"]]:
+            continue
+        cand[(g["sport"], opp["id"])].append(g)
+
+    def _side(g):
+        opp = next(s for s in g["teams"] if s["id"] != rules.MICHIGAN)
+        return ("neutral" if g.get("neutral")
+                else "away" if opp.get("home") else "home")
+
+    series = 0
+    for games in cand.values():
+        games.sort(key=lambda x: x["date"])
+        for i, a_ in enumerate(games):
+            for b_ in games[i + 1:]:
+                if b_["season"] - a_["season"] != 1:
+                    continue
+                ka, kb = _side(a_), _side(b_)
+                if ka == "neutral" and kb == "neutral":
+                    lab = "Neutral & Neutral"
+                elif {ka, kb} == {"home", "away"}:
+                    lab = "Home & Home"
+                elif "neutral" in (ka, kb):
+                    lab = "Home & Neutral"
+                else:
+                    continue          # two homes or two aways is not a series
+                for g in (a_, b_):
+                    if not g.get("series"):
+                        g["series"] = lab
+                        series += 1
+    print("  %d games in a home-and-home style series" % series)
+
     # THE ROUND INSIDE THE EVENT (his call 2026-09-14). He asked whether he had
     # to type these in; he does not -- an MTE bracket is fixed, so the round
     # falls out of the ORDER of Michigan's games and whether it won them.

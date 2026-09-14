@@ -296,7 +296,7 @@ function rowHtml(g, browse) {
     '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
       col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
-    '<div class="tags">' + tags.join("") + "</div></button>";
+    '<div class="tags">' + tags.join("") + "</div></div>";
 }
 
 /* MICHIGAN view (trial, his call 2026-09-11). One card per Michigan game, in
@@ -622,7 +622,12 @@ function michCard(g, p) {
     bit(place, PLACE_SHORT[place], false, 3);
   }
   if (g.event && !g.stage && !mteCard) bit(g.event);
-  mine.filter(t => SERIES_FAMILY.indexOf(t) > -1)
+  // THE SERIES IS DERIVED at harvest (two meetings in consecutive seasons the
+  // schools arranged between them) -- but a tag he wrote by hand still wins,
+  // which is what keeps Texas 2024 marked when its return leg sits in 2027,
+  // outside the archive (2026-09-14)
+  const handSeries = mine.filter(t => SERIES_FAMILY.indexOf(t) > -1);
+  (handSeries.length ? handSeries : (g.series ? [g.series] : []))
     .forEach(t => bit(t, SERIES_SHORT[t], false, 2));
   const shows = showsOf(g);
   if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon", false, 1);
@@ -751,7 +756,7 @@ function michCard(g, p) {
     '<div class="tags mdets">' +
       (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
       chipHtml + "</span>" + umRank +
-    "</div></button>";
+    "</div></div>";
 }
 
 // A Michigan chip row that runs onto a second line trims its long show tags --

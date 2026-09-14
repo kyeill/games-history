@@ -242,6 +242,28 @@ the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 
 ## tags.json
 
+**A CARD IS A `<div>`, AND IT HAS TO CLOSE AS ONE.** Turning the row from a
+button into a div (2026-09-14) changed the OPENING tag in both card builders
+and left `"</div></button>"` at the end of each. Every card then shipped a
+stray `</button>` and one unclosed `<div>`. The parser papered over it at forty
+cards and gave way at 530: NINETEEN cards rendered completely empty, and a
+header came out with its `[g10]` in the middle. `rowHtml` returned perfectly
+good HTML the whole time -- the damage was done by the cards BEFORE it, which
+is why checking one card in isolation proved nothing. When a card renders
+blank, count the tags across the whole list, not within one card.
+
+**THE SERIES TAG IS DERIVED** (his call 2026-09-14: "try to do it on your own
+and me adjust it via chat when needed"). A series is two meetings in
+CONSECUTIVE seasons that the two schools arranged between them: non-conference,
+outside any tournament, outside a preseason MTE, and NOT under an event name --
+the Big Ten/ACC Challenge and the Gavitt Games are the leagues' doing, and he
+tags none of them. home+away is `Home & Home`, neutral+neutral is
+`Neutral & Neutral`, either+neutral is `Home & Neutral`; two homes or two aways
+is no series at all. This reproduces 16 of the 17 he tagged by hand with no
+disagreements. The 17th is Texas 2024, whose return leg is in 2027 and so is
+not in the archive -- which is why a tag in tags.json still OVERRIDES the
+derived one.
+
 **THE TAG EDITOR IS GONE** (his call 2026-09-14). He no longer edits tags by
 tapping a card, and everything downstream existed only to persist those edits,
 so all of it came out: the bottom sheet, the GitHub token in Settings, the
