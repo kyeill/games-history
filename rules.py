@@ -656,8 +656,12 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
     # weeknight package, and the one Michigan actually plays in, where ESPN's
     # Big Monday and Super Tuesday below have never caught it. The bracket is
     # the B1G Peacock window's own, so the two cannot disagree.
+    # ...and it does NOT wait for a ranked team the way the window does (his
+    # call 2026-09-14). Those games carry no window at all, so they never reach
+    # TV Windows to disagree with one -- they are Michigan-view cards, and there
+    # a bare "TUESDAY" said less than it could.
     if (any("Peacock" in n for n in nets) and both_big_ten
-            and day in ("Tue", "Thu") and ranked):
+            and day in ("Tue", "Thu")):
         return "Peacock " + DAY_FULL[d.weekday()]
     # the same brackets the windows use, so a card's label and its window
     # can never disagree

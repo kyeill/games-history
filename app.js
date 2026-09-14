@@ -13,7 +13,8 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // VIEW switches between the two collections within it.
 let BROWSE = null, TAB = "cfb", VIEW = "michigan", SHEET = null;
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
-              team: null, marquee: false, rival: null, post: false, winner: null };
+              team: null, marquee: false, rival: null, post: false, winner: null,
+              net: null };
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -1043,6 +1044,9 @@ function visible() {
       return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase;
     });
   }
+  // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
+  // so the filter and the header can never disagree (his call 2026-09-14)
+  if (FILT.net) list = list.filter(g => primaryNet(g.nets) === FILT.net);
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
@@ -1190,6 +1194,28 @@ function filterChips() {
         .concat(lined(mt.bigTen.filter(id => !isRival(id))),
                 lined(mt.power), lined(mt.rest)),
       FILT.team));
+    // THE NETWORK, in his order (2026-09-14): the ones he watches on, then a
+    // bar, then whatever else carried a game -- NET_RANK for the tail, so the
+    // ESPN family and the streamers keep the order they have everywhere else.
+    const PIN_NET = ["FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "BTN"];
+    const seenNet = new Set();
+    visibleWithout("net").forEach(g => {
+      const n = primaryNet(g.nets);
+      if (n) seenNet.add(n);
+    });
+    if (FILT.net) seenNet.add(FILT.net);
+    const netRank = n => {
+      const i = NET_RANK.indexOf(n), s = STREAMERS.indexOf(n);
+      return i > -1 ? i : s > -1 ? 900 + s : 500;
+    };
+    const pinned = PIN_NET.filter(n => seenNet.has(n));
+    const others = Array.from(seenNet).filter(n => PIN_NET.indexOf(n) < 0)
+      .sort((x, y) => netRank(x) - netRank(y) || x.localeCompare(y));
+    const netOpt = n => [n, n];
+    h += group("Network", select("net", "All Networks",
+      pinned.map(netOpt).concat(others.length
+        ? [["─".repeat(12), null]].concat(others.map(netOpt)) : []),
+      FILT.net));
     return h + group("", sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
@@ -1667,6 +1693,7 @@ async function init() {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
         FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
+        FILT.net = null;
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
         FILT.post = false; FILT.winner = null;
         SORT = defaultSort();
@@ -1674,11 +1701,13 @@ async function init() {
         // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+        FILT.net = null;
         SORT = defaultSort();
       } else if (leaving === "rivals" || leaving === "michigan") {
         // leaving Rivals or Michigan puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+        FILT.net = null;
         if (leaving === "michigan") SORT = defaultSort();
       }
       draw();

@@ -211,6 +211,14 @@ His call on the five that were left: VCU spells out; Utep, Njit, Unlv and Ucla
 stay in Proper case, and UCLA still goes up in capitals in the Big Ten years
 like every other Big Ten team.
 
+**THE NETWORK FILTER MATCHES `primaryNet`**, the one network a card actually
+names, not every net ESPN lists against a game (2026-09-14) -- so the filter and
+the header can never disagree, and the long tail collapses: ESPN3 is primary on
+7 basketball cards rather than appearing on 43. His order is FOX, CBS, NBC,
+ABC, ESPN, FS1, BTN, then a bar and whatever else carried a game, tailed in
+NET_RANK order so the ESPN family and the streamers keep the sequence they have
+everywhere else.
+
 **THE TEAM FILTER ON THE MICHIGAN VIEWS LISTS THE OPPONENTS**, not the teams
 (2026-09-14). Michigan plays in every game there, so it is deleted from the
 option list, and the rivals are passed to `teamOrder` as the pins. It carries
