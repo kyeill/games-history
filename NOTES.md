@@ -27,6 +27,28 @@ one line at a 347px phone card, and `.sport` is `white-space: normal` with
 visible overflow, so a header that did NOT fit would wrap rather than clip --
 check the wrap, not an ellipsis.
 
+**HIS PHONE IS 402 CSS PIXELS WIDE -- MEASURE THERE, NOT ON A DESKTOP.**
+Calibrated 2026-09-14 from two cards he named as "essentially the max", and
+both land exactly on the limit at 402, which is what makes it trustworthy:
+
+  * the 2026 NCAA championship header needs 346px and has 346px -- slack ZERO
+  * the 2025-26 Auburn footer needs 276px at full text and has 270 -- it MUST
+    give something up, which is why he sees it contracted
+
+A card is 374px at that width, the header gets 346 and the footer 270 (the
+Michigan rank box takes the rest). Desktop measurements are useless for this:
+at 1280 a card is 378px and almost nothing wraps. Note also that the wrap test
+DIFFERS by element -- the footer compares its children's offsets, but the
+header holds ONE span, so it has to be measured by HEIGHT against the line box.
+
+**CONTRACT AS FEW PIECES AS POSSIBLE.** `trimMichChips` used to apply every
+short form the moment a row wrapped, which left "LCA | N&N" on a card with room
+for "Little Caesars Arena | N&N" (his catch 2026-09-14). It now shortens one
+piece at a time, from the END, re-checking after each: the TV time goes first
+and the leading location last. The header works the same way -- "NCAA
+TOURNAMENT" falls back to "NCAA" on the five cards that need it and stays
+spelled out on the other thirty-odd.
+
 **WHERE THE EVENT NAME ALREADY CARRIES THE CITY, the city goes** (2026-09-14):
 the Cowboys Classic was always in Arlington and the Jumpman Invitational always
 in Charlotte, so printing both wrapped the row for nothing. Those four games

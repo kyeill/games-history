@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-084837";
+const BUILD = "20260914-085950";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -426,14 +426,22 @@ function michCard(g, p) {
   // 2026-09-14): "NCAA TOURNAMENT", "COLLEGE FOOTBALL PLAYOFF". The Big Ten
   // Tournament stays short -- "BIG TEN QUARTERS" -- because the conference
   // name already carries it. Rounds 1 and 2 read FIRST and SECOND here too.
-  const stageHead = () =>
-    (g.post || bigStage ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
-    esc(g.stage
+  const stageHead = () => {
+    const yr = g.post || bigStage
+      ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
+    const full = g.stage
       .replace("Big Ten Tournament", "Big Ten")
-      .replace("CFP", "College Football Playoff")
       .replace(" | ", " ")
       .replace("Round 1", "First Round")
-      .replace("Round 2", "Second Round"));
+      .replace("Round 2", "Second Round")
+      .replace("Semis", "Semifinals");
+    // the longest rounds against the longest cities run past his phone, so
+    // "NCAA TOURNAMENT" keeps a short form for trimMichChips to reach for
+    const brief = full.replace("NCAA Tournament ", "NCAA ");
+    return yr + (brief !== full
+      ? '<span class="hstage" data-short="' + esc(brief) + '">' + esc(full) + "</span>"
+      : esc(full));
+  };
   if (bigStage) {
     // the round, then WHERE it was played; the date and the TV details have
     // gone down to the third row
@@ -746,18 +754,38 @@ function michCard(g, p) {
 // "Big Noon Kickoff" to "Big Noon", "College GameDay" to "GameDay" (his call
 // 2026-09-11). Re-run after every draw and when the window changes size.
 function trimMichChips() {
+  // THE HEADER FIRST (his call 2026-09-14). It holds one piece of text rather
+  // than a row of them, so a wrap is measured by HEIGHT against the line box,
+  // not by comparing children the way the footer does.
+  document.querySelectorAll(".row.mich .sport").forEach(head => {
+    const s = head.querySelector("[data-short]");
+    if (!s) return;
+    if (s.dataset.full) s.textContent = s.dataset.full;
+    const lh = parseFloat(getComputedStyle(head).lineHeight) || 19;
+    if (head.getBoundingClientRect().height <= lh * 1.5) return;
+    if (!s.dataset.full) s.dataset.full = s.textContent;
+    s.textContent = s.dataset.short;
+  });
   document.querySelectorAll(".row.mich .mdl").forEach(row => {
-    const shorts = row.querySelectorAll("[data-short]");
+    const shorts = Array.prototype.slice.call(row.querySelectorAll("[data-short]"));
     if (!shorts.length) return;
+    // every pass starts from the FULL text: a wider window gives room back
     shorts.forEach(s => { if (s.dataset.full) s.textContent = s.dataset.full; });
     const first = row.firstElementChild;
     const wrapped = () => Array.prototype.some.call(row.children,
       c => c.offsetTop > first.offsetTop + 2);
     if (!wrapped()) return;
-    shorts.forEach(s => {
+    // AS FEW PIECES AS POSSIBLE (his call 2026-09-14). Shortening everything
+    // the moment a row wrapped left "LCA | N&N" on a card with room for
+    // "Little Caesars Arena | N&N". One at a time from the END instead,
+    // checking after each -- the leading location says the most, so it is the
+    // last to give way, and the TV time the first.
+    for (let i = shorts.length - 1; i >= 0; i--) {
+      const s = shorts[i];
       if (!s.dataset.full) s.dataset.full = s.textContent;
       s.textContent = s.dataset.short;
-    });
+      if (!wrapped()) return;
+    }
   });
 }
 let MICH_RESIZE = null;
