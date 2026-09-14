@@ -211,6 +211,15 @@ His call on the five that were left: VCU spells out; Utep, Njit, Unlv and Ucla
 stay in Proper case, and UCLA still goes up in capitals in the Big Ten years
 like every other Big Ten team.
 
+**THE NETWORK FILTER IS A REGULAR-SEASON QUESTION** (2026-09-14). Asking for
+CBS is asking what he watched on CBS, not for the NCAA Tournament games CBS
+happened to carry, so any game with a STAGE is out -- a bowl, the CFP, the Big
+Ten or NCAA Tournament, the NIT. A preseason MTE has no stage and stays. The
+dropdown drops a network whose only games are postseason, because choosing it
+could return nothing: TBS is the one that goes, all 13 of its games being NCAA
+Tournament. The counts it changes most are CBS basketball (93 to 53), BTN (154
+to 141) and ESPN football (28 to 18).
+
 **THE NETWORK FILTER MATCHES `primaryNet`**, the one network a card actually
 names, not every net ESPN lists against a game (2026-09-14) -- so the filter and
 the header can never disagree, and the long tail collapses: ESPN3 is primary on
