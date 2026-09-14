@@ -449,15 +449,11 @@ def load_sheet():
                 "shade": bool(cell("shade")), "border": cell("border"),
                 "note": cell("notes") or cell("note"),
                 "footer": cell("footer"), "box": box,
-                # the round inside a multi-team event ("Final", "Semis"), from
-                # a Round column he may not have added yet -- "" until he does
-                "round": cell("round"),
             }
             flags = used.setdefault((code, season), set())
             for label, flag in (("case", "case"), ("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
-                                ("note", "note"), ("footer", "footer"),
-                            ("round", "round")):
+                                ("note", "note"), ("footer", "footer")):
                 if cell(label):
                     flags.add(flag)
             if any(box.values()):

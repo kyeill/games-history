@@ -112,7 +112,8 @@ sixth. The Players Era Festival is the one non-bracket -- pool play into a
 single placement game -- and is special-cased to `Game 1`, `Game 2`, `Final`.
 All 35 MTE games were checked against the real brackets.
 
-A **Round** column on his sheet still overrides any of it, game by game.
+There is no Round column: he had one and retired it (2026-09-14), so the
+bracket is the ONLY source. To correct a round, correct the logic.
 
 When one of those rows would wrap, the TIME is what goes and the network stays
 (`bit(tvTxt, netTxt)`), which is why some MTE footers read `truTV` and others
@@ -189,8 +190,7 @@ the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 **COLUMNS ARE READ BY NAME, and a missing one is simply blank.** `load_sheet`
 maps header text to an index and `cell()` answers "" for anything it cannot
 find, so a NEW COLUMN costs no code -- he adds it, the next build picks it up.
-That is how **Round** works: `mx.round` fills the MTE header after the event
-name, and until the column exists every MTE header is just the event.
+That is how **Case** arrived (2026-09-14), and how **Round** came and went.
 
 **gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
 headers are "2025-26", "2024-25" and so on; gviz typed those columns as DATES

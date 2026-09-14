@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-104603";
+const BUILD = "20260914-105103";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -440,8 +440,9 @@ function michCard(g, p) {
   } else if (mteCard) {
     // the event, then the round within it -- his Round column, blank until he
     // fills it in, and then the header is simply the event
-    // his Round column overrides whatever the bracket worked out
-    const rnd = mx.round || g.mte_round || "";
+    // the bracket works the round out on its own (see harvest); the Round
+    // column that used to override it is retired (2026-09-14)
+    const rnd = g.mte_round || "";
     // the one event long enough to run past the header on its longer rounds;
     // it keeps the full name wherever it fits (2026-09-14)
     const EVENT_SHORT = {
