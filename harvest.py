@@ -1576,10 +1576,10 @@ def harvest():
                     lab = "Neutral & Neutral"
                 elif {ka, kb} == {"home", "away"}:
                     lab = "Home & Home"
-                elif "neutral" in (ka, kb):
-                    lab = "Home & Neutral"
                 else:
-                    continue          # two homes or two aways is not a series
+                    # a MATCHED pair or nothing: two homes, two aways, or one
+                    # home and one neutral is coincidence, not a contract
+                    continue
                 for g in (a_, b_):
                     if not g.get("series"):
                         g["series"] = lab

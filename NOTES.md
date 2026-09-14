@@ -257,9 +257,13 @@ and me adjust it via chat when needed"). A series is two meetings in
 CONSECUTIVE seasons that the two schools arranged between them: non-conference,
 outside any tournament, outside a preseason MTE, and NOT under an event name --
 the Big Ten/ACC Challenge and the Gavitt Games are the leagues' doing, and he
-tags none of them. home+away is `Home & Home`, neutral+neutral is
-`Neutral & Neutral`, either+neutral is `Home & Neutral`; two homes or two aways
-is no series at all. This reproduces 16 of the 17 he tagged by hand with no
+tags none of them. It must be a MATCHED PAIR: home+away is
+`Home & Home` and neutral+neutral is `Neutral & Neutral`, while two homes, two
+aways, or one home and one neutral is coincidence and gets nothing. The mixed
+rule only ever produced Eastern Michigan 2022 at Crisler plus 2023 at Little
+Caesars, which he rejected; he has never hand-tagged a Michigan game
+`Home & Neutral` either, so the label now only reaches this view through
+tags.json, where all six of his sit on OTHER teams' games. This reproduces 16 of the 17 he tagged by hand with no
 disagreements. The 17th is Texas 2024, whose return leg is in 2027 and so is
 not in the archive -- which is why a tag in tags.json still OVERRIDES the
 derived one.
