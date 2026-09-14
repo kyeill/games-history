@@ -1140,9 +1140,31 @@ function filterChips() {
   let h = group("Year", select("season", "All Years",
     viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
-  // MICHIGAN (trial, 2026-09-11): Year and the sort
-  if (VIEW === "michigan")
+  // MICHIGAN (trial, 2026-09-11): Year, the OPPONENT and the sort.
+  // Michigan is in every game on this view, so the Team filter lists who it
+  // PLAYED and leaves Michigan itself out (his call 2026-09-14). His order is
+  // rivals, the rest of the Big Ten, the other power leagues, then everyone
+  // else, with a bar between each group -- one more bar than the other views,
+  // which run the rivals into the Big Ten.
+  if (VIEW === "michigan") {
+    const rivalIds = sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"];
+    const seen = teamsIn(visibleWithout("team"),
+      g => g.teams.map(t => t.id), FILT.team);
+    seen.delete(MICHIGAN);
+    const mt = teamOrder(sport, seen, rivalIds);
+    const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
+    const lined = ids => ids.length
+      ? [["─".repeat(12), null]].concat(ids.map(optOf)) : [];
+    // teamOrder hands the pins back at the head of its Big Ten group; split
+    // them out again so a bar can sit between the rivals and the rest
+    const isRival = id => rivalIds.indexOf(id) > -1;
+    h += group("Team", select("team", "All Teams",
+      mt.bigTen.filter(isRival).map(optOf)
+        .concat(lined(mt.bigTen.filter(id => !isRival(id))),
+                lined(mt.power), lined(mt.rest)),
+      FILT.team));
     return h + group("", sortButton());
+  }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
   // Marquee

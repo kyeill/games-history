@@ -145,6 +145,14 @@ out, in the header and the third row alike; every other date stays in slashes.
 Three games in the archive fall on it, two of them wins. I first read "a win
 on 9/21" as every win and spelled out all of them -- it means that DAY.
 
+**THE TEAM FILTER ON THE MICHIGAN VIEWS LISTS THE OPPONENTS**, not the teams
+(2026-09-14). Michigan plays in every game there, so it is deleted from the
+option list, and the rivals are passed to `teamOrder` as the pins. It carries
+ONE MORE BAR than the other views: his order here is rivals, then the rest of
+the Big Ten, then the other power leagues, then everyone else, where elsewhere
+the rivals run straight into the Big Ten. `FILT.team` itself needed no change
+-- it is applied before the per-view filter, so it already worked.
+
 ## The Google Sheet
 
 **COLUMNS ARE READ BY NAME, and a missing one is simply blank.** `load_sheet`
