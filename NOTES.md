@@ -214,10 +214,14 @@ like every other Big Ten team.
 **THE NETWORK FILTER MATCHES `primaryNet`**, the one network a card actually
 names, not every net ESPN lists against a game (2026-09-14) -- so the filter and
 the header can never disagree, and the long tail collapses: ESPN3 is primary on
-7 basketball cards rather than appearing on 43. His order is FOX, CBS, NBC,
-ABC, ESPN, FS1, BTN, then a bar and whatever else carried a game, tailed in
-NET_RANK order so the ESPN family and the streamers keep the sequence they have
-everywhere else.
+7 basketball cards rather than appearing on 43. His order DIFFERS BY SPORT (`NET_GROUPS`):
+
+  * CFB  FOX, CBS, NBC | ABC, ESPN, ESPN2, FS1, BTN, Peacock
+  * CBB  FOX, CBS, NBC, ABC | ESPN, FS1, BTN, Peacock, TBS, TNT, truTV |
+    then whatever else carried a game, alphabetically
+
+A group with nothing in it brings no bar with it, which is why football shows
+two groups and basketball three.
 
 **THE TEAM FILTER ON THE MICHIGAN VIEWS LISTS THE OPPONENTS**, not the teams
 (2026-09-14). Michigan plays in every game there, so it is deleted from the

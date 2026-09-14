@@ -1194,28 +1194,35 @@ function filterChips() {
         .concat(lined(mt.bigTen.filter(id => !isRival(id))),
                 lined(mt.power), lined(mt.rest)),
       FILT.team));
-    // THE NETWORK, in his order (2026-09-14): the ones he watches on, then a
-    // bar, then whatever else carried a game -- NET_RANK for the tail, so the
-    // ESPN family and the streamers keep the order they have everywhere else.
-    const PIN_NET = ["FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "BTN"];
+    // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
+    // broadcast networks he watches on, a bar, then the cable tier, then
+    // whatever else carried a game, alphabetically. A group with nothing in
+    // it brings no bar with it.
+    const NET_GROUPS = {
+      CFB: [["FOX", "CBS", "NBC"],
+            ["ABC", "ESPN", "ESPN2", "FS1", "BTN", "Peacock"]],
+      CBB: [["FOX", "CBS", "NBC", "ABC"],
+            ["ESPN", "FS1", "BTN", "Peacock", "TBS", "TNT", "truTV"]]
+    };
     const seenNet = new Set();
     visibleWithout("net").forEach(g => {
       const n = primaryNet(g.nets);
       if (n) seenNet.add(n);
     });
     if (FILT.net) seenNet.add(FILT.net);
-    const netRank = n => {
-      const i = NET_RANK.indexOf(n), s = STREAMERS.indexOf(n);
-      return i > -1 ? i : s > -1 ? 900 + s : 500;
-    };
-    const pinned = PIN_NET.filter(n => seenNet.has(n));
-    const others = Array.from(seenNet).filter(n => PIN_NET.indexOf(n) < 0)
-      .sort((x, y) => netRank(x) - netRank(y) || x.localeCompare(y));
+    const groups = NET_GROUPS[sport] || [];
+    const namedNet = [].concat.apply([], groups);
+    const restNet = Array.from(seenNet)
+      .filter(n => namedNet.indexOf(n) < 0).sort();
     const netOpt = n => [n, n];
-    h += group("Network", select("net", "All Networks",
-      pinned.map(netOpt).concat(others.length
-        ? [["─".repeat(12), null]].concat(others.map(netOpt)) : []),
-      FILT.net));
+    let netOpts = [];
+    groups.concat([restNet]).forEach(grp => {
+      const have = grp.filter(n => seenNet.has(n));
+      if (!have.length) return;
+      if (netOpts.length) netOpts.push(["────────────", null]);
+      netOpts = netOpts.concat(have.map(netOpt));
+    });
+    h += group("Network", select("net", "All Networks", netOpts, FILT.net));
     return h + group("", sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
