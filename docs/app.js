@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-120517";
+const BUILD = "20260914-120958";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1201,8 +1201,8 @@ function filterChips() {
     const NET_GROUPS = {
       CFB: [["FOX", "CBS", "NBC"],
             ["ABC", "ESPN", "ESPN2", "FS1", "BTN", "Peacock"]],
-      CBB: [["FOX", "CBS", "NBC", "ABC"],
-            ["ESPN", "FS1", "BTN", "Peacock", "TBS", "TNT", "truTV"]]
+      CBB: [["FOX", "CBS", "NBC", "ABC", "ESPN", "ESPN2", "FS1", "BTN",
+             "Peacock", "TBS", "TNT", "truTV"]]
     };
     const seenNet = new Set();
     visibleWithout("net").forEach(g => {

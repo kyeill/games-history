@@ -217,8 +217,8 @@ the header can never disagree, and the long tail collapses: ESPN3 is primary on
 7 basketball cards rather than appearing on 43. His order DIFFERS BY SPORT (`NET_GROUPS`):
 
   * CFB  FOX, CBS, NBC | ABC, ESPN, ESPN2, FS1, BTN, Peacock
-  * CBB  FOX, CBS, NBC, ABC | ESPN, FS1, BTN, Peacock, TBS, TNT, truTV |
-    then whatever else carried a game, alphabetically
+  * CBB  FOX, CBS, NBC, ABC, ESPN, ESPN2, FS1, BTN, Peacock, TBS, TNT,
+    truTV | then whatever else carried a game, alphabetically
 
 A group with nothing in it brings no bar with it, which is why football shows
 two groups and basketball three.
