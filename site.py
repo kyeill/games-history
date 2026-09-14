@@ -28,21 +28,16 @@ REPO = "kyeill/games-history"      # where tags.json is committed
 # would write a file the app never reads.
 TAGS_PATH = "docs/tags.json"
 
-# The manual tags. These are DETAILS shown on a row, deliberately NOT filter
-# options -- his call 2026-09-09, along with dropping "home and home", which he
-# would rather write in a note. "Big Noon Kickoff" is FOX's pregame SHOW being
-# on site, not the noon kickoff window itself (that is the TV window "FOX Big
-# Noon"). Any other tag can still be typed into the sheet.
-STARTER_TAGS = [
-    "Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral & Neutral",
-    "Home & Neutral", "Annual", "Buy Game",
-]
+# The manual tags tags.json carries: DETAILS shown on a row, deliberately not
+# filter options (his call 2026-09-09). "Big Noon Kickoff" is FOX's pregame
+# SHOW being on site, not the noon kickoff window itself (that is the TV window
+# "FOX Big Noon"). The app no longer offers them for editing -- the tag sheet
+# came out 2026-09-14 -- so git is the only way that file changes now.
 
 CSS = """
 :root{
   --bg:#16161a; --card:#1e1e23; --ink:#ececea; --muted:#9a9a95;
   --line:#2b2b31; --rank:#8fb0d8; --accent:#e0834f; --ok:#7fb98a;
-  --sheet:#212127;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -123,11 +118,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
      the teams row grew ~10px taller than the team lines and meta's 1fr/1fr
      split no longer matched them. Sending the slack to the bottom instead
      keeps every track at its content height. */
-  column-gap:14px;align-items:start;align-content:start;
-  cursor:pointer;text-align:left;
-  width:100%;font:inherit;color:inherit}
-.row:hover{border-color:#3b3b43}
-.row:focus-visible{outline:2px solid var(--rank);outline-offset:2px}
+  column-gap:14px;align-items:start;align-content:start}
 /* week + date, where the sport label used to be */
 /* The header row carries the slot label at the left and the DATE at the
    right, where it lines up with the network and time in the column below. */
@@ -367,41 +358,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   padding:5px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .inarch{color:var(--ok);font-size:11.5px;font-weight:700;letter-spacing:.05em}
 
-/* bottom sheet: tag editor + settings */
-.scrim{position:fixed;inset:0;background:#000a;z-index:20;display:none}
-.scrim.on{display:block}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--sheet);
-  border-top:1px solid var(--line);border-radius:14px 14px 0 0;
-  padding:16px 16px calc(18px + env(safe-area-inset-bottom));
-  max-height:82vh;overflow-y:auto;display:none;
-  max-width:880px;margin:0 auto}
-.sheet.on{display:block}
-.sheet h3{margin:0 0 3px;font-size:17px}
-.sheet .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
-.sheet label{display:block;font-size:11px;text-transform:uppercase;
-  letter-spacing:.07em;color:var(--muted);font-weight:700;margin:14px 0 6px}
-.sheet input[type=text],.sheet input[type=password],.sheet textarea{
-  width:100%;background:var(--card);border:1px solid var(--line);
-  color:var(--ink);border-radius:7px;padding:7px 10px;font:inherit;font-size:14px}
-.sheet textarea{min-height:56px;resize:vertical}
-.tagpick{display:flex;flex-wrap:wrap;gap:6px}
-.done{margin-top:16px;width:100%;background:#2e3a48;border:1px solid #3f5064;
-  color:#cfe0f2;border-radius:8px;padding:9px;font:inherit;font-size:15px;
-  font-weight:600;cursor:pointer}
-.danger{color:var(--accent);font-size:13px;margin-top:10px}
-.hint{color:var(--muted);font-size:12.5px;margin-top:8px}
-.hint code{background:var(--card);padding:1px 5px;border-radius:4px;
-  font-size:12px}
-
-.syncbar{position:fixed;left:0;right:0;bottom:0;z-index:10;
-  background:#232830;border-top:1px solid #333a45;
-  padding:9px 14px calc(9px + env(safe-area-inset-bottom));
-  display:none;align-items:center;gap:12px;justify-content:center}
-.syncbar.on{display:flex}
-.syncbar span{font-size:14px}
-.syncbar button{background:#3a5570;border:1px solid #4a6a8a;color:#dceaf7;
-  border-radius:7px;padding:5px 14px;font:inherit;font-size:14px;
-  font-weight:600;cursor:pointer}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:74px;z-index:30;
   background:#2b3a2e;border:1px solid #3d5442;color:#c8e6cf;padding:8px 16px;
   border-radius:8px;font-size:14px;display:none}
@@ -425,7 +381,6 @@ BODY = """
   <span class="count" id="count"></span>
   <span class="spacer"></span>
   <button class="iconbtn" id="clearbtn">Clear Filters</button>
-  <button class="iconbtn" id="settingsbtn">Settings</button>
 </header>
 
 <nav>
@@ -451,45 +406,6 @@ BODY = """
 <div id="list"></div>
 </div>
 
-<div class="scrim" id="scrim"></div>
-
-<div class="sheet" id="sheet">
-  <h3 id="sh-title"></h3>
-  <p class="sub" id="sh-sub"></p>
-  <label>Your tags</label>
-  <div class="tagpick" id="sh-tags"></div>
-  <label for="sh-new">Add a tag</label>
-  <div class="daterow" style="display:flex">
-    <input type="text" id="sh-new" placeholder="e.g. snow game"
-           style="flex:1;min-width:140px">
-    <button class="go" id="sh-add">Add</button>
-  </div>
-  <label for="sh-note">Note</label>
-  <textarea id="sh-note" placeholder="Anything worth remembering"></textarea>
-  <button class="iconbtn" id="sh-inarch" style="margin-top:14px;width:100%;
-    padding:8px">Add to archive</button>
-  <button class="done">Done</button>
-</div>
-
-<div class="sheet" id="settings">
-  <h3>Settings</h3>
-  <p class="sub">Your tags are saved to <code>tags.json</code> in the
-    repo, so every device sees them.</p>
-  <label for="tokbox">GitHub token</label>
-  <input type="password" id="tokbox" placeholder="github_pat_...">
-  <button class="go" id="savetok" style="margin-top:9px">Save token</button>
-  <p class="hint">A fine-grained token with <b>Contents: read and write</b> on
-    <code>__REPO__</code> only. It is stored in this browser and never leaves
-    it except as an Authorization header to GitHub. Paste it once per device.</p>
-  <p class="danger">Anyone with this device can edit that one repo. Clearing
-    browser data removes the token and you re-paste it.</p>
-  <button class="done">Done</button>
-</div>
-
-<div class="syncbar" id="syncbar">
-  <span id="synctext"></span>
-  <button id="savebtn">Save to GitHub</button>
-</div>
 <div class="toast" id="toast"></div>
 """
 
@@ -615,10 +531,7 @@ def build():
 
     stamp = time.strftime("%Y%m%d-%H%M%S")
     js = (open(os.path.join(HERE, "app.js"), encoding="utf-8").read()
-          .replace("__REPO__", REPO)
-          .replace("__TAGS_PATH__", TAGS_PATH)
-          .replace("__BUILD__", stamp)
-          .replace("__STARTER__", json.dumps(STARTER_TAGS)))
+          .replace("__BUILD__", stamp))
     html = ("<!doctype html>\n<html lang=\"en\">\n<head>\n"
             "<meta charset=\"utf-8\">\n"
             "<meta name=\"viewport\" content=\"width=device-width,"
@@ -638,7 +551,7 @@ def build():
             "css2?family=Source+Sans+3:wght@400;600;700&display=swap\">\n"
             "<style>%s</style>\n</head>\n<body>%s\n"
             "<script src=\"app.js?v=%s\"></script>\n</body>\n</html>\n"
-            % (CSS, BODY.replace("__REPO__", REPO), stamp))
+            % (CSS, BODY, stamp))
 
     open(os.path.join(SITE, "index.html"), "w", encoding="utf-8").write(html)
     open(os.path.join(SITE, "app.js"), "w", encoding="utf-8").write(js)

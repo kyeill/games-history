@@ -1,17 +1,15 @@
 /* Games History -- the whole app. site.py copies this in and fills the
    __PLACEHOLDERS__. Kept as a real .js file rather than a Python string so it
    stays editable and lintable. */
-const REPO = "__REPO__", TAGS_PATH = "__TAGS_PATH__";
-const STARTER = __STARTER__;
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
 const BUILD = "__BUILD__";
 const CARD = [0x1e, 0x1e, 0x23];
-let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
+let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
-let BROWSE = null, TAB = "cfb", VIEW = "michigan", SHEET = null;
+let BROWSE = null, TAB = "cfb", VIEW = "michigan";
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null,
               net: null };
@@ -38,18 +36,6 @@ let SORT = defaultSort();
 const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
-
-/* ---------- storage: every accessor can throw in a locked-down browser --- */
-function lsGet(k, d) {
-  try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }
-  catch (e) { return d; }
-}
-function lsSet(k, v) {
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { }
-}
-function token() {
-  try { return localStorage.getItem("gh_token") || ""; } catch (e) { return ""; }
-}
 
 /* ---------- colour: the same wash maths as colors.py -------------------- */
 function shade(hex, lighten, strength) {
@@ -84,10 +70,8 @@ function esc(s) {
 }
 
 /* ---------- tag state --------------------------------------------------- */
-function eff(id) {
-  const base = TAGS[id] || {}, over = PENDING[id];
-  return over ? Object.assign({}, base, over) : base;
-}
+// tags.json as it stands -- there is no local overlay any more (2026-09-14)
+function eff(id) { return TAGS[id] || {}; }
 function myTags(id) { return eff(id).tags || []; }
 const SHOW_TAGS = ["Big Noon Kickoff", "College GameDay"];
 // HIS LOCATIONS TAB IS THE ONLY SOURCE for the two shows (his call
@@ -104,17 +88,6 @@ function plainTags(g) {
 }
 function isHidden(id) { return !!eff(id).hide; }
 function isAdded(id) { return !!eff(id).add; }
-function pendingCount() { return Object.keys(PENDING).length; }
-
-function setPending(id, patch, game) {
-  const cur = Object.assign({}, TAGS[id] || {}, PENDING[id] || {}, patch);
-  if (game && !cur.game && !GAMES.some(g => g.id === id)) cur.game = game;
-  // returning to exactly what the repo already holds is not a change
-  if (JSON.stringify(cur) === JSON.stringify(TAGS[id] || {})) delete PENDING[id];
-  else PENDING[id] = cur;
-  lsSet("pending", PENDING);
-  drawSync();
-}
 
 /* ---------- rendering --------------------------------------------------- */
 function fmtDate(d) {
@@ -297,7 +270,7 @@ function rowHtml(g, browse) {
     flag = !!c;
     ring = c ? [c, c + "44"] : null;
   }
-  return '<button class="row' + (flag ? " celebrate" : "") +
+  return '<div class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
     (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
@@ -770,7 +743,7 @@ function michCard(g, p) {
     cls += " celebrate";
     ring = ";--celeb:" + bc + ";--celebring:" + bc + "44";
   }
-  return '<button class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
+  return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(p.headCol) + "><span>" + head +
       (dateDown ? "" : headDate) + "</span></div>" +
@@ -1014,7 +987,7 @@ function visible() {
   if (TAB === "browse") return BROWSE || [];
   let list = GAMES.filter(g => !isHidden(g.id));
   // games added by hand live only in tags.json, so fold them back in
-  Object.keys(TAGS).concat(Object.keys(PENDING)).forEach(id => {
+  Object.keys(TAGS).forEach(id => {
     const e = eff(id);
     if (e.add && e.game && !list.some(g => g.id === id)) list.push(e.game);
   });
@@ -1448,61 +1421,6 @@ function draw() {
       ? "Pick a start and end date, then Load."
       : "Nothing matches those filters.") + "</p>";
   if (VIEW === "michigan" && TAB !== "browse") trimMichChips();
-  drawSync();
-}
-
-function drawSync() {
-  const n = pendingCount();
-  document.getElementById("syncbar").classList.toggle("on", n > 0);
-  document.getElementById("synctext").textContent =
-    n + (n === 1 ? " unsaved change" : " unsaved changes");
-}
-
-/* ---------- the tag sheet ----------------------------------------------- */
-function openSheet(id) {
-  const g = (BROWSE || []).concat(GAMES).find(x => x.id === id) || eff(id).game;
-  if (!g) return;
-  SHEET = g;
-  const e = eff(id), mine = myTags(id);
-  const seen = Object.keys(TAGS).concat(Object.keys(PENDING))
-    .reduce((a, k) => a.concat(myTags(k)), []);
-  const known = Array.from(new Set(STARTER.concat(seen))).sort();
-  const inArchive = GAMES.some(x => x.id === id) || !!e.add;
-
-  // a neutral-site game has no home team, so "at" would be wrong
-  document.getElementById("sh-title").textContent =
-    teamName(g.teams[1], g.sport, g.season) + (g.neutral ? " vs " : " at ") +
-    teamName(g.teams[0], g.sport, g.season);
-  document.getElementById("sh-sub").textContent =
-    g.dow + " " + g.date + "  ·  " + scoreText(g.teams[1].score) + "–" +
-    scoreText(g.teams[0].score) + "  ·  " +
-    (primaryNet(g.nets) || "no network listed");
-  document.getElementById("sh-tags").innerHTML = known.map(t =>
-    '<button class="f" aria-pressed="' + (mine.indexOf(t) > -1) +
-    '" data-tag="' + esc(t) + '">' + esc(t) + "</button>").join("");
-  document.getElementById("sh-note").value = e.note || "";
-  const ib = document.getElementById("sh-inarch");
-  ib.textContent = inArchive ? "Remove from archive" : "Add to archive";
-  ib.dataset.on = String(inArchive);
-  document.getElementById("sh-new").value = "";
-  show("sheet");
-}
-function show(which) {
-  document.getElementById("scrim").classList.add("on");
-  document.getElementById(which).classList.add("on");
-}
-function hideAll() {
-  document.getElementById("scrim").classList.remove("on");
-  document.querySelectorAll(".sheet").forEach(s => s.classList.remove("on"));
-  SHEET = null;
-  draw();
-}
-function toggleTag(t) {
-  if (!SHEET) return;
-  const cur = myTags(SHEET.id).slice(), i = cur.indexOf(t);
-  if (i < 0) cur.push(t); else cur.splice(i, 1);
-  setPending(SHEET.id, { tags: cur }, SHEET);
-  openSheet(SHEET.id);
 }
 
 /* ---------- Browse: ESPN queried live from the browser ------------------ */
@@ -1590,65 +1508,8 @@ function toast(msg, bad) {
   t.classList.add("on");
   setTimeout(() => t.classList.remove("on"), 3200);
 }
-function b64encode(s) {
-  return btoa(String.fromCharCode.apply(null,
-    Array.from(new TextEncoder().encode(s))));
-}
-function b64decode(s) {
-  return new TextDecoder().decode(
-    Uint8Array.from(atob(s.replace(/\s/g, "")), c => c.charCodeAt(0)));
-}
-async function save() {
-  const tk = token();
-  if (!tk) { show("settings"); toast("Add a GitHub token first", true); return; }
-  const api = "https://api.github.com/repos/" + REPO + "/contents/" + TAGS_PATH;
-  const hdr = { Authorization: "Bearer " + tk,
-                Accept: "application/vnd.github+json" };
-  const btn = document.getElementById("savebtn");
-  btn.disabled = true;
-  try {
-    // read the CURRENT file first, so two devices merge instead of clobbering
-    let sha = null, remote = {};
-    const g = await fetch(api, { headers: hdr });
-    if (g.status === 200) {
-      const j = await g.json();
-      sha = j.sha;
-      try { remote = JSON.parse(b64decode(j.content)) || {}; } catch (e) { }
-    } else if (g.status !== 404) {
-      throw new Error("GitHub said " + g.status);
-    }
-    const merged = Object.assign({}, remote);
-    Object.keys(PENDING).forEach(id => {
-      const v = PENDING[id];
-      const empty = (!v.tags || !v.tags.length) && !v.add && !v.hide && !v.note;
-      if (empty) delete merged[id]; else merged[id] = v;
-    });
-    const body = {
-      message: "tags: " + pendingCount() + " change(s) from the app",
-      content: b64encode(JSON.stringify(merged, null, 1))
-    };
-    if (sha) body.sha = sha;
-    const p = await fetch(api,
-      { method: "PUT", headers: hdr, body: JSON.stringify(body) });
-    if (!p.ok) {
-      const j = await p.json().catch(() => ({}));
-      throw new Error(j.message || ("GitHub said " + p.status));
-    }
-    TAGS = merged;
-    PENDING = {};
-    lsSet("pending", {});
-    toast("Saved to GitHub");
-  } catch (e) {
-    toast(String(e.message || e), true);
-  } finally {
-    btn.disabled = false;
-    draw();
-  }
-}
-
 /* ---------- wiring ------------------------------------------------------ */
 async function init() {
-  PENDING = lsGet("pending", {});
   const v = "?v=" + BUILD;
   const r = await Promise.all([
     fetch("games.json" + v).then(x => x.json()),
@@ -1751,31 +1612,6 @@ async function init() {
     if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();
   });
-  document.getElementById("list").addEventListener("click", e => {
-    const row = e.target.closest("button.row");
-    if (row) openSheet(row.dataset.id);
-  });
-  document.getElementById("sh-tags").addEventListener("click", e => {
-    const b = e.target.closest("button");
-    if (b) toggleTag(b.dataset.tag);
-  });
-  document.getElementById("sh-add").addEventListener("click", () => {
-    const v = document.getElementById("sh-new").value.trim();
-    if (v) toggleTag(v);
-  });
-  document.getElementById("sh-inarch").addEventListener("click", e => {
-    if (!SHEET) return;
-    const on = e.currentTarget.dataset.on === "true";
-    const known = GAMES.some(x => x.id === SHEET.id);
-    setPending(SHEET.id, known ? { hide: on } : { add: !on }, SHEET);
-    openSheet(SHEET.id);
-  });
-  document.getElementById("sh-note").addEventListener("change", e => {
-    if (SHEET) setPending(SHEET.id, { note: e.target.value.trim() }, SHEET);
-  });
-  document.querySelectorAll(".done").forEach(b =>
-    b.addEventListener("click", hideAll));
-  document.getElementById("scrim").addEventListener("click", hideAll);
   // Clear Filters wipes everything, including the opening defaults -- it is
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
@@ -1784,23 +1620,7 @@ async function init() {
     draw();
     window.scrollTo({ top: 0 });
   });
-  document.getElementById("settingsbtn").addEventListener("click", () => {
-    document.getElementById("tokbox").value = token();
-    show("settings");
-  });
-  document.getElementById("savetok").addEventListener("click", () => {
-    try {
-      localStorage.setItem("gh_token",
-        document.getElementById("tokbox").value.trim());
-    } catch (e) { }
-    toast("Token saved on this device");
-    hideAll();
-  });
-  document.getElementById("savebtn").addEventListener("click", save);
   document.getElementById("goload").addEventListener("click", browseLoad);
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") hideAll();
-  });
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => { });
   }

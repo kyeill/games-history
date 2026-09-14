@@ -240,6 +240,20 @@ the Big Ten, then the other power leagues, then everyone else, where elsewhere
 the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 -- it is applied before the per-view filter, so it already worked.
 
+## tags.json
+
+**THE TAG EDITOR IS GONE** (his call 2026-09-14). He no longer edits tags by
+tapping a card, and everything downstream existed only to persist those edits,
+so all of it came out: the bottom sheet, the GitHub token in Settings, the
+unsaved-changes bar, the pending queue in localStorage, and `lsGet` / `lsSet` /
+`token` with them. A card is a `<div>` now rather than a `<button>` -- a
+control that does nothing is worse than no control.
+
+**tags.json IS STILL READ, and still matters.** It supplies the footer chips
+(B1G East, Home & Home, the show tags) and the handful of games that exist
+ONLY there, folded back in by `visible()`. GIT IS NOW THE ONLY WAY IT CHANGES.
+`STARTER_TAGS` in site.py is documentation of what it holds, nothing more.
+
 ## The Google Sheet
 
 **COLUMNS ARE READ BY NAME, and a missing one is simply blank.** `load_sheet`
