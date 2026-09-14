@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-121655";
+const BUILD = "20260914-122108";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1207,8 +1207,7 @@ function filterChips() {
     const NET_GROUPS = {
       CFB: [["FOX", "CBS", "NBC"],
             ["ABC", "ESPN", "ESPN2", "FS1", "BTN", "Peacock"]],
-      CBB: [["FOX", "CBS", "NBC", "ABC", "ESPN", "ESPN2", "FS1", "BTN",
-             "Peacock", "TBS", "TNT", "truTV"]]
+      CBB: [["FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "BTN", "Peacock"]]
     };
     // ...and a network whose only games are postseason never reaches the
     // dropdown, since choosing it could only ever return nothing
@@ -1221,7 +1220,8 @@ function filterChips() {
     const groups = NET_GROUPS[sport] || [];
     const namedNet = [].concat.apply([], groups);
     const restNet = Array.from(seenNet)
-      .filter(n => namedNet.indexOf(n) < 0).sort();
+      .filter(n => namedNet.indexOf(n) < 0)
+      .sort((x, y) => x.localeCompare(y, undefined, { sensitivity: "base" }));
     const netOpt = n => [n, n];
     let netOpts = [];
     groups.concat([restNet]).forEach(grp => {
