@@ -550,8 +550,12 @@ function michCard(g, p) {
     parts.push({ t: String(s), short: short || "", his: !!his });
     return true;                      // the array below only counts entries
   };
+  // the two venue names long enough to push the row onto a second line (his
+  // call 2026-09-13); the short form appears only when it has to
+  const PLACE_SHORT = { "Madison Square Garden": "MSG",
+                        "Little Caesars Arena": "LCA" };
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
-  if (place) bit(place);
+  if (place) bit(place, PLACE_SHORT[place]);
   if (g.event && !g.stage) bit(g.event);
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1)
     .forEach(t => bit(t, SERIES_SHORT[t]));
@@ -659,7 +663,11 @@ function michCard(g, p) {
   // the deeper version of it.
   const bword = String(mx.border || "").trim().toLowerCase();
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
-    : michColour(mx.border) || finalRing;
+    : michColour(mx.border) || finalRing ||
+      // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
+      // 2026-09-13), dashed when the game was lost
+      (g.preseason ? "#8a8a92" : null);
+  if (g.preseason && lost) cls += " predash";
   let ring = "";
   if (bc) {
     cls += " celebrate";

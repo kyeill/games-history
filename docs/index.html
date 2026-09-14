@@ -305,6 +305,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .tags.mdets{padding-right:0}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}
+/* a preseason tournament LOSS: the grey frame goes dashed (his call
+   2026-09-13), so a win and a loss in the same tournament read apart */
+.row.mich.predash{border-style:dashed}
 /* a bye / postseason tile: one card slot, slim on a phone */
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;
   padding:6px 10px;border:1px solid var(--line);border-radius:9px;color:#9fb6cf;
@@ -453,6 +456,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260913-202508"></script>
+<script src="app.js?v=20260913-204652"></script>
 </body>
 </html>
