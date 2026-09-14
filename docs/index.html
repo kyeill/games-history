@@ -307,9 +307,13 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a preseason tournament LOSS: the grey frame goes dashed (his call
    2026-09-13), so a win and a loss in the same tournament read apart */
 .row.mich.predash{border-style:dashed}
-/* a bye / postseason tile: one card slot, slim on a phone */
+/* a bye / postseason tile: one card slot, slim on a phone. It carries a FILL
+   (his call 2026-09-14) -- outlined alone it read as a hole punched in a
+   three-across desktop row. One step above the card, so the row reads as three
+   solid blocks and the bye is still the quietest of them. */
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;
-  padding:6px 10px;border:1px solid var(--line);border-radius:9px;color:#9fb6cf;
+  padding:6px 10px;background:#22222a;
+  border:1px solid var(--line);border-radius:9px;color:#9fb6cf;
   font-size:15.5px;font-weight:500;letter-spacing:.03em;text-transform:uppercase}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
@@ -455,6 +459,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260914-105952"></script>
+<script src="app.js?v=20260914-111049"></script>
 </body>
 </html>
