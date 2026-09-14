@@ -43,6 +43,11 @@ OVERRIDES = {
     "238": ("000000", "Vanderbilt: black, not the gold"),
     "277": ("002855", "West Virginia: navy, not the gold"),
     "2294": ("231f20", "Iowa: black, not the gold"),
+
+    # ...and the ONE exception to that rule, his call 2026-09-14: Notre Dame
+    # reads GOLD rather than ESPN's navy. Their #C99700 is an antique gold,
+    # dark enough that its wash does not read as Michigan's maize.
+    "87": ("c99700", "Notre Dame: he wants gold, not the navy"),
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),

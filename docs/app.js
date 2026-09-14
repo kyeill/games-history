@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-092340";
+const BUILD = "20260914-093441";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -429,15 +429,23 @@ function michCard(g, p) {
   const stageHead = () => {
     const yr = g.post || bigStage
       ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
-    const full = g.stage
-      .replace("Big Ten Tournament", "Big Ten")
+    let full = g.stage
       .replace(" | ", " ")
       .replace("Round 1", "First Round")
       .replace("Round 2", "Second Round")
       .replace("Semis", "Semifinals");
+    // FOOTBALL says GAME; BASKETBALL keeps the word Tournament, and its title
+    // game reads FINAL rather than Championship (his calls 2026-09-14)
+    if (g.sport === "CFB" && full === "Big Ten Championship") {
+      full = "Big Ten Championship Game";
+    }
+    full = full.replace("Big Ten Tournament Championship", "Big Ten Tournament Final");
     // the longest rounds against the longest cities run past his phone, so
-    // "NCAA TOURNAMENT" keeps a short form for trimMichChips to reach for
-    const brief = full.replace("NCAA Tournament ", "NCAA ");
+    // each of these keeps a short form for trimMichChips to reach for
+    const brief = full
+      .replace("NCAA Tournament ", "NCAA ")
+      .replace("Big Ten Tournament ", "Big Ten ")
+      .replace("Big Ten Championship Game", "Big Ten Championship");
     return yr + (brief !== full
       ? '<span class="hstage" data-short="' + esc(brief) + '">' + esc(full) + "</span>"
       : esc(full));
@@ -707,16 +715,11 @@ function michCard(g, p) {
   }
   // a postseason win, or a win over Ohio State, Michigan State or Notre Dame,
   // washes the WHOLE card in the opponent's colour instead of its stripe.
-  // A BIG TEN TOURNAMENT win is the exception (his call 2026-09-11): it only
-  // washes in a year the tournament was actually WON -- the same three seasons
-  // that capitalise -- or when the opponent is a rival. A run that ended short
-  // of the title is a win, not a championship, so it keeps its stripe.
-  const btt = (g.stage || "").indexOf("Big Ten Tournament") === 0;
-  const rival = RIVALS.indexOf(opp.id) > -1;
-  const bigWin = mx.shade !== undefined ? !!mx.shade
-    : !lost && (btt
-      ? (inList(CAPS_B1G_TOURN, g) || rival)
-      : !!(g.post || g.champ || rival));
+  // THE WASH IS HIS SHEET'S DECISION AND NOTHING ELSE (his call 2026-09-14).
+  // It used to fall back to rules of my own -- postseason, a conference title,
+  // a rival, a Big Ten Tournament won -- which he has now retired in favour of
+  // the Shade column. A season he has not filled in simply has no washes.
+  const bigWin = !!mx.shade;
   let cls = " mich mich-" + g.sport.toLowerCase() +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     (g.ot ? " ot" : "") +

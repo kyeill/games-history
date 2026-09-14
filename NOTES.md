@@ -27,7 +27,11 @@ one line at a 347px phone card, and `.sport` is `white-space: normal` with
 visible overflow, so a header that did NOT fit would wrap rather than clip --
 check the wrap, not an ellipsis.
 
-**HIS PHONE IS 402 CSS PIXELS WIDE -- MEASURE THERE, NOT ON A DESKTOP.**
+**HIS PHONE IS ROUGHLY 410 CSS PIXELS WIDE -- MEASURE THERE, NOT ON A
+DESKTOP.** First put at 402 from the two cards below; he then confirmed the
+Players Era footer keeps its TIME on his screen with about one character to
+spare, which needs 408, so 410 is the working figure. Audit at 402 for a safety
+margin and at 410 for what he actually sees.
 Calibrated 2026-09-14 from two cards he named as "essentially the max", and
 both land exactly on the limit at 402, which is what makes it trustworthy:
 
@@ -183,6 +187,18 @@ is added.
 every upcoming Michigan game from Key Games until it learned about `upcoming`
 (2026-09-14). This is the same trap as the washes and the strikethrough: "did
 not win" and "lost" are one test everywhere in this app.
+
+**THE WASH IS HIS SHEET'S DECISION AND NOTHING ELSE** (2026-09-14). `bigWin`
+used to fall back to rules of my own -- postseason, a conference title, a
+rival, a Big Ten Tournament actually won -- and he has retired all of them in
+favour of the Shade column. A season whose column is empty simply has no
+washes, which is why BASKETBALL currently shows none: only the football tab is
+filled in (194 games carry a value, 59 of them true). That is not a bug.
+`CAPS_B1G_TOURN` still drives CAPITALISATION, so it is not dead code.
+
+**NOTRE DAME WASHES GOLD**, the one exception to "yellow belongs to Michigan"
+in colors.py (2026-09-14). Their #C99700 is an antique gold, dark enough that
+its wash (#60563b) cannot be mistaken for maize.
 
 **THE GREY PLACEHOLDER BOX READS WHITE** (2026-09-14). A Michigan card he has
 given no uniform or box colours paints both bubbles #4a4a52 with white text,
