@@ -1488,6 +1488,28 @@ def harvest():
         g["mx"] = {k: v for k, v in mx.items() if v not in (None, "", {}, [])}
     print("  sheet matched %d Michigan games" % hits)
 
+    # THE PRESEASON TOURNAMENT (his call 2026-09-13): a NOVEMBER neutral-site
+    # event Michigan played more than once. That picks out exactly one per
+    # season -- Maui, Battle 4 Atlantis, the Legends Classic and the rest --
+    # and leaves the one-off neutral games alone, which is what separates a
+    # tournament from a showcase.
+    pre = collections.defaultdict(list)
+    for g in keep:
+        if (g.get("michigan") and g["sport"] == "CBB" and g.get("neutral")
+                and g["date"][5:7] == "11"):
+            key = (g["season"], g.get("event") or g.get("city")
+                   or g.get("venue") or "?")
+            pre[key].append(g)
+    n = 0
+    for key, games in pre.items():
+        if len(games) < 2:
+            continue
+        for g in games:
+            g["preseason"] = True
+            n += 1
+    print("  %d preseason-tournament games across %d seasons"
+          % (n, sum(1 for v in pre.values() if len(v) > 1)))
+
     # HIS LOCATIONS TAB decides which games carry a show chip (2026-09-13).
     # One host name per date is enough: no team plays twice in a day. A late
     # kickoff shifts the Eastern date, so the day either side is tried too.
