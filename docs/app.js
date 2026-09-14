@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-134251";
+const BUILD = "20260914-145350";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -12,7 +12,7 @@ let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 let BROWSE = null, TAB = "cfb", VIEW = "michigan";
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null,
-              net: null };
+              net: null, recent: false };
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -1048,6 +1048,12 @@ function visible() {
   // windows the button ticks, so it stacks with the window dropdown instead
   // of pretending to be it. Nothing rides along any more.
   if (FILT.marquee) list = list.filter(g => g.mq);
+  // HIS RECENT STRETCH (2026-09-14): football from 2021, basketball from the
+  // 2020-21 season -- which is season 2020 in the file, a basketball season
+  // being named for the year it starts in.
+  if (FILT.recent) {
+    list = list.filter(g => g.season >= (g.sport === "CFB" ? 2021 : 2020));
+  }
   if (FILT.windows && FILT.windows.length)
     list = list.filter(g =>
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
@@ -1209,7 +1215,8 @@ function filterChips() {
       netOpts = netOpts.concat(have.map(netOpt));
     });
     h += group("Network", select("net", "All Networks", netOpts, FILT.net));
-    return h + group("", sortButton());
+    return h + group("", '<button class="f" data-act="recent" aria-pressed="' +
+      !!FILT.recent + '">2021-onward</button>' + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
@@ -1574,7 +1581,7 @@ async function init() {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
         FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
-        FILT.net = null;
+        FILT.net = null; FILT.recent = false;
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
         FILT.post = false; FILT.winner = null;
         SORT = defaultSort();
@@ -1582,13 +1589,13 @@ async function init() {
         // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null;
+        FILT.net = null; FILT.recent = false;
         SORT = defaultSort();
       } else if (leaving === "rivals" || leaving === "michigan") {
         // leaving Rivals or Michigan puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null;
+        FILT.net = null; FILT.recent = false;
         if (leaving === "michigan") SORT = defaultSort();
       }
       draw();
@@ -1601,6 +1608,8 @@ async function init() {
       FILT.marquee = !FILT.marquee;
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
+    } else if (b.dataset.act === "recent") {
+      FILT.recent = !FILT.recent;
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }
@@ -1621,7 +1630,8 @@ async function init() {
   // the escape from "newest season + Marquee", not a reset to it.
   document.getElementById("clearbtn").addEventListener("click", () => {
     FILT = { season: null, week: null, month: null, type: null, windows: null,
-             team: null, marquee: false, rival: null, post: false, winner: null };
+             team: null, marquee: false, rival: null, post: false, winner: null,
+             net: null, recent: false };
     draw();
     window.scrollTo({ top: 0 });
   });

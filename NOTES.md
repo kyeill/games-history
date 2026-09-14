@@ -211,6 +211,13 @@ His call on the five that were left: VCU spells out; Utep, Njit, Unlv and Ucla
 stay in Proper case, and UCLA still goes up in capitals in the Big Ten years
 like every other Big Ten team.
 
+**THE "2021-ONWARD" TOGGLE** (2026-09-14) cuts football to 2021 and later and
+basketball to the 2020-21 season and later -- SEASON 2020 in the file, a
+basketball season being named for the year it starts in. That off-by-one is the
+whole subtlety. It composes with everything else rather than replacing it, so
+it narrows whatever is already on screen; 194 football cards become 72 and 530
+basketball ones become 205.
+
 **THE NETWORK FILTER IS A REGULAR-SEASON QUESTION** (2026-09-14). Asking for
 CBS is asking what he watched on CBS, not for the NCAA Tournament games CBS
 happened to carry, so any game with a STAGE is out -- a bowl, the CFP, the Big
