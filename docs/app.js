@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-091046";
+const BUILD = "20260914-092340";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -451,7 +451,15 @@ function michCard(g, p) {
     // fills it in, and then the header is simply the event
     // his Round column overrides whatever the bracket worked out
     const rnd = mx.round || g.mte_round || "";
-    when = esc(g.event || place) + (rnd ? " | " + esc(rnd) : "");
+    // the one event long enough to run past the header on its longer rounds;
+    // it keeps the full name wherever it fits (2026-09-14)
+    const EVENT_SHORT = {
+      "Fort Myers Tip-Off | Beach Division": "Fort Myers Tip-Off | Beach Div" };
+    const ev = g.event || place;
+    const evShort = EVENT_SHORT[ev];
+    when = (evShort
+      ? '<span data-short="' + esc(evShort) + '" data-trim="3">' + esc(ev) + "</span>"
+      : esc(ev)) + (rnd ? " | " + esc(rnd) : "");
   } else if (g.stage) {
     when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
@@ -764,13 +772,19 @@ function trimMichChips() {
   // than a row of them, so a wrap is measured by HEIGHT against the line box,
   // not by comparing children the way the footer does.
   document.querySelectorAll(".row.mich .sport").forEach(head => {
-    const s = head.querySelector("[data-short]");
-    if (!s) return;
-    if (s.dataset.full) s.textContent = s.dataset.full;
+    const shorts = Array.prototype.slice.call(head.querySelectorAll("[data-short]"));
+    if (!shorts.length) return;
+    shorts.forEach(s => { if (s.dataset.full) s.textContent = s.dataset.full; });
     const lh = parseFloat(getComputedStyle(head).lineHeight) || 19;
-    if (head.getBoundingClientRect().height <= lh * 1.5) return;
-    if (!s.dataset.full) s.dataset.full = s.textContent;
-    s.textContent = s.dataset.short;
+    const wrapped = () => head.getBoundingClientRect().height > lh * 1.5;
+    if (!wrapped()) return;
+    shorts.sort((a, b) => (+a.dataset.trim || 5) - (+b.dataset.trim || 5));
+    for (let i = 0; i < shorts.length; i++) {
+      const s = shorts[i];
+      if (!s.dataset.full) s.dataset.full = s.textContent;
+      s.textContent = s.dataset.short;
+      if (!wrapped()) return;
+    }
   });
   document.querySelectorAll(".row.mich .mdl").forEach(row => {
     const shorts = Array.prototype.slice.call(row.querySelectorAll("[data-short]"));
