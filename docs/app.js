@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-100147";
+const BUILD = "20260914-100912";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -480,10 +480,13 @@ function michCard(g, p) {
                        "Hall of Fame Tip-Off", "Roman Main Event",
                        "Players Era"];
     const wantPlace = MTE_PLACE.some(e => ev.indexOf(e) > -1);
+    // the location reads next to its EVENT and the round comes last (his call
+    // 2026-09-14) -- the opposite of a tournament card, where the round is
+    // part of the tournament's own name and the location closes the line
     when = (evShort
       ? '<span data-short="' + esc(evShort) + '" data-trim="3">' + esc(ev) + "</span>"
-      : esc(ev)) + (rnd ? " | " + esc(rnd) : "") +
-      (wantPlace && place ? " | " + esc(place) : "");
+      : esc(ev)) + (wantPlace && place ? " | " + esc(place) : "") +
+      (rnd ? " | " + esc(rnd) : "");
   } else if (g.stage) {
     when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;

@@ -480,10 +480,13 @@ function michCard(g, p) {
                        "Hall of Fame Tip-Off", "Roman Main Event",
                        "Players Era"];
     const wantPlace = MTE_PLACE.some(e => ev.indexOf(e) > -1);
+    // the location reads next to its EVENT and the round comes last (his call
+    // 2026-09-14) -- the opposite of a tournament card, where the round is
+    // part of the tournament's own name and the location closes the line
     when = (evShort
       ? '<span data-short="' + esc(evShort) + '" data-trim="3">' + esc(ev) + "</span>"
-      : esc(ev)) + (rnd ? " | " + esc(rnd) : "") +
-      (wantPlace && place ? " | " + esc(place) : "");
+      : esc(ev)) + (wantPlace && place ? " | " + esc(place) : "") +
+      (rnd ? " | " + esc(rnd) : "");
   } else if (g.stage) {
     when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;

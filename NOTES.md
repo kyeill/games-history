@@ -12,9 +12,12 @@ the place go UP, the date and the TV details come DOWN:
 | shape | header | third row |
 | --- | --- | --- |
 | tournament | `2026 NCAA ELITE EIGHT \| CHICAGO` | `SUN 3/29/26 \| CBS 2:15pm` |
-| MTE | `[nc7] PLAYERS ERA FESTIVAL \| FINAL \| LAS VEGAS` | `TNT 9:30pm \| 11/26/25` |
+| MTE | `[nc7] PLAYERS ERA FESTIVAL \| LAS VEGAS \| FINAL` | `TNT 9:30pm \| 11/26/25` |
 
-The MTE LOCATION sits in the header (2026-09-14), which is what leaves the
+The MTE LOCATION sits in the header BESIDE ITS EVENT, with the round last
+(2026-09-14) -- the opposite way round from a tournament card, where the round
+belongs to the tournament's own name and the location closes the line. This is
+what leaves, which is what leaves the
 third row able to spell the network, the time and the date out in full -- no
 MTE footer trims anything now. Only six events need a location at all: the NIT
 Tip-Off, the Legends Classic, the 2K Classic, the Hall of Fame Tip-Off, the
