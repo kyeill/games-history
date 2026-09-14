@@ -87,11 +87,11 @@
   },
   "401082449": {
     "event": "Hall of Fame Tip-Off",
-    "city": "CT"
+    "city": "Connecticut"
   },
   "401096969": {
     "event": "Hall of Fame Tip-Off",
-    "city": "CT"
+    "city": "Connecticut"
   },
   "401166090": {
     "event": "Battle 4 Atlantis"
@@ -188,5 +188,11 @@
   },
   "401716054": {
     "city": ""
+  },
+  "400915044": {
+    "city": "New York"
+  },
+  "400926410": {
+    "city": "New York"
   }
 }

@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-093441";
+const BUILD = "20260914-100147";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -439,13 +439,20 @@ function michCard(g, p) {
     if (g.sport === "CFB" && full === "Big Ten Championship") {
       full = "Big Ten Championship Game";
     }
-    full = full.replace("Big Ten Tournament Championship", "Big Ten Tournament Final");
+    full = full.replace("Big Ten Tournament Championship", "Big Ten Tournament Final")
+      // the early rounds ALWAYS drop the word, won or not (his call
+      // 2026-09-14) -- they are the longest labels and the least interesting
+      .replace("Big Ten Tournament First Round", "Big Ten First Round")
+      .replace("Big Ten Tournament Second Round", "Big Ten Second Round");
     // the longest rounds against the longest cities run past his phone, so
-    // each of these keeps a short form for trimMichChips to reach for
-    const brief = full
+    // each of these keeps a short form for trimMichChips to reach for. A Big
+    // Ten SEMIFINAL keeps the word and gives up the spelling instead.
+    let brief = full
       .replace("NCAA Tournament ", "NCAA ")
-      .replace("Big Ten Tournament ", "Big Ten ")
       .replace("Big Ten Championship Game", "Big Ten Championship");
+    brief = full === "Big Ten Tournament Semifinals"
+      ? "Big Ten Tournament Semis"
+      : brief.replace("Big Ten Tournament ", "Big Ten ");
     return yr + (brief !== full
       ? '<span class="hstage" data-short="' + esc(brief) + '">' + esc(full) + "</span>"
       : esc(full));
@@ -465,9 +472,18 @@ function michCard(g, p) {
       "Fort Myers Tip-Off | Beach Division": "Fort Myers Tip-Off | Beach Div" };
     const ev = g.event || place;
     const evShort = EVENT_SHORT[ev];
+    // THE LOCATION RIDES IN THE HEADER (his call 2026-09-14), which leaves the
+    // third row holding nothing but the network, the time and the date -- all
+    // spelled out. Only these events need one: the rest say where they are in
+    // their own names (Maui, Battle 4 Atlantis, Puerto Rico, Fort Myers).
+    const MTE_PLACE = ["NIT Tip-Off", "Legends Classic", "2K Classic",
+                       "Hall of Fame Tip-Off", "Roman Main Event",
+                       "Players Era"];
+    const wantPlace = MTE_PLACE.some(e => ev.indexOf(e) > -1);
     when = (evShort
       ? '<span data-short="' + esc(evShort) + '" data-trim="3">' + esc(ev) + "</span>"
-      : esc(ev)) + (rnd ? " | " + esc(rnd) : "");
+      : esc(ev)) + (rnd ? " | " + esc(rnd) : "") +
+      (wantPlace && place ? " | " + esc(place) : "");
   } else if (g.stage) {
     when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
@@ -632,9 +648,8 @@ function michCard(g, p) {
     bit(dateText);
     bit(tvTxt, netTxt, false, 4);
   } else if (mteCard) {
-    // the location leads on an MTE, and the date comes last
-    if (place) bit(place, PLACE_SHORT[place], false, 3);
-    // the network is the part he reads, so only the TIME goes (2026-09-13)
+    // the location has gone up into the header (2026-09-14), so this row holds
+    // the network, the time and the date, and has room to spell them out
     bit(tvTxt, netTxt, false, 4);
     bit(dateText);
   } else if (place) {

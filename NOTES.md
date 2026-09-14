@@ -12,7 +12,16 @@ the place go UP, the date and the TV details come DOWN:
 | shape | header | third row |
 | --- | --- | --- |
 | tournament | `2026 NCAA ELITE EIGHT \| CHICAGO` | `SUN 3/29/26 \| CBS 2:15pm` |
-| MTE | `[nc7] PLAYERS ERA FESTIVAL \| FINAL` | `Las Vegas \| TNT 9:30pm \| 11/26/25` |
+| MTE | `[nc7] PLAYERS ERA FESTIVAL \| FINAL \| LAS VEGAS` | `TNT 9:30pm \| 11/26/25` |
+
+The MTE LOCATION sits in the header (2026-09-14), which is what leaves the
+third row able to spell the network, the time and the date out in full -- no
+MTE footer trims anything now. Only six events need a location at all: the NIT
+Tip-Off, the Legends Classic, the 2K Classic, the Hall of Fame Tip-Off, the
+Roman Main Event and the Players Era Festival. The rest say where they are in
+their own names -- Maui, Battle 4 Atlantis, Puerto Rico, Fort Myers -- and show
+none. The BIG TEN first and second rounds always drop the word "Tournament";
+a semifinal keeps it and shortens to SEMIS instead.
 
 Every tournament header leads with the YEAR (2026-09-14). ESPN does not count
 the Big Ten Tournament as postseason, so `g.post` alone missed it and those
