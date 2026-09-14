@@ -14,15 +14,36 @@ the place go UP, the date and the TV details come DOWN:
 | tournament | `2026 NCAA ELITE EIGHT \| CHICAGO` | `SUN 3/29/26 \| CBS 2:15pm` |
 | MTE | `[nc7] PLAYERS ERA FESTIVAL \| FINAL` | `Las Vegas \| TNT 9:30pm \| 11/26/25` |
 
+Every tournament header leads with the YEAR (2026-09-14). ESPN does not count
+the Big Ten Tournament as postseason, so `g.post` alone missed it and those
+headers went bare; `bigStage` carries them now.
+
 The tournament shape covers the Big Ten Tournament, the NCAA Tournament, the
 NIT, the CFP and the Big Ten Championship -- `bigStage` in `michCard`. The
 ORDINARY BOWLS are deliberately out of it: a Citrus Bowl header already IS its
 location, so lifting the place would print the name twice.
 
 The MTE shape is `g.preseason`, the flag harvest sets on a November neutral-site
-event Michigan played more than once. The round after the event name comes from
-a **Round** column on his sheet -- blank until he fills it in, and then the
-header is simply the event.
+event Michigan played more than once.
+
+**THE MTE ROUND IS DERIVED, NOT TYPED** (his question 2026-09-14: did he need to
+supply them?). He does not -- an MTE bracket is fixed, so the round falls out of
+the ORDER of Michigan's games and whether it won them. Three games means an
+eight-team bracket, two means a four-team one:
+
+| games | won so far | round |
+| --- | --- | --- |
+| 3 | game 1 | `Quarters`, then `Semis`, then `Final` / `3rd Place` |
+| 3 | lost game 1 | `Quarters`, then `Consolation`, then `5th Place` / `7th Place` |
+| 2 | -- | `Semis`, then `Final` / `3rd Place` |
+
+The label names THE GAME, not the finish: Michigan lost the 2023 Battle 4
+Atlantis fifth-place game, so that card reads `5TH PLACE` and the team came
+sixth. The Players Era Festival is the one non-bracket -- pool play into a
+single placement game -- and is special-cased to `Pool`, `Pool`, `Final`.
+All 35 MTE games were checked against the real brackets.
+
+A **Round** column on his sheet still overrides any of it, game by game.
 
 When one of those rows would wrap, the TIME is what goes and the network stays
 (`bit(tvTxt, netTxt)`), which is why some MTE footers read `truTV` and others
@@ -32,8 +53,8 @@ except the 2012 Cowboys Classic.
 **THE NCAA TOURNAMENT SHOWS THE CITY, NOT THE VENUE.** `rules.display_city`
 swaps in the venue for the New York / LA / Chicago / Detroit metros, which made
 a Sweet Sixteen read "United Center" when he wants "Chicago".
-`rules.tourney_city` overrides it for NCAA Tournament games only. The 2020-21
-tournament is the exception -- every round was played in Indiana, so only the
+`rules.tourney_city` overrides it for the NCAA and Big Ten Tournaments
+(2026-09-14). The 2020-21 NCAA tournament is the exception -- every round was played in Indiana, so only the
 venue tells the rounds apart, and that season shows venues throughout.
 
 ESPN carries NO venue at all for the 2013 Sweet Sixteen and Elite Eight; both

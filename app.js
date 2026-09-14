@@ -420,8 +420,10 @@ function michCard(g, p) {
       (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
     : fmtDate(g.date);
   let when = p.when, right = shownDate;
+  // the year leads every tournament header (his call 2026-09-14) -- ESPN does
+  // not count the Big Ten Tournament as postseason, so `post` alone missed it
   const stageHead = () =>
-    (g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
+    (g.post || bigStage ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
     esc(g.stage.replace(" Tournament", "").replace(" | ", " "));
   if (bigStage) {
     // the round, then WHERE it was played; the date and the TV details have
@@ -430,7 +432,9 @@ function michCard(g, p) {
   } else if (mteCard) {
     // the event, then the round within it -- his Round column, blank until he
     // fills it in, and then the header is simply the event
-    when = esc(g.event || place) + (mx.round ? " | " + esc(mx.round) : "");
+    // his Round column overrides whatever the bracket worked out
+    const rnd = mx.round || g.mte_round || "";
+    when = esc(g.event || place) + (rnd ? " | " + esc(rnd) : "");
   } else if (g.stage) {
     when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;

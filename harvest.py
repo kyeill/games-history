@@ -1524,6 +1524,31 @@ def harvest():
     print("  %d preseason-tournament games across %d seasons"
           % (n, sum(1 for v in pre.values() if len(v) > 1)))
 
+    # THE ROUND INSIDE THE EVENT (his call 2026-09-14). He asked whether he had
+    # to type these in; he does not -- an MTE bracket is fixed, so the round
+    # falls out of the ORDER of Michigan's games and whether it won them.
+    #   three games = an eight-team bracket, two = a four-team one
+    # His Round column still wins wherever he disagrees (see michCard).
+    for key, games in pre.items():
+        if len(games) < 2:
+            continue
+        games.sort(key=lambda x: x["date"])
+        won = [any(t["id"] == "130" and t["win"] for t in g["teams"])
+               for g in games]
+        if len(games) >= 3:
+            # the Players Era Festival is POOL PLAY into one placement game,
+            # not a bracket -- the only such event he has played
+            pool = "Players Era" in (games[0].get("event") or "")
+            rounds = ["Pool" if pool else "Quarters",
+                      "Pool" if pool else ("Semis" if won[0] else "Consolation"),
+                      "Final" if won[0] and won[1]
+                      else "3rd Place" if won[0]
+                      else "5th Place" if won[1] else "7th Place"]
+        else:
+            rounds = ["Semis", "Final" if won[0] else "3rd Place"]
+        for g, r in zip(games, rounds):
+            g["mte_round"] = r
+
     # HIS LOCATIONS TAB decides which games carry a show chip (2026-09-13).
     # One host name per date is enough: no team plays twice in a day. A late
     # kickoff shifts the Eastern date, so the day either side is tried too.
