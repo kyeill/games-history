@@ -128,8 +128,15 @@ but only through a category that does not depend on the result -- which means
 BOTH TEAMS RANKED. Feeding the better rank in as the winner can never return an
 upset label ("anyone beats #1" needs the loser to be #1), so nothing is ever
 announced as an upset before it is played, and the daily rebuild re-files it
-once it has been. The show chips needed no change: the Locations matcher
-already ran over the upcoming games.
+once it has been. **A SHOW IS ITS OWN ADMISSION TO TV WINDOWS, and the upcoming path has to work
+that out for itself** (his catch 2026-09-14). The Locations matcher runs at the
+very END of the harvest, long after the upcoming loop has already dropped every
+game with no TV window -- so a game whose ONLY claim is hosting Big Noon
+Kickoff or College GameDay never reached the file at all. Kansas-Arizona State
+(FS1, noon, no window, Big Noon Kickoff) is the case that exposed it. The
+upcoming loop now matches `locs` itself before deciding to drop a game, and
+sets `show` from the same test the archive uses. I had told him the missing
+Kansas game was expected; it was not.
 
 The remaining hardcodes (`champ`, `title`, `show`, `bfri`, `opener`) really are
 unknowable before kickoff, but CHECK against the archive branch before assuming

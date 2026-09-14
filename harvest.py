@@ -1357,7 +1357,18 @@ def harvest():
             else:
                 slots = rules.cbb_slots(nets, d, all(q == bt_code for q in confs),
                                         ranked, bt_code in confs)
-            if not slots and not mich:
+            # A SHOW IS ITS OWN ADMISSION to TV Windows, the same as in the
+            # archive: a game whose only claim is hosting Big Noon Kickoff or
+            # College GameDay still belongs there. This has to be worked out
+            # HERE, because the Locations matcher runs long after the game
+            # would already have been dropped (his catch 2026-09-14).
+            names = frozenset(norm((k.get("team") or {}).get("location") or "")
+                              for k in cs)
+            show = any(names & {norm(v) for v in locs.get((code, dd), {}).values()}
+                       for dd in (d.date().isoformat(),
+                                  (d.date() - dt.timedelta(days=1)).isoformat(),
+                                  (d.date() + dt.timedelta(days=1)).isoformat()))
+            if not slots and not mich and not show:
                 continue          # nothing to show it under on TV Windows
             # MARQUEE, worked out the same way the archive does it -- this was
             # hardcoded False, which hid every upcoming game from the Marquee
@@ -1392,7 +1403,7 @@ def harvest():
                 "city": rules.display_city((v.get("address") or {}).get("city"),
                                            v.get("fullName")),
                 "post": False, "event": None, "bowl": None, "offsite": None,
-                "stage": None, "ot": False, "mq": marquee, "show": None,
+                "stage": None, "ot": False, "mq": marquee, "show": show,
                 "showcase": False, "opener": False, "bfri": False,
                 "kickoff": False, "suffix": None, "rivals": False,
                 "rivals_only": False, "rival_loss": False, "big": [],
