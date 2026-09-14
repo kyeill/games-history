@@ -479,10 +479,11 @@ function michCard(g, p) {
     // dropping them there lost the network and the time (his catch
     // 2026-09-13)
     when += tvBits;
-  } else {
-    // ...and where the label DOES name the network, the time still has to be
-    // here (his call 2026-09-14), appended to the back of it -- TV Windows
-    // leaves it out because the window implies it; this view never does.
+  } else if (g.sport === "CBB") {
+    // ...and where the label DOES name the network, BASKETBALL still shows the
+    // time (his call 2026-09-14), appended to the back of the label -- TV
+    // Windows leaves it out because the window implies it. Football keeps it
+    // off: that header already carries a week, a window and a date.
     when += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   }
   // no emoji in the header any more (his call 2026-09-13)

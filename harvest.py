@@ -1076,7 +1076,8 @@ def harvest():
                     suffix = rules.cbb_header_suffix(
                         nets, d, tourney=tourney, big_ten=(bt in confs),
                         espn_sat=x["id"] in espn_sat,
-                        both_big_ten=all(q == bt for q in confs))
+                        both_big_ten=all(q == bt for q in confs),
+                        ranked=any(ranks))
                 conf, head = rules.power5_title(heads, code)
                 title = rules.is_title_game(code, conf, head)
                 # a show broadcast from this game? match either side of the

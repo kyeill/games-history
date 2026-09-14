@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-114209";
+const BUILD = "20260914-114953";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -479,10 +479,11 @@ function michCard(g, p) {
     // dropping them there lost the network and the time (his catch
     // 2026-09-13)
     when += tvBits;
-  } else {
-    // ...and where the label DOES name the network, the time still has to be
-    // here (his call 2026-09-14), appended to the back of it -- TV Windows
-    // leaves it out because the window implies it; this view never does.
+  } else if (g.sport === "CBB") {
+    // ...and where the label DOES name the network, BASKETBALL still shows the
+    // time (his call 2026-09-14), appended to the back of the label -- TV
+    // Windows leaves it out because the window implies it. Football keeps it
+    // off: that header already carries a week, a window and a date.
     when += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   }
   // no emoji in the header any more (his call 2026-09-13)

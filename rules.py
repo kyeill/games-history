@@ -618,7 +618,7 @@ def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
 
 
 def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
-                      both_big_ten=False):
+                      both_big_ten=False, ranked=False):
     """The label on a basketball card. Not a window -- the cards carry no
     window chips at all -- just a name for the slot.
 
@@ -652,6 +652,13 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
         for n in ("NBC", "ABC"):
             if n in nets:
                 return n + " " + DAY_FULL[d.weekday()]
+    # PEACOCK names its day as well (his call 2026-09-14) -- the Big Ten's
+    # weeknight package, and the one Michigan actually plays in, where ESPN's
+    # Big Monday and Super Tuesday below have never caught it. The bracket is
+    # the B1G Peacock window's own, so the two cannot disagree.
+    if (any("Peacock" in n for n in nets) and both_big_ten
+            and day in ("Tue", "Thu") and ranked):
+        return "Peacock " + DAY_FULL[d.weekday()]
     # the same brackets the windows use, so a card's label and its window
     # can never disagree
     # The ESPN Saturday WINDOW takes every 6:00-9:30pm game; this LABEL goes

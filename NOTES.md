@@ -170,10 +170,19 @@ WHOLE header -- and it no longer waits on a Big Ten team. Only the four
 broadcast networks have a tint (ABC, CBS, FOX, NBC), which is why 75 of 530
 basketball cards colour and the ESPN and BTN games do not.
 
-**AND THE TIME ALWAYS SHOWS HERE.** A window label names its own network, so
-TV Windows leaves the time off as implied; this view appends it to the back of
-the label instead -- "FOX FRIDAY 8:00PM", "WEEK 2 | FOX BIG NOON 12:00PM".
-Measured after: no header or footer wraps in either sport.
+**AND THE TIME ALWAYS SHOWS HERE -- IN BASKETBALL.** A window label names its
+own network, so TV Windows leaves the time off as implied; this view appends it
+to the back of the label instead, "FOX FRIDAY 8:00PM". FOOTBALL does not: that
+header already carries a week, a window and a date (his call 2026-09-14).
+
+**PEACOCK NAMES ITS DAY** (2026-09-14). He asked after ESPN's Big Monday and
+Super Tuesday: those labels exist in `cbb_header_suffix` already, Michigan has
+simply never played one. Its weeknight Big Ten package is Peacock, so those
+cards read "PEACOCK TUESDAY" / "PEACOCK THURSDAY" on EXACTLY the bracket the
+B1G Peacock window uses -- two Big Ten teams, Tuesday or Thursday, someone
+ranked. Nine cards take it; a December game keeps "DECEMBER TUESDAY", and a
+Peacock game outside the bracket keeps the plain day, which is why one or two
+read "TUESDAY | PEACOCK" instead. Label and window agree on all 530 cards.
 
 **THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
 #8a8a92 goes on a preseason-tournament game (dashed on a loss) and now on any
