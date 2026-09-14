@@ -444,6 +444,8 @@ def load_sheet():
                    "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
             out[(code, season, date)] = {
                 "name": cell("opponent"), "attended": bool(cell("attended")),
+                # his CASE column: "UPPER" puts the opponent in capitals
+                "case": cell("case"),
                 "shade": bool(cell("shade")), "border": cell("border"),
                 "note": cell("notes") or cell("note"),
                 "footer": cell("footer"), "box": box,
@@ -452,7 +454,7 @@ def load_sheet():
                 "round": cell("round"),
             }
             flags = used.setdefault((code, season), set())
-            for label, flag in (("attended", "attended"), ("shade", "shade"),
+            for label, flag in (("case", "case"), ("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
                                 ("note", "note"), ("footer", "footer"),
                             ("round", "round")):
@@ -1476,39 +1478,21 @@ def harvest():
     sheet, sheet_used = load_sheet()
 
     def sheet_case(g):
-        """His column C as a CASE instruction, or None when it says nothing.
+        """His CASE column, or None where he has not said (2026-09-14).
 
-        Only meaningful where MY name is not itself an acronym: "UNLV" against
-        my "Unlv" is a real signal, "UCLA" against my "UCLA" is not -- ESPN
-        writes those in capitals whatever he intends.
+        This used to INFER the answer from whether his opponent cell was
+        written in capitals, which cannot tell "capitalise this" from a school
+        whose name IS an acronym -- it broke on UNLV and again on VCU. He now
+        says so in a column of its own, so nothing is guessed.
         """
         row = sheet.get((g["sport"], g["season"], g["date"]))
         if not row:
             return None
-        opp = next(t["id"] for t in g["teams"] if t["id"] != rules.MICHIGAN)
-        mine = (teams.get(opp) or {}).get("short") or ""
-        if not mine or mine == mine.upper():
-            return None
-        core = re.sub(r"^(at |vs\. )", "", row["name"]).strip()
-        letters = [c for c in core if c.isalpha()]
-        if not letters:
-            return None
-        # ...and the same question about HIS cell: where he wrote the school's
-        # ACRONYM he wrote a NAME, not a case. Spelling VCU out as "Virginia
-        # Commonwealth" made my side ordinary, at which point his "VCU" started
-        # reading as a demand for capitals (caught 2026-09-14).
-        espn = (teams.get(opp) or {}).get("name") or ""
-        head = espn.split(" ")[0]
-        if head.isalpha() and head.isupper() and core.upper() == head:
-            return None
-        return "Y" if all(c.isupper() for c in letters) else "N"
+        said = (row.get("case") or "").strip().upper()
+        if not said:
+            return None                 # blank leaves app.js's own scopes alone
+        return "Y" if said == "UPPER" else "N"
 
-    # CAPITALS ARE PER SEASON, like every other column: a season he has not
-    # marked keeps the rules it has (the championship scopes in app.js).
-    # Without this gate every unmarked row read as "not capitals" and the
-    # basketball seasons lost all 85 of theirs (caught 2026-09-13).
-    caps_seasons = {(g["sport"], g["season"]) for g in keep
-                    if g.get("michigan") and sheet_case(g) == "Y"}
     hits = 0
     for g in keep:
         if not g.get("michigan"):
@@ -1519,10 +1503,9 @@ def harvest():
         hits += 1
         flags = sheet_used.get((g["sport"], g["season"]), set())
         mx = g.setdefault("mx", {})
-        if (g["sport"], g["season"]) in caps_seasons:
-            case = sheet_case(g)
-            if case:
-                mx["caps"] = case
+        case = sheet_case(g)
+        if case:
+            mx["caps"] = case
         if "attended" in flags:
             mx["attended"] = row["attended"]
         if "shade" in flags:

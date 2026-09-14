@@ -145,18 +145,25 @@ out, in the header and the third row alike; every other date stays in slashes.
 Three games in the archive fall on it, two of them wins. I first read "a win
 on 9/21" as every win and spelled out all of them -- it means that DAY.
 
-**THE ACRONYM TRAP RUNS BOTH WAYS.** ALL CAPS is his marking for a win in a
+**HIS CASE COLUMN SAYS WHO GOES UP IN CAPITALS** (2026-09-14). "UPPER" means
+capitals, anything else means Proper Case, and a BLANK says nothing at all --
+it leaves the scopes in app.js (`CAPS_ALL` and friends) to decide. The two
+agree exactly today: 109 cards are marked UPPER and 109 render that way, with
+no card capitalised that he did not ask for. The "at " / "vs. " prefix is a
+separate span and never takes the capitals.
+
+This RETIRED the inference described below, which had to guess from whether his
+opponent cell was written in capitals and got it wrong twice. Keep the history:
+
+**THE ACRONYM TRAP RAN BOTH WAYS.** ALL CAPS is his marking for a win in a
 capitalised season, so a school whose name IS an acronym is ambiguous, and
 `sheet_case` has to tell a name from a case. It first asked only whether MY
 display name was an acronym -- "UNLV" against my "Unlv" is a real instruction,
 "UCLA" against my "UCLA" is not. Spelling VCU out as "Virginia Commonwealth"
 (2026-09-14) made my side ordinary, at which point his "VCU" read as a demand
-for capitals and the card came back VIRGINIA COMMONWEALTH. The guard now also
-asks about HIS cell: where he wrote the school's ACRONYM -- matched against the
-first word of ESPN's displayName -- he wrote a NAME, not a case. Ten rows are
-suppressed this way (UCLA x6, VCU x2, NJIT, UNLV) and none of them lost a
-capital that mattered: the 2023 UNLV game still capitalises through `CAPS_ALL`
-in app.js, which does not consult the sheet at all.
+for capitals and the card came back VIRGINIA COMMONWEALTH. Both guards are now moot -- the Case
+column states the answer outright -- and the two cards the guessing could never
+get right, UNLV in 2023 and UCLA in 2025-26, are the two it now gets right.
 
 His call on the five that were left: VCU spells out; Utep, Njit, Unlv and Ucla
 stay in Proper case, and UCLA still goes up in capitals in the Big Ten years
