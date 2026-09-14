@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-111650";
+const BUILD = "20260914-112141";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -840,7 +840,8 @@ function michListHtml(list) {
       gaps.push("Postseason");
     } else if (!post(a) && a.sport === "CFB") {
       for (let d = lo + 4; d <= hi - 4; d++)
-        if (new Date(d * 864e5).getUTCDay() === 6) gaps.push("Bye \u00b7 " + fmtDate(iso(d)));
+        if (new Date(d * 864e5).getUTCDay() === 6)
+          gaps.push("Bye Week (" + fmtDate(iso(d)) + ")");
       if (SORT !== "asc") gaps.reverse();
     }
     gaps.forEach(t => out.push(tile(t)));

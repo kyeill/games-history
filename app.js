@@ -840,7 +840,8 @@ function michListHtml(list) {
       gaps.push("Postseason");
     } else if (!post(a) && a.sport === "CFB") {
       for (let d = lo + 4; d <= hi - 4; d++)
-        if (new Date(d * 864e5).getUTCDay() === 6) gaps.push("Bye \u00b7 " + fmtDate(iso(d)));
+        if (new Date(d * 864e5).getUTCDay() === 6)
+          gaps.push("Bye Week (" + fmtDate(iso(d)) + ")");
       if (SORT !== "asc") gaps.reverse();
     }
     gaps.forEach(t => out.push(tile(t)));
