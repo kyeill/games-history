@@ -163,6 +163,18 @@ ever go missing, the answer is in the Case column, not in the code.
 This RETIRED the inference described below, which had to guess from whether his
 opponent cell was written in capitals and got it wrong twice. Keep the history:
 
+**A TOURNAMENT HEADER WEARS ITS TOURNAMENT'S COLOUR** (2026-09-14): Big Ten
+blue for the Big Ten Championship Game and the Big Ten Tournament, CFP gold for
+the CFP, NCAA blue for the NCAA -- the same three the championship rings and
+the divider tiles use, with NCAA blue lightened to #4d9ae0 so it reads on the
+card. It beats the window tint below, which those cards do not have anyway.
+
+**NO NETWORK MEANS NO NETWORK.** ESPN lists no broadcast for 20 basketball
+games -- early-season ones against small schools -- and the card used to print
+an em dash where the network goes. It shows the TIME alone now (2026-09-14).
+The footer's copy had the opposite bug: with no network it dropped the time as
+well, so an MTE read "Bahamas | 11/26/15".
+
 **ON THIS CARD A HEADER COLOUR IS ALL OR NOTHING** (2026-09-14). Elsewhere the
 network cell carries the network's tint on its own; here that read as an
 accident rather than a signal, so whatever colour the card earns paints the
@@ -216,7 +228,9 @@ basketball to the 2020-21 season and later -- SEASON 2020 in the file, a
 basketball season being named for the year it starts in. That off-by-one is the
 whole subtlety. It composes with everything else rather than replacing it, so
 it narrows whatever is already on screen; 194 football cards become 72 and 530
-basketball ones become 205.
+basketball ones become 205. While it is on the Year list drops the seasons it
+hides, since picking one could only return nothing, and it SURVIVES a view
+switch -- only Clear Filters puts it back.
 
 **THE NETWORK FILTER IS A REGULAR-SEASON QUESTION** (2026-09-14). Asking for
 CBS is asking what he watched on CBS, not for the NCAA Tournament games CBS

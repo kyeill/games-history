@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-145350";
+const BUILD = "20260914-150129";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -364,9 +364,13 @@ function michCard(g, p) {
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
   // the network and time as plain text, for the third row of those two shapes
   const netTxt = primaryNet(g.nets);
-  const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : "";
-  const tvBits = ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
-    "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
+  const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : fmtTime(g.time);
+  // ESPN lists no broadcast at all for 20 basketball games -- early-season
+  // ones against small schools. They now show the TIME alone rather than an
+  // em dash standing in for a network (his call 2026-09-14).
+  const tvBits = ' | ' +
+    (netTxt ? '<span' + col(p.netCol) + ">" + esc(netTxt) + "</span> " : "") +
+    '<span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   // SEPTEMBER 21 is his date: a Michigan WIN that day spells itself out --
   // "Sep 21, 2024" -- in the header and in the third row alike. Every other
   // date stays in slashes (his call 2026-09-13).
@@ -748,9 +752,16 @@ function michCard(g, p) {
     cls += " celebrate";
     ring = ";--celeb:" + bc + ";--celebring:" + bc + "44";
   }
+  // A TOURNAMENT HEADER WEARS ITS TOURNAMENT'S COLOUR (his call 2026-09-14),
+  // the same three the championship rings and the divider tiles use. NCAA blue
+  // is lightened to read on the card, exactly as it is on a tile.
+  const stageCol = !bigStage ? null
+    : st.indexOf("Big Ten") === 0 ? "#0088ce"
+    : st.indexOf("NCAA Tournament") === 0 ? "#4d9ae0"
+    : st.indexOf("CFP") === 0 ? "#c28c19" : null;
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
-    '<div class="sport"' + col(p.headCol) + "><span>" + head +
+    '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
       (dateDown ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
@@ -1158,8 +1169,13 @@ function filterChips() {
   const viewSeasons = Array.from(new Set(GAMES.filter(g => g.sport === sport &&
     (VIEW === "rivals" ? rivalsAllows(g)
       : VIEW === "michigan" ? g.michigan : !g.rivals_only)).map(g => g.season)));
+  // ...and while "2021-Onward" is on, the years it hides are not offered
+  // either (his call 2026-09-14) -- picking one could only return nothing
+  const yearFloor = sport === "CFB" ? 2021 : 2020;
+  const yearList = FILT.recent
+    ? viewSeasons.filter(y => y >= yearFloor) : viewSeasons;
   let h = group("Year", select("season", "All Years",
-    viewSeasons.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
+    yearList.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
   // MICHIGAN (trial, 2026-09-11): Year, the OPPONENT and the sort.
   // Michigan is in every game on this view, so the Team filter lists who it
@@ -1216,7 +1232,7 @@ function filterChips() {
     });
     h += group("Network", select("net", "All Networks", netOpts, FILT.net));
     return h + group("", '<button class="f" data-act="recent" aria-pressed="' +
-      !!FILT.recent + '">2021-onward</button>' + sortButton());
+      !!FILT.recent + '">2021-Onward</button>' + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
@@ -1581,7 +1597,7 @@ async function init() {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
         FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
-        FILT.net = null; FILT.recent = false;
+        FILT.net = null;
         FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
         FILT.post = false; FILT.winner = null;
         SORT = defaultSort();
@@ -1589,13 +1605,13 @@ async function init() {
         // the Michigan view opens on its newest season, in schedule order
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null; FILT.recent = false;
+        FILT.net = null;
         SORT = defaultSort();
       } else if (leaving === "rivals" || leaving === "michigan") {
         // leaving Rivals or Michigan puts back the season a normal view opens on
         FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
         FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null; FILT.recent = false;
+        FILT.net = null;
         if (leaving === "michigan") SORT = defaultSort();
       }
       draw();
