@@ -4,6 +4,42 @@ Each of these cost a debugging pass or would have. Do not rediscover them.
 
 ## The Michigan card
 
+**WHERE A CARD PUTS ITS PIECES** (his call 2026-09-13). Most cards read
+`[nc7] WEEK 1 | PEACOCK 12:00PM | 9/5/26` up top and the location, the event
+and his tags down in the third row. TWO SHAPES INVERT THAT -- the round and
+the place go UP, the date and the TV details come DOWN:
+
+| shape | header | third row |
+| --- | --- | --- |
+| tournament | `2026 NCAA ELITE EIGHT \| CHICAGO` | `SUN 3/29/26 \| CBS 2:15pm` |
+| MTE | `[nc7] PLAYERS ERA FESTIVAL \| FINAL` | `Las Vegas \| TNT 9:30pm \| 11/26/25` |
+
+The tournament shape covers the Big Ten Tournament, the NCAA Tournament, the
+NIT, the CFP and the Big Ten Championship -- `bigStage` in `michCard`. The
+ORDINARY BOWLS are deliberately out of it: a Citrus Bowl header already IS its
+location, so lifting the place would print the name twice.
+
+The MTE shape is `g.preseason`, the flag harvest sets on a November neutral-site
+event Michigan played more than once. The round after the event name comes from
+a **Round** column on his sheet -- blank until he fills it in, and then the
+header is simply the event.
+
+When one of those rows would wrap, the TIME is what goes and the network stays
+(`bit(tvTxt, netTxt)`), which is why some MTE footers read `truTV` and others
+`TNT 9:30pm`. Measured at a 378px card: every Michigan card fits on one line
+except the 2012 Cowboys Classic.
+
+**THE NCAA TOURNAMENT SHOWS THE CITY, NOT THE VENUE.** `rules.display_city`
+swaps in the venue for the New York / LA / Chicago / Detroit metros, which made
+a Sweet Sixteen read "United Center" when he wants "Chicago".
+`rules.tourney_city` overrides it for NCAA Tournament games only. The 2020-21
+tournament is the exception -- every round was played in Indiana, so only the
+venue tells the rounds apart, and that season shows venues throughout.
+
+ESPN carries NO venue at all for the 2013 Sweet Sixteen and Elite Eight; both
+are pinned to Arlington in `game-overrides.json`.
+
+
 **THE STRIPE RULE** (his Footer column = "Stripe"), written down because he
 expects to change it again (2026-09-13). Blue is #003d7a, maize #ffcb05, and
 the alternation always STARTS BLUE:
@@ -20,6 +56,12 @@ Three games in the archive fall on it, two of them wins. I first read "a win
 on 9/21" as every win and spelled out all of them -- it means that DAY.
 
 ## The Google Sheet
+
+**COLUMNS ARE READ BY NAME, and a missing one is simply blank.** `load_sheet`
+maps header text to an index and `cell()` answers "" for anything it cannot
+find, so a NEW COLUMN costs no code -- he adds it, the next build picks it up.
+That is how **Round** works: `mx.round` fills the MTE header after the event
+name, and until the column exists every MTE header is just the event.
 
 **gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
 headers are "2025-26", "2024-25" and so on; gviz typed those columns as DATES

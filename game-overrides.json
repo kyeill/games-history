@@ -16,15 +16,15 @@
   },
   "313250235": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "313260150": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "313270026": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "323170130": {
     "event": "NIT Tip-Off"
@@ -34,23 +34,23 @@
   },
   "323260221": {
     "event": "NIT Tip-Off",
-    "city": ""
+    "city": "New York"
   },
   "323280130": {
     "event": "NIT Tip-Off",
-    "city": ""
+    "city": "New York"
   },
   "400502928": {
     "event": "Puerto Rico Tip-Off",
-    "city": ""
+    "city": "San Juan"
   },
   "400518717": {
     "event": "Puerto Rico Tip-Off",
-    "city": ""
+    "city": "San Juan"
   },
   "400518935": {
     "event": "Puerto Rico Tip-Off",
-    "city": ""
+    "city": "San Juan"
   },
   "400827676": {
     "event": "Battle 4 Atlantis",
@@ -69,15 +69,15 @@
   },
   "400986374": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "401000094": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "401000097": {
     "event": "Maui Invitational",
-    "city": ""
+    "city": "Maui"
   },
   "401082446": {
     "event": "Hall of Fame Tip-Off"
@@ -122,11 +122,11 @@
   },
   "401706905": {
     "event": "Fort Myers Tip-Off - Beach Div",
-    "city": ""
+    "city": "Fort Myers"
   },
   "401729802": {
     "event": "Fort Myers Tip-Off - Beach Div",
-    "city": ""
+    "city": "Fort Myers"
   },
   "313330258": {
     "event": "Big Ten/ACC Challenge"
@@ -172,6 +172,12 @@
   },
   "401574571": {
     "event": "Gavitt Games",
-    "city": ""
+    "city": "New York"
+  },
+  "330882305": {
+    "city": "Arlington"
+  },
+  "330900057": {
+    "city": "Arlington"
   }
 }

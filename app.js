@@ -394,6 +394,21 @@ function michCard(g, p) {
   // STAGE card drops its own bar and the word "Tournament", takes the TV
   // details after the bar instead, and moves its day beside the date:
   // "2026 NCAA ROUND 1 | CBS 7:30PM" ... "THU 3/19/26".
+  // WHERE A CARD PUTS ITS PIECES (his call 2026-09-13). Two shapes lift the
+  // ROUND and the PLACE into the header and drop the date and the TV details
+  // into the third row:
+  //   a tournament  "2026 NCAA ELITE EIGHT | CHICAGO"    "SUN 3/29/26 | CBS 2:15PM"
+  //   an MTE        "[nc7] PLAYERS ERA FESTIVAL | FINAL" "Las Vegas | TNT 9:30 | 11/26/25"
+  // The ordinary bowls stay out of this set: a Citrus Bowl header already IS
+  // its location, and lifting it would print the name twice.
+  const TOURNEY = ["Big Ten Tournament", "NCAA Tournament", "NIT ", "CFP ",
+                   "Big Ten Championship"];
+  const bigStage = !!g.stage && TOURNEY.some(s => g.stage.indexOf(s) === 0);
+  const mteCard = !!g.preseason && !g.stage;
+  const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
+  // the network and time as plain text, for the third row of those two shapes
+  const netTxt = primaryNet(g.nets);
+  const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : "";
   const tvBits = ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
     "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   // SEPTEMBER 21 is his date: a Michigan WIN that day spells itself out --
@@ -405,9 +420,19 @@ function michCard(g, p) {
       (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
     : fmtDate(g.date);
   let when = p.when, right = shownDate;
-  if (g.stage) {
-    const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
-    when = year + esc(g.stage.replace(" Tournament", "").replace(" | ", " ")) + tvBits;
+  const stageHead = () =>
+    (g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
+    esc(g.stage.replace(" Tournament", "").replace(" | ", " "));
+  if (bigStage) {
+    // the round, then WHERE it was played; the date and the TV details have
+    // gone down to the third row
+    when = stageHead() + (place ? " | " + esc(place) : "");
+  } else if (mteCard) {
+    // the event, then the round within it -- his Round column, blank until he
+    // fills it in, and then the header is simply the event
+    when = esc(g.event || place) + (mx.round ? " | " + esc(mx.round) : "");
+  } else if (g.stage) {
+    when = stageHead() + tvBits;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
   } else if (!g.header || /^December /.test(g.header)) {
     // a window label already names its network ("FOX PRIMETIME"), so the TV
@@ -553,10 +578,24 @@ function michCard(g, p) {
   // the two venue names long enough to push the row onto a second line (his
   // call 2026-09-13); the short form appears only when it has to
   const PLACE_SHORT = { "Madison Square Garden": "MSG",
-                        "Little Caesars Arena": "LCA" };
-  const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
-  if (place) bit(place, PLACE_SHORT[place]);
-  if (g.event && !g.stage) bit(g.event);
+                        "Little Caesars Arena": "LCA",
+                        "Barclays Center": "Brooklyn" };
+  if (bigStage) {
+    // the date leads and the TV details follow it -- the reverse of an
+    // ordinary card, where both sit up in the header (his call 2026-09-13)
+    bit(dateText);
+    bit(tvTxt, netTxt);
+  } else if (mteCard) {
+    // the location leads on an MTE, and the date comes last
+    if (place) bit(place, PLACE_SHORT[place]);
+    // when the row wraps the TIME is what goes -- the network is the part he
+    // reads (2026-09-13)
+    bit(tvTxt, netTxt);
+    bit(dateText);
+  } else if (place) {
+    bit(place, PLACE_SHORT[place]);
+  }
+  if (g.event && !g.stage && !mteCard) bit(g.event);
   mine.filter(t => SERIES_FAMILY.indexOf(t) > -1)
     .forEach(t => bit(t, SERIES_SHORT[t]));
   const shows = showsOf(g);
@@ -590,8 +629,12 @@ function michCard(g, p) {
   // B1G East" -- but a location, a show or a series tag is worth the row on
   // its own, and then the date stays up in the header. An empty row counts as
   // nothing, so the date fills it.
-  const dateDown = parts.every(q => q.his);
-  if (dateDown) parts.unshift({ t: dateText, short: "", his: false });
+  // ...and on a tournament or an MTE card it is ALWAYS down there, placed
+  // above in the order he asked for, so the header must not print it again
+  const dateDown = bigStage || mteCard || parts.every(q => q.his);
+  if (dateDown && !bigStage && !mteCard) {
+    parts.unshift({ t: dateText, short: "", his: false });
+  }
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '"' : "") +
     (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";

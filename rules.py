@@ -94,6 +94,19 @@ FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2"
 CITY_NOT_VENUE = {"Credit Union 1 Arena"}
 
 
+def tourney_city(city, venue, stage, season):
+    """The location on an NCAA Tournament card: the CITY, never the venue --
+    a Sweet Sixteen belongs to Chicago, not to the United Center (his call
+    2026-09-13). The 2020-21 tournament is the exception: every round was in
+    Indiana, so only the venue separates them.
+    """
+    if stage and stage.startswith("NCAA Tournament"):
+        if season == 2020:
+            return venue or CITY_OVERRIDES.get(city, city)
+        return CITY_OVERRIDES.get(city, city)
+    return display_city(city, venue)
+
+
 def display_city(city, venue=None):
     if city in VENUE_METROS and venue and venue not in CITY_NOT_VENUE:
         return venue

@@ -447,11 +447,15 @@ def load_sheet():
                 "shade": bool(cell("shade")), "border": cell("border"),
                 "note": cell("notes") or cell("note"),
                 "footer": cell("footer"), "box": box,
+                # the round inside a multi-team event ("Final", "Semis"), from
+                # a Round column he may not have added yet -- "" until he does
+                "round": cell("round"),
             }
             flags = used.setdefault((code, season), set())
             for label, flag in (("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
-                                ("note", "note"), ("footer", "footer")):
+                                ("note", "note"), ("footer", "footer"),
+                            ("round", "round")):
                 if cell(label):
                     flags.add(flag)
             if any(box.values()):
@@ -1247,10 +1251,16 @@ def harvest():
                                            big_ten=(bt in confs),
                                            tourney=tourney),
                     "offsite": offsite.get(x["id"]),
+                    # THE NCAA TOURNAMENT SHOWS THE CITY (his call
+                    # 2026-09-13): the venue-for-metro rule makes a Sweet
+                    # Sixteen read "United Center" when he wants "Chicago".
+                    # 2020-21 is the exception -- that whole tournament was in
+                    # Indiana, so only the venue tells the rounds apart.
                     "city": (game_over[x["id"]]["city"]
                              if "city" in game_over.get(x["id"], {})
-                             else rules.display_city(
-                                 (v.get("address") or {}).get("city"), v.get("fullName"))),
+                             else rules.tourney_city(
+                                 (v.get("address") or {}).get("city"),
+                                 v.get("fullName"), stage_txt, y)),
                     "nets": sorted(nets), "teams": side,
                     "header": (rules.cfb_header(card_slots, d, forced,
                                                 season=y, week=week_no)
