@@ -341,7 +341,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .mgap{display:flex;align-items:center;justify-content:center;min-height:38px;
   padding:6px 10px;background:#22222a;
   border:1px solid var(--line);border-radius:9px;color:var(--ink);
-  font-size:15.5px;font-weight:500;letter-spacing:.03em;text-transform:uppercase}
+  font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
 /* Dense: network over time, small, inside one team line -- side by side they
