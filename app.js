@@ -845,11 +845,14 @@ function michListHtml(list) {
       : st.indexOf("NCAA Tournament") === 0 ? "NCAA Tournament"
       : st.indexOf("NIT") === 0 ? "National Invitation Tournament" : "";
   };
+  const asc = SORT === "asc";
   const out = [];
-  // Each tile labels the block BELOW it, so a run that opens the list needs one
-  // before the first card -- which is the NCAA Tournament whenever he is
-  // sorting newest first.
-  if (list[0].sport === "CBB" && phase(list[0])) out.push(tile(phase(list[0])));
+  // A TILE MARKS WHERE THE TOURNAMENT BEGAN, not where the block starts on
+  // screen (his call 2026-09-14). Oldest first that is above its games;
+  // NEWEST first it is BELOW them -- the 2025-26 NCAA tile reads after Howard,
+  // the first-round game, rather than above the championship. The two edges of
+  // the list need it too, for a filter that leaves a run unbounded.
+  if (asc && list[0].sport === "CBB" && phase(list[0])) out.push(tile(phase(list[0])));
   out.push(cards[0]);
   for (let i = 1; i < list.length; i++) {
     const a = list[i - 1], b = list[i];
@@ -858,9 +861,10 @@ function michListHtml(list) {
     if (a.sport === "CBB") {
       // basketball names the tournament rather than saying "Postseason": the
       // Big Ten Tournament is not flagged postseason, so one divider could
-      // only ever sit between it and the NCAA
-      const pb = phase(b);
-      if (pb && pb !== phase(a)) gaps.push(pb);
+      // only ever sit between it and the NCAA. The label is whichever side is
+      // LATER in time -- that is the run this boundary opens.
+      const starts = asc ? b : a, from = asc ? a : b;
+      if (phase(starts) && phase(starts) !== phase(from)) gaps.push(phase(starts));
     } else if (post(a) !== post(b)) {
       gaps.push("Postseason");
     } else if (!post(a)) {
@@ -872,6 +876,8 @@ function michListHtml(list) {
     gaps.forEach(t => out.push(tile(t)));
     out.push(cards[i]);
   }
+  const last = list[list.length - 1];
+  if (!asc && last.sport === "CBB" && phase(last)) out.push(tile(phase(last)));
   return out.join("");
 }
 

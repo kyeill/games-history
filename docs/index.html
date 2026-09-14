@@ -315,12 +315,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   padding:6px 10px;background:#22222a;
   border:1px solid var(--line);border-radius:9px;color:var(--ink);
   font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
-/* ...and it wears its tournament's colour (his call 2026-09-14). The BORDER
-   takes the true hue; the TEXT takes one that reads on #22222a -- NCAA blue
-   manages only 2.5:1 straight, so its text is lightened to 5.4:1. */
-.mgap.g-b1g{border-color:#0088ce;color:#0088ce}
-.mgap.g-ncaa{border-color:#005eb8;color:#4d9ae0}
-.mgap.g-cfp{border-color:#c28c19;color:#c28c19}
+/* ...and its TEXT wears its tournament's colour, the border left alone (his
+   call 2026-09-14). NCAA blue manages only 2.5:1 on #22222a, so that one is
+   lightened until it reads; the other two clear 4:1 as they are. */
+.mgap.g-b1g{color:#0088ce}
+.mgap.g-ncaa{color:#4d9ae0}
+.mgap.g-cfp{color:#c28c19}
 .row.mich .mm .nm{font-size:12.5px;color:var(--muted);font-style:normal}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
 /* Dense: network over time, small, inside one team line -- side by side they
@@ -465,6 +465,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 </div>
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260914-113132"></script>
+<script src="app.js?v=20260914-113537"></script>
 </body>
 </html>
