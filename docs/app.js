@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-151614";
+const BUILD = "20260914-152239";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -739,8 +739,10 @@ function michCard(g, p) {
   // preseason tournament when he has given no border of his own (his call
   // 2026-09-14). The championship rings above still beat it, so a title win
   // keeps its blue or its gold; a LOSS stays unframed, the muting says it.
-  const bigTourneyWin = !lost && !upcoming(g) &&
-    (st.indexOf("NCAA Tournament") === 0 || st.indexOf("CFP") === 0);
+  // THE NCAA TOURNAMENT FRAMES A LOSS TOO (his call 2026-09-14), the same as
+  // the football postseason below -- it used to frame wins only, which left a
+  // Sweet Sixteen defeat bare beside a dashed bowl defeat.
+  const ncaaGame = !upcoming(g) && st.indexOf("NCAA Tournament") === 0;
   // AN ORDINARY BOWL takes the same grey an MTE does (his call 2026-09-14) --
   // not CFP gold. The CFP and the Big Ten Championship Game are not ordinary
   // bowls; everything else postseason in football is.
@@ -753,9 +755,9 @@ function michCard(g, p) {
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
-      (g.preseason || bowlGame || bigTourneyWin ? "#8a8a92" : null);
+      (g.preseason || bowlGame || ncaaGame ? "#8a8a92" : null);
   // ...and like an MTE it goes dashed on a loss
-  if ((g.preseason || bowlGame) && lost) cls += " predash";
+  if ((g.preseason || bowlGame || ncaaGame) && lost) cls += " predash";
   let ring = "";
   if (bc) {
     cls += " celebrate";

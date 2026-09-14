@@ -174,6 +174,13 @@ the CFP, NCAA blue for the NCAA -- the same three the championship rings and
 the divider tiles use, with NCAA blue lightened to #4d9ae0 so it reads on the
 card. It beats the window tint below, which those cards do not have anyway.
 
+**ONLY ONE GAME IN THE ARCHIVE HAS NO NETWORK NOW.** He supplied the other 19
+on 2026-09-14 -- mostly B1G+, the Big Ten's own stream, for early-season home
+games against small schools. What is left is FERRIS STATE, 11 November 2011,
+which he did not name; B1G+ did not exist yet that season, so it may genuinely
+have had no broadcast. ESPN already had the right TIME on every one of the 19,
+which was a useful check that they were the games he meant.
+
 **NO NETWORK MEANS NO NETWORK.** ESPN lists no broadcast for 20 basketball
 games -- early-season ones against small schools -- and the card used to print
 an em dash where the network goes. It shows the TIME alone now (2026-09-14).
@@ -202,11 +209,10 @@ Peacock game outside the bracket keeps the plain day, which is why one or two
 read "TUESDAY | PEACOCK" instead. Label and window agree on all 530 cards.
 
 **THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
-#8a8a92 goes on a preseason-tournament game, on ANY FOOTBALL POSTSEASON GAME
-bar the Big Ten Championship Game -- an ordinary bowl and the CFP alike, his
-calls 2026-09-14 -- and on an NCAA Tournament WIN, in each case only where his
-Border column is blank. All of those go DASHED on a loss except the NCAA, which
-frames wins only -- 14 NCAA games
+#8a8a92 goes on a preseason-tournament game and on ANY POSTSEASON GAME he has
+not coloured himself -- an ordinary bowl, the CFP, the NCAA Tournament -- all
+of them DASHED on a loss (his calls 2026-09-14). The Big Ten Championship Game
+is the one exception, carrying his own blue -- 14 NCAA games
 today, no CFP ones, since both CFP wins already carry a border of his. The
 order is: "Opponent" first, then his own colour, then the championship rings
 (Big Ten blue, NCAA blue, CFP gold), then this grey. A LOSS stays unframed.
