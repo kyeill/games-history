@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-083507";
+const BUILD = "20260914-084304";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -532,17 +532,19 @@ function michCard(g, p) {
     }
     return ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   };
-  const ink = (bg, fg) => fg ? readable(fg, bg)
+  // a card he has given no colours reads WHITE on the grey placeholder (his
+  // call 2026-09-14) rather than picking maize or navy by contrast
+  const ink = (bg, fg) => bg === UNSET ? WHITE
+    : fg ? readable(fg, bg)
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = (bg, fg) => (bg ? ' style="background:' + bg + ";color:" +
     ink(bg, fg) + '"' : "");
   // the two boxes share one height and one type size (his call)
-  // an unplayed game shows an EMPTY box -- no score, and no uniform colour
-  // behind it either (his call 2026-09-12)
-  const score = upcoming(g)
-    ? '<span class="sc mbox mblank"></span>'
-    : '<span class="sc mbox"' + paint(top, scoreInk) + ">" + m.score + "-" +
-      opp.score + "</span>";
+  // BOTH BUBBLES ALWAYS SHOW, an unplayed game included (his call
+  // 2026-09-14) -- it is painted like any other, just with no score in it,
+  // which on a card with no colours is the grey placeholder
+  const score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
+    (upcoming(g) ? "" : m.score + "-" + opp.score) + "</span>";
   // Michigan's rank sits on the THIRD ROW, under the score and the same width
   // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
   // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in
@@ -818,7 +820,10 @@ function bigViewAllows(g) {
   // rival wins. Both still appear under TV Windows, which is a record of what
   // was ON, not a highlight reel.
   const mich = g.teams.find(t => t.id === MICHIGAN);
-  if (mich && !mich.win) return false;
+  // ...but a game that has not kicked off has no winner, and must not be read
+  // as a Michigan loss (his call 2026-09-14, when upcoming games joined this
+  // view) -- see `upcoming` below
+  if (mich && !mich.win && !upcoming(g)) return false;
   return !g.teams.some(t => RIVALS.indexOf(t.id) > -1 && t.win);
 }
 // NOT PLAYED YET (his call 2026-09-12). An upcoming game has no score and no

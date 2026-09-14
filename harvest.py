@@ -1368,13 +1368,23 @@ def harvest():
             marquee = rules.is_marquee(code, nets, d, slots,
                                        big_ten=(bt_code in confs),
                                        tourney=tourney)
+            # KEY GAMES BEFORE KICKOFF (his call 2026-09-14): only the
+            # categories that do NOT depend on the result, which means both
+            # teams ranked. Feeding the BETTER rank in as the winner can never
+            # return an upset label -- "anyone beats #1" needs the loser to be
+            # #1 -- so an upcoming game is never announced as an upset, and the
+            # daily rebuild re-files it properly once it has been played.
+            ranks = sorted(s["rank"] for s in side if s["rank"])
+            gtype = (rules.game_type(code, ranks[0], ranks[1],
+                                     has_big_ten=(bt_code in confs))
+                     if len(ranks) == 2 else None)
             v = c.get("venue") or {}
             keep.append({
                 "id": x["id"], "sport": code, "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
                 "time": d.strftime("%H:%M"), "neutral": bool(c.get("neutralSite")),
                 "nets": sorted(nets), "teams": side, "week": wk,
-                "slots": sorted(slots), "type": None, "champ": None,
+                "slots": sorted(slots), "type": gtype, "champ": None,
                 "round": (heads[0] if heads else None), "title": False,
                 "header": (rules.cfb_header(sorted(slots), d, season=y, week=wk)
                            if code == "CFB" else None),

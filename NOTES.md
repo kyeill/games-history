@@ -123,10 +123,30 @@ hardcoded `False` there while the archive computed it through
 looking for this weekend's Big Noon, B1G Time and Saturday Night games and
 found nothing. The fix computed `tourney` and `mq` exactly as the archive does.
 
-Anything else that path hardcodes (`type`, `champ`, `title`, `show`, `bfri`,
-`opener`) is genuinely unknowable before kickoff, but CHECK against the archive
-branch before assuming so -- the two `keep.append` calls should be read side by
-side whenever a field is added.
+`type` went the same way on 2026-09-14: an upcoming game can reach KEY GAMES,
+but only through a category that does not depend on the result -- which means
+BOTH TEAMS RANKED. Feeding the better rank in as the winner can never return an
+upset label ("anyone beats #1" needs the loser to be #1), so nothing is ever
+announced as an upset before it is played, and the daily rebuild re-files it
+once it has been. The show chips needed no change: the Locations matcher
+already ran over the upcoming games.
+
+The remaining hardcodes (`champ`, `title`, `show`, `bfri`, `opener`) really are
+unknowable before kickoff, but CHECK against the archive branch before assuming
+so -- the two `keep.append` calls should be read side by side whenever a field
+is added.
+
+**AND EVERY VIEW FILTER HAS TO STEP AROUND AN UNPLAYED GAME TOO.**
+`bigViewAllows` drops any game Michigan did not win, which silently excluded
+every upcoming Michigan game from Key Games until it learned about `upcoming`
+(2026-09-14). This is the same trap as the washes and the strikethrough: "did
+not win" and "lost" are one test everywhere in this app.
+
+**THE GREY PLACEHOLDER BOX READS WHITE** (2026-09-14). A Michigan card he has
+given no uniform or box colours paints both bubbles #4a4a52 with white text,
+rather than picking maize or navy by contrast. BOTH bubbles always render --
+an unplayed game shows an empty score bubble, not a missing one -- and
+`min-width` on `.sc.mbox` is what keeps the empty one its full width.
 
 
 **An unplayed game reads as a MICHIGAN LOSS unless every result rule guards

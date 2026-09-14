@@ -93,6 +93,12 @@ FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2"
 # call 2026-09-11)
 CITY_NOT_VENUE = {"Credit Union 1 Arena"}
 
+# The 2021 NCAA Tournament was played entirely in Indiana, so those cards carry
+# venues rather than cities -- in the short form he uses (his call 2026-09-14).
+BUBBLE_VENUE = {"Mackey Arena": "Mackey",
+                "Lucas Oil Stadium": "Lucas Oil",
+                "Gainbridge Fieldhouse": "Gainbridge"}
+
 
 def tourney_city(city, venue, stage, season):
     """The location on an NCAA Tournament card: the CITY, never the venue --
@@ -103,7 +109,9 @@ def tourney_city(city, venue, stage, season):
     """
     if stage and stage.startswith(("NCAA Tournament", "Big Ten Tournament")):
         if season == 2020 and stage.startswith("NCAA Tournament"):
-            return venue or CITY_OVERRIDES.get(city, city)
+            # the 2021 bubble: every round in Indiana, so the VENUE is what
+            # separates them -- shortened to the name he uses (2026-09-14)
+            return BUBBLE_VENUE.get(venue, venue) or CITY_OVERRIDES.get(city, city)
         return CITY_OVERRIDES.get(city, city)
     return display_city(city, venue)
 
