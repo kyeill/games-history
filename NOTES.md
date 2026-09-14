@@ -163,6 +163,11 @@ ever go missing, the answer is in the Case column, not in the code.
 This RETIRED the inference described below, which had to guess from whether his
 opponent cell was written in capitals and got it wrong twice. Keep the history:
 
+**THE NEW YEAR'S SIX READ IN CFP GOLD** (2026-09-14) -- Rose, Sugar, Orange,
+Cotton, Fiesta, Peach. For Michigan that is exactly three cards: the 2011
+Sugar, the 2016 Orange and the 2018 Peach. A CFP game PLAYED in one of them
+already takes the gold through its own stage, so the two rules agree.
+
 **A TOURNAMENT HEADER WEARS ITS TOURNAMENT'S COLOUR** (2026-09-14): Big Ten
 blue for the Big Ten Championship Game and the Big Ten Tournament, CFP gold for
 the CFP, NCAA blue for the NCAA -- the same three the championship rings and
@@ -197,10 +202,11 @@ Peacock game outside the bracket keeps the plain day, which is why one or two
 read "TUESDAY | PEACOCK" instead. Label and window agree on all 530 cards.
 
 **THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
-#8a8a92 goes on a preseason-tournament game (dashed on a loss), on an ORDINARY
-BOWL (also dashed on a loss -- not CFP gold, his call 2026-09-14; the CFP and
-the Big Ten Championship Game are not ordinary bowls), and on any NCAA
-Tournament or CFP WIN where his Border column is blank -- 14 NCAA games
+#8a8a92 goes on a preseason-tournament game, on ANY FOOTBALL POSTSEASON GAME
+bar the Big Ten Championship Game -- an ordinary bowl and the CFP alike, his
+calls 2026-09-14 -- and on an NCAA Tournament WIN, in each case only where his
+Border column is blank. All of those go DASHED on a loss except the NCAA, which
+frames wins only -- 14 NCAA games
 today, no CFP ones, since both CFP wins already carry a border of his. The
 order is: "Opponent" first, then his own colour, then the championship rings
 (Big Ten blue, NCAA blue, CFP gold), then this grey. A LOSS stays unframed.

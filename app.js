@@ -744,8 +744,11 @@ function michCard(g, p) {
   // AN ORDINARY BOWL takes the same grey an MTE does (his call 2026-09-14) --
   // not CFP gold. The CFP and the Big Ten Championship Game are not ordinary
   // bowls; everything else postseason in football is.
+  // ...and the CFP counts as one for the FRAME (his call 2026-09-14), so a
+  // semifinal LOSS is dashed grey like any other bowl loss. Only the Big Ten
+  // Championship Game is left out, which carries his own blue.
   const bowlGame = g.sport === "CFB" && !!st &&
-    st.indexOf("CFP") !== 0 && st.indexOf("Big Ten Championship") !== 0;
+    st.indexOf("Big Ten Championship") !== 0;
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
@@ -761,7 +764,13 @@ function michCard(g, p) {
   // A TOURNAMENT HEADER WEARS ITS TOURNAMENT'S COLOUR (his call 2026-09-14),
   // the same three the championship rings and the divider tiles use. NCAA blue
   // is lightened to read on the card, exactly as it is on a tile.
-  const stageCol = !bigStage ? null
+  // A NEW YEAR'S SIX bowl reads in CFP gold too (his call 2026-09-14) -- for
+  // Michigan that is the 2011 Sugar, the 2016 Orange and the 2018 Peach. A CFP
+  // game played IN one of them already carries the gold through its own stage.
+  const NY6 = ["Rose Bowl", "Sugar Bowl", "Orange Bowl",
+               "Cotton Bowl", "Fiesta Bowl", "Peach Bowl"];
+  const stageCol = NY6.indexOf(st) > -1 ? "#c28c19"
+    : !bigStage ? null
     : st.indexOf("Big Ten") === 0 ? "#0088ce"
     : st.indexOf("NCAA Tournament") === 0 ? "#4d9ae0"
     : st.indexOf("CFP") === 0 ? "#c28c19" : null;
