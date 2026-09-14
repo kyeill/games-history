@@ -197,8 +197,10 @@ Peacock game outside the bracket keeps the plain day, which is why one or two
 read "TUESDAY | PEACOCK" instead. Label and window agree on all 530 cards.
 
 **THE GREY FRAME MARKS A TOURNAMENT WIN HE HAS NOT COLOURED** (2026-09-14).
-#8a8a92 goes on a preseason-tournament game (dashed on a loss) and now on any
-NCAA Tournament or CFP WIN where his Border column is blank -- 14 NCAA games
+#8a8a92 goes on a preseason-tournament game (dashed on a loss), on an ORDINARY
+BOWL (also dashed on a loss -- not CFP gold, his call 2026-09-14; the CFP and
+the Big Ten Championship Game are not ordinary bowls), and on any NCAA
+Tournament or CFP WIN where his Border column is blank -- 14 NCAA games
 today, no CFP ones, since both CFP wins already carry a border of his. The
 order is: "Opponent" first, then his own colour, then the championship rings
 (Big Ten blue, NCAA blue, CFP gold), then this grey. A LOSS stays unframed.

@@ -741,12 +741,18 @@ function michCard(g, p) {
   // keeps its blue or its gold; a LOSS stays unframed, the muting says it.
   const bigTourneyWin = !lost && !upcoming(g) &&
     (st.indexOf("NCAA Tournament") === 0 || st.indexOf("CFP") === 0);
+  // AN ORDINARY BOWL takes the same grey an MTE does (his call 2026-09-14) --
+  // not CFP gold. The CFP and the Big Ten Championship Game are not ordinary
+  // bowls; everything else postseason in football is.
+  const bowlGame = g.sport === "CFB" && !!st &&
+    st.indexOf("CFP") !== 0 && st.indexOf("Big Ten Championship") !== 0;
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
-      (g.preseason || bigTourneyWin ? "#8a8a92" : null);
-  if (g.preseason && lost) cls += " predash";
+      (g.preseason || bowlGame || bigTourneyWin ? "#8a8a92" : null);
+  // ...and like an MTE it goes dashed on a loss
+  if ((g.preseason || bowlGame) && lost) cls += " predash";
   let ring = "";
   if (bc) {
     cls += " celebrate";
