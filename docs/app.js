@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-221358";
+const BUILD = "20260913-222135";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -422,9 +422,18 @@ function michCard(g, p) {
   let when = p.when, right = shownDate;
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
+  // The tournament writes itself out in full on this view (his call
+  // 2026-09-14): "NCAA TOURNAMENT", "COLLEGE FOOTBALL PLAYOFF". The Big Ten
+  // Tournament stays short -- "BIG TEN QUARTERS" -- because the conference
+  // name already carries it. Rounds 1 and 2 read FIRST and SECOND here too.
   const stageHead = () =>
     (g.post || bigStage ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
-    esc(g.stage.replace(" Tournament", "").replace(" | ", " "));
+    esc(g.stage
+      .replace("Big Ten Tournament", "Big Ten")
+      .replace("CFP", "College Football Playoff")
+      .replace(" | ", " ")
+      .replace("Round 1", "First Round")
+      .replace("Round 2", "Second Round"));
   if (bigStage) {
     // the round, then WHERE it was played; the date and the TV details have
     // gone down to the third row

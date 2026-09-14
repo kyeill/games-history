@@ -18,6 +18,22 @@ Every tournament header leads with the YEAR (2026-09-14). ESPN does not count
 the Big Ten Tournament as postseason, so `g.post` alone missed it and those
 headers went bare; `bigStage` carries them now.
 
+**On this view the tournament writes itself out in full** -- `NCAA TOURNAMENT`,
+`COLLEGE FOOTBALL PLAYOFF`, and `FIRST ROUND` / `SECOND ROUND` rather than
+Round 1 and 2 (2026-09-14). The BIG TEN TOURNAMENT stays short (`BIG TEN
+QUARTERS`) because the conference name already carries it. Measured: the
+longest header, `2023 COLLEGE FOOTBALL PLAYOFF CHAMPIONSHIP | HOUSTON`, fits on
+one line at a 347px phone card, and `.sport` is `white-space: normal` with
+visible overflow, so a header that did NOT fit would wrap rather than clip --
+check the wrap, not an ellipsis.
+
+**WHERE THE EVENT NAME ALREADY CARRIES THE CITY, the city goes** (2026-09-14):
+the Cowboys Classic was always in Arlington and the Jumpman Invitational always
+in Charlotte, so printing both wrapped the row for nothing. Those four games
+carry `"city": ""` in game-overrides.json. After that the only Michigan card
+that still wraps is 2025 Week 14, whose three tags (Big Noon, GameDay, B1G
+Protect) are all already at their short forms.
+
 The tournament shape covers the Big Ten Tournament, the NCAA Tournament, the
 NIT, the CFP and the Big Ten Championship -- `bigStage` in `michCard`. The
 ORDINARY BOWLS are deliberately out of it: a Citrus Bowl header already IS its
@@ -34,13 +50,13 @@ eight-team bracket, two means a four-team one:
 | games | won so far | round |
 | --- | --- | --- |
 | 3 | game 1 | `Quarters`, then `Semis`, then `Final` / `3rd Place` |
-| 3 | lost game 1 | `Quarters`, then `Consolation`, then `5th Place` / `7th Place` |
+| 3 | lost game 1 | `Quarters`, then `Con`, then `5th Place` / `7th Place` |
 | 2 | -- | `Semis`, then `Final` / `3rd Place` |
 
 The label names THE GAME, not the finish: Michigan lost the 2023 Battle 4
 Atlantis fifth-place game, so that card reads `5TH PLACE` and the team came
 sixth. The Players Era Festival is the one non-bracket -- pool play into a
-single placement game -- and is special-cased to `Pool`, `Pool`, `Final`.
+single placement game -- and is special-cased to `Game 1`, `Game 2`, `Final`.
 All 35 MTE games were checked against the real brackets.
 
 A **Round** column on his sheet still overrides any of it, game by game.

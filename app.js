@@ -422,9 +422,18 @@ function michCard(g, p) {
   let when = p.when, right = shownDate;
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
+  // The tournament writes itself out in full on this view (his call
+  // 2026-09-14): "NCAA TOURNAMENT", "COLLEGE FOOTBALL PLAYOFF". The Big Ten
+  // Tournament stays short -- "BIG TEN QUARTERS" -- because the conference
+  // name already carries it. Rounds 1 and 2 read FIRST and SECOND here too.
   const stageHead = () =>
     (g.post || bigStage ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "") +
-    esc(g.stage.replace(" Tournament", "").replace(" | ", " "));
+    esc(g.stage
+      .replace("Big Ten Tournament", "Big Ten")
+      .replace("CFP", "College Football Playoff")
+      .replace(" | ", " ")
+      .replace("Round 1", "First Round")
+      .replace("Round 2", "Second Round"));
   if (bigStage) {
     // the round, then WHERE it was played; the date and the TV details have
     // gone down to the third row
