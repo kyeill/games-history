@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260914-112141";
+const BUILD = "20260914-112713";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -831,14 +831,33 @@ function michListHtml(list) {
   const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
   const post = g => !!(g.post || g.champ);
   const tile = t => '<div class="mgap">' + t + "</div>";
-  const out = [cards[0]];
+  // WHICH TOURNAMENT A BASKETBALL GAME BELONGS TO (his call 2026-09-14), or ""
+  // for the regular season, which needs no label of its own.
+  const phase = g => {
+    const st = g.stage || "";
+    return st.indexOf("Big Ten Tournament") === 0 ? "Big Ten Tournament"
+      : st.indexOf("NCAA Tournament") === 0 ? "NCAA Tournament"
+      : st.indexOf("NIT") === 0 ? "National Invitation Tournament" : "";
+  };
+  const out = [];
+  // Each tile labels the block BELOW it, so a run that opens the list needs one
+  // before the first card -- which is the NCAA Tournament whenever he is
+  // sorting newest first.
+  if (list[0].sport === "CBB" && phase(list[0])) out.push(tile(phase(list[0])));
+  out.push(cards[0]);
   for (let i = 1; i < list.length; i++) {
     const a = list[i - 1], b = list[i];
     const lo = Math.min(day(a.date), day(b.date)), hi = Math.max(day(a.date), day(b.date));
     const gaps = [];
-    if (post(a) !== post(b)) {
+    if (a.sport === "CBB") {
+      // basketball names the tournament rather than saying "Postseason": the
+      // Big Ten Tournament is not flagged postseason, so one divider could
+      // only ever sit between it and the NCAA
+      const pb = phase(b);
+      if (pb && pb !== phase(a)) gaps.push(pb);
+    } else if (post(a) !== post(b)) {
       gaps.push("Postseason");
-    } else if (!post(a) && a.sport === "CFB") {
+    } else if (!post(a)) {
       for (let d = lo + 4; d <= hi - 4; d++)
         if (new Date(d * 864e5).getUTCDay() === 6)
           gaps.push("Bye Week (" + fmtDate(iso(d)) + ")");
