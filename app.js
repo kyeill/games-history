@@ -338,51 +338,27 @@ function michColour(v) {
   if (/^#?[0-9a-f]{6}$/i.test(s)) return "#" + s.replace("#", "");
   return MICH_COLOURS[s.toLowerCase()] || null;
 }
-/* HIS CHAMPIONSHIP SEASONS (his list 2026-09-11). An opponent name goes up in
-   CAPITALS only on a WIN, and only inside the scope that won the title --
-   everything else reads Proper Case, including Big Ten opponents in an
-   ordinary season, which the other views would otherwise capitalise.
-     CFB 2021, 2022  Big Ten champions   -> Big Ten opponents
-     CFB 2023        national champions  -> every game
-     CBB 2025        NCAA champions      -> every game EXCEPT the Big Ten
-                     Tournament, which it did not win (his call 2026-09-11):
-                     conference, non-conference and NCAA alike
-     CBB 2013        Big Ten regular season title -> conference regular season
-     CBB 2016, 2017, 2024  Big Ten Tournament title -> those tournament games
-   2013-14 won the regular season but LOST the tournament final, so its
-   tournament games stay Proper Case. */
-const CAPS_ALL = {CFB: [2023]};
-const CAPS_ALL_NO_BTT = {CBB: [2025]};
-const CAPS_B1G_OPP = {CFB: [2021, 2022]};
-const CAPS_CONF_REG = {CBB: [2013]};
-const CAPS_B1G_TOURN = {CBB: [2016, 2017, 2024]};
+/* CAPITALS COME FROM HIS SHEET AND NOWHERE ELSE (his call 2026-09-14).
 
-function inList(map, g) {
-  return (map[g.sport] || []).indexOf(g.season) > -1;
-}
-function michCaps(g, opp, won) {
-  if (!won || upcoming(g)) return false;
-  if (inList(CAPS_ALL, g)) return true;
-  const stage = g.stage || "";
-  // every win but the tournament it did not win
-  if (inList(CAPS_ALL_NO_BTT, g)) return stage.indexOf("Big Ten Tournament") !== 0;
-  if (inList(CAPS_B1G_OPP, g) && opp.conf === BIG_TEN[g.sport]) return true;
-  // the conference regular season: a Big Ten game that is not the tournament
-  if (inList(CAPS_CONF_REG, g) && opp.conf === BIG_TEN[g.sport] && !stage && !g.post) return true;
-  if (inList(CAPS_B1G_TOURN, g) && stage.indexOf("Big Ten Tournament") === 0) return true;
-  return false;
-}
+   The Case column says "UPPER" or it does not; a BLANK is Proper Case, with
+   whatever display name the acronym rules give it (Ucla, Njit, Unlv, Utep).
+   The "at " / "vs. " prefix is its own span and never takes the capitals.
+
+   This replaced a set of CHAMPIONSHIP SCOPES held here -- CFB 2023 every game,
+   CBB 2025 every game but the Big Ten Tournament, CFB 2021-22 Big Ten
+   opponents, CBB 2013 the conference regular season, CBB 2016/17/24 the
+   tournament games -- which encoded the same 109 cards his column now does.
+   Two sources for one fact meant his sheet could ADD a capital but never
+   remove one, so the scopes went (see NOTES.md). */
 
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
   const mx = g.mx || {}, lost = !upcoming(g) && !m.win;
-  // Proper Case is the DEFAULT here (his call 2026-09-11) -- the Big Ten rule
-  // of the other views does not reach this one -- and his championship scopes
-  // put a win in capitals. The caps column still forces either way by hand.
+  // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
+  // does not reach this one -- and his Case column is the only thing that
+  // lifts a name into capitals (2026-09-14).
   let nm = teamName(opp, null, g.season);
-  const caps = mx.caps === "Y" ? true
-    : mx.caps === "N" ? false
-    : michCaps(g, opp, !lost);
+  const caps = mx.caps === "Y";
   if (caps) nm = nm.toUpperCase();
   const where = g.neutral ? "vs. " : opp.home ? "at " : "";
   // the rating reads "73+"; a team no system rates reads "DII" as it is

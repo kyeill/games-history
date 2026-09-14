@@ -145,12 +145,19 @@ out, in the header and the third row alike; every other date stays in slashes.
 Three games in the archive fall on it, two of them wins. I first read "a win
 on 9/21" as every win and spelled out all of them -- it means that DAY.
 
-**HIS CASE COLUMN SAYS WHO GOES UP IN CAPITALS** (2026-09-14). "UPPER" means
-capitals, anything else means Proper Case, and a BLANK says nothing at all --
-it leaves the scopes in app.js (`CAPS_ALL` and friends) to decide. The two
-agree exactly today: 109 cards are marked UPPER and 109 render that way, with
-no card capitalised that he did not ask for. The "at " / "vs. " prefix is a
-separate span and never takes the capitals.
+**HIS CASE COLUMN IS THE ONLY AUTHORITY ON CAPITALS** (2026-09-14). "UPPER"
+means capitals; ANYTHING ELSE, blank included, means Proper Case with whatever
+display name the acronym rules give (Ucla, Njit, Unlv, Utep). The "at " /
+"vs. " prefix is a separate span and never takes them. 109 cards are marked
+UPPER and 109 render that way.
+
+The app used to hold his CHAMPIONSHIP SCOPES as well -- `CAPS_ALL` (CFB 2023),
+`CAPS_ALL_NO_BTT` (CBB 2025), `CAPS_B1G_OPP` (CFB 2021-22), `CAPS_CONF_REG`
+(CBB 2013), `CAPS_B1G_TOURN` (CBB 2016/17/24) -- encoding the same 109 cards.
+Two sources for one fact meant his sheet could ADD a capital but never remove
+one, so the scopes went, along with `michCaps` and `inList`. Removing them
+changed NOTHING on the page, which is the proof the two agreed. If capitals
+ever go missing, the answer is in the Case column, not in the code.
 
 This RETIRED the inference described below, which had to guess from whether his
 opponent cell was written in capitals and got it wrong twice. Keep the history:
