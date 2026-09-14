@@ -1359,6 +1359,15 @@ def harvest():
                                         ranked, bt_code in confs)
             if not slots and not mich:
                 continue          # nothing to show it under on TV Windows
+            # MARQUEE, worked out the same way the archive does it -- this was
+            # hardcoded False, which hid every upcoming game from the Marquee
+            # button (his catch 2026-09-14). A conference tournament belongs to
+            # no broadcast package, so it is never Marquee.
+            tourney = (rules.is_championship(heads)
+                       and d.month in (3, 4) and code == "CBB")
+            marquee = rules.is_marquee(code, nets, d, slots,
+                                       big_ten=(bt_code in confs),
+                                       tourney=tourney)
             v = c.get("venue") or {}
             keep.append({
                 "id": x["id"], "sport": code, "season": y,
@@ -1373,7 +1382,7 @@ def harvest():
                 "city": rules.display_city((v.get("address") or {}).get("city"),
                                            v.get("fullName")),
                 "post": False, "event": None, "bowl": None, "offsite": None,
-                "stage": None, "ot": False, "mq": False, "show": None,
+                "stage": None, "ot": False, "mq": marquee, "show": None,
                 "showcase": False, "opener": False, "bfri": False,
                 "kickoff": False, "suffix": None, "rivals": False,
                 "rivals_only": False, "rival_loss": False, "big": [],

@@ -116,6 +116,19 @@ header row matches what that tab should have before trusting a fetch.
 
 ## Upcoming games and the daily build
 
+**AN UPCOMING GAME IS BUILT BY A SECOND, SEPARATE CODE PATH, and every flag it
+does not set is a bug waiting to happen** (his catch 2026-09-14). `mq` was
+hardcoded `False` there while the archive computed it through
+`rules.is_marquee`, so the Marquee button hid every upcoming game -- he went
+looking for this weekend's Big Noon, B1G Time and Saturday Night games and
+found nothing. The fix computed `tourney` and `mq` exactly as the archive does.
+
+Anything else that path hardcodes (`type`, `champ`, `title`, `show`, `bfri`,
+`opener`) is genuinely unknowable before kickoff, but CHECK against the archive
+branch before assuming so -- the two `keep.append` calls should be read side by
+side whenever a field is added.
+
+
 **An unplayed game reads as a MICHIGAN LOSS unless every result rule guards
 against it** (2026-09-12). Everywhere in the app "did not win" and "lost" are
 the same test, so a game with no winner picked up the dimming, the
