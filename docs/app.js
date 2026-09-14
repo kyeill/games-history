@@ -6,7 +6,7 @@ const STARTER = ["Big Noon Kickoff", "College GameDay", "Home & Home", "Neutral 
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260913-201549";
+const BUILD = "20260913-202044";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {}, PENDING = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -396,7 +396,15 @@ function michCard(g, p) {
   // "2026 NCAA ROUND 1 | CBS 7:30PM" ... "THU 3/19/26".
   const tvBits = ' | <span' + col(p.netCol) + ">" + esc(primaryNet(g.nets) || "\u2014") +
     "</span> <span" + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
-  let when = p.when, right = fmtDate(g.date);
+  // SEPTEMBER 21 is his date: a Michigan WIN that day spells itself out --
+  // "Sep 21, 2024" -- in the header and in the third row alike. Every other
+  // date stays in slashes (his call 2026-09-13).
+  const sept21Win = !lost && !upcoming(g) && g.date.slice(5) === "09-21";
+  const shownDate = sept21Win
+    ? MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
+      (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
+    : fmtDate(g.date);
+  let when = p.when, right = shownDate;
   if (g.stage) {
     const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
     when = year + esc(g.stage.replace(" Tournament", "").replace(" | ", " ")) + tvBits;
@@ -414,12 +422,7 @@ function michCard(g, p) {
   // empty, in which case it drops down there instead and the header ends
   // without it (his call 2026-09-13). Decided below, once the footer is known.
   const headDate = ' | <span class="hdate">' + right + "</span>";
-  // A WIN SPELLS THE DATE OUT (his call 2026-09-13): "Sep 21, 2024" rather
-  // than "9/21/24", so the third row of a win reads differently from a loss.
-  const longDate = MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
-    (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4);
-  const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") +
-    (lost || upcoming(g) ? fmtDate(g.date) : longDate);
+  const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") + shownDate;
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
   // ON maize and blue ON blue, which cannot be read as the same value, so the
@@ -595,18 +598,26 @@ function michCard(g, p) {
   } else if (mode === "stripe" && parts.length > 1) {
     chipHtml = parts.map((p, i) => wrap(p, i % 2 ? FMAIZE : FBLUE)).join(SEP);
   } else if (mode === "stripe" && parts.length === 1) {
-    // more than one word alternates word by word; a single run -- a date on
-    // its own -- alternates by CHARACTER instead, digits blue and the slashes
-    // maize, so "9/21/24" still stripes (his call 2026-09-13)
+    // THE STRIPE RULE, for one piece of text (his calls 2026-09-13):
+    //   a SPELLED-OUT DATE   "Sep 21, 2024" -> the day blue, the YEAR maize
+    //   several words        alternate word by word, starting blue
+    //   one unbroken run     "9/21/24" -> digits blue, separators maize
     const only = parts[0].t;
     const spaced = only.indexOf(" ") > -1;
-    const runs = spaced
-      ? only.split(/\s+/).map((w, i) => [w, i % 2 ? FMAIZE : FBLUE])
-      : only.split(/(\d+)/).filter(Boolean)
-          .map(s => [s, /\d/.test(s) ? FBLUE : FMAIZE]);
+    const longDate = /^[A-Z][a-z]{2} \d+, \d{4}$/.test(only);
+    let runs;
+    if (longDate) {
+      const cut = only.lastIndexOf(" ");
+      runs = [[only.slice(0, cut), FBLUE], [only.slice(cut + 1), FMAIZE]];
+    } else if (spaced) {
+      runs = only.split(/\s+/).map((w, i) => [w, i % 2 ? FMAIZE : FBLUE]);
+    } else {
+      runs = only.split(/(\d+)/).filter(Boolean)
+        .map(s => [s, /\d/.test(s) ? FBLUE : FMAIZE]);
+    }
     chipHtml = '<span class="mdet">' + runs
       .map(r => '<span style="color:' + r[1] + '">' + esc(r[0]) + "</span>")
-      .join(spaced ? " " : "") + "</span>";
+      .join(longDate ? " " : (spaced ? " " : "")) + "</span>";
   } else {
     chipHtml = parts.map(p => wrap(p)).join(SEP);
   }

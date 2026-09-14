@@ -2,6 +2,23 @@
 
 Each of these cost a debugging pass or would have. Do not rediscover them.
 
+## The Michigan card
+
+**THE STRIPE RULE** (his Footer column = "Stripe"), written down because he
+expects to change it again (2026-09-13). Blue is #003d7a, maize #ffcb05, and
+the alternation always STARTS BLUE:
+
+  * more than one footer piece -- alternate between the PIPES, piece by piece
+  * one piece, several words -- alternate word by word
+  * one piece, a spelled-out date ("Sep 21, 2024") -- the day blue, the YEAR
+    maize
+  * one piece, one unbroken run ("9/21/24") -- digits blue, separators maize
+
+**SEPTEMBER 21 is his date.** A Michigan WIN on 21 September spells its date
+out, in the header and the third row alike; every other date stays in slashes.
+Three games in the archive fall on it, two of them wins. I first read "a win
+on 9/21" as every win and spelled out all of them -- it means that DAY.
+
 ## The Google Sheet
 
 **gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
