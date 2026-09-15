@@ -667,7 +667,7 @@ CONF_BEST = {"1": (2021, 2026),      # ACC
              "9": (2021, 2023)}      # Pac-12
 # A game has to be on one of these to count. He expects the first five; FS1 and
 # ESPN2 are allowed because a good Big 12 game does land there.
-CONF_BEST_NETS = {"FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "ESPN2"}
+CONF_BEST_NETS = ["FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "ESPN2"]
 
 
 def conf_best_ids(evs, season):
@@ -706,13 +706,21 @@ def conf_best_ids(evs, season):
         span = CONF_BEST.get(conf)
         if not span or not (span[0] <= season <= span[1]):
             continue
-        if not (set(networks(c)) & CONF_BEST_NETS):
+        on = [n for n in CONF_BEST_NETS if n in set(networks(c))]
+        if not on:
             continue
         ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
-        if not ranks:
-            continue                      # at least one team ranked
-        # both ranked beats one ranked; then the highest rank, then its partner
-        key = (0 if len(ranks) == 2 else 1, ranks[0], ranks[1] if len(ranks) > 1 else 99)
+        # Ranked-v-ranked beats one-ranked beats none. A week with NO ranked
+        # team anywhere still gets a game (his call 2026-09-14), and there the
+        # best is the biggest network and the latest kickoff -- primetime being
+        # where a conference puts its showcase.
+        if len(ranks) == 2:
+            key = (0, ranks[0], ranks[1], 0, 0)
+        elif ranks:
+            key = (1, ranks[0], 99, 0, 0)
+        else:
+            key = (2, 99, 99, CONF_BEST_NETS.index(on[0]),
+                   -(d.hour * 60 + d.minute))
         slot = (conf, week)
         if slot not in pick or key < pick[slot][0]:
             pick[slot] = (key, x["id"])
