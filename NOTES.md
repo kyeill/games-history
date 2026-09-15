@@ -322,6 +322,20 @@ maps header text to an index and `cell()` answers "" for anything it cannot
 find, so a NEW COLUMN costs no code -- he adds it, the next build picks it up.
 That is how **Case** arrived (2026-09-14), and how **Round** came and went.
 
+**A COLLAPSED ROW GROUP IS INVISIBLE TO gviz.** This is the worst trap in the
+whole pipeline, because nothing looks wrong. His Locations tab holds 302
+show-days; with the historical rows COLLAPSED in his browser the export
+returned FOURTEEN, and the build quietly stripped 174 GameDay and Big Noon
+chips out of the archive. The sheet was never edited -- the rows were merely
+folded shut. I diagnosed it as deleted data and was about to offer to restore
+it from git.
+
+`LOCATIONS_FLOOR` and `SHEET_FLOOR` in harvest.py now ABORT the build when a
+tab comes back far short (150 show-days, 600 Michigan rows -- well under the
+real 302 and 733, so ordinary editing never trips them). A failed build leaves
+the last good site up, which a quiet one does not. WATCH THE `locations:` AND
+`sheet:` LINES after every harvest; the game count alone will not tell you.
+
 **gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
 headers are "2025-26", "2024-25" and so on; gviz typed those columns as DATES
 and returned every label EMPTY, except the single cell that happened to be

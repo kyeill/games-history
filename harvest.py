@@ -17,6 +17,14 @@ OUT = os.path.join(HERE, "output")
 ET = ZoneInfo("America/New_York")
 BASE = "https://site.api.espn.com/apis/site/v2/sports"
 SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
+
+# FLOORS FOR THE GOOGLE SHEET (2026-09-14). A row group COLLAPSED in the
+# browser is omitted from the gviz export, so a tab can shrink to nothing
+# without being edited. These are set well under the real counts -- 302
+# show-days and 733 Michigan rows at the time of writing -- so ordinary
+# editing never trips them, but a collapse does.
+LOCATIONS_FLOOR = 150
+SHEET_FLOOR = 600
 # Rivals reaches further back (his call 2026-09-11), for his rivals only --
 # see rival_events
 RIVAL_SEASONS = list(range(2014, 2021))
@@ -459,6 +467,11 @@ def load_sheet():
             if any(box.values()):
                 flags.add("box")
     print("  sheet: %d rows across %d season-sports" % (len(out), len(used)))
+    if len(out) < SHEET_FLOOR:
+        raise SystemExit(
+            "ABORT: his Michigan tabs returned only %d rows, below the floor "
+            "of %d. Rows COLLAPSED in the browser are omitted from the gviz "
+            "export -- expand them and run again." % (len(out), SHEET_FLOOR))
     return out, used
 
 
@@ -796,6 +809,15 @@ def load_locations():
                 if who:
                     out.setdefault((code, day), {})[tag] = who
     print("  locations: %d show-days" % len(out))
+    # A COLLAPSED ROW GROUP IS INVISIBLE TO gviz (caught 2026-09-14): with his
+    # historical rows collapsed in the browser this returned 14 rows instead of
+    # 302 and the archive lost 174 show chips, with the sheet never edited.
+    # Failing here leaves the last good site up; a quiet build would not.
+    if len(out) < LOCATIONS_FLOOR:
+        raise SystemExit(
+            "ABORT: the Locations tab returned only %d show-days, below the "
+            "floor of %d. Rows COLLAPSED in the browser are omitted from the "
+            "gviz export -- expand them and run again." % (len(out), LOCATIONS_FLOOR))
     return out
 
 
