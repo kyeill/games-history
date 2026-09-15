@@ -311,36 +311,55 @@ Week 0 and Conference Championship Week are outside it; the covered range is
 week 1 to the week before the title games, and `champ_week()` reads that week
 off ESPN rather than assuming a number.
 
-**WHAT COUNTS AS SHOWN.** A game covers its HOME team's conference, on any day
-and by any rule -- a window, a neutral kickoff, GameDay, a Big Ten host
-stand-in. A VISITOR covers its conference in exactly two packages (`COVER_AWAY`):
-the ACC at an SEC home team on ABC, and the Big 12 at a Big Ten home team on
-FOX.
+**WHAT COUNTS AS SHOWN.** A game covers its HOME team's conference -- but only
+if it is ACTUALLY ON TV WINDOWS, which `_on_tv` decides with the same test the
+page uses. A VISITOR covers its conference in exactly two packages
+(`COVER_AWAY`): the ACC at an SEC home team on ABC, and the Big 12 at a Big Ten
+home team on FOX.
 
 **WHAT GETS ADDED.** Where a conference-week is empty, `cover_ids` picks one
-SATURDAY HOME game of that conference. His waterfall: FOX/CBS/NBC first,
-exhausted before ESPN, which is exhausted before FS1/ESPN2 -- the TIER ALWAYS
-WINS, so an ESPN2 game with a #2 team loses to an ESPN game with a #15 team
-(2021 week 2, UAB-Georgia against Texas-Arkansas). Within a tier: ranked v
-ranked by the better rank, then a single ranked team by its rank, then kickoff
--- 7-9pm, 12-3pm, 3-7pm, after 9pm, and a morning game last.
+HOME game of that conference. Saturday first; a Thursday or Friday game is
+taken only when the week has no Saturday candidate at all (his call
+2026-09-15), so a Friday #2 can lose to a Saturday #12. Then his waterfall:
+FOX/CBS/NBC, exhausted before ESPN, exhausted before FS1/ESPN2 -- the TIER
+ALWAYS WINS, so an ESPN2 game with a #2 team loses to an ESPN game with a #15
+team. Within a tier: ranked v ranked by the better rank, then a single ranked
+team by its rank, then kickoff -- 7-9pm, 12-3pm, 3-7pm, after 9pm, a morning
+game last.
 
-**PICKED FIRST, WITHDRAWN AFTERWARDS**, for the same reason as before: nothing
-knows what a week holds until every game in it has been decided. Each candidate
-records whether it had any OTHER reason to be kept (`coveronly`), and the pass
-after the loop drops the ones whose conference turned out to be shown anyway.
-The surviving covers become `standin`, which is what the page filters on; a
-withdrawn candidate that is a Michigan game or a rival's loss keeps its place
-on those views as `rivals_only` rather than being dropped outright.
+**PICKED FIRST, WITHDRAWN AFTERWARDS**, because nothing knows what a week holds
+until every game in it has been decided. Each candidate is admitted in the main
+loop and records whether it had any other TV WINDOWS claim (`coveronly`); the
+pass after the loop drops the ones whose conference turned out to be shown.
+Survivors become `standin`, which is what the page filters on. A withdrawn
+candidate keeps whatever other place it had -- Key Games if it has a game type,
+the Michigan view or Rivals as `rivals_only` -- and only a game with no other
+claim at all is dropped.
 
-28 games added, 132 candidates withdrawn: Pac-12 18, ACC 8, Big 12 1, SEC 1,
+**THREE BUGS HE CAUGHT THE SAME DAY**, each of which made an empty week look
+full. Worth remembering, because all three were silent:
+
+1. `covers()` never checked the VISITOR's conference, so the two away packages
+   read as "any SEC home game on ABC covers the ACC" and "any Big Ten home game
+   on FOX covers the Big 12". That alone hid 22 of the missing weeks.
+2. Coverage counted every game the ARCHIVE kept, and a game kept for its game
+   TYPE alone is on Key Games, not TV Windows. Those games now count as empty
+   -- and, being window-less, they are usually the week's best cover.
+3. `champ_week` read "FCS Championship - First Round" as Championship Week. The
+   FCS playoffs open on rivalry weekend, so weeks 13 of 2021, 2022 and 2023
+   were never checked at all. It now ignores any headline with FCS or Round in
+   it: 2021-23 are week 14, 2024-25 week 15, 2026 week 14.
+
+ONE CONFERENCE-WEEK HIS RULES CANNOT FILL: week 2 of 2021, the ACC, where no
+ACC team hosted on any of the six networks. His fix is Pittsburgh at Tennessee
+-- an ACC visitor on ESPN, not the ABC the away rule wants -- pinned by game id
+in `COVER_FORCE`. It covers the SEC that week too, which is why Texas-Arkansas
+is no longer added.
+
+67 games added, 118 candidates withdrawn: ACC 26, Big 12 20, Pac-12 20, SEC 1,
 Big Ten 0 -- the Big Ten never needs one, because every Big Ten home game on a
-broadcast network is already a stand-in. All 28 fall in 2021-23. `output/
-cover-added.txt` lists them after every harvest.
-
-ONE CONFERENCE-WEEK IS STILL EMPTY: **2021 week 2, the ACC**. No ACC team
-hosted a game on any of the six networks that Saturday, so there is nothing to
-add.
+broadcast network is already a stand-in. `output/cover-added.txt` lists them
+after every harvest.
 
 ## The name of a postseason game
 
