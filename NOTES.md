@@ -275,6 +275,34 @@ the Big Ten, then the other power leagues, then everyone else, where elsewhere
 the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 -- it is applied before the per-view filter, so it already worked.
 
+## The name of a postseason game
+
+**ONE LABEL FOR EVERY VIEW**, built by `stageLabel` / `stageYear` (2026-09-14):
+
+    Big Ten Tournament | Championship  ->  2015 BIG TEN TOURNAMENT FINAL (SUN)
+    SEC Championship                   ->  2025 SEC CHAMPIONSHIP GAME (SAT)
+    CFP | Semis                        ->  2019 CFP SEMIFINALS (SAT)
+    NCAA Tournament | Round 2          ->  2013 NCAA TOURNAMENT SECOND ROUND
+
+The YEAR is the one the game was PLAYED in: football's season year,
+basketball's season PLUS ONE, since a basketball season is named for the year
+it starts. Then the bar goes, rounds 1 and 2 spell themselves out, Semis
+becomes Semifinals, a CONFERENCE tournament crowns a FINAL (the NCAA and the
+NIT keep their Championship), and a conference title GAME says so.
+
+Two orderings matter. The "Game" test runs BEFORE the bar is removed, or "CFP |
+Championship" would become a title game. The "Final" test runs AFTER, and
+excludes NCAA and NIT by name.
+
+Spelling the rounds out pushed four Rivals headers onto a second line, so those
+views now abbreviate too: `trimStageHeads` drops the word TOURNAMENT from a
+label that would wrap, the same way `trimMichChips` does on the Michigan card.
+Measured across all eight view-and-sport combinations at 410px and at the fixed
+378px desktop card: nothing wraps, and only those four abbreviate.
+
+**EVERY VIEW SPELLS THE YEAR OUT** in a date now -- 9/6/2025, not 9/6/25 -- the
+date sitting top right where the room is.
+
 ## tags.json
 
 **A CARD IS A `<div>`, AND IT HAS TO CLOSE AS ONE.** Turning the row from a

@@ -90,11 +90,41 @@ function isHidden(id) { return !!eff(id).hide; }
 function isAdded(id) { return !!eff(id).add; }
 
 /* ---------- rendering --------------------------------------------------- */
-function fmtDate(d, full) {
-  // "2025-09-06" -> "9/6/25", or "9/6/2025" when `full` -- the Michigan views
-  // spell the year out (his call 2026-09-14); the denser views do not
+function fmtDate(d) {
+  // "2025-09-06" -> "9/6/2025". Every view spells the year out (his call
+  // 2026-09-14): the date sits top right, where the room is.
   return String(+d.slice(5, 7)) + "/" + String(+d.slice(8, 10)) + "/" +
-    (full ? d.slice(0, 4) : d.slice(2, 4));
+    d.slice(0, 4);
+}
+
+/* THE NAME OF A POSTSEASON GAME, one way for every view (his calls
+   2026-09-14). "Big Ten Tournament | Championship" reads
+
+       2015 BIG TEN TOURNAMENT FINAL
+
+   The YEAR is the one the game was PLAYED in -- football's season year,
+   basketball's season plus one, since a basketball season is named for the
+   year it starts. Then the bar goes; rounds 1 and 2 spell themselves out;
+   Semis becomes Semifinals; a CONFERENCE tournament crowns a FINAL, while the
+   NCAA and the NIT keep their Championship; and a conference title GAME says
+   so, which the CFP championship must not. The Michigan card layers its own
+   abbreviations on top of this. */
+function stageYear(g) {
+  return (g.sport === "CFB" ? g.season : g.season + 1) + " ";
+}
+function stageLabel(g) {
+  let s = g.stage || "";
+  if (!s) return "";
+  // tested BEFORE the bar goes: "CFP | Championship" is not a title game
+  if (s.indexOf(" | ") < 0 && /Championship$/.test(s)) s += " Game";
+  s = s.replace(" | ", " ")
+    .replace("Round 1", "First Round")
+    .replace("Round 2", "Second Round")
+    .replace("Semis", "Semifinals");
+  if (/Tournament Championship$/.test(s) && !/^(NCAA|NIT)/.test(s)) {
+    s = s.replace(/Championship$/, "Final");
+  }
+  return s;
 }
 function fmtTime(t) {
   const p = t.split(":"), h = +p[0] % 12 || 12;
@@ -237,8 +267,15 @@ function rowHtml(g, browse) {
     // a postseason game carries its year (his call 2026-09-11): the season a
     // football game belongs to (2020 CFP), the March a basketball game is
     // played in (2016 NCAA Tournament)
-    const year = g.post ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
-    when = year + esc(g.stage) + " (" + esc(g.dow) + ")";
+    // the long ones keep a short form for trimStageHeads to reach for: a
+    // conference or the NCAA gives up the word TOURNAMENT before it wraps
+    const lab = stageLabel(g);
+    const brief = lab.replace(/ Tournament /, " ");
+    when = stageYear(g) +
+      (brief !== lab
+        ? '<span data-short="' + esc(brief) + '">' + esc(lab) + "</span>"
+        : esc(lab)) +
+      " (" + esc(g.dow) + ")";
   } else if (g.sport === "CFB") {
     // Week 0 is a real week, so test for a MISSING week, not a falsy one
     const hasWeek = g.week != null;
@@ -379,7 +416,7 @@ function michCard(g, p) {
   const shownDate = sept21Win
     ? MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
       (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
-    : fmtDate(g.date, true);
+    : fmtDate(g.date);
   let when = p.when, right = shownDate;
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
@@ -390,19 +427,10 @@ function michCard(g, p) {
   const stageHead = () => {
     const yr = g.post || bigStage
       ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
-    let full = g.stage
-      .replace(" | ", " ")
-      .replace("Round 1", "First Round")
-      .replace("Round 2", "Second Round")
-      .replace("Semis", "Semifinals");
-    // FOOTBALL says GAME; BASKETBALL keeps the word Tournament, and its title
-    // game reads FINAL rather than Championship (his calls 2026-09-14)
-    if (g.sport === "CFB" && full === "Big Ten Championship") {
-      full = "Big Ten Championship Game";
-    }
-    full = full.replace("Big Ten Tournament Championship", "Big Ten Tournament Final")
-      // the early rounds ALWAYS drop the word, won or not (his call
-      // 2026-09-14) -- they are the longest labels and the least interesting
+    // the shared label, plus the one abbreviation this view makes on its own:
+    // the Big Ten's early rounds drop the word Tournament, won or not (his
+    // call 2026-09-14) -- they are the longest labels and the least interesting
+    const full = stageLabel(g)
       .replace("Big Ten Tournament First Round", "Big Ten First Round")
       .replace("Big Ten Tournament Second Round", "Big Ten Second Round");
     // the longest rounds against the longest cities run past his phone, so
@@ -791,6 +819,22 @@ function michCard(g, p) {
 // A Michigan chip row that runs onto a second line trims its long show tags --
 // "Big Noon Kickoff" to "Big Noon", "College GameDay" to "GameDay" (his call
 // 2026-09-11). Re-run after every draw and when the window changes size.
+/* The same idea as trimMichChips, for the OTHER views' headers: a stage label
+   that would wrap gives up the word TOURNAMENT (2026-09-14). Their header is a
+   flex row with the date pinned right, so a wrap is measured by HEIGHT against
+   the line box. */
+function trimStageHeads() {
+  document.querySelectorAll(".row .sport").forEach(head => {
+    const s = head.querySelector("[data-short]");
+    if (!s) return;
+    if (s.dataset.full) s.textContent = s.dataset.full;
+    const lh = parseFloat(getComputedStyle(head).lineHeight) || 19;
+    if (head.getBoundingClientRect().height <= lh * 1.6) return;
+    if (!s.dataset.full) s.dataset.full = s.textContent;
+    s.textContent = s.dataset.short;
+  });
+}
+
 function trimMichChips() {
   // THE HEADER FIRST (his call 2026-09-14). It holds one piece of text rather
   // than a row of them, so a wrap is measured by HEIGHT against the line box,
@@ -836,7 +880,9 @@ function trimMichChips() {
 let MICH_RESIZE = null;
 window.addEventListener("resize", () => {
   clearTimeout(MICH_RESIZE);
-  MICH_RESIZE = setTimeout(() => { if (VIEW === "michigan") trimMichChips(); }, 150);
+  MICH_RESIZE = setTimeout(() => {
+    if (VIEW === "michigan") trimMichChips(); else trimStageHeads();
+  }, 150);
 });
 
 /* Dividers in the Michigan view (his call 2026-09-11), only when one season
@@ -890,7 +936,7 @@ function michListHtml(list) {
     } else if (!post(a)) {
       for (let d = lo + 4; d <= hi - 4; d++)
         if (new Date(d * 864e5).getUTCDay() === 6)
-          gaps.push("Bye Week (" + fmtDate(iso(d), true) + ")");
+          gaps.push("Bye Week (" + fmtDate(iso(d)) + ")");
       if (SORT !== "asc") gaps.reverse();
     }
     gaps.forEach(t => out.push(tile(t)));
@@ -1467,6 +1513,7 @@ function draw() {
       ? "Pick a start and end date, then Load."
       : "Nothing matches those filters.") + "</p>";
   if (VIEW === "michigan" && TAB !== "browse") trimMichChips();
+  else trimStageHeads();
 }
 
 /* ---------- Browse: ESPN queried live from the browser ------------------ */
