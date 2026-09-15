@@ -280,8 +280,10 @@ the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 **EVERY CONFERENCE GETS A GAME A WEEK** on TV Windows -- ACC and Big 12 from
 2021, the Pac-12 2021-23 before it broke up (his calls 2026-09-14). It only
 needs a NEW one when the week's ordinary rules -- windows, neutral sites,
-GameDay, Big Noon -- turned up nothing for that conference, counting ANY DAY
-and counting the conference as the VISITOR.
+GameDay, Big Noon -- turned up nothing for that conference, counting ANY DAY.
+THE HOME TEAM CARRIES THE CONFERENCE (his call 2026-09-14), both for finding an
+existing game and for choosing a new one -- a conference is not represented by
+its road teams.
 
 His waterfall for the game to add, in `conf_best_ids`. FOX/CBS/NBC/ABC/ESPN
 first, exhausted before FS1/ESPN2 gets a turn; within a tier, ranked-v-ranked
@@ -297,8 +299,13 @@ loop drops the ones whose conference turned out to be covered. 33 are withdrawn
 that way. A title game is never a weekly best, though ESPN files those as
 regular season.
 
-The result is ZERO conference-weeks with nothing, from Week 1 to the last
-regular-season week of every season in range.
+THE UPCOMING WEEK gets stand-ins too, by the same waterfall, so the coming
+Saturday's ACC and Big 12 games are there before they are played. That block
+runs before the withdrawal pass, so its picks are judged like any other.
+
+147 stand-ins, 30 withdrawn. THREE conference-weeks still hold nothing, all of
+them ACC: 2021 week 2, 2022 week 1, 2026 week 1 -- weeks when no ACC team
+hosted a Saturday game on any of those seven networks.
 
 ## The name of a postseason game
 

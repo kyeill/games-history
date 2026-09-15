@@ -723,14 +723,18 @@ def conf_best_ids(evs, season):
         else:
             rest = (2, CONF_BEST_TIERS[tier].index(order[0]), _kick_bucket(d))
         key = (tier,) + rest
-        # EITHER side counts: a conference is represented by its road teams too
-        for conf in {str((k.get("team") or {}).get("conferenceId")) for k in cs}:
-            span = CONF_BEST.get(conf)
-            if not span or not (span[0] <= season <= span[1]):
-                continue
-            slot = (conf, week)
-            if slot not in pick or key < pick[slot][0]:
-                pick[slot] = (key, x["id"])
+        # THE HOME TEAM CARRIES THE CONFERENCE (his call 2026-09-14): a
+        # conference is not represented by its road teams
+        home = next((k for k in cs if k.get("homeAway") == "home"), None)
+        if not home:
+            continue                      # a neutral game names no host
+        conf = str((home.get("team") or {}).get("conferenceId"))
+        span = CONF_BEST.get(conf)
+        if not span or not (span[0] <= season <= span[1]):
+            continue
+        slot = (conf, week)
+        if slot not in pick or key < pick[slot][0]:
+            pick[slot] = (key, x["id"])
     return {k: v[1] for k, v in pick.items()}
 
 
@@ -1413,7 +1417,10 @@ def harvest():
         y = upcoming_season(code, start)
         if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
             continue
-        for x in upcoming_events(code, start, end):
+        up_evs = upcoming_events(code, start, end)
+        # the coming Saturday's stand-ins, by the same waterfall (2026-09-14)
+        up_pick = set(conf_best_ids(up_evs, y).values()) if code == "CFB" else set()
+        for x in up_evs:
             if x.get("id") in have:
                 continue
             comps = x.get("competitions") or []
@@ -1475,7 +1482,7 @@ def harvest():
                        for dd in (d.date().isoformat(),
                                   (d.date() - dt.timedelta(days=1)).isoformat(),
                                   (d.date() + dt.timedelta(days=1)).isoformat()))
-            if not slots and not mich and not show:
+            if not slots and not mich and not show and x["id"] not in up_pick:
                 continue          # nothing to show it under on TV Windows
             # MARQUEE, worked out the same way the archive does it -- this was
             # hardcoded False, which hid every upcoming game from the Marquee
@@ -1511,6 +1518,8 @@ def harvest():
                                            v.get("fullName")),
                 "post": False, "event": None, "bowl": None, "offsite": None,
                 "stage": None, "ot": False, "mq": marquee, "show": show,
+                "confbest": x["id"] in up_pick,
+                "confonly": (x["id"] in up_pick and not (slots or show or mich)),
                 "showcase": False, "opener": False, "bfri": False,
                 "kickoff": False, "suffix": None, "rivals": False,
                 "rivals_only": False, "rival_loss": False, "big": [],
@@ -1659,14 +1668,16 @@ def harvest():
     for g in keep:
         if g["sport"] != "CFB" or g.get("confonly") or g.get("week") is None:
             continue
-        for s in g["teams"]:
-            covered.add((g["season"], s.get("conf"), g["week"]))
+        h = next((s for s in g["teams"] if s.get("home")), None)
+        if h:
+            covered.add((g["season"], h.get("conf"), g["week"]))
     dropped = 0
     trimmed = []
     for g in keep:
         if g.get("confonly"):
-            mine = {s.get("conf") for s in g["teams"]} & set(CONF_BEST)
-            if any((g["season"], cf, g["week"]) in covered for cf in mine):
+            h = next((s for s in g["teams"] if s.get("home")), None)
+            cf = h.get("conf") if h else None
+            if cf in CONF_BEST and (g["season"], cf, g["week"]) in covered:
                 dropped += 1
                 continue
         trimmed.append(g)
