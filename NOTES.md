@@ -281,10 +281,16 @@ the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 2026-09-14), where before it held the Big Ten's slate and the national marquee
 games and nothing else. `conf_best_ids` in harvest.py picks them, in his words:
 every SATURDAY game HOSTED by a team of that conference, on FOX/CBS/NBC/ABC/
-ESPN (FS1 and ESPN2 allowed, and they do turn up -- 17 of 160), with at least
-one ranked team; ranked-v-ranked beats one-ranked, and within that the highest
-rank wins, its partner breaking ties. The Pac-12 runs 2021-23 only, having
-broken up after.
+ESPN (FS1 and ESPN2 allowed, and they do turn up). Ranked-v-ranked beats
+one-ranked beats NONE, and within that the highest rank wins with its partner
+breaking ties. A conference-week with NO ranked team anywhere still gets a game
+(his call 2026-09-14): there the best is the biggest network, in his own order,
+and then the latest kickoff, primetime being where a conference puts its
+showcase. 175 picks; the Pac-12 runs 2021-23 only, having broken up after.
+
+The gaps that remain are 19, and TWELVE of them are conference championship
+week, which he asked to stop before. The rest are a Week 1 or Week 3 where the
+conference hosted no Saturday game on any of those networks at all.
 
 It has to be a PRE-PASS over the week's events, not a test inside the keep
 loop: the best game cannot be known until every game that week has been seen,
