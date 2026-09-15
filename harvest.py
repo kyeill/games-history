@@ -660,6 +660,65 @@ def load_ratings():
     return out, known
 
 
+# The conferences whose weekly best joins TV Windows, and the seasons they run
+# for (his call 2026-09-14). The Pac-12 stops after 2023, when it broke up.
+CONF_BEST = {"1": (2021, 2026),      # ACC
+             "4": (2021, 2026),      # Big 12
+             "9": (2021, 2023)}      # Pac-12
+# A game has to be on one of these to count. He expects the first five; FS1 and
+# ESPN2 are allowed because a good Big 12 game does land there.
+CONF_BEST_NETS = {"FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "ESPN2"}
+
+
+def conf_best_ids(evs, season):
+    """One Saturday game per conference per week: the id of the best game each
+    of those conferences HOSTED. See CONF_BEST above for his rule."""
+    pick = {}
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps:
+            continue
+        c = comps[0]
+        cs = c.get("competitors") or []
+        if len(cs) != 2:
+            continue
+        if (x.get("season") or {}).get("type") != 2:
+            continue                      # regular season only
+        # ...and a CONFERENCE TITLE GAME is not a weekly best, though ESPN
+        # files it as regular season (caught 2026-09-14)
+        if rules.is_championship([n.get("headline") or ""
+                                  for n in (c.get("notes") or [])]):
+            continue
+        week = (x.get("week") or {}).get("number")
+        if week is None:
+            continue
+        try:
+            d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                 .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+        except (KeyError, ValueError):
+            continue
+        if d.weekday() != 5:              # Saturday only
+            continue
+        home = next((k for k in cs if k.get("homeAway") == "home"), None)
+        if not home:
+            continue
+        conf = str((home.get("team") or {}).get("conferenceId"))
+        span = CONF_BEST.get(conf)
+        if not span or not (span[0] <= season <= span[1]):
+            continue
+        if not (set(networks(c)) & CONF_BEST_NETS):
+            continue
+        ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
+        if not ranks:
+            continue                      # at least one team ranked
+        # both ranked beats one ranked; then the highest rank, then its partner
+        key = (0 if len(ranks) == 2 else 1, ranks[0], ranks[1] if len(ranks) > 1 else 99)
+        slot = (conf, week)
+        if slot not in pick or key < pick[slot][0]:
+            pick[slot] = (key, x["id"])
+    return {v[1] for v in pick.values()}
+
+
 def rank_of(c):
     v = (c.get("curatedRank") or {}).get("current")
     return None if v in (None, 0, 99) else v
@@ -978,6 +1037,8 @@ def harvest():
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
+            # the best ACC / Big 12 / Pac-12 game each Saturday (2026-09-14)
+            conf_best = conf_best_ids(evs, y) if code == "CFB" else set()
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
             # the Michigan view: opponents' playoff finish and final AP rank this
@@ -1165,6 +1226,7 @@ def harvest():
                     [(k["team"]["id"], str(k["team"].get("conferenceId"))) for k in cs]))
                 normal = bool(slots or gtype or title or black_friday or show
                               or opener or showcase or kickoff
+                              or x["id"] in conf_best
                               or x["id"] in overrides or x["id"] in extras)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -1292,6 +1354,8 @@ def harvest():
                     # "" means show nothing, which `or` could not express
                     "event": (game_over[x["id"]]["event"]
                               if "event" in game_over.get(x["id"], {}) else event),
+                    # the best ACC / Big 12 / Pac-12 game of its week
+                    "confbest": x["id"] in conf_best,
                     "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,

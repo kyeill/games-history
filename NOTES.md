@@ -275,6 +275,30 @@ the Big Ten, then the other power leagues, then everyone else, where elsewhere
 the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 -- it is applied before the per-view filter, so it already worked.
 
+## The weekly best of the other conferences
+
+**TV WINDOWS CARRIES ONE ACC, BIG 12 AND PAC-12 GAME A WEEK** (his call
+2026-09-14), where before it held the Big Ten's slate and the national marquee
+games and nothing else. `conf_best_ids` in harvest.py picks them, in his words:
+every SATURDAY game HOSTED by a team of that conference, on FOX/CBS/NBC/ABC/
+ESPN (FS1 and ESPN2 allowed, and they do turn up -- 17 of 160), with at least
+one ranked team; ranked-v-ranked beats one-ranked, and within that the highest
+rank wins, its partner breaking ties. The Pac-12 runs 2021-23 only, having
+broken up after.
+
+It has to be a PRE-PASS over the week's events, not a test inside the keep
+loop: the best game cannot be known until every game that week has been seen,
+and the losers are dropped from the archive entirely. The pick then joins
+`normal` as one more reason to keep a game.
+
+A CONFERENCE TITLE GAME IS NOT A WEEKLY BEST, and ESPN files those as regular
+season -- so `stype == 2` let the 2023 Big 12 and ACC championships in as their
+week's pick until `is_championship` was checked too.
+
+160 games, marked `confbest` in the file so the choice can be audited rather
+than inferred. 11 of them already sat in a Marquee window and stay there; the
+rest carry no window, so their header is the bare week number.
+
 ## The name of a postseason game
 
 **ONE LABEL FOR EVERY VIEW**, built by `stageLabel` / `stageYear` (2026-09-14):
