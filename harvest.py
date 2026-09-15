@@ -689,6 +689,118 @@ def fox_friday_dates(evs):
     return out
 
 
+# POWER FOUR/FIVE COVERAGE (his call 2026-09-15). Every TV Window week, Week 0
+# and Conference Championship Week excluded, has to show each power conference.
+# The Pac-12 stops after 2023, when it broke up.
+COVER_CONFS = {"1": (2021, 2026),      # ACC
+               "4": (2021, 2026),      # Big 12
+               "5": (2021, 2026),      # Big Ten
+               "8": (2021, 2026),      # SEC
+               "9": (2021, 2023)}      # Pac-12
+# A HOME GAME COVERS ITS CONFERENCE. An away game covers it only in the two
+# packages he named: the ACC visiting the SEC on ABC, and the Big 12 visiting
+# the Big Ten on FOX.
+COVER_AWAY = {("1", "8", "ABC"), ("4", "5", "FOX")}
+# His network waterfall for a game that has to be ADDED: each tier is exhausted
+# before the next gets a turn.
+COVER_TIERS = [["FOX", "CBS", "NBC"], ["ESPN"], ["FS1", "ESPN2"]]
+
+
+def _kick_bucket(d):
+    """His kickoff preference when nothing in the game is ranked: primetime,
+    then the early window, then the afternoon, then the late night, then
+    whatever is left (a morning kick)."""
+    m = d.hour * 60 + d.minute
+    if 19 * 60 <= m <= 21 * 60:
+        return 0
+    if 12 * 60 <= m < 15 * 60:
+        return 1
+    if 15 * 60 <= m < 19 * 60:
+        return 2
+    if m > 21 * 60:
+        return 3
+    return 4
+
+
+def champ_week(evs):
+    """The week ESPN files the conference championship games under -- the first
+    week TV Windows does NOT have to cover."""
+    ws = []
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps or (x.get("season") or {}).get("type") != 2:
+            continue
+        if rules.is_championship([n.get("headline") or ""
+                                  for n in (comps[0].get("notes") or [])]):
+            w = (x.get("week") or {}).get("number")
+            if w:
+                ws.append(w)
+    return min(ws) if ws else None
+
+
+def covers(conf, home_conf, away_conf, nets):
+    """Does this game cover `conf`? Its home conference always; a visitor only
+    in the two packages of COVER_AWAY."""
+    if home_conf == conf:
+        return True
+    return any(conf == a and home_conf == h and n in nets
+               for a, h, n in COVER_AWAY)
+
+
+def cover_ids(evs, season, wk0=(), net_over=None):
+    """The best game available to stand in for each (conference, week), by his
+    waterfall (2026-09-15). Every slot gets a candidate here; which slots
+    actually NEED one is settled after the main loop, when coverage is known.
+
+    A game that has to be ADDED is always a Saturday HOME game of the
+    conference -- the away packages above admit an existing game, they do not
+    choose a new one."""
+    pick = {}
+    last = champ_week(evs)
+    for x in evs:
+        comps = x.get("competitions") or []
+        if not comps:
+            continue
+        c = comps[0]
+        cs = c.get("competitors") or []
+        if len(cs) != 2 or (x.get("season") or {}).get("type") != 2:
+            continue
+        week = 0 if x["id"] in wk0 else (x.get("week") or {}).get("number")
+        if not week or (last and week >= last):
+            continue              # Week 0 and Championship Week are not covered
+        try:
+            d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                 .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+        except (KeyError, ValueError):
+            continue
+        if d.weekday() != 5:
+            continue              # an ADDED game is always a Saturday game
+        nets = set((net_over or {}).get(x["id"], ())) or set(networks(c))
+        tier = next((i for i, tn in enumerate(COVER_TIERS) if nets & set(tn)), None)
+        if tier is None:
+            continue
+        home = next((k for k in cs if k.get("homeAway") == "home"), None)
+        if not home:
+            continue              # a neutral game names no host
+        conf = str((home.get("team") or {}).get("conferenceId"))
+        span = COVER_CONFS.get(conf)
+        if not span or not (span[0] <= season <= span[1]):
+            continue
+        ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
+        if len(ranks) == 2:
+            rest = (0, ranks[0], ranks[1], 0)
+        elif ranks:
+            rest = (1, ranks[0], 99, 0)
+        else:
+            order = [n for n in COVER_TIERS[tier] if n in nets]
+            rest = (2, _kick_bucket(d), COVER_TIERS[tier].index(order[0]), 0)
+        key = (tier,) + rest
+        slot = (conf, week)
+        if slot not in pick or key < pick[slot][0]:
+            pick[slot] = (key, x["id"])
+    return {k: v[1] for k, v in pick.items()}
+
+
 def week_zero_ids(evs):
     """Football games played in WEEK 0.
 
@@ -958,6 +1070,7 @@ def harvest():
     game_over = load_game_overrides()
     ratings, rated_teams = load_ratings()
     seeds = load_seeds()
+    cover_last = {}       # the championship week of each football season
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
         years = set(RIVAL_SEASONS) | set(SEASONS) | rules.MICHIGAN_SEASONS.get(code, set())
@@ -977,6 +1090,12 @@ def harvest():
                         evs.append(x)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
+            # the best candidate to cover each power conference this week; which
+            # of them is NEEDED is settled after the loop (his call 2026-09-15)
+            cover_pick = set()
+            if code == "CFB" and archive_era:
+                cover_pick = set(cover_ids(evs, y, wk0, net_overrides).values())
+                cover_last[y] = champ_week(evs)
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
@@ -1172,9 +1291,10 @@ def harvest():
                 kickoff = (code == "CFB" and stype == 2 and rules.cfb_neutral_kickoff(
                     d, y, bool(c.get("neutralSite")),
                     [(k["team"]["id"], str(k["team"].get("conferenceId"))) for k in cs]))
-                normal = bool(slots or gtype or title or black_friday or show
-                              or opener or showcase or kickoff or standin
+                normal_other = bool(slots or gtype or title or black_friday
+                              or show or opener or showcase or kickoff or standin
                               or x["id"] in overrides or x["id"] in extras)
+                normal = bool(normal_other or x["id"] in cover_pick)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
                 # 2026-09-09). ESPN publishes no rankings for tournament games
@@ -1308,6 +1428,10 @@ def harvest():
                               if "event" in game_over.get(x["id"], {}) else event),
                     # admitted to TV Windows without a window of its own
                     "standin": bool(standin),
+                    # this week's cover for a power conference, and whether it
+                    # had any other reason to be here (see the pass below)
+                    "coverpick": x["id"] in cover_pick,
+                    "coveronly": (x["id"] in cover_pick and not normal_other),
                     "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
@@ -1344,6 +1468,9 @@ def harvest():
         if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
             continue
         up_evs = upcoming_events(code, start, end)
+        # the coming week is covered like any other (his call 2026-09-14)
+        up_cover = (set(cover_ids(up_evs, y, set(), net_overrides).values())
+                    if code == "CFB" else set())
         for x in up_evs:
             if x.get("id") in have:
                 continue
@@ -1411,7 +1538,8 @@ def harvest():
                        for dd in (d.date().isoformat(),
                                   (d.date() - dt.timedelta(days=1)).isoformat(),
                                   (d.date() + dt.timedelta(days=1)).isoformat()))
-            if not slots and not mich and not show and not standin:
+            if (not slots and not mich and not show and not standin
+                    and x["id"] not in up_cover):
                 continue          # nothing to show it under on TV Windows
             # MARQUEE, worked out the same way the archive does it -- this was
             # hardcoded False, which hid every upcoming game from the Marquee
@@ -1449,6 +1577,9 @@ def harvest():
                 "post": False, "event": None, "bowl": None, "offsite": None,
                 "stage": None, "ot": False, "mq": marquee, "show": show,
                 "standin": bool(standin),
+                "coverpick": x["id"] in up_cover,
+                "coveronly": (x["id"] in up_cover
+                              and not (slots or show or mich or standin)),
                 "showcase": False, "opener": False, "bfri": False,
                 "kickoff": False, "suffix": None, "rivals": False,
                 "rivals_only": False, "rival_loss": False, "big": [],
@@ -1590,6 +1721,89 @@ def harvest():
 
     print("  %d stand-ins (SEC on CBS 2021-22, Big Ten hosts on broadcast)"
           % sum(1 for g in keep if g.get("standin")))
+
+    # POWER FOUR/FIVE COVERAGE (his call 2026-09-15). A cover is added only
+    # where the week's ordinary rules left a conference off TV Windows, and
+    # that cannot be known until every game in the week has been decided. So
+    # each candidate is admitted above and judged here: the ones whose
+    # conference turned out to be shown already are withdrawn.
+    champ_wk = {y: w for y, w in cover_last.items() if w}
+    # a season still being played has no championship week yet: cover only the
+    # weeks that have actually been played
+    played = {}
+    for g in keep:
+        if g["sport"] == "CFB" and not g.get("upcoming") and g.get("week"):
+            played[g["season"]] = max(played.get(g["season"], 0), g["week"])
+    def _covered_by(g):
+        """The conferences this game puts on TV Windows."""
+        h = next((k for k in g["teams"] if k.get("home")), None)
+        a = next((k for k in g["teams"] if not k.get("home")), None)
+        if not h or not a:
+            return set()                  # a neutral game covers nobody
+        nets = set(g.get("nets") or ())
+        return {q for q in COVER_CONFS
+                if covers(q, h.get("conf"), a.get("conf"), nets)}
+    covered = set()
+    for g in keep:
+        if (g["sport"] != "CFB" or g.get("coveronly")
+                or g.get("rivals_only") or g.get("week") in (None, 0)):
+            continue
+        if g["week"] >= champ_wk.get(g["season"], 99):
+            continue
+        for q in _covered_by(g):
+            covered.add((g["season"], q, g["week"]))
+    kept_cover, dropped = [], 0
+    for g in sorted((x for x in keep if x.get("coveronly")),
+                    key=lambda x: (x["season"], x["week"], x["date"])):
+        h = next((k for k in g["teams"] if k.get("home")), None)
+        slot = (g["season"], h.get("conf") if h else None, g["week"])
+        if slot in covered:
+            dropped += 1
+            g["drop_cover"] = True
+            continue
+        covered |= {(g["season"], q, g["week"]) for q in _covered_by(g)}
+        g["standin"] = True
+        kept_cover.append(g)
+    trimmed = []
+    for g in keep:
+        if g.pop("drop_cover", False):
+            # a Michigan game or a rival's loss still belongs to its own view;
+            # only its claim on TV Windows goes
+            if g.get("michigan") or g.get("rivals"):
+                g["rivals_only"], g["mq"] = True, False
+                trimmed.append(g)
+            continue
+        trimmed.append(g)
+    keep = trimmed
+    for g in keep:
+        g.pop("coveronly", None)
+        # the surviving covers are `standin` like any other window-less game;
+        # the candidate flag itself is of no use to the page
+        g.pop("coverpick", None)
+    print("  %d conference covers added, %d withdrawn as already shown"
+          % (len(kept_cover), dropped))
+    # the gaps: a conference-week that nothing on the three tiers could fill
+    CONF_NAME = {"1": "ACC", "4": "Big 12", "5": "Big Ten", "8": "SEC",
+                 "9": "Pac-12"}
+    gaps = []
+    for yr in sorted(set(champ_wk) | set(played)):
+        last = min(champ_wk.get(yr, 99), played.get(yr, 0) + 1)
+        for q, span in sorted(COVER_CONFS.items()):
+            if not (span[0] <= yr <= span[1]):
+                continue
+            for w in range(1, last):
+                if (yr, q, w) not in covered:
+                    gaps.append((yr, CONF_NAME[q], w))
+    if gaps:
+        print("  %d conference-weeks still empty: %s"
+              % (len(gaps), ", ".join("%d %s wk %d" % g for g in gaps)))
+    io.open(os.path.join(OUT, "cover-added.txt"), "w", encoding="utf-8").write(
+        "\n".join("%d\twk %s\t%s\t%s\t%s\t%s" % (
+            g["season"], g["week"], g["date"], g["time"],
+            "/".join(g["nets"]),
+            " at ".join(teams[k["id"]]["short"] for k in
+                        sorted(g["teams"], key=lambda k: k["home"])))
+            for g in kept_cover) + "\n")
 
     # THE SERIES TAG (his call 2026-09-14), worked out rather than typed: two
     # meetings in CONSECUTIVE seasons that the two schools arranged between

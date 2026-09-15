@@ -301,8 +301,46 @@ network is there before it is played.
 
 This REPLACED the conference weekly-best waterfall of 2026-09-14 (ACC / Big 12
 / Pac-12, one game a week, picked by rank and withdrawn when the week turned
-out to be covered). He erased it on 2026-09-15; `conf_best_ids`, `CONF_BEST`
-and the withdrawal pass are gone with it.
+out to be covered). He erased it on 2026-09-15.
+
+## Power Four/Five coverage
+
+**EVERY TV WINDOW WEEK SHOWS EVERY POWER CONFERENCE** (his call 2026-09-15) --
+ACC, Big 12, Big Ten and SEC from 2021, the Pac-12 2021-23 before it broke up.
+Week 0 and Conference Championship Week are outside it; the covered range is
+week 1 to the week before the title games, and `champ_week()` reads that week
+off ESPN rather than assuming a number.
+
+**WHAT COUNTS AS SHOWN.** A game covers its HOME team's conference, on any day
+and by any rule -- a window, a neutral kickoff, GameDay, a Big Ten host
+stand-in. A VISITOR covers its conference in exactly two packages (`COVER_AWAY`):
+the ACC at an SEC home team on ABC, and the Big 12 at a Big Ten home team on
+FOX.
+
+**WHAT GETS ADDED.** Where a conference-week is empty, `cover_ids` picks one
+SATURDAY HOME game of that conference. His waterfall: FOX/CBS/NBC first,
+exhausted before ESPN, which is exhausted before FS1/ESPN2 -- the TIER ALWAYS
+WINS, so an ESPN2 game with a #2 team loses to an ESPN game with a #15 team
+(2021 week 2, UAB-Georgia against Texas-Arkansas). Within a tier: ranked v
+ranked by the better rank, then a single ranked team by its rank, then kickoff
+-- 7-9pm, 12-3pm, 3-7pm, after 9pm, and a morning game last.
+
+**PICKED FIRST, WITHDRAWN AFTERWARDS**, for the same reason as before: nothing
+knows what a week holds until every game in it has been decided. Each candidate
+records whether it had any OTHER reason to be kept (`coveronly`), and the pass
+after the loop drops the ones whose conference turned out to be shown anyway.
+The surviving covers become `standin`, which is what the page filters on; a
+withdrawn candidate that is a Michigan game or a rival's loss keeps its place
+on those views as `rivals_only` rather than being dropped outright.
+
+28 games added, 132 candidates withdrawn: Pac-12 18, ACC 8, Big 12 1, SEC 1,
+Big Ten 0 -- the Big Ten never needs one, because every Big Ten home game on a
+broadcast network is already a stand-in. All 28 fall in 2021-23. `output/
+cover-added.txt` lists them after every harvest.
+
+ONE CONFERENCE-WEEK IS STILL EMPTY: **2021 week 2, the ACC**. No ACC team
+hosted a game on any of the six networks that Saturday, so there is nothing to
+add.
 
 ## The name of a postseason game
 
