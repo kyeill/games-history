@@ -682,6 +682,13 @@ scope, and switching sport **clears** the game-type and TV-window filters —
 without that, a CFB value left set while viewing CBB filters everything away
 and the page looks broken rather than empty-by-choice.
 
+**A LEVEL PAIR IS NOT AN UPSET** (his call 2026-09-15), football only. Three
+bands in `rules.LEVEL_BANDS`: both teams 20-25 (any gap), both 11-19 within
+four spots, both 6-10 within two. A game inside a band is a Ranked Game
+whichever team won. The top five are deliberately left out -- an upset up there
+is an upset -- and "anyone beats #1" is tested before any of this, so it still
+reads Top 10 Upsets. Eight games moved: 35 CFB Ranked Upsets became 27.
+
 **Every game in the archive must be REACHABLE from a view.** A game qualifies
 by a TV window, a game type, a Black Friday flag or a manual override -- and
 being a conference-tournament game is NOT one of them. It used to be, and it

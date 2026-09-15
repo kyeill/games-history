@@ -712,6 +712,20 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
     return None
 
 
+# FOOTBALL ONLY: two teams close enough in the poll that the better-ranked one
+# losing is not an upset (his call 2026-09-15). Each band is the range BOTH
+# teams have to sit in, with the widest gap that still reads as level. The
+# 20-25 band takes any pair inside it; 11-19 allows four spots; 6-10 allows
+# two. The top five are deliberately absent -- an upset up there is an upset.
+LEVEL_BANDS = [(20, 25, 5), (11, 19, 4), (6, 10, 2)]
+
+
+def _level(a, b):
+    """Are these two ranks level enough that neither can upset the other?"""
+    lo, hi = min(a, b), max(a, b)
+    return any(lo >= s and hi <= e and hi - lo <= g for s, e, g in LEVEL_BANDS)
+
+
 def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
               b1g_tourney_run=False):
     """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
@@ -722,7 +736,9 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
     CFB
       Top 10 Upsets   unranked beats a top-10 team, OR anyone beats #1
       Ranked Upsets   the worse-ranked team won, in top-10 v top-10
-                      or in ranked v ranked with a Big Ten team
+                      or in ranked v ranked with a Big Ten team -- unless the
+                      two are LEVEL (see LEVEL_BANDS), which makes it a
+                      Ranked Game whoever won
       Ranked Games    the same two scopes, better-ranked team won
 
     CBB (a tighter net -- college basketball is far the bigger slate)
@@ -757,7 +773,9 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
         top10 = rank_win <= 10 and rank_lose <= 10
         if not (top10 or has_big_ten):
             return title_fallback(rank_win, rank_lose) if p5_title else None
-        return "Ranked Upsets" if rank_win > rank_lose else "Ranked Games"
+        if rank_win > rank_lose and not _level(rank_win, rank_lose):
+            return "Ranked Upsets"
+        return "Ranked Games"
 
     if rank_win <= 10 and rank_lose <= 10:
         return "Top 10 Games"
