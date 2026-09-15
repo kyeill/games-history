@@ -334,6 +334,41 @@ def cfb_header(slots, d, forced=False, season=None, week=None):
 BROADCAST = {"FOX", "CBS", "NBC", "ABC"}
 
 
+# THE STAND-INS (his call 2026-09-15). Two sets of football games reach TV
+# Windows without belonging to any window: they are never Marquee, and only the
+# first of them writes a header.
+#
+# 1. CBS's 3:30 Saturday game in 2021-22 -- the SEC's game of the week. The
+#    WINDOW does not exist in those seasons (CBS buys the Big Ten in 2023), so
+#    these games carry no slot and read "SEC on CBS" on the card.
+# 2. Every Big Ten HOME game on a broadcast network from 2021 on, whatever the
+#    kickoff. This picks up the FOX and CBS games either side of Big Noon and
+#    B1G Time, and the weeknight ABC games the Saturday window misses.
+SEC_CBS_SEASONS = (2021, 2022)
+SEC_CONF = "8"
+B1G_HOST_FROM = 2021
+
+
+def sec_on_cbs(season, nets, d, conf_ids=()):
+    """The 3:30 CBS game of a season before the CBS window existed.
+
+    An SEC team has to be in it. The 3:30 slot was the SEC's game of the week,
+    but CBS put five other games there in those two seasons -- Army-Navy twice,
+    two Air Force games and Arizona-San Diego State -- and none of those is
+    "SEC on CBS".
+    """
+    return (season in SEC_CBS_SEASONS and "CBS" in nets
+            and SEC_CONF in set(conf_ids)
+            and DOW[d.weekday()] == "Sat"
+            and abs(_mins(d) - (15 * 60 + 30)) <= 45)
+
+
+def b1g_host(season, nets, home_conf, sport="CFB"):
+    """A Big Ten team hosting on FOX, CBS, NBC or ABC, 2021 on."""
+    return (season >= B1G_HOST_FROM and home_conf == BIG_TEN[sport]
+            and bool(set(nets) & BROADCAST))
+
+
 def cfb_opener(nets, d, week, week0=False, big_ten=False, ranked=False,
                notre_dame=False):
     """Week 0, and the non-Saturday games of Week 1, on a broadcast network.

@@ -660,84 +660,6 @@ def load_ratings():
     return out, known
 
 
-# The conferences that need a game a week on TV Windows, and the seasons they
-# run for (his call 2026-09-14). The Pac-12 stops after 2023, when it broke up.
-CONF_BEST = {"1": (2021, 2026),      # ACC
-             "4": (2021, 2026),      # Big 12
-             "9": (2021, 2023)}      # Pac-12
-# His waterfall: the first tier is tried to exhaustion before the second.
-CONF_BEST_TIERS = [["FOX", "CBS", "NBC", "ABC", "ESPN"], ["FS1", "ESPN2"]]
-
-
-def _kick_bucket(d):
-    """His kickoff preference when nothing is ranked: primetime, then the
-    early window, then the afternoon, then whatever is left."""
-    m = d.hour * 60 + d.minute
-    if 19 * 60 <= m <= 21 * 60:
-        return 0
-    if 12 * 60 <= m < 15 * 60:
-        return 1
-    if 15 * 60 <= m < 19 * 60:
-        return 2
-    return 3
-
-
-def conf_best_ids(evs, season):
-    """One game per conference per week, by his waterfall. Returns
-    {(conf, week): event id} -- whether it is NEEDED is settled later, once the
-    ordinary rules have had their say."""
-    pick = {}
-    for x in evs:
-        comps = x.get("competitions") or []
-        if not comps:
-            continue
-        c = comps[0]
-        cs = c.get("competitors") or []
-        if len(cs) != 2:
-            continue
-        if (x.get("season") or {}).get("type") != 2:
-            continue                      # regular season only
-        if rules.is_championship([n.get("headline") or ""
-                                  for n in (c.get("notes") or [])]):
-            continue                      # a title game is not a weekly best
-        week = (x.get("week") or {}).get("number")
-        if week is None:
-            continue
-        try:
-            d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
-                 .replace(tzinfo=dt.timezone.utc).astimezone(ET))
-        except (KeyError, ValueError):
-            continue
-        if d.weekday() != 5:
-            continue                      # a PICK is always a Saturday game
-        nets = set(networks(c))
-        tier = next((i for i, tn in enumerate(CONF_BEST_TIERS) if nets & set(tn)), None)
-        if tier is None:
-            continue
-        order = [n for n in CONF_BEST_TIERS[tier] if n in nets]
-        ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
-        if len(ranks) == 2:
-            rest = (0, ranks[0], ranks[1])
-        elif ranks:
-            rest = (1, ranks[0], 99)
-        else:
-            rest = (2, CONF_BEST_TIERS[tier].index(order[0]), _kick_bucket(d))
-        key = (tier,) + rest
-        # THE HOME TEAM CARRIES THE CONFERENCE (his call 2026-09-14): a
-        # conference is not represented by its road teams
-        home = next((k for k in cs if k.get("homeAway") == "home"), None)
-        if not home:
-            continue                      # a neutral game names no host
-        conf = str((home.get("team") or {}).get("conferenceId"))
-        span = CONF_BEST.get(conf)
-        if not span or not (span[0] <= season <= span[1]):
-            continue
-        slot = (conf, week)
-        if slot not in pick or key < pick[slot][0]:
-            pick[slot] = (key, x["id"])
-    return {k: v[1] for k, v in pick.items()}
-
-
 def rank_of(c):
     v = (c.get("curatedRank") or {}).get("current")
     return None if v in (None, 0, 99) else v
@@ -1056,9 +978,6 @@ def harvest():
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
-            # the best ACC / Big 12 / Pac-12 game each Saturday (2026-09-14)
-            conf_picks = conf_best_ids(evs, y) if code == "CFB" else {}
-            conf_pick_ids = set(conf_picks.values())
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
             # the Michigan view: opponents' playoff finish and final AP rank this
@@ -1160,6 +1079,15 @@ def harvest():
                 # it is never Marquee and never carries a slot label.
                 tourney = (rules.is_championship(heads)
                            and d.month in (3, 4) and code == "CBB")
+                # THE STAND-INS (his call 2026-09-15): the 2021-22 SEC
+                # game on CBS, and any Big Ten home game on a broadcast
+                # network from 2021. Neither belongs to a window, so neither
+                # is Marquee -- see rules.sec_on_cbs / rules.b1g_host.
+                home_conf = next((str((k.get("team") or {}).get("conferenceId"))
+                                  for k in cs if k.get("homeAway") == "home"), None)
+                sec_cbs = code == "CFB" and rules.sec_on_cbs(y, nets, d, confs)
+                standin = code == "CFB" and (
+                    sec_cbs or rules.b1g_host(y, nets, home_conf))
                 if code == "CFB":
                     slots = rules.cfb_slots(nets, d, y, team_ids, set(confs),
                                             fox_fri)
@@ -1244,12 +1172,8 @@ def harvest():
                 kickoff = (code == "CFB" and stype == 2 and rules.cfb_neutral_kickoff(
                     d, y, bool(c.get("neutralSite")),
                     [(k["team"]["id"], str(k["team"].get("conferenceId"))) for k in cs]))
-                normal_other = bool(slots or gtype or title or black_friday or show
-                              or opener or showcase or kickoff
-                              or x["id"] in overrides or x["id"] in extras)
                 normal = bool(slots or gtype or title or black_friday or show
-                              or opener or showcase or kickoff
-                              or x["id"] in conf_pick_ids
+                              or opener or showcase or kickoff or standin
                               or x["id"] in overrides or x["id"] in extras)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -1297,6 +1221,7 @@ def harvest():
                     slots = slots & {"FOX Big Noon", "ABC Saturday"}
                     gtype, black_friday, show, opener = None, False, False, False
                     showcase = kickoff = False
+                    standin = sec_cbs = False
                 # A championship game carries NO TV window chip (his call): it
                 # is admitted to that view by the `title` flag instead.
                 if title:
@@ -1341,6 +1266,12 @@ def harvest():
                 week_no = (None if postseason
                            else 0 if x["id"] in wk0
                            else (x.get("week") or {}).get("number"))
+                head_txt = (rules.cfb_header(card_slots, d, forced, season=y,
+                                             week=week_no)
+                            if code == "CFB" else None)
+                # the 2021-22 SEC game has no window to name it
+                if sec_cbs and not head_txt:
+                    head_txt = rules.SEC_ON_CBS["label"]
                 keep.append({
                     "id": x["id"], "sport": code, "season": y,
                     "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
@@ -1368,20 +1299,15 @@ def harvest():
                                  (v.get("address") or {}).get("city"),
                                  v.get("fullName"), stage_txt, y)),
                     "nets": sorted(nets), "teams": side,
-                    "header": (rules.cfb_header(card_slots, d, forced,
-                                                season=y, week=week_no)
-                               if code == "CFB" else suffix),
+                    "header": (head_txt if code == "CFB" else suffix),
                     "slots": sorted(slots), "type": gtype,
                     "champ": conf, "round": head, "title": title,
                     # an override KEY that is present wins even when empty --
                     # "" means show nothing, which `or` could not express
                     "event": (game_over[x["id"]]["event"]
                               if "event" in game_over.get(x["id"], {}) else event),
-                    # the week's stand-in for a conference, and whether the
-                    # game had any other reason to be here (see the withdrawal
-                    # pass below)
-                    "confbest": x["id"] in conf_pick_ids,
-                    "confonly": (x["id"] in conf_pick_ids and not normal_other),
+                    # admitted to TV Windows without a window of its own
+                    "standin": bool(standin),
                     "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
@@ -1418,8 +1344,6 @@ def harvest():
         if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
             continue
         up_evs = upcoming_events(code, start, end)
-        # the coming Saturday's stand-ins, by the same waterfall (2026-09-14)
-        up_pick = set(conf_best_ids(up_evs, y).values()) if code == "CFB" else set()
         for x in up_evs:
             if x.get("id") in have:
                 continue
@@ -1466,6 +1390,11 @@ def harvest():
             confs = [s["conf"] for s in side]
             ids = {s["id"] for s in side}
             ranked = any(s["rank"] for s in side)
+            # the stand-ins, worked out exactly as the archive does it
+            home_conf = next((q["conf"] for q in side if q["home"]), None)
+            sec_cbs = code == "CFB" and rules.sec_on_cbs(y, nets, d, confs)
+            standin = code == "CFB" and (
+                sec_cbs or rules.b1g_host(y, nets, home_conf))
             if code == "CFB":
                 slots = rules.cfb_slots(nets, d, y, ids, set(confs))
             else:
@@ -1482,7 +1411,7 @@ def harvest():
                        for dd in (d.date().isoformat(),
                                   (d.date() - dt.timedelta(days=1)).isoformat(),
                                   (d.date() + dt.timedelta(days=1)).isoformat()))
-            if not slots and not mich and not show and x["id"] not in up_pick:
+            if not slots and not mich and not show and not standin:
                 continue          # nothing to show it under on TV Windows
             # MARQUEE, worked out the same way the archive does it -- this was
             # hardcoded False, which hid every upcoming game from the Marquee
@@ -1511,15 +1440,15 @@ def harvest():
                 "nets": sorted(nets), "teams": side, "week": wk,
                 "slots": sorted(slots), "type": gtype, "champ": None,
                 "round": (heads[0] if heads else None), "title": False,
-                "header": (rules.cfb_header(sorted(slots), d, season=y, week=wk)
+                "header": ((rules.cfb_header(sorted(slots), d, season=y, week=wk)
+                            or (rules.SEC_ON_CBS["label"] if sec_cbs else None))
                            if code == "CFB" else None),
                 "venue": v.get("fullName"),
                 "city": rules.display_city((v.get("address") or {}).get("city"),
                                            v.get("fullName")),
                 "post": False, "event": None, "bowl": None, "offsite": None,
                 "stage": None, "ot": False, "mq": marquee, "show": show,
-                "confbest": x["id"] in up_pick,
-                "confonly": (x["id"] in up_pick and not (slots or show or mich)),
+                "standin": bool(standin),
                 "showcase": False, "opener": False, "bfri": False,
                 "kickoff": False, "suffix": None, "rivals": False,
                 "rivals_only": False, "rival_loss": False, "big": [],
@@ -1659,33 +1588,8 @@ def harvest():
     print("  %d preseason-tournament games across %d seasons"
           % (n, sum(1 for v in pre.values() if len(v) > 1)))
 
-    # WITHDRAW THE WEEKLY BESTS THAT WERE NOT NEEDED (his call 2026-09-14).
-    # A pick stands in for a conference the week's ordinary rules missed, so it
-    # goes as soon as they turn out to have covered that conference after all
-    # -- on ANY day, with the conference on EITHER side. It cannot be settled
-    # earlier: nothing knows what the week holds until every game is decided.
-    covered = set()
-    for g in keep:
-        if g["sport"] != "CFB" or g.get("confonly") or g.get("week") is None:
-            continue
-        h = next((s for s in g["teams"] if s.get("home")), None)
-        if h:
-            covered.add((g["season"], h.get("conf"), g["week"]))
-    dropped = 0
-    trimmed = []
-    for g in keep:
-        if g.get("confonly"):
-            h = next((s for s in g["teams"] if s.get("home")), None)
-            cf = h.get("conf") if h else None
-            if cf in CONF_BEST and (g["season"], cf, g["week"]) in covered:
-                dropped += 1
-                continue
-        trimmed.append(g)
-    keep = trimmed
-    for g in keep:
-        g.pop("confonly", None)
-    print("  %d conference stand-ins kept, %d withdrawn as already covered"
-          % (sum(1 for g in keep if g.get("confbest")), dropped))
+    print("  %d stand-ins (SEC on CBS 2021-22, Big Ten hosts on broadcast)"
+          % sum(1 for g in keep if g.get("standin")))
 
     # THE SERIES TAG (his call 2026-09-14), worked out rather than typed: two
     # meetings in CONSECUTIVE seasons that the two schools arranged between

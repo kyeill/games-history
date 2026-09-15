@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260915-100501";
+const BUILD = "20260915-103544";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1085,7 +1085,7 @@ function visible() {
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
-         || g.showcase || g.kickoff || g.confbest)
+         || g.showcase || g.kickoff || g.standin)
       : (g.type && bigViewAllows(g)));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game

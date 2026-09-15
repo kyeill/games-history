@@ -275,37 +275,34 @@ the Big Ten, then the other power leagues, then everyone else, where elsewhere
 the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 -- it is applied before the per-view filter, so it already worked.
 
-## The weekly best of the other conferences
+## The stand-ins: games on TV Windows with no window
 
-**EVERY CONFERENCE GETS A GAME A WEEK** on TV Windows -- ACC and Big 12 from
-2021, the Pac-12 2021-23 before it broke up (his calls 2026-09-14). It only
-needs a NEW one when the week's ordinary rules -- windows, neutral sites,
-GameDay, Big Noon -- turned up nothing for that conference, counting ANY DAY.
-THE HOME TEAM CARRIES THE CONFERENCE (his call 2026-09-14), both for finding an
-existing game and for choosing a new one -- a conference is not represented by
-its road teams.
+**TWO SETS OF FOOTBALL GAMES REACH TV WINDOWS WITHOUT A WINDOW** (his call
+2026-09-15). They are flagged `standin` in games.json, the app admits them to
+TV Windows on that flag alone, and NEITHER IS EVER MARQUEE -- Marquee is still
+exactly the three football windows.
 
-His waterfall for the game to add, in `conf_best_ids`. FOX/CBS/NBC/ABC/ESPN
-first, exhausted before FS1/ESPN2 gets a turn; within a tier, ranked-v-ranked
-by best rank, else the best ranked team at all, else network order preferring a
-7-9pm kickoff, then 12-3pm, then 3-7pm, then anything. A PICK IS ALWAYS A
-SATURDAY GAME even though coverage counts any day.
+1. **The 3:30 CBS game of 2021 and 2022**, which reads `SEC on CBS` in the
+   header. The CBS WINDOW does not exist in those seasons -- `cfb_slots` starts
+   it in 2023, when CBS bought the Big Ten -- so these games carry no slot and
+   `harvest.py` writes the header itself. An SEC team has to be in it:
+   CBS put five non-SEC games in that slot over the two seasons (Army-Navy
+   twice, two Air Force games, Arizona-San Diego State) and those are not the
+   SEC package. 24 games, 12 a season.
+2. **Every Big Ten HOME game on FOX, CBS, NBC or ABC from 2021 on**, any day
+   and any kickoff, with NO header. Most of these already had a window (ABC
+   Saturday takes every Saturday ABC game, and the three Marquee windows take
+   the rest), so the flag only ADDS FOX's late-afternoon and late-night Big Ten
+   games, the noon CBS and NBC games, and the odd weeknight.
 
-**THE PICK IS MADE FIRST AND WITHDRAWN AFTERWARDS.** Coverage cannot be known
-until the main loop has decided every game in the week, and a stand-in must not
-displace what the ordinary rules would have found -- so each pick records
-whether it had any OTHER reason to be kept (`confonly`), and a pass after the
-loop drops the ones whose conference turned out to be covered. 33 are withdrawn
-that way. A title game is never a weekly best, though ESPN files those as
-regular season.
+239 games carry the flag; 47 of them are on TV Windows for no other reason.
+The upcoming week is tested the same way, so a Big Ten home game on a broadcast
+network is there before it is played.
 
-THE UPCOMING WEEK gets stand-ins too, by the same waterfall, so the coming
-Saturday's ACC and Big 12 games are there before they are played. That block
-runs before the withdrawal pass, so its picks are judged like any other.
-
-147 stand-ins, 30 withdrawn. THREE conference-weeks still hold nothing, all of
-them ACC: 2021 week 2, 2022 week 1, 2026 week 1 -- weeks when no ACC team
-hosted a Saturday game on any of those seven networks.
+This REPLACED the conference weekly-best waterfall of 2026-09-14 (ACC / Big 12
+/ Pac-12, one game a week, picked by rank and withdrawn when the week turned
+out to be covered). He erased it on 2026-09-15; `conf_best_ids`, `CONF_BEST`
+and the withdrawal pass are gone with it.
 
 ## The name of a postseason game
 

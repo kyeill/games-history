@@ -1085,7 +1085,7 @@ function visible() {
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
-         || g.showcase || g.kickoff || g.confbest)
+         || g.showcase || g.kickoff || g.standin)
       : (g.type && bigViewAllows(g)));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
