@@ -295,6 +295,15 @@ A CONFERENCE TITLE GAME IS NOT A WEEKLY BEST, and ESPN files those as regular
 season -- so `stype == 2` let the 2023 Big 12 and ACC championships in as their
 week's pick until `is_championship` was checked too.
 
+**KEEPING A GAME AND SHOWING IT ARE TWO DIFFERENT DECISIONS.** The pick joins
+`normal` in harvest, which puts it in the FILE; TV Windows then asks for a
+window, a title, a show and so on, and 88 of the 160 have none of those -- so
+they sat in the archive invisible until `g.confbest` was added to the view's
+filter too. Whenever a new admission reason is added, BOTH ends need it.
+
+Note also that TV Windows opens with MARQUEE ON, and these are deliberately not
+Marquee -- so they only appear once that button is off.
+
 160 games, marked `confbest` in the file so the choice can be audited rather
 than inferred. 11 of them already sat in a Marquee window and stay there; the
 rest carry no window, so their header is the bare week number.
