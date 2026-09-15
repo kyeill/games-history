@@ -660,19 +660,32 @@ def load_ratings():
     return out, known
 
 
-# The conferences whose weekly best joins TV Windows, and the seasons they run
-# for (his call 2026-09-14). The Pac-12 stops after 2023, when it broke up.
+# The conferences that need a game a week on TV Windows, and the seasons they
+# run for (his call 2026-09-14). The Pac-12 stops after 2023, when it broke up.
 CONF_BEST = {"1": (2021, 2026),      # ACC
              "4": (2021, 2026),      # Big 12
              "9": (2021, 2023)}      # Pac-12
-# A game has to be on one of these to count. He expects the first five; FS1 and
-# ESPN2 are allowed because a good Big 12 game does land there.
-CONF_BEST_NETS = ["FOX", "CBS", "NBC", "ABC", "ESPN", "FS1", "ESPN2"]
+# His waterfall: the first tier is tried to exhaustion before the second.
+CONF_BEST_TIERS = [["FOX", "CBS", "NBC", "ABC", "ESPN"], ["FS1", "ESPN2"]]
+
+
+def _kick_bucket(d):
+    """His kickoff preference when nothing is ranked: primetime, then the
+    early window, then the afternoon, then whatever is left."""
+    m = d.hour * 60 + d.minute
+    if 19 * 60 <= m <= 21 * 60:
+        return 0
+    if 12 * 60 <= m < 15 * 60:
+        return 1
+    if 15 * 60 <= m < 19 * 60:
+        return 2
+    return 3
 
 
 def conf_best_ids(evs, season):
-    """One Saturday game per conference per week: the id of the best game each
-    of those conferences HOSTED. See CONF_BEST above for his rule."""
+    """One game per conference per week, by his waterfall. Returns
+    {(conf, week): event id} -- whether it is NEEDED is settled later, once the
+    ordinary rules have had their say."""
     pick = {}
     for x in evs:
         comps = x.get("competitions") or []
@@ -684,11 +697,9 @@ def conf_best_ids(evs, season):
             continue
         if (x.get("season") or {}).get("type") != 2:
             continue                      # regular season only
-        # ...and a CONFERENCE TITLE GAME is not a weekly best, though ESPN
-        # files it as regular season (caught 2026-09-14)
         if rules.is_championship([n.get("headline") or ""
                                   for n in (c.get("notes") or [])]):
-            continue
+            continue                      # a title game is not a weekly best
         week = (x.get("week") or {}).get("number")
         if week is None:
             continue
@@ -697,34 +708,30 @@ def conf_best_ids(evs, season):
                  .replace(tzinfo=dt.timezone.utc).astimezone(ET))
         except (KeyError, ValueError):
             continue
-        if d.weekday() != 5:              # Saturday only
+        if d.weekday() != 5:
+            continue                      # a PICK is always a Saturday game
+        nets = set(networks(c))
+        tier = next((i for i, tn in enumerate(CONF_BEST_TIERS) if nets & set(tn)), None)
+        if tier is None:
             continue
-        home = next((k for k in cs if k.get("homeAway") == "home"), None)
-        if not home:
-            continue
-        conf = str((home.get("team") or {}).get("conferenceId"))
-        span = CONF_BEST.get(conf)
-        if not span or not (span[0] <= season <= span[1]):
-            continue
-        on = [n for n in CONF_BEST_NETS if n in set(networks(c))]
-        if not on:
-            continue
+        order = [n for n in CONF_BEST_TIERS[tier] if n in nets]
         ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
-        # Ranked-v-ranked beats one-ranked beats none. A week with NO ranked
-        # team anywhere still gets a game (his call 2026-09-14), and there the
-        # best is the biggest network and the latest kickoff -- primetime being
-        # where a conference puts its showcase.
         if len(ranks) == 2:
-            key = (0, ranks[0], ranks[1], 0, 0)
+            rest = (0, ranks[0], ranks[1])
         elif ranks:
-            key = (1, ranks[0], 99, 0, 0)
+            rest = (1, ranks[0], 99)
         else:
-            key = (2, 99, 99, CONF_BEST_NETS.index(on[0]),
-                   -(d.hour * 60 + d.minute))
-        slot = (conf, week)
-        if slot not in pick or key < pick[slot][0]:
-            pick[slot] = (key, x["id"])
-    return {v[1] for v in pick.values()}
+            rest = (2, CONF_BEST_TIERS[tier].index(order[0]), _kick_bucket(d))
+        key = (tier,) + rest
+        # EITHER side counts: a conference is represented by its road teams too
+        for conf in {str((k.get("team") or {}).get("conferenceId")) for k in cs}:
+            span = CONF_BEST.get(conf)
+            if not span or not (span[0] <= season <= span[1]):
+                continue
+            slot = (conf, week)
+            if slot not in pick or key < pick[slot][0]:
+                pick[slot] = (key, x["id"])
+    return {k: v[1] for k, v in pick.items()}
 
 
 def rank_of(c):
@@ -1046,7 +1053,8 @@ def harvest():
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
             espn_sat = espn_saturday_ids(evs) if code == "CBB" else set()
             # the best ACC / Big 12 / Pac-12 game each Saturday (2026-09-14)
-            conf_best = conf_best_ids(evs, y) if code == "CFB" else set()
+            conf_picks = conf_best_ids(evs, y) if code == "CFB" else {}
+            conf_pick_ids = set(conf_picks.values())
             sizes = event_sizes(evs)
             offsite = offsite_games(evs)
             # the Michigan view: opponents' playoff finish and final AP rank this
@@ -1232,9 +1240,12 @@ def harvest():
                 kickoff = (code == "CFB" and stype == 2 and rules.cfb_neutral_kickoff(
                     d, y, bool(c.get("neutralSite")),
                     [(k["team"]["id"], str(k["team"].get("conferenceId"))) for k in cs]))
+                normal_other = bool(slots or gtype or title or black_friday or show
+                              or opener or showcase or kickoff
+                              or x["id"] in overrides or x["id"] in extras)
                 normal = bool(slots or gtype or title or black_friday or show
                               or opener or showcase or kickoff
-                              or x["id"] in conf_best
+                              or x["id"] in conf_pick_ids
                               or x["id"] in overrides or x["id"] in extras)
                 # A conference tournament or playoff round that is NOT the
                 # final is out of the archive entirely, both tabs (his call
@@ -1362,8 +1373,11 @@ def harvest():
                     # "" means show nothing, which `or` could not express
                     "event": (game_over[x["id"]]["event"]
                               if "event" in game_over.get(x["id"], {}) else event),
-                    # the best ACC / Big 12 / Pac-12 game of its week
-                    "confbest": x["id"] in conf_best,
+                    # the week's stand-in for a conference, and whether the
+                    # game had any other reason to be here (see the withdrawal
+                    # pass below)
+                    "confbest": x["id"] in conf_pick_ids,
+                    "confonly": (x["id"] in conf_pick_ids and not normal_other),
                     "bfri": black_friday, "suffix": suffix,
                     "opener": opener,
                     "rival_loss": rival_loss, "rivals": rivals, "post": postseason,
@@ -1635,6 +1649,32 @@ def harvest():
             n += 1
     print("  %d preseason-tournament games across %d seasons"
           % (n, sum(1 for v in pre.values() if len(v) > 1)))
+
+    # WITHDRAW THE WEEKLY BESTS THAT WERE NOT NEEDED (his call 2026-09-14).
+    # A pick stands in for a conference the week's ordinary rules missed, so it
+    # goes as soon as they turn out to have covered that conference after all
+    # -- on ANY day, with the conference on EITHER side. It cannot be settled
+    # earlier: nothing knows what the week holds until every game is decided.
+    covered = set()
+    for g in keep:
+        if g["sport"] != "CFB" or g.get("confonly") or g.get("week") is None:
+            continue
+        for s in g["teams"]:
+            covered.add((g["season"], s.get("conf"), g["week"]))
+    dropped = 0
+    trimmed = []
+    for g in keep:
+        if g.get("confonly"):
+            mine = {s.get("conf") for s in g["teams"]} & set(CONF_BEST)
+            if any((g["season"], cf, g["week"]) in covered for cf in mine):
+                dropped += 1
+                continue
+        trimmed.append(g)
+    keep = trimmed
+    for g in keep:
+        g.pop("confonly", None)
+    print("  %d conference stand-ins kept, %d withdrawn as already covered"
+          % (sum(1 for g in keep if g.get("confbest")), dropped))
 
     # THE SERIES TAG (his call 2026-09-14), worked out rather than typed: two
     # meetings in CONSECUTIVE seasons that the two schools arranged between

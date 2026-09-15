@@ -277,42 +277,28 @@ the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 
 ## The weekly best of the other conferences
 
-**TV WINDOWS CARRIES ONE ACC, BIG 12 AND PAC-12 GAME A WEEK** (his call
-2026-09-14), where before it held the Big Ten's slate and the national marquee
-games and nothing else. `conf_best_ids` in harvest.py picks them, in his words:
-every SATURDAY game HOSTED by a team of that conference, on FOX/CBS/NBC/ABC/
-ESPN (FS1 and ESPN2 allowed, and they do turn up). Ranked-v-ranked beats
-one-ranked beats NONE, and within that the highest rank wins with its partner
-breaking ties. A conference-week with NO ranked team anywhere still gets a game
-(his call 2026-09-14): there the best is the biggest network, in his own order,
-and then the latest kickoff, primetime being where a conference puts its
-showcase. 175 picks; the Pac-12 runs 2021-23 only, having broken up after.
+**EVERY CONFERENCE GETS A GAME A WEEK** on TV Windows -- ACC and Big 12 from
+2021, the Pac-12 2021-23 before it broke up (his calls 2026-09-14). It only
+needs a NEW one when the week's ordinary rules -- windows, neutral sites,
+GameDay, Big Noon -- turned up nothing for that conference, counting ANY DAY
+and counting the conference as the VISITOR.
 
-The gaps that remain are 19, and TWELVE of them are conference championship
-week, which he asked to stop before. The rest are a Week 1 or Week 3 where the
-conference hosted no Saturday game on any of those networks at all.
+His waterfall for the game to add, in `conf_best_ids`. FOX/CBS/NBC/ABC/ESPN
+first, exhausted before FS1/ESPN2 gets a turn; within a tier, ranked-v-ranked
+by best rank, else the best ranked team at all, else network order preferring a
+7-9pm kickoff, then 12-3pm, then 3-7pm, then anything. A PICK IS ALWAYS A
+SATURDAY GAME even though coverage counts any day.
 
-It has to be a PRE-PASS over the week's events, not a test inside the keep
-loop: the best game cannot be known until every game that week has been seen,
-and the losers are dropped from the archive entirely. The pick then joins
-`normal` as one more reason to keep a game.
+**THE PICK IS MADE FIRST AND WITHDRAWN AFTERWARDS.** Coverage cannot be known
+until the main loop has decided every game in the week, and a stand-in must not
+displace what the ordinary rules would have found -- so each pick records
+whether it had any OTHER reason to be kept (`confonly`), and a pass after the
+loop drops the ones whose conference turned out to be covered. 33 are withdrawn
+that way. A title game is never a weekly best, though ESPN files those as
+regular season.
 
-A CONFERENCE TITLE GAME IS NOT A WEEKLY BEST, and ESPN files those as regular
-season -- so `stype == 2` let the 2023 Big 12 and ACC championships in as their
-week's pick until `is_championship` was checked too.
-
-**KEEPING A GAME AND SHOWING IT ARE TWO DIFFERENT DECISIONS.** The pick joins
-`normal` in harvest, which puts it in the FILE; TV Windows then asks for a
-window, a title, a show and so on, and 88 of the 160 have none of those -- so
-they sat in the archive invisible until `g.confbest` was added to the view's
-filter too. Whenever a new admission reason is added, BOTH ends need it.
-
-Note also that TV Windows opens with MARQUEE ON, and these are deliberately not
-Marquee -- so they only appear once that button is off.
-
-160 games, marked `confbest` in the file so the choice can be audited rather
-than inferred. 11 of them already sat in a Marquee window and stay there; the
-rest carry no window, so their header is the bare week number.
+The result is ZERO conference-weeks with nothing, from Week 1 to the last
+regular-season week of every season in range.
 
 ## The name of a postseason game
 
