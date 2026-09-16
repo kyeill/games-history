@@ -386,6 +386,8 @@ B1G_HOCKEY_NEUTRAL_UNTIL = 2016
 def hockey_conf(team_id, y):
     if team_id in B1G_HOCKEY or (team_id == rules.NOTRE_DAME and y >= B1G_HOCKEY_ND_FROM):
         return rules.BIG_TEN["CHK"]
+    if (hockey_team_info(team_id).get("location") or "") in rules.ECAC_HOCKEY:
+        return "ECAC"
     return "0"
 
 
@@ -402,6 +404,13 @@ def hockey_stage(heads):
                    else "Championship" if ("final" in low or "champ" in low)
                    else "First Round" if "first" in low else part or "Tournament")
             return "Big Ten Tournament | " + rnd
+        if h.startswith("ECAC"):
+            rnd = ("Quarters" if "quarter" in low else "Semis" if "semi" in low
+                   else "Third Place" if "third" in low or "consol" in low
+                   else "Championship" if ("final" in low or "champ" in low)
+                   else "First Round" if "first" in low or "1st" in low
+                   else part or "Tournament")
+            return "ECAC Tournament | " + rnd
         if "NCAA" in h and "Hockey" in h:
             rnd = ("Frozen Four" if "frozen" in low
                    else "First Round" if "regional semi" in low
@@ -438,7 +447,17 @@ FROZEN_FOUR_CITY = {2009: "Detroit", 2010: "St. Paul", 2011: "Tampa", 2012: "Pit
 NCAA_ROUNDS = ["First Round", "Second Round", "Frozen Four", "Championship"]
 # regional cities, per team and season, where ESPN has no venue
 NCAA_REGIONAL_CITY = {("130", 2015): "Cincinnati", ("130", 2017): "Worcester",
-                      ("130", 2021): "Allentown"}
+                      ("130", 2021): "Allentown",
+                      ("172", 2011): "Green Bay", ("172", 2018): "Providence"}
+# THE ECAC TOURNAMENT, before ESPN labels it: its weekends are fixed to the
+# NCAA regionals -- the championship weekend (semifinals, final, and a
+# third-place game in the early years) is the week before, the quarterfinals
+# two weeks before, the first round three. Checked on Cornell's 2010, 2012,
+# 2018 and 2019 (2026-09-16). 2019-20 had no NCAA Tournament, so its reference
+# date is the one it would have had.
+ECAC_REFERENCE = {2019: "2020-03-25"}
+ECAC_CITY = {2009: "Albany", 2010: "Atlantic City", 2011: "Atlantic City",
+             2012: "Atlantic City"}          # Lake Placid from 2013-14 on
 
 
 # REGULAR-SEASON EVENTS, per team (his list, 2026-09-16) -- ESPN gives these
@@ -468,15 +487,37 @@ def hockey_event(team_id, y, day):
     return None
 
 
-def hockey_old_stage(team_id, y, day, conf_team_ids, ncaa_seen):
+def hockey_old_stage(team_id, y, day, conf_team_ids, ncaa_seen, earlier=()):
     """The stage of a pre-2022-23 game, from its date alone. `ncaa_seen` counts
-    the team's NCAA games so far this season, oldest first."""
+    the team's NCAA games so far this season, oldest first; `earlier` is the
+    team's records so far, for the ECAC's semifinal-then-final order."""
     ncaa = NCAA_HOCKEY_START.get(y)
     if ncaa and day >= ncaa:
         rnd = NCAA_ROUNDS[min(ncaa_seen, 3)]
         city = (FROZEN_FOUR_CITY.get(y) if ncaa_seen >= 2
                 else NCAA_REGIONAL_CITY.get((team_id, y)))
         return "NCAA Tournament | " + rnd, city, True
+    if hockey_conf(team_id, y) == "ECAC":
+        ref = NCAA_HOCKEY_START.get(y) or ECAC_REFERENCE.get(y)
+        if not ref or len(conf_team_ids) != 2:
+            return None, None, False
+        friday = dt.date.fromisoformat(ref) + dt.timedelta(days=2)
+        before = (friday - dt.date.fromisoformat(day)).days
+        if 5 <= before <= 7:
+            done = [g for g in earlier if g["season"] == y and (g.get("stage") or "")
+                    .startswith("ECAC Tournament | ") and g["stage"].split(" | ")[1]
+                    in ("Semis", "Championship", "Third Place")]
+            if not done:
+                rnd = "Semis"
+            else:
+                won = any(t["win"] and t["id"] == team_id for t in done[-1]["teams"])
+                rnd = "Championship" if won else "Third Place"
+            return "ECAC Tournament | " + rnd, ECAC_CITY.get(y, "Lake Placid"), False
+        if 8 <= before <= 14:
+            return "ECAC Tournament | Quarters", None, False
+        if 15 <= before <= 21:
+            return "ECAC Tournament | First Round", None, False
+        return None, None, False
     first = B1G_HOCKEY_TOURNEY.get(y)
     if first and day >= first[0] and len(conf_team_ids) == 2:
         gap = (dt.date.fromisoformat(day) - dt.date.fromisoformat(first[0])).days // first[1]
@@ -521,9 +562,10 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             old_city = None
             if not stage and y <= 2021:
                 ids = [(k.get("team") or {}).get("id") for k in cs]
-                in_conf = [i for i in ids if hockey_conf(i, y) == rules.BIG_TEN["CHK"]]
+                own = hockey_conf(team_id, y)
+                in_conf = [i for i in ids if hockey_conf(i, y) == own]
                 stage, old_city, is_ncaa = hockey_old_stage(
-                    team_id, y, d.strftime("%Y-%m-%d"), in_conf, ncaa_seen)
+                    team_id, y, d.strftime("%Y-%m-%d"), in_conf, ncaa_seen, out)
                 post = post or is_ncaa
             elif stage and stage.startswith("NCAA") and y <= 2021:
                 post = True
@@ -571,9 +613,18 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             city = (v.get("address") or {}).get("city")
             if ev:
                 old_city = ev["city"]
+            # the ECAC championship weekend is in Lake Placid (Atlantic City and
+            # Albany before it) whatever ESPN's venue says -- it names Ithaca
+            # for Cornell's 2023 semifinal
+            if (stage and stage.startswith("ECAC") and stage.split(" | ")[1]
+                    in ("Semis", "Championship", "Third Place")):
+                old_city = ECAC_CITY.get(y, "Lake Placid")
             b1g_tourney = bool(stage and stage.startswith("Big Ten"))
+            ecac_final_weekend = bool(stage and stage.startswith("ECAC") and
+                                      stage.split(" | ")[1] in
+                                      ("Semis", "Championship", "Third Place"))
             neutral = bool(c.get("neutralSite")) or (post and bool(stage)) or (
-                b1g_tourney and y in B1G_HOCKEY_CITY) or bool(ev)
+                b1g_tourney and y in B1G_HOCKEY_CITY) or bool(ev) or ecac_final_weekend
             out.append({
                 "id": x["id"], "sport": "CHK", "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
@@ -591,7 +642,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 # a Big Ten Tournament game carries the conference, as the
                 # basketball ones do -- which is also what keeps it out of
                 # Michigan's game numbers
-                "champ": "Big Ten" if b1g_tourney else None,
+                "champ": ("Big Ten" if b1g_tourney else "ECAC"
+                          if stage and stage.startswith("ECAC") else None),
                 "round": heads[0] if heads else None,
                 "title": False, "event": ev["event"] if ev else None,
                 "standin": False,
@@ -600,7 +652,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "rivals_only": True, "bowl": None, "showcase": False,
                 "kickoff": False, "stage": stage,
                 "upcoming": upcoming or None,
-                "michigan": team_id == rules.MICHIGAN, "mx": {},
+                "michigan": team_id == rules.MICHIGAN, "focus": team_id,
+                "mx": {},
             })
             if not out[-1]["upcoming"]:
                 out[-1].pop("upcoming")
@@ -616,6 +669,103 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                     won = any(t["win"] and t["id"] == team_id for t in first[-1]["teams"])
                     out[-1]["mte_round"] = "Final" if won else "Third Place"
     return out, misses
+
+
+def cornell_cbb_games(seasons, teams, latest_conf):
+    """Cornell's Ivy League Tournament and NCAA Tournament games (his call
+    2026-09-16) -- nothing else of its basketball seasons -- from ESPN's team
+    schedule, which labels both. The NIT does not count."""
+    team_id = rules.CORNELL
+    sport = SPORTS["CBB"][0]
+    out = []
+    for y in seasons:
+        path = os.path.join(CACHE, "cornell-cbb-%d.json" % y)
+        if os.path.exists(path):
+            evs = json.load(open(path, encoding="utf-8"))["events"]
+        else:
+            evs, seen = [], set()
+            for stype in (2, 3):
+                try:
+                    got = get_json("%s/%s/teams/%s/schedule" % (BASE, sport, team_id),
+                                   params={"season": y + 1, "seasontype": stype})
+                except requests.HTTPError:
+                    continue
+                for x in got.get("events") or []:
+                    if x.get("id") and x["id"] not in seen:
+                        seen.add(x["id"])
+                        x["_stype"] = stype
+                        evs.append(x)
+            if season_over("CBB", y):
+                json.dump({"events": evs}, open(path, "w", encoding="utf-8"))
+        for x in evs:
+            c = (x.get("competitions") or [{}])[0]
+            cs = c.get("competitors") or []
+            heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
+            head = heads[0] if heads else ""
+            if not (c.get("status") or {}).get("type", {}).get("completed") or len(cs) != 2:
+                continue
+            ivy = head.startswith("Ivy League Tournament")
+            ncaa = x.get("_stype") == 3 and "CHAMPIONSHIP" in head.upper() and "NIT" not in head
+            if not (ivy or ncaa):
+                continue
+            d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                 .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+            if ivy:
+                low = head.split(" - ")[-1].lower()
+                stage = "Ivy League Tournament | " + (
+                    "Semis" if "semi" in low else "Championship" if "final" in low
+                    or "champ" in low else head.split(" - ")[-1])
+            else:
+                stage = rules.stage_label("CBB", 3, heads, month=d.month, season=y)
+            poll = ap_before("CBB", y, d.date()) if not ncaa else {}
+            side = []
+            for k in cs:
+                t = k.get("team") or {}
+                tid = t.get("id")
+                loc = t.get("location") or t.get("displayName")
+                if tid not in teams:
+                    info = hockey_team_info(tid)
+                    teams[tid] = {"name": t.get("displayName") or info.get("name"),
+                                  "short": rules.display_name(loc),
+                                  "abbr": t.get("abbreviation"),
+                                  "color": info.get("color"), "alt": info.get("alt")}
+                sc = k.get("score")
+                score = sc.get("value") if isinstance(sc, dict) else sc
+                conf = "IVY" if loc in rules.IVY else "0"
+                prev = latest_conf.get(("CBB", tid))
+                if prev is None:
+                    latest_conf[("CBB", tid)] = (d, conf)
+                rank = (k.get("curatedRank") or {}).get("current")
+                side.append({"id": tid, "score": int(score) if score is not None else None,
+                             "rank": (rank if rank and rank != 99 else None) or poll.get(tid),
+                             "win": bool(k.get("winner")),
+                             "home": k.get("homeAway") == "home",
+                             "conf": conf, "seed": None})
+            v = c.get("venue") or {}
+            city = (v.get("address") or {}).get("city")
+            if not city:
+                m = re.search(r" AT ([A-Z .'-]+?) [A-Z]{2}$", head.upper())
+                city = (m.group(1).title() if m else
+                        {"Levien Gymnasium": "New York"}.get(v.get("fullName")))
+            out.append({
+                "id": x["id"], "sport": "CBB", "season": y,
+                "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
+                "time": d.strftime("%H:%M"), "neutral": city != "Ithaca", "ot": False,
+                "show": False, "week": None, "venue": v.get("fullName"),
+                "mq": False, "offsite": None,
+                # the Ivy tournament names its CITY plainly; the venue-for-metro
+                # rule would turn New York back into Levien Gymnasium
+                "city": (rules.tourney_city(city, v.get("fullName"), stage, y)
+                         if ncaa else city),
+                "nets": sorted(set(networks(c))), "teams": side, "header": None,
+                "slots": [], "type": None, "champ": "Ivy" if ivy else None,
+                "round": head, "title": False, "event": None, "standin": False,
+                "bfri": False, "suffix": None, "opener": False,
+                "rival_loss": False, "rivals": False, "post": ncaa,
+                "rivals_only": True, "bowl": None, "showcase": False,
+                "kickoff": False, "stage": stage, "michigan": False,
+                "focus": team_id, "mx": {}})
+    return out
 
 
 def postseason_events(code, y):
@@ -865,8 +1015,10 @@ def playoff_finish(code, y, evs):
 
 
 SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
-SHEET_TABS = {"CFB": "Michigan CFB", "CBB": "Michigan CBB",
-              "CHK": "Michigan Hockey"}
+# (focus team, sport) -> tab
+SHEET_TABS = {("130", "CFB"): "Michigan CFB", ("130", "CBB"): "Michigan CBB",
+              ("130", "CHK"): "Michigan Hockey",
+              ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB"}
 
 
 def sheet_season(sport, year):
@@ -901,7 +1053,7 @@ def load_sheet():
     season at all.
     """
     out, used, bodies = {}, {}, {}
-    for code, tab in SHEET_TABS.items():
+    for (focus, code), tab in SHEET_TABS.items():
         url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
                "?tqx=out:csv&headers=1&sheet=%s"
                % (SHEET_ID, tab.replace(" ", "%20")))
@@ -948,7 +1100,7 @@ def load_sheet():
                 continue
             box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
                    "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
-            out[(code, season, date)] = {
+            out[(focus, code, season, date)] = {
                 "name": cell("opponent"), "attended": bool(cell("attended")),
                 # his CASE column: "UPPER" puts the opponent in capitals
                 "case": cell("case"),
@@ -956,7 +1108,7 @@ def load_sheet():
                 "note": cell("notes") or cell("note"),
                 "footer": cell("footer"), "box": box,
             }
-            flags = used.setdefault((code, season), set())
+            flags = used.setdefault((focus, code, season), set())
             for label, flag in (("case", "case"), ("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
                                 ("note", "note"), ("footer", "footer")):
@@ -1166,7 +1318,13 @@ def rank_of(c):
 def networks(comp):
     out = []
     for b in comp.get("broadcasts") or []:
-        out += b.get("names") or []
+        # the scoreboard lists "names"; a TEAM SCHEDULE gives each broadcast as
+        # media.shortName instead, and reading only "names" found no TV at all
+        # on hockey and Cornell games (2026-09-16)
+        names = b.get("names") or []
+        if not names and (b.get("media") or {}).get("shortName"):
+            names = [b["media"]["shortName"]]
+        out += names
     return sorted(set(out))
 
 
@@ -2142,6 +2300,15 @@ def harvest():
     keep += hk
     print("  hockey: %d Michigan games, %d with a USCHO rank on either side"
           % (len(hk), sum(1 for g in hk if any(t["rank"] for t in g["teams"]))))
+    ck, _ = hockey_games(rules.CORNELL, sorted(rules.CORNELL_SEASONS["CHK"]),
+                         teams, latest_conf, start, end)
+    keep += ck
+    cb = cornell_cbb_games(sorted(rules.CORNELL_SEASONS["CBB"]), teams, latest_conf)
+    keep += cb
+    print("  Cornell: %d hockey games, %d basketball tournament games" % (len(ck), len(cb)))
+    for g in keep:
+        if g.get("michigan") and not g.get("focus"):
+            g["focus"] = rules.MICHIGAN
 
     # ESPN RECORDS A FEW GAMES TWICE, under two event ids -- Michigan-
     # Pittsburgh on 2012-11-21 and Michigan-West Virginia on 2012-12-15, each
@@ -2157,7 +2324,7 @@ def harvest():
     seen, merged = {}, 0
     deduped = []
     for g in keep:
-        sig = (g["sport"], g["date"], g["time"],
+        sig = (g["sport"], g["date"], g["time"], g.get("focus"),
                frozenset(t["id"] for t in g["teams"]))
         if sig not in seen:
             seen[sig] = g
@@ -2188,13 +2355,14 @@ def harvest():
     # prefix -- NC3 -- so the games that matter stand out from the buy games.
     count = collections.Counter()
     for g in keep:
-        if g.get("michigan") and not g["post"] and not g["champ"]:
-            key = (g["sport"], g["season"], len({t["conf"] for t in g["teams"]}) == 1)
+        focus = g.get("focus")
+        if focus and not g["post"] and not g["champ"]:
+            key = (focus, g["sport"], g["season"], len({t["conf"] for t in g["teams"]}) == 1)
             count[key] += 1
-            if key[2]:
+            if key[3]:
                 g["mx"]["num"] = "g%d" % count[key]
             else:
-                opp = next((t for t in g["teams"] if t["id"] != rules.MICHIGAN), None)
+                opp = next((t for t in g["teams"] if t["id"] != focus), None)
                 big = (opp is not None and g["sport"] in rules.POWER_CONF_IDS
                        and rules.nc_power(g["sport"], g["season"], opp["id"],
                                           opp.get("conf")))
@@ -2212,7 +2380,7 @@ def harvest():
         whose name IS an acronym -- it broke on UNLV and again on VCU. He now
         says so in a column of its own, so nothing is guessed.
         """
-        row = sheet.get((g["sport"], g["season"], g["date"]))
+        row = sheet.get((g.get("focus"), g["sport"], g["season"], g["date"]))
         if not row:
             return None
         said = (row.get("case") or "").strip().upper()
@@ -2222,13 +2390,13 @@ def harvest():
 
     hits = 0
     for g in keep:
-        if not g.get("michigan"):
+        if not g.get("focus"):
             continue
-        row = sheet.get((g["sport"], g["season"], g["date"]))
+        row = sheet.get((g["focus"], g["sport"], g["season"], g["date"]))
         if not row:
             continue
         hits += 1
-        flags = sheet_used.get((g["sport"], g["season"]), set())
+        flags = sheet_used.get((g["focus"], g["sport"], g["season"]), set())
         mx = g.setdefault("mx", {})
         case = sheet_case(g)
         if case:
@@ -2476,6 +2644,7 @@ def harvest():
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
                "big_ten": rules.BIG_TEN, "season_names": rules.SEASON_NAMES,
+               "team_conf": {"172": rules.CORNELL_CONF},
                "net_priority": rules.NET_PRIORITY,
                "seasons": sorted({g["season"] for g in keep})},
               open(os.path.join(OUT, "games.json"), "w", encoding="utf-8"),

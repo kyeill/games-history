@@ -28,6 +28,8 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
+// the conference a non-Michigan team view capitalises, per team and sport
+let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // Oldest-first by default (his call 2026-09-09): with a season filter on, that
 // reads as the season unfolding. The toggle flips it.
@@ -73,7 +75,8 @@ function teamName(t, sport, season) {
   if (sn && season != null && season < sn.before) nm = sn.name;
   // Big Ten teams go up in caps. Membership is as of THAT SEASON, so USC is
   // capitalised from 2024 and not before.
-  return (sport && t.conf === BIG_TEN[sport]) ? nm.toUpperCase() : nm;
+  const caps = VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : BIG_TEN[sport];
+  return (sport && t.conf === caps) ? nm.toUpperCase() : nm;
 }
 function esc(s) {
   return String(s).replace(/[&<>"]/g,
@@ -329,7 +332,7 @@ function rowHtml(g, browse) {
   // being tinted -- which is what a non-Marquee game used to get -- read as an
   // accident rather than a signal, so whatever colour the card earns paints
   // the whole header. It does not wait on a Big Ten team either.
-  if (VIEW === "michigan" && !browse) {
+  if (teamView() && !browse) {
     const one = winCol || netCol;
     return michCard(g, { tags: tags, when: when, headCol: one,
                          netCol: one, timeCol: one });
@@ -385,7 +388,8 @@ function rowHtml(g, browse) {
 const MICH_COLOURS = { blue: "#00274c", maize: "#ffcb05", white: "#ffffff",
   b1g: "#0088ce", cfp: "#c28c19",
   gold: "#c28c19", grey: "#8a8a92", gray: "#8a8a92", black: "#111114",
-  red: "#c8102e", green: "#1d7a3a", navy: "#00274c" };
+  red: "#c8102e", green: "#1d7a3a", navy: "#00274c",
+  carnelian: "#b31b1b" };
 function michColour(v) {
   const s = String(v || "").trim();
   if (/^#?[0-9a-f]{6}$/i.test(s)) return "#" + s.replace("#", "");
@@ -405,7 +409,8 @@ function michColour(v) {
    remove one, so the scopes went (see NOTES.md). */
 
 function michCard(g, p) {
-  const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
+  const fid = g.focus || focusId();
+  const m = g.teams.find(t => t.id === fid), opp = g.teams.find(t => t.id !== fid) || g.teams[0];
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
   const tied = !!g.tie;
   const mx = g.mx || {}, lost = !upcoming(g) && !m.win && !tied;
@@ -433,7 +438,7 @@ function michCard(g, p) {
   // The ordinary bowls stay out of this set: a Citrus Bowl header already IS
   // its location, and lifting it would print the name twice.
   const TOURNEY = ["Big Ten Tournament", "NCAA Tournament", "NIT ", "CFP ",
-                   "Big Ten Championship"];
+                   "Big Ten Championship", "ECAC Tournament", "Ivy League Tournament"];
   const bigStage = !!g.stage && TOURNEY.some(s => g.stage.indexOf(s) === 0);
   const mteCard = !!g.preseason && !g.stage;
   const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
@@ -552,8 +557,9 @@ function michCard(g, p) {
   // accessories as the text on both.
   // HOCKEY TRACKS NO JERSEY (his call 2026-09-16): its boxes are always
   // Michigan blue with maize, and his Sheet needs no colour columns for it
-  const HOCKEY_BOX = { score_bg: "Blue", score_font: "Maize",
-                       rank_bg: "Blue", rank_font: "Maize" };
+  const HOCKEY_BOX = fid === CORNELL
+    ? { score_bg: "Carnelian", score_font: "White", rank_bg: "Carnelian", rank_font: "White" }
+    : { score_bg: "Blue", score_font: "Maize", rank_bg: "Blue", rank_font: "Maize" };
   const u = (mx.uni || []).map(michColour),
     bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : {});
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
@@ -924,7 +930,7 @@ let MICH_RESIZE = null;
 window.addEventListener("resize", () => {
   clearTimeout(MICH_RESIZE);
   MICH_RESIZE = setTimeout(() => {
-    if (VIEW === "michigan") trimMichChips(); else trimStageHeads();
+    if (teamView()) trimMichChips(); else trimStageHeads();
   }, 150);
 });
 
@@ -953,6 +959,8 @@ function michListHtml(list) {
   const phase = g => {
     const st = g.stage || "";
     return st.indexOf("Big Ten Tournament") === 0 ? "Big Ten Tournament"
+      : st.indexOf("ECAC Tournament") === 0 ? "ECAC Tournament"
+      : st.indexOf("Ivy League Tournament") === 0 ? "Ivy League Tournament"
       : st.indexOf("NCAA Tournament") === 0 ? "NCAA Tournament"
       : st.indexOf("NIT") === 0 ? "National Invitation Tournament" : "";
   };
@@ -1034,6 +1042,14 @@ function upcoming(g) { return !!g.upcoming; }
 function scoreText(v) { return (v === null || v === undefined) ? "" : v; }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
+/* TEAM VIEWS (2026-09-16): the Michigan card now serves any FOCUS team --
+   Michigan's views, and Cornell's (hockey, and basketball's Ivy and NCAA
+   Tournament games). Every record of a team view carries `focus`, the team the
+   card is about; a game in two teams' views is two records. */
+const CORNELL = "172";
+function teamView() { return VIEW === "michigan" || VIEW === "cornell"; }
+function focusId() { return VIEW === "cornell" ? CORNELL : MICHIGAN; }
+function focusTeam(g) { return g.teams.find(t => t.id === (g.focus || focusId())); }
 
 /* HIGHLIGHTS on the Michigan views (his calls 2026-09-16). Never a game not
    yet played.
@@ -1066,7 +1082,7 @@ function michBorder(g) {
   return "other";
 }
 function highlightOf(g, kind) {
-  const m = michTeam(g);
+  const m = focusTeam(g);
   if (!m || upcoming(g)) return false;
   const mx = g.mx || {}, st = g.stage || "";
   const shaded = !!mx.shade, border = michBorder(g);
@@ -1180,7 +1196,7 @@ function visible() {
   // Key Games needs a game TYPE. Being a conference-tournament game is not
   // itself a qualification -- an ACC first-rounder between unranked teams has
   // no business here, and every championship game carries a type anyway.
-  list = list.filter(g => VIEW === "michigan" ? !!g.michigan
+  list = list.filter(g => teamView() ? g.focus === focusId()
     : VIEW === "rivals" ? rivalsAllows(g)
     : g.rivals_only ? false
     : VIEW === "tv"
@@ -1224,7 +1240,7 @@ function visible() {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
-  if (VIEW === "michigan" && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
+  if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1265,7 +1281,7 @@ function visible() {
   // date. Oldest First is simply chronological throughout.
   // Rivals orders by TRUE date (his call 2026-09-11): a CFP game has no week,
   // so a week block would put the Big Ten title game ahead of it
-  const block = g => (VIEW !== "rivals" && VIEW !== "michigan" &&
+  const block = g => (VIEW !== "rivals" && !teamView() &&
       g.sport === "CFB" && g.week != null)
     ? g.season + "-" + String(g.week).padStart(2, "0")
     : g.date;
@@ -1294,7 +1310,7 @@ function visible() {
 // games until November -- so the overall max opened the tab on nothing.
 function latestSeason() {
   const own = GAMES.filter(g => g.sport === SPORT_OF[TAB] &&
-      (VIEW === "michigan" ? g.michigan : !g.rivals_only))
+      (teamView() ? g.focus === focusId() : !g.rivals_only))
     .map(g => g.season);
   if (own.length) return Math.max.apply(null, own);
   return SEASONS.length ? Math.max.apply(null, SEASONS) : null;
@@ -1349,7 +1365,7 @@ function filterChips() {
   // other views start with the archive
   const viewSeasons = Array.from(new Set(GAMES.filter(g => g.sport === sport &&
     (VIEW === "rivals" ? rivalsAllows(g)
-      : VIEW === "michigan" ? g.michigan : !g.rivals_only)).map(g => g.season)));
+      : teamView() ? g.focus === focusId() : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
   const yearFloor = sport === "CFB" ? 2021 : 2020;
@@ -1364,22 +1380,26 @@ function filterChips() {
   // rivals, the rest of the Big Ten, the other power leagues, then everyone
   // else, with a bar between each group -- one more bar than the other views,
   // which run the rivals into the Big Ten.
-  if (VIEW === "michigan") {
-    const rivalIds = sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"];
+  if (teamView()) {
+    // Cornell has no rivals pinned; its own league leads the list instead
+    const rivalIds = VIEW === "cornell" ? []
+      : sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"];
     const seen = teamsIn(visibleWithout("team"),
       g => g.teams.map(t => t.id), FILT.team);
-    seen.delete(MICHIGAN);
-    const mt = teamOrder(sport, seen, rivalIds);
+    seen.delete(focusId());
+    const mt = teamOrder(sport, seen, rivalIds,
+      VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : null);
     const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
     const lined = ids => ids.length
       ? [["─".repeat(12), null]].concat(ids.map(optOf)) : [];
     // teamOrder hands the pins back at the head of its Big Ten group; split
     // them out again so a bar can sit between the rivals and the rest
     const isRival = id => rivalIds.indexOf(id) > -1;
+    const pinned = mt.bigTen.filter(isRival).map(optOf);
+    const league = mt.bigTen.filter(id => !isRival(id));
     h += group("Team", select("team", "All Teams",
-      mt.bigTen.filter(isRival).map(optOf)
-        .concat(lined(mt.bigTen.filter(id => !isRival(id))),
-                lined(mt.power), lined(mt.rest)),
+      pinned.concat(pinned.length ? lined(league) : league.map(optOf),
+                    lined(mt.power), lined(mt.rest)),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
     // broadcast networks he watches on, a bar, then the cable tier, then
@@ -1512,7 +1532,7 @@ function filterChips() {
    move -- Stanford's is a 2023 Pac-12 game; that game is only the fallback.
    Declared inside the function, not as top-level consts, because init() runs
    before later top-level consts are initialised (see clearFilters). */
-function teamOrder(sport, allowed, pinsOverride) {
+function teamOrder(sport, allowed, pinsOverride, leadConf) {
   const PINS = { CFB: ["130", "194", "127", "87"],   // Michigan, Ohio State, Michigan State, Notre Dame
                  CBB: ["130", "127", "194"] };       // Michigan, Michigan State, Ohio State
   const POWER = { CFB: ["1", "8", "4"],              // ACC, SEC, Big 12
@@ -1532,7 +1552,7 @@ function teamOrder(sport, allowed, pinsOverride) {
   const others = Object.keys(latest).filter(id => pins.indexOf(id) < 0 && ok(id));
   const confOf = id =>
     (TEAMS[id] && TEAMS[id].conf && TEAMS[id].conf[sport]) || latest[id].conf;
-  const inBigTen = id => confOf(id) === BIG_TEN[sport];
+  const inBigTen = id => confOf(id) === (leadConf || BIG_TEN[sport]);
   const inPower = id => (POWER[sport] || []).indexOf(confOf(id)) > -1;
   return {
     bigTen: pins.concat(others.filter(inBigTen).sort(byName)),
@@ -1639,7 +1659,8 @@ const NAV = {
   cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
         ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
-        ["Rivals", "cbb", "rivals"]]
+        ["Rivals", "cbb", "rivals"], ["Cornell", "cbb", "cornell"]],
+  hockey: [["Cornell", "chk", "cornell"]]
 };
 
 function draw() {
@@ -1653,10 +1674,10 @@ function draw() {
   document.getElementById("count").textContent =
     list.length.toLocaleString() + " games";
   document.getElementById("list").innerHTML = list.length
-    ? (VIEW === "michigan" ? michListHtml(list)
+    ? (teamView() ? michListHtml(list)
       : list.map(g => rowHtml(g, false)).join(""))
     : '<p class="empty">Nothing matches those filters.</p>';
-  if (VIEW === "michigan") trimMichChips();
+  if (teamView()) trimMichChips();
   else trimStageHeads();
 }
 
@@ -1685,18 +1706,18 @@ function switchView(view) {
     FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
     FILT.post = false; FILT.winner = null;
     SORT = defaultSort();
-  } else if (VIEW === "michigan") {
+  } else if (teamView()) {
     // the Michigan view opens on its newest season, in schedule order
     FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
     FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
     FILT.net = null;
     SORT = defaultSort();
-  } else if (leaving === "rivals" || leaving === "michigan") {
+  } else if (leaving === "rivals" || leaving === "michigan" || leaving === "cornell") {
     // leaving Rivals or Michigan puts back the season a normal view opens on
     FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
     FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
     FILT.net = null;
-    if (leaving === "michigan") SORT = defaultSort();
+    if (leaving === "michigan" || leaving === "cornell") SORT = defaultSort();
   }
 }
 function go(tab, view) {
@@ -1728,6 +1749,7 @@ async function init() {
   HEADER_TINT = r[0].header_tint || {};
   NET_TINT = r[0].net_tint || {};
   BIG_TEN = r[0].big_ten || {};
+  TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};
   NET_PRIORITY = r[0].net_priority || {};

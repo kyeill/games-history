@@ -89,6 +89,9 @@ OVERRIDES = {
     "2060": ("1b365d", "Bentley: navy"),
     "2815": ("000000", "Lindenwood: black, not the gold"),
     "285": ("003f87", "Lake Superior State: blue, not the gold"),
+    "2008": ("0077c8", "Alabama Huntsville: blue"),
+    "298": ("236192", "Alaska: blue, not the gold"),
+    "2144": ("000000", "Colorado College: black, not the gold"),
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),

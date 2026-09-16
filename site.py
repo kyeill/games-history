@@ -389,6 +389,7 @@ BODY = """
   <button data-top="michigan" aria-selected="true">Michigan</button>
   <button data-top="cfb" aria-selected="false">CFB</button>
   <button data-top="cbb" aria-selected="false">CBB</button>
+  <button data-top="hockey" aria-selected="false">Hockey</button>
 </nav>
 
 <div class="viewbar" id="viewbar"></div>

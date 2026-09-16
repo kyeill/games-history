@@ -16,6 +16,8 @@ DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 # was IN at the time of the game (USC reads Pac-12 in 2021, Big Ten in 2025).
 # hockey has no ESPN conference id on its schedules; "B1GH" is harvest's own
 BIG_TEN = {"CFB": "5", "CBB": "7", "CHK": "B1GH"}
+# the view a team card belongs to, by its focus team (app.js reads this)
+TEAM_VIEWS = {"130": "michigan", "172": "cornell"}
 # Football has five power conferences; basketball has SIX -- the Big East is
 # a major basketball conference with no football to speak of. His "Power
 # Five/Six", 2026-09-09.
@@ -88,6 +90,17 @@ CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
 # with his own details from michigan.csv and ratings.csv. It began as a trial
 # on 2023 football and 2025-26 basketball.
 MICHIGAN = "130"
+# CORNELL (his plan, 2026-09-16): hockey from 2009-10, and basketball from
+# 2009-10 for its Ivy League and NCAA Tournament games only
+CORNELL = "172"
+CORNELL_SEASONS = {"CHK": set(range(2009, 2027)), "CBB": set(range(2009, 2027))}
+# the conference whose names Cornell's cards capitalise, as Michigan's do the
+# Big Ten's -- harvest's own codes, since ESPN's schedules carry no conference
+CORNELL_CONF = {"CHK": "ECAC", "CBB": "IVY"}
+ECAC_HOCKEY = {"Brown", "Clarkson", "Colgate", "Cornell", "Dartmouth", "Harvard",
+               "Princeton", "Quinnipiac", "Rensselaer", "St. Lawrence", "Union", "Yale"}
+IVY = {"Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Pennsylvania",
+       "Penn", "Princeton", "Yale"}
 MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026)),
                     # hockey from 2013-14 (his call 2026-09-16), through the
                     # season now starting
@@ -574,7 +587,9 @@ def stage_label(sport, season_type, headlines, conf=None, month=None, season=Non
     if season_type == 3:
         event = _cbb_postseason_event(text.split(" - ")[0])
         if event == "NCAA":
-            if season is not None and season <= 2014:
+            # ...from 2010-11, when the First Four began: 2009-10's "1st
+            # ROUND" is the round of 64 (Cornell's Temple game, 2026-09-16)
+            if season is not None and 2010 <= season <= 2014:
                 rnd = NCAA_OLD_ROUNDS.get(rnd, rnd)
             event = "NCAA Tournament"
         return event + (" | " + rnd if rnd else "")
