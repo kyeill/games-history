@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-090029";
+const BUILD = "20260916-090215";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -236,10 +236,7 @@ function rowHtml(g, browse) {
     // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
     // Ford Field, Madison Square Garden.
     tags.push(chip("champ", g.offsite));
-  } else if (g.neutral && g.city &&
-             !(VIEW === "michigan" && !browse && ny6Bowl(g))) {
-    // a Michigan NEW YEAR'S SIX bowl names no city (his call 2026-09-16): the
-    // header already says Orange Bowl, and Miami Gardens adds nothing to it
+  } else if (g.neutral && g.city) {
     tags.push(chip("champ", g.city));
   }
   // Champions Classic and CBS Sports Classic move every year, so their cards
@@ -677,7 +674,9 @@ function michCard(g, p) {
     // the network, the time and the date, and has room to spell them out
     bit(tvTxt, netTxt, false, 4);
     bit(dateText);
-  } else if (place) {
+  } else if (place && !ny6Bowl(g)) {
+    // a NEW YEAR'S SIX bowl names no city (his call 2026-09-16): the header
+    // already says Orange Bowl, and Miami Gardens adds nothing to it
     bit(place, PLACE_SHORT[place], false, 3);
   }
   if (g.event && !g.stage && !mteCard) bit(g.event);
