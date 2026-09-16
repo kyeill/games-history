@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-090215";
+const BUILD = "20260916-091933";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -51,6 +51,10 @@ function shade(hex, lighten, strength) {
   return "#" + p.map((c, i) => Math.round(CARD[i] + (c - CARD[i]) * strength)
     .toString(16).padStart(2, "0")).join("");
 }
+// THE MICHIGAN VIEW'S OWN WASH, where it differs from every other view: Notre
+// Dame's card stays antique gold there while the rest of the site reads navy
+// (his call 2026-09-16). A border marked "Opponent" still uses teamColor.
+const MICH_WASH = { "87": "c99700" };
 function teamColor(t) {
   return COLORS[t.id] || (t.color || "").replace("#", "") || "6a6a70";
 }
@@ -825,7 +829,7 @@ function michCard(g, p) {
   // game played IN one of them already carries the gold through its own stage.
   const stageCol = stageColor(g);
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
-    shade(teamColor(opp)) + ring + '">' +
+    shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
       (dateDown ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +

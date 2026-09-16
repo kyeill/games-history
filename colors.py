@@ -44,10 +44,35 @@ OVERRIDES = {
     "277": ("002855", "West Virginia: navy, not the gold"),
     "2294": ("231f20", "Iowa: black, not the gold"),
 
-    # ...and the ONE exception to that rule, his call 2026-09-14: Notre Dame
-    # reads GOLD rather than ESPN's navy. Their #C99700 is an antique gold,
-    # dark enough that its wash does not read as Michigan's maize.
-    "87": ("c99700", "Notre Dame: he wants gold, not the navy"),
+    # More black-and-gold (and one navy-and-gold) schools, his list of
+    # 2026-09-16. Black washes grey, the same trade as the six above.
+    "119": ("000000", "Towson: black, not the gold"),
+    "2029": ("000000", "Arkansas-Pine Bluff: black, not the gold"),
+    "2670": ("000000", "VCU: black, not the gold"),
+    "94": ("000000", "Northern Kentucky: black, not the gold"),
+    "338": ("000000", "Kennesaw State: black, not the gold"),
+    "2572": ("000000", "Southern Miss: black, not the gold"),
+    "28": ("182b49", "UC San Diego: Triton navy, not the gold"),
+
+    # NOTRE DAME IS NAVY everywhere but the Michigan view (his call
+    # 2026-09-16), which keeps the antique gold #c99700 for its card wash --
+    # that lives in app.js (MICH_WASH), not here. A border he marks "Opponent"
+    # there takes this navy.
+    "87": ("0c2340", "Notre Dame: navy; the Michigan view washes gold"),
+    # his call 2026-09-16: ESPN's #061440 is so dark it washes grey
+    "213": ("1e407c", "Penn State: Beaver Blue, bluer than ESPN's near-black navy"),
+
+    # NO COLOUR FROM ESPN AT ALL -- a plain #000000 and no alternate, so these
+    # washed the default grey. His colours, picked 2026-09-16 from each
+    # school's own palette, never the gold.
+    "2124": ("0033a0", "Chaminade: royal blue"),
+    "2837": ("002d72", "East Texas A&M: blue"),
+    "2222": ("ba0c2f", "Ferris State: crimson"),
+    "2273": ("003087", "Hillsdale: blue"),
+    "128": ("005a3c", "Northern Michigan: green"),
+    "215": ("00653a", "Slippery Rock: green"),
+    "284": ("3b2a7a", "Stonehill: purple"),
+    "2627": ("4f2d7f", "Tarleton State: purple"),
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),

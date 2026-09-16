@@ -51,6 +51,10 @@ function shade(hex, lighten, strength) {
   return "#" + p.map((c, i) => Math.round(CARD[i] + (c - CARD[i]) * strength)
     .toString(16).padStart(2, "0")).join("");
 }
+// THE MICHIGAN VIEW'S OWN WASH, where it differs from every other view: Notre
+// Dame's card stays antique gold there while the rest of the site reads navy
+// (his call 2026-09-16). A border marked "Opponent" still uses teamColor.
+const MICH_WASH = { "87": "c99700" };
 function teamColor(t) {
   return COLORS[t.id] || (t.color || "").replace("#", "") || "6a6a70";
 }
@@ -825,7 +829,7 @@ function michCard(g, p) {
   // game played IN one of them already carries the gold through its own stage.
   const stageCol = stageColor(g);
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
-    shade(teamColor(opp)) + ring + '">' +
+    shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
       (dateDown ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +

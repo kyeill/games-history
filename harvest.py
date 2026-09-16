@@ -337,6 +337,61 @@ def ap_ranks(code, y, week):
     return ranks
 
 
+def ap_before(code, y, day):
+    """The AP poll in force on `day` -- the latest one released on or before it
+    -- as {team id: rank}.
+
+    ESPN's scoreboard carries NO rankings on Big Ten Tournament games in the
+    older seasons, and the week number that ap_ranks keys on is missing on them
+    too, so the poll is found by its DATE instead. His list of 2026-09-16
+    (Michigan State #2 and Purdue #8 in 2018, Ohio State #9 in 2021, eleven
+    more) is exactly this, every one.
+    """
+    season = y if code == "CFB" else y + 1
+    best = (None, {})
+    for week in range(1, 26):
+        path = os.path.join(POLLS, "%s-%d-w%02d-dated.json" % (code.lower(), season, week))
+        if os.path.exists(path):
+            got = json.load(open(path, encoding="utf-8"))
+        else:
+            got = {"date": None, "ranks": {}}
+            try:
+                r = requests.get("%s/%s/seasons/%d/types/2/weeks/%d/rankings/1"
+                                 % (CORE, POLL_PATHS[code], season, week), timeout=30)
+            except requests.RequestException:
+                return best[1]
+            if r.status_code == 200:
+                j = r.json()
+                got["date"] = (j.get("date") or "")[:10] or None
+                # polls before 2017 carry no date of their own; the WEEK they
+                # belong to does, and a poll is released as its week opens
+                if not got["date"]:
+                    try:
+                        wk = requests.get("%s/%s/seasons/%d/types/2/weeks/%d"
+                                          % (CORE, POLL_PATHS[code], season, week),
+                                          timeout=30).json()
+                        got["date"] = (wk.get("startDate") or "")[:10] or None
+                    except (requests.RequestException, ValueError):
+                        pass
+                for t in j.get("ranks") or []:
+                    m = re.search(r"/teams/([0-9]+)",
+                                  (t.get("team") or {}).get("$ref", ""))
+                    if m:
+                        got["ranks"][m.group(1)] = t.get("current")
+            if got["ranks"] or season_over(code, y):
+                os.makedirs(POLLS, exist_ok=True)
+                json.dump(got, open(path, "w", encoding="utf-8"))
+        if not got["date"]:
+            if best[0]:
+                break                     # past the last poll of the season
+            continue
+        if got["date"] <= day.isoformat():
+            best = (got["date"], got["ranks"])
+        else:
+            break
+    return best[1]
+
+
 def final_poll(code, y):
     """The season's FINAL poll as {team id: rank}, cached under cache/polls/.
 
@@ -1421,6 +1476,12 @@ def harvest():
                                               month=d.month, season=y)
                 # his seeds ride on conference-tournament games only
                 seeded = bool(stage_txt and stage_txt.startswith("Big Ten Tournament"))
+                # a Big Ten Tournament game ESPN left unranked takes the AP
+                # poll in force that day (his list, 2026-09-16). DISPLAY ONLY:
+                # it is read after the game type is settled, so Key Games is
+                # unchanged.
+                poll_day = (ap_before(code, y, d.date())
+                            if seeded and not any(ranks) else {})
                 side = []
                 for k in cs:
                     t = k["team"]
@@ -1436,7 +1497,8 @@ def harvest():
                     if was.get("conf"):
                         teams[t["id"]]["conf"] = was["conf"]
                     side.append({"id": t["id"], "score": int(k["score"]),
-                                 "rank": rank_of(k) or (ap.get(t["id"]) if rivals_only else None),
+                                 "rank": (rank_of(k) or poll_day.get(t["id"])
+                                          or (ap.get(t["id"]) if rivals_only else None)),
                                  "win": bool(k.get("winner")),
                                  "home": k.get("homeAway") == "home",
                                  "conf": str(t.get("conferenceId")),
