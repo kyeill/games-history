@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-084949";
+const BUILD = "20260916-090029";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -13,6 +13,9 @@ let BROWSE = null, TAB = "cfb", VIEW = "michigan";
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null,
               net: null, recent: false };
+// what the filters were before CURRENT was pressed, so releasing it puts them
+// back (his call 2026-09-16)
+let CURRENT_PREV = null;
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -189,6 +192,24 @@ function teamLine(t, sport, season, seed, g0) {
     '<span class="sc">' + scoreText(t.score) + "</span></div>";
 }
 
+/* A TOURNAMENT HEADER WEARS ITS TOURNAMENT'S COLOUR (his calls 2026-09-14,
+   Rivals too 2026-09-16): the Big Ten Tournament and Championship Game in Big
+   Ten blue, the NCAA Tournament in its blue -- lightened to read on a card,
+   as it is on a divider tile -- and the CFP and the New Year's Six bowls in
+   CFP gold. The NIT and the other bowls stay plain. */
+function ny6Bowl(g) {
+  return ["Rose Bowl", "Sugar Bowl", "Orange Bowl", "Cotton Bowl",
+          "Fiesta Bowl", "Peach Bowl"].indexOf(g.stage || "") > -1;
+}
+function stageColor(g) {
+  const st = g.stage || "";
+  if (ny6Bowl(g) || st.indexOf("CFP") === 0) return "#c28c19";
+  if (st.indexOf("Big Ten Tournament") === 0 ||
+      st.indexOf("Big Ten Championship") === 0) return "#0088ce";
+  if (st.indexOf("NCAA Tournament") === 0) return "#4d9ae0";
+  return null;
+}
+
 function rowHtml(g, browse) {
   const home = g.teams[0], away = g.teams[1];
   const win = home.win ? home : away;
@@ -215,7 +236,10 @@ function rowHtml(g, browse) {
     // Named by VENUE, not city -- the venue IS the story here. Wrigley Field,
     // Ford Field, Madison Square Garden.
     tags.push(chip("champ", g.offsite));
-  } else if (g.neutral && g.city) {
+  } else if (g.neutral && g.city &&
+             !(VIEW === "michigan" && !browse && ny6Bowl(g))) {
+    // a Michigan NEW YEAR'S SIX bowl names no city (his call 2026-09-16): the
+    // header already says Orange Bowl, and Miami Gardens adds nothing to it
     tags.push(chip("champ", g.city));
   }
   // Champions Classic and CBS Sports Classic move every year, so their cards
@@ -253,7 +277,7 @@ function rowHtml(g, browse) {
   // ...but the HEADER keeps that colour only when a Big Ten team is playing
   // (his call 2026-09-11). The network and the time keep theirs regardless.
   const bigTen = g.teams.some(t => t.conf === BIG_TEN[g.sport]);
-  const headCol = bigTen ? winCol : null;
+  const headCol = (VIEW === "rivals" && stageColor(g)) || (bigTen ? winCol : null);
   const timeCol = winCol;
   const col = c => (c ? ' style="color:' + c + '"' : "");
   const DAYS = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
@@ -417,7 +441,9 @@ function michCard(g, p) {
     ? MONTHS[+g.date.slice(5, 7) - 1].slice(0, 3) + " " +
       (+g.date.slice(8, 10)) + ", " + g.date.slice(0, 4)
     : fmtDate(g.date);
-  let when = p.when, right = shownDate;
+  // "DECEMBER SATURDAY" reads "SATURDAY" on this view (his call 2026-09-16);
+  // the date beside it already says December
+  let when = p.when.replace(/^December /, ""), right = shownDate;
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
   // The tournament writes itself out in full on this view (his call
@@ -798,13 +824,7 @@ function michCard(g, p) {
   // A NEW YEAR'S SIX bowl reads in CFP gold too (his call 2026-09-14) -- for
   // Michigan that is the 2011 Sugar, the 2016 Orange and the 2018 Peach. A CFP
   // game played IN one of them already carries the gold through its own stage.
-  const NY6 = ["Rose Bowl", "Sugar Bowl", "Orange Bowl",
-               "Cotton Bowl", "Fiesta Bowl", "Peach Bowl"];
-  const stageCol = NY6.indexOf(st) > -1 ? "#c28c19"
-    : !bigStage ? null
-    : st.indexOf("Big Ten") === 0 ? "#0088ce"
-    : st.indexOf("NCAA Tournament") === 0 ? "#4d9ae0"
-    : st.indexOf("CFP") === 0 ? "#c28c19" : null;
+  const stageCol = stageColor(g);
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
@@ -1096,6 +1116,23 @@ function visible() {
       const m = +g.date.slice(5, 7);
       return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase;
     });
+  }
+  // CURRENT (his call 2026-09-16): every TV Windows game in the LATEST week
+  // there is, the coming one included. Football's week is its number;
+  // basketball has none, so its week is Monday to Sunday around the latest
+  // game -- the same span the upcoming window runs to.
+  if (VIEW === "tv" && FILT.current && list.length) {
+    if (SPORT_OF[TAB] === "CFB") {
+      const key = g => g.week == null ? -1 : g.season * 100 + g.week;
+      const top = Math.max.apply(null, list.map(key));
+      list = list.filter(g => key(g) === top);
+    } else {
+      const last = list.map(g => g.date).sort().pop();
+      const d = new Date(last + "T12:00:00Z");
+      const mon = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5)
+        .toISOString().slice(0, 10);
+      list = list.filter(g => g.date >= mon);
+    }
   }
   // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
   // so the filter and the header can never disagree (his call 2026-09-14).
@@ -1487,7 +1524,9 @@ function sortButton() {
 
 function marqueeOn() { return !!FILT.marquee; }
 function quickButtons() {
-  return '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
+  return (VIEW === "tv" ? '<button class="f" data-act="current" aria-pressed="' +
+      !!FILT.current + '">Current</button>' : "") +
+    '<button class="f" data-act="marquee" aria-pressed="' + marqueeOn() +
     '">Marquee Windows</button>' +
     sortButton();
 }
@@ -1658,6 +1697,7 @@ async function init() {
       FILT.type = null;
       FILT.windows = null;
       FILT.marquee = VIEW === "tv";
+      FILT.current = false; CURRENT_PREV = null;
       if (VIEW === "rivals") {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
@@ -1685,6 +1725,24 @@ async function init() {
   document.getElementById("filters").addEventListener("click", e => {
     const b = e.target.closest("button.f[data-act]");
     if (!b) return;
+    if (b.dataset.act === "current") {
+      if (!FILT.current) {
+        // everything else off, oldest first -- the week reads in order
+        CURRENT_PREV = { filt: Object.assign({}, FILT), sort: SORT };
+        FILT = { season: null, week: null, month: null, type: null,
+                 windows: null, team: null, marquee: false, rival: null,
+                 post: false, winner: null, net: null, recent: false,
+                 current: true };
+        SORT = "asc";
+      } else {
+        if (CURRENT_PREV) { FILT = CURRENT_PREV.filt; SORT = CURRENT_PREV.sort; }
+        FILT.current = false;
+        CURRENT_PREV = null;
+      }
+      draw();
+      return;
+    }
+    if (b.dataset.act !== "sort") { FILT.current = false; CURRENT_PREV = null; }
     if (b.dataset.act === "marquee") {
       FILT.marquee = !FILT.marquee;
     } else if (b.dataset.act === "post") {
@@ -1700,6 +1758,7 @@ async function init() {
     const k = e.target.dataset && e.target.dataset.kind;
     if (!k) return;
     const v = e.target.value;
+    FILT.current = false; CURRENT_PREV = null;
     if (k === "window") FILT.windows = v === "" ? null : [v];
     else FILT[k] = v === "" ? null
       : ((k === "season" || k === "week" || k === "month") ? +v : v);
