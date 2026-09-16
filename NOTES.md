@@ -1,3 +1,52 @@
+# The expansion plan (his spec, 2026-09-16)
+
+Agreed before any of it was built. Soccer is NOT part of this app -- a separate
+app if ever.
+
+**TABS**, in his order: **Michigan** (Football, Basketball, Hockey) > **CFB**
+(TV Windows, Key Games, Rivals) > **CBB** (TV Windows, Key Games, Rivals,
+Cornell) > **Hockey** (Cornell, Rivals) > **Detroit** (Tigers, Lions, Red
+Wings, Pistons, Cavaliers). Browse is gone. DONE: the Michigan / CFB / CBB
+rows (`TOP` + `NAV` in app.js; TAB is still the sport, VIEW the view).
+
+**BUILD ORDER**: make the Michigan card a GENERAL TEAM CARD (team, sport, first
+year, inclusion rule, TV or not, colours, Sheet tab as settings) -> Michigan
+hockey -> Cornell hockey + Cornell basketball -> hockey Rivals -> Lions -> Red
+Wings / Pistons / Cavaliers -> Tigers.
+
+| view | from | games | notes |
+| --- | --- | --- | --- |
+| Michigan hockey | 2013 | all | his Sheet: shade, borders, home & home |
+| Cornell hockey | 2009 | all | same as Michigan |
+| Cornell basketball | 2009 | all | same as Michigan |
+| Hockey Rivals | | MSU, OSU, ND **NCAA Tournament losses only** | wants to see how teams' seasons ended, like CFB/CBB |
+| Tigers | 2006 | walk-off wins, extra-inning wins, no-hitters THROWN BY the Tigers, all playoff games | |
+| Lions | 2011 | all, with TV | filters: Primetime, Key Games, Playoffs |
+| Red Wings | 1997 | playoffs | |
+| Pistons | 2003 | NBA Cup + playoffs | |
+| Cavaliers | 2017 | NBA Cup + playoffs | |
+
+Filters on the team tabs are the familiar kinds (opponent, postseason). LIONS:
+**Primetime** = every Sunday-night game plus every non-Sunday game; **Key
+Games** = WINS decided in the final 2:00 or in overtime; **Playoffs**.
+
+HOCKEY always shows RANKINGS; TV only for the postseason, where it exists.
+
+**DATA, checked 2026-09-16:**
+- ESPN team schedules reach every start year above (the 1997 Red Wings Cup run
+  is there, 20 games). TV is listed on the 2011 Lions, almost never on old
+  NHL/NBA/MLB games, and on recent college hockey postseason games only.
+- ESPN has college hockey POLLS only from about 2021-22. Before that, rankings
+  come from **USCHO** (his call): `uscho.com/rankings/d-i-mens-poll/YYYY-MM-DD/`
+  embeds the whole poll as JSON (`PollDate`, `season` like "20132014", `rnk`,
+  `shortname`, `SchoolID`) -- top 20 only. Names need mapping to ESPN's.
+- NBA Cup games are labelled by ESPN itself: "NBA Cup - Group Play", "NBA Cup
+  Championship".
+- TIGERS: walk-offs and extra innings come from the inning-by-inning line
+  (home side batted in the last inning; more than nine innings). NO-HITTERS
+  CANNOT come from ESPN -- its summary lists 0 hits for BOTH teams in
+  Verlander's 2007 no-hitter -- so they are a short list in his Sheet.
+
 # Traps
 
 Each of these cost a debugging pass or would have. Do not rediscover them.
