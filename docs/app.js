@@ -4,12 +4,16 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-140250";
+const BUILD = "20260916-144031";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
 // VIEW switches between the two collections within it.
-let BROWSE = null, TAB = "cfb", VIEW = "michigan";
+// TOP is the tab along the top (his order, 2026-09-16): Michigan, CFB, CBB --
+// Hockey and Detroit join as they are built, and Browse is gone. TAB is still
+// the SPORT and VIEW the view within it, so every rule keyed on those is
+// untouched; TOP only decides which buttons the second row offers.
+let TOP = "michigan", TAB = "cfb", VIEW = "michigan";
 let FILT = { season: null, week: null, month: null, type: null, windows: null,
               team: null, marquee: false, rival: null, post: false, winner: null,
               net: null, recent: false };
@@ -1154,7 +1158,6 @@ function celebrateColor(g) {
 }
 
 function visible() {
-  if (TAB === "browse") return BROWSE || [];
   let list = GAMES.filter(g => !isHidden(g.id));
   // games added by hand live only in tags.json, so fold them back in
   Object.keys(TAGS).forEach(id => {
@@ -1310,7 +1313,6 @@ function seasonLabel(y) {
 }
 
 function filterChips() {
-  if (TAB === "browse") return "";
   // Every filter is a dropdown (his call 2026-09-09), and the Tag filter is
   // gone. Game type and TV window come from ORDER in games.json -- HIS
   // sequence, not alphabetical -- scoped to the sport tab, because CFB and CBB
@@ -1619,105 +1621,31 @@ function quickButtons() {
     sortButton();
 }
 
-function draw() {
-  const browsing = TAB === "browse";
-  document.querySelectorAll("nav button").forEach(b =>
-    b.setAttribute("aria-selected", String(b.dataset.tab === TAB)));
-  document.querySelectorAll("#viewbar button").forEach(b =>
-    b.setAttribute("aria-selected", String(b.dataset.view === VIEW)));
-  document.getElementById("viewbar").style.display =
-    browsing ? "none" : "inline-flex";
-  document.getElementById("filters").innerHTML = filterChips();
-  document.getElementById("daterow").style.display = browsing ? "flex" : "none";
-  const list = visible();
-  document.getElementById("count").textContent = TAB === "browse"
-    ? (BROWSE === null ? "pick a date range" : list.length + " games")
-    : list.length.toLocaleString() + " games";
-  document.getElementById("list").innerHTML = list.length
-    ? (VIEW === "michigan" && TAB !== "browse" ? michListHtml(list)
-      : list.map(g => rowHtml(g, TAB === "browse")).join(""))
-    : '<p class="empty">' + (TAB === "browse"
-      ? "Pick a start and end date, then Load."
-      : "Nothing matches those filters.") + "</p>";
-  if (VIEW === "michigan" && TAB !== "browse") trimMichChips();
-  else trimStageHeads();
-}
-
-/* ---------- Browse: ESPN queried live from the browser ------------------ */
-const ESPN = {
-  CFB: ["football/college-football", "80"],
-  CBB: ["basketball/mens-college-basketball", "50"]
+// Each top tab's second row: label, sport, view.
+const NAV = {
+  michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"]],
+  cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
+        ["Rivals", "cfb", "rivals"]],
+  cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
+        ["Rivals", "cbb", "rivals"]]
 };
-function etParts(iso) {
-  const f = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/New_York", year: "numeric", month: "2-digit",
-    day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
-    weekday: "short"
-  }).formatToParts(new Date(iso));
-  const g = t => f.find(p => p.type === t).value;
-  return {
-    date: g("year") + "-" + g("month") + "-" + g("day"),
-    time: (g("hour") === "24" ? "00" : g("hour")) + ":" + g("minute"),
-    dow: g("weekday").slice(0, 3)
-  };
-}
-function normalize(ev, sport) {
-  const c = (ev.competitions || [])[0];
-  if (!c) return null;
-  const cs = c.competitors || [];
-  if (cs.length !== 2) return null;
-  if (!((c.status || {}).type || {}).completed) return null;
-  const p = etParts(ev.date), nets = [];
-  (c.broadcasts || []).forEach(b => (b.names || []).forEach(n => nets.push(n)));
-  const teams = cs.map(k => {
-    const r = (k.curatedRank || {}).current;
-    if (k.team && !TEAMS[k.team.id]) {
-      TEAMS[k.team.id] = { short: k.team.location || k.team.displayName,
-                           name: k.team.displayName };
-    }
-    return {
-      id: k.team.id, score: +k.score, rank: (r && r !== 99) ? r : null,
-      win: !!k.winner, home: k.homeAway === "home",
-      color: k.team.color || "", name: k.team.location || k.team.displayName
-    };
-  });
-  const v = c.venue || {};
-  return {
-    id: ev.id, sport: sport, season: null, date: p.date, dow: p.dow,
-    time: p.time, neutral: !!c.neutralSite,
-    ot: ((c.status || {}).period || 0) > (sport === "CFB" ? 4 : 2),
-    venue: v.fullName, city: (v.address || {}).city,
-    nets: Array.from(new Set(nets)).sort(), teams: teams,
-    week: (ev.week || {}).number || null,
-    slots: [], big: [], champ: null,
-    round: ((c.notes || [])[0] || {}).headline || null
-  };
-}
-async function browseLoad() {
-  const a = document.getElementById("from").value;
-  const b = document.getElementById("to").value;
-  if (!a || !b) { toast("Pick both dates", true); return; }
-  document.getElementById("list").innerHTML =
-    '<p class="empty">Loading…</p>';
-  const from = a.replace(/-/g, ""), to = b.replace(/-/g, ""), out = [];
-  let capped = false;
-  for (const sp of Object.keys(ESPN)) {
-    const path = ESPN[sp][0], grp = ESPN[sp][1];
-    try {
-      const r = await fetch("https://site.api.espn.com/apis/site/v2/sports/" +
-        path + "/scoreboard?dates=" + from + "-" + to + "&groups=" + grp +
-        "&limit=1000");
-      if (!r.ok) continue;
-      const j = await r.json();
-      const ev = j.events || [];
-      if (ev.length >= 1000) capped = true;
-      ev.forEach(e => { const g = normalize(e, sp); if (g) out.push(g); });
-    } catch (e) { toast("Could not reach ESPN", true); }
-  }
-  BROWSE = out;
-  // ESPN silently caps a range at 1000 events rather than paginating
-  if (capped) toast("1000-game cap hit — narrow the range", true);
-  draw();
+
+function draw() {
+  document.querySelectorAll("nav button").forEach(b =>
+    b.setAttribute("aria-selected", String(b.dataset.top === TOP)));
+  document.getElementById("viewbar").innerHTML = NAV[TOP].map(v =>
+    '<button data-tab="' + v[1] + '" data-view="' + v[2] + '" aria-selected="' +
+    (v[1] === TAB && v[2] === VIEW) + '">' + v[0] + "</button>").join("");
+  document.getElementById("filters").innerHTML = filterChips();
+  const list = visible();
+  document.getElementById("count").textContent =
+    list.length.toLocaleString() + " games";
+  document.getElementById("list").innerHTML = list.length
+    ? (VIEW === "michigan" ? michListHtml(list)
+      : list.map(g => rowHtml(g, false)).join(""))
+    : '<p class="empty">Nothing matches those filters.</p>';
+  if (VIEW === "michigan") trimMichChips();
+  else trimStageHeads();
 }
 
 /* ---------- saving to GitHub -------------------------------------------- */
@@ -1729,6 +1657,52 @@ function toast(msg, bad) {
   setTimeout(() => t.classList.remove("on"), 3200);
 }
 /* ---------- wiring ------------------------------------------------------ */
+function switchView(view) {
+  const leaving = VIEW;
+  VIEW = view;
+  FILT.type = null;
+  FILT.windows = null;
+  FILT.marquee = VIEW === "tv";
+  FILT.current = false; CURRENT_PREV = null;
+  FILT.hl = null;
+  if (VIEW === "rivals") {
+    // his Rivals default (2026-09-11): every season, newest first, opened
+    // on Ohio State in football and Michigan State in basketball
+    FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
+    FILT.net = null;
+    FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
+    FILT.post = false; FILT.winner = null;
+    SORT = defaultSort();
+  } else if (VIEW === "michigan") {
+    // the Michigan view opens on its newest season, in schedule order
+    FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
+    FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+    FILT.net = null;
+    SORT = defaultSort();
+  } else if (leaving === "rivals" || leaving === "michigan") {
+    // leaving Rivals or Michigan puts back the season a normal view opens on
+    FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
+    FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
+    FILT.net = null;
+    if (leaving === "michigan") SORT = defaultSort();
+  }
+}
+function go(tab, view) {
+  if (tab !== TAB) {
+    // Switching sport goes back to the TAB DEFAULT, not merely clean filters
+    // (his call 2026-09-11): the latest season with games, the default sort.
+    // CFB and CBB share no game types or windows, so a value left over from
+    // the other sport would filter everything away.
+    TAB = tab;
+    VIEW = "michigan";
+    SORT = defaultSort();
+    clearFilters();
+    FILT.current = false; CURRENT_PREV = null;
+  }
+  if (view !== VIEW) switchView(view);
+  draw();
+  window.scrollTo({ top: 0 });
+}
 async function init() {
   const v = "?v=" + BUILD;
   const r = await Promise.all([
@@ -1752,65 +1726,20 @@ async function init() {
     if (t.ok) TAGS = await t.json();
   } catch (e) { }
 
-  // LOCAL dates, not toISOString -- that reads UTC, so an evening in the
-  // Eastern time zone would open Browse on tomorrow.
-  const ymd = d => d.getFullYear() + "-" +
-    String(d.getMonth() + 1).padStart(2, "0") + "-" +
-    String(d.getDate()).padStart(2, "0");
-  // Browse opens on the past week, which is the stretch he is actually
-  // checking -- a single day is almost always empty.
-  document.getElementById("from").value = ymd(new Date(Date.now() - 7 * 864e5));
-  document.getElementById("to").value = ymd(new Date());
   draw();
 
+  // THE TWO ROWS (2026-09-16). A top tab opens on its first view; a view button
+  // may change the sport as well as the view (Michigan's Football/Basketball).
   document.querySelectorAll("nav button").forEach(b =>
     b.addEventListener("click", e => {
-      TAB = e.currentTarget.dataset.tab;
-      // Switching sport goes back to the TAB DEFAULT, not merely clean filters:
-      // the MICHIGAN view (his call 2026-09-11), the latest season with games,
-      // Newest First. CFB and CBB share no game types or windows anyway, so a
-      // value left over from the other sport would filter everything away.
-      VIEW = "michigan";
-      SORT = defaultSort();
-      clearFilters();
-      draw();
-      window.scrollTo({ top: 0 });
+      TOP = e.currentTarget.dataset.top;
+      const first = NAV[TOP][0];
+      go(first[1], first[2]);
     }));
-  document.querySelectorAll("#viewbar button").forEach(b =>
-    b.addEventListener("click", e => {
-      // the sport does not change, so the filters are still valid -- only the
-      // game-type / TV-window pair is view-specific
-      const leaving = VIEW;
-      VIEW = e.currentTarget.dataset.view;
-      FILT.type = null;
-      FILT.windows = null;
-      FILT.marquee = VIEW === "tv";
-      FILT.current = false; CURRENT_PREV = null;
-      FILT.hl = null;
-      if (VIEW === "rivals") {
-        // his Rivals default (2026-09-11): every season, newest first, opened
-        // on Ohio State in football and Michigan State in basketball
-        FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
-        FILT.net = null;
-        FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
-        FILT.post = false; FILT.winner = null;
-        SORT = defaultSort();
-      } else if (VIEW === "michigan") {
-        // the Michigan view opens on its newest season, in schedule order
-        FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
-        FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null;
-        SORT = defaultSort();
-      } else if (leaving === "rivals" || leaving === "michigan") {
-        // leaving Rivals or Michigan puts back the season a normal view opens on
-        FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
-        FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-        FILT.net = null;
-        if (leaving === "michigan") SORT = defaultSort();
-      }
-      draw();
-      window.scrollTo({ top: 0 });
-    }));
+  document.getElementById("viewbar").addEventListener("click", e => {
+    const b = e.target.closest("button[data-view]");
+    if (b) go(b.dataset.tab, b.dataset.view);
+  });
   document.getElementById("filters").addEventListener("click", e => {
     const b = e.target.closest("button.f[data-act]");
     if (!b) return;
@@ -1864,7 +1793,6 @@ async function init() {
     draw();
     window.scrollTo({ top: 0 });
   });
-  document.getElementById("goload").addEventListener("click", browseLoad);
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => { });
   }

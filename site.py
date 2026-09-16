@@ -386,23 +386,12 @@ BODY = """
 </header>
 
 <nav>
-  <button data-tab="cfb" aria-selected="true">College Football</button>
-  <button data-tab="cbb" aria-selected="false">College Basketball</button>
-  <button data-tab="browse" aria-selected="false">Browse</button>
+  <button data-top="michigan" aria-selected="true">Michigan</button>
+  <button data-top="cfb" aria-selected="false">CFB</button>
+  <button data-top="cbb" aria-selected="false">CBB</button>
 </nav>
 
-<div class="viewbar" id="viewbar">
-  <button data-view="michigan" aria-selected="true">Michigan</button>
-  <button data-view="tv" aria-selected="false">TV Windows</button>
-  <button data-view="big" aria-selected="false">Key Games</button>
-  <button data-view="rivals" aria-selected="false">Rivals</button>
-</div>
-
-<div class="daterow" id="daterow" style="display:none">
-  <input type="date" id="from" aria-label="From date">
-  <input type="date" id="to" aria-label="To date">
-  <button class="go" id="goload">Load</button>
-</div>
+<div class="viewbar" id="viewbar"></div>
 
 <div class="filters" id="filters"></div>
 <div id="list"></div>
