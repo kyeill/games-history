@@ -337,35 +337,42 @@ def ap_ranks(code, y, week):
     return ranks
 
 
-def ap_before(code, y, day):
-    """The AP poll in force on `day` -- the latest one released on or before it
-    -- as {team id: rank}.
+POLL_SERIES = {}      # (code, season, poll) -> [(date, ranks)] in week order
 
-    ESPN's scoreboard carries NO rankings on Big Ten Tournament games in the
-    older seasons, and the week number that ap_ranks keys on is missing on them
-    too, so the poll is found by its DATE instead. His list of 2026-09-16
-    (Michigan State #2 and Purdue #8 in 2018, Ohio State #9 in 2021, eleven
-    more) is exactly this, every one.
-    """
-    season = y if code == "CFB" else y + 1
-    best = (None, {})
+
+def poll_series(code, season, poll=1):
+    """Every week of one poll for one season, each with the DATE it came out,
+    cached under cache/polls/. Poll 1 is the AP; 21 is the CFP committee.
+    Polls before 2017 carry no date of their own, so the week's start date
+    stands in -- a poll is released as its week opens."""
+    key = (code, season, poll)
+    if key in POLL_SERIES:
+        return POLL_SERIES[key]
+    y = season if code == "CFB" else season - 1
+    tag = "" if poll == 1 else "-p%d" % poll
+    out, seen_any, misses = [], False, 0
     for week in range(1, 26):
-        path = os.path.join(POLLS, "%s-%d-w%02d-dated.json" % (code.lower(), season, week))
+        path = os.path.join(POLLS, "%s-%d-w%02d%s-dated.json"
+                            % (code.lower(), season, week, tag))
         if os.path.exists(path):
             got = json.load(open(path, encoding="utf-8"))
         else:
             got = {"date": None, "ranks": {}}
             try:
-                r = requests.get("%s/%s/seasons/%d/types/2/weeks/%d/rankings/1"
-                                 % (CORE, POLL_PATHS[code], season, week), timeout=30)
+                r = requests.get("%s/%s/seasons/%d/types/2/weeks/%d/rankings/%d"
+                                 % (CORE, POLL_PATHS[code], season, week, poll),
+                                 timeout=30)
             except requests.RequestException:
-                return best[1]
+                break
             if r.status_code == 200:
                 j = r.json()
                 got["date"] = (j.get("date") or "")[:10] or None
-                # polls before 2017 carry no date of their own; the WEEK they
-                # belong to does, and a poll is released as its week opens
-                if not got["date"]:
+                for t in j.get("ranks") or []:
+                    m = re.search(r"/teams/([0-9]+)",
+                                  (t.get("team") or {}).get("$ref", ""))
+                    if m:
+                        got["ranks"][m.group(1)] = t.get("current")
+                if got["ranks"] and not got["date"]:
                     try:
                         wk = requests.get("%s/%s/seasons/%d/types/2/weeks/%d"
                                           % (CORE, POLL_PATHS[code], season, week),
@@ -373,23 +380,44 @@ def ap_before(code, y, day):
                         got["date"] = (wk.get("startDate") or "")[:10] or None
                     except (requests.RequestException, ValueError):
                         pass
-                for t in j.get("ranks") or []:
-                    m = re.search(r"/teams/([0-9]+)",
-                                  (t.get("team") or {}).get("$ref", ""))
-                    if m:
-                        got["ranks"][m.group(1)] = t.get("current")
             if got["ranks"] or season_over(code, y):
                 os.makedirs(POLLS, exist_ok=True)
                 json.dump(got, open(path, "w", encoding="utf-8"))
-        if not got["date"]:
-            if best[0]:
-                break                     # past the last poll of the season
-            continue
-        if got["date"] <= day.isoformat():
-            best = (got["date"], got["ranks"])
+        if got["date"] and got["ranks"]:
+            out.append((got["date"], got["ranks"]))
+            seen_any, misses = True, 0
+        elif seen_any:
+            # A SKIPPED WEEK IS NOT THE END (2026-09-16): 2020 football has
+            # holes all through the autumn and 2025-26 basketball skips its
+            # holiday week, so only a run of three misses ends the season
+            misses += 1
+            if misses >= 3:
+                break
+    # ...and ORDER BY DATE, not by week: ESPN files some polls under the wrong
+    # week (2025-26's final April poll sits in week 2)
+    out.sort(key=lambda p: p[0])
+    POLL_SERIES[key] = out
+    return out
+
+
+def ap_before(code, y, day, poll=1):
+    """The poll in force on `day` -- the latest one released on or before it
+    -- as {team id: rank}.
+
+    ESPN's scoreboard drops rankings on a good share of older games: the Big
+    Ten Tournament (his list of 2026-09-16, fourteen games, matched exactly),
+    the Champions Classic, North Carolina-Michigan in 2017 and 2018, and the
+    2018 and 2019 CFP semifinals. The week number that ap_ranks keys on is
+    missing on many of them too, so the poll is found by its DATE instead.
+    """
+    season = y if code == "CFB" else y + 1
+    best = {}
+    for date, ranks in poll_series(code, season, poll):
+        if date <= day.isoformat():
+            best = ranks
         else:
             break
-    return best[1]
+    return best
 
 
 def final_poll(code, y):
@@ -1476,12 +1504,20 @@ def harvest():
                                               month=d.month, season=y)
                 # his seeds ride on conference-tournament games only
                 seeded = bool(stage_txt and stage_txt.startswith("Big Ten Tournament"))
-                # a Big Ten Tournament game ESPN left unranked takes the AP
-                # poll in force that day (his list, 2026-09-16). DISPLAY ONLY:
-                # it is read after the game type is settled, so Key Games is
-                # unchanged.
-                poll_day = (ap_before(code, y, d.date())
-                            if seeded and not any(ranks) else {})
+                # A GAME ESPN LEFT WITH NO RANKING ON EITHER SIDE takes the
+                # poll in force that day (his calls 2026-09-16). A game with
+                # no ranked team really in it simply finds nothing. The CFP
+                # reads the COMMITTEE's rankings, since there the number is
+                # the seed; the NCAA Tournament and the NIT are left alone --
+                # their number is a seed no poll holds, and ESPN has every one.
+                # DISPLAY ONLY: this is read after the game type is settled,
+                # so Key Games and Rivals admission are unchanged.
+                poll_day = {}
+                if not any(ranks):
+                    if stage_txt and stage_txt.startswith("CFP"):
+                        poll_day = ap_before(code, y, d.date(), poll=21)
+                    elif not (stage_txt and stage_txt.startswith(("NCAA Tournament", "NIT"))):
+                        poll_day = ap_before(code, y, d.date())
                 side = []
                 for k in cs:
                     t = k["team"]

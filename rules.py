@@ -706,9 +706,9 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
     if espn_sat:
         return "ESPN Primetime"
     if "ESPN" in nets and day == "Mon" and 18 * 60 <= t <= 21 * 60 + 30:
-        return "Big Monday"
+        return "ESPN Big Monday"            # the network named (his call 2026-09-16)
     if "ESPN" in nets and day == "Tue" and 18 * 60 <= t <= 21 * 60 + 30:
-        return "Super Tuesday"
+        return "ESPN Super Tuesday"
     return None
 
 

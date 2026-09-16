@@ -192,7 +192,13 @@ function teamLine(t, sport, season, seed, g0) {
     '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
     '<span class="rk">' +
     (t.rank && !seedGame(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
-    '<span class="nm">' + inline + esc(teamName(t, sport, season)) + "</span>" +
+    '<span class="nm">' + inline + esc(teamName(t, sport, season)) +
+    // A CONFERENCE-TOURNAMENT game carries his seed in front of the name, so
+    // the poll ranking moves to AFTER it, small and grey like a Michigan card's
+    // final rating (his call 2026-09-16) -- the rank column goes, and both
+    // names line up with every other card
+    (g0 && confSeeded(g0) && t.rank ? '<span class="rkaft">#' + t.rank + "</span>" : "") +
+    "</span>" +
     '<span class="sc">' + scoreText(t.score) + "</span></div>";
 }
 
@@ -344,7 +350,7 @@ function rowHtml(g, browse) {
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     // a seeded game drops the rank column: the seed rides with the name
-    (seedGame(g) ? " rk-no" : "") +
+    ((seedGame(g) || confSeeded(g)) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -1214,7 +1220,7 @@ function visible() {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
     // the Postseason button: everything by default, pressed only the CFP and
     // the NCAA Tournament (his call 2026-09-11)
-    if (FILT.post) list = list.filter(playoffGame);
+    if (FILT.post) list = list.filter(rivalsPost);
     if (FILT.winner) list = list.filter(g =>
       g.teams.some(t => t.win && t.id === FILT.winner));
   }
@@ -1564,6 +1570,16 @@ function seedGame(g) {
   return playoffGame(g);
 }
 
+function confSeeded(g) {
+  return !playoffGame(g) && g.teams.some(t => t.seed != null);
+}
+// The Rivals Postseason button: the CFP and the NCAA Tournament, plus the Big
+// Ten Tournament FINAL and the Big Ten Championship Game (his call 2026-09-16)
+function rivalsPost(g) {
+  const s = g.stage || "";
+  return playoffGame(g) || s === "Big Ten Tournament | Championship" ||
+    s.indexOf("Big Ten Championship") === 0;
+}
 function playoffGame(g) {
   const s = g.stage || "";
   return s.indexOf("CFP") === 0 || s.indexOf("NCAA Tournament") === 0;
