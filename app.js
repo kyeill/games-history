@@ -1023,12 +1023,14 @@ function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
      Special     WIN, shaded, with a maize / CFP / NCAA border -- or a B1G
                  border, but only on a Big Ten Tournament game or the Big Ten
                  Championship Game (a regular-season title clinch does not count)
-     Memorable   WIN, shaded and/or any border, that is not already Special
+     Memorable   WIN, shaded and/or any border -- Special games included
      Postseason  WIN: football's bowls, the CFP and the Big Ten Championship
-                 Game; basketball's Big Ten and NCAA Tournaments (not the NIT)
+                 Game; basketball's NCAA Tournament only (no Big Ten
+                 Tournament, no NIT)
      Attended    his * in the Attended column, WIN OR LOSS
      Details     WIN OR LOSS: a neutral site outside the postseason (MTEs
-                 included), a Home & Home / Neutral & Neutral / Home & Neutral
+                 included, and a home game moved off campus -- Northwestern
+                 at Wrigley Field), a Home & Home / Neutral & Neutral / Home & Neutral
                  (never Notre Dame's -- that is a rivalry, not a scheduled
                  series), the Big Ten/ACC Challenge or the Gavitt Games
    A "border" is the one HE gives in the sheet, or the championship ring a
@@ -1060,17 +1062,17 @@ function highlightOf(g, kind) {
     const notreDame = g.teams.some(t => t.id === "87");
     const series = !notreDame &&
       (hand.length > 0 || FAMILY.indexOf(g.series) > -1);
-    return (g.neutral && !st && !g.post) || series ||
+    return ((g.neutral || !!g.offsite) && !st && !g.post) || series ||
       /ACC Challenge|Gavitt/.test(g.event || "");
   }
   if (!m.win) return false;
   const special = shaded && border === "title";
   if (kind === "Special") return special;
-  if (kind === "Memorable") return (shaded || !!border) && !special;
+  if (kind === "Memorable") return shaded || !!border;
   if (kind === "Postseason") {
     return g.sport === "CFB"
       ? !!g.post || st.indexOf("Big Ten Championship") === 0
-      : st.indexOf("Big Ten Tournament") === 0 || st.indexOf("NCAA Tournament") === 0;
+      : st.indexOf("NCAA Tournament") === 0;
   }
   return false;
 }
