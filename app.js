@@ -724,7 +724,10 @@ function michCard(g, p) {
   // nothing, so the date fills it.
   // ...and on a tournament or an MTE card it is ALWAYS down there, placed
   // above in the order he asked for, so the header must not print it again
-  const dateDown = bigStage || mteCard || parts.every(q => q.his);
+  // ...REVERSED 2026-09-16: his Notes are DETAILS like any other, so they take
+  // the third row on their own and the date stays up in the header. The date
+  // only drops when the row would otherwise be empty.
+  const dateDown = bigStage || mteCard || !parts.length;
   if (dateDown && !bigStage && !mteCard) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
@@ -915,7 +918,9 @@ window.addEventListener("resize", () => {
    on a desktop it takes one card's slot and three-across stays in step. */
 function michListHtml(list) {
   const cards = list.map(g => rowHtml(g, false));
-  if (FILT.season == null || list.length < 2) return cards.join("");
+  // no dividers under a Highlights filter (his call 2026-09-16): a bye or a
+  // tournament tile means nothing between two hand-picked games
+  if (FILT.season == null || list.length < 2 || FILT.hl) return cards.join("");
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
   const post = g => !!(g.post || g.champ);
@@ -1013,17 +1018,19 @@ function scoreText(v) { return (v === null || v === undefined) ? "" : v; }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
 
-/* HIGHLIGHTS on the Michigan views (his call 2026-09-16) -- WINS ONLY, and
-   never a game not yet played.
-     Special     shaded, with a maize / CFP / B1G / NCAA border
-     Memorable   shaded, with any border
-     Meaningful  shaded, or any border, or both
-     Postseason  football's bowls, the CFP and the Big Ten Championship Game;
-                 basketball's Big Ten and NCAA Tournaments (not the NIT)
-     Attended    his * in the Attended column
-     Details     a neutral site outside the postseason (MTEs included), a
-                 Home & Home / Neutral & Neutral / Home & Neutral, the Big
-                 Ten/ACC Challenge or the Gavitt Games
+/* HIGHLIGHTS on the Michigan views (his calls 2026-09-16). Never a game not
+   yet played.
+     Special     WIN, shaded, with a maize / CFP / NCAA border -- or a B1G
+                 border, but only on a Big Ten Tournament game or the Big Ten
+                 Championship Game (a regular-season title clinch does not count)
+     Memorable   WIN, shaded and/or any border, that is not already Special
+     Postseason  WIN: football's bowls, the CFP and the Big Ten Championship
+                 Game; basketball's Big Ten and NCAA Tournaments (not the NIT)
+     Attended    his * in the Attended column, WIN OR LOSS
+     Details     WIN OR LOSS: a neutral site outside the postseason (MTEs
+                 included), a Home & Home / Neutral & Neutral / Home & Neutral
+                 (never Notre Dame's -- that is a rivalry, not a scheduled
+                 series), the Big Ten/ACC Challenge or the Gavitt Games
    A "border" is the one HE gives in the sheet, or the championship ring a
    title win carries on its own. The automatic grey frame on a bowl, an MTE or
    an NCAA game is not one -- every such game has it, so it says nothing. */
@@ -1034,29 +1041,36 @@ function michBorder(g) {
       st === "CFP | Championship") return "title";
   const b = String((g.mx || {}).border || "").trim().toLowerCase();
   if (!b) return "";
-  return ["maize", "cfp", "b1g", "ncaa"].indexOf(b) > -1 ? "title" : "other";
+  const bigTenEvent = st.indexOf("Big Ten Tournament") === 0 ||
+    st.indexOf("Big Ten Championship") === 0;
+  if (["maize", "cfp", "ncaa"].indexOf(b) > -1 || (b === "b1g" && bigTenEvent))
+    return "title";
+  return "other";
 }
 function highlightOf(g, kind) {
   const m = michTeam(g);
-  if (!m || !m.win || upcoming(g)) return false;
+  if (!m || upcoming(g)) return false;
   const mx = g.mx || {}, st = g.stage || "";
   const shaded = !!mx.shade, border = michBorder(g);
-  if (kind === "Special") return shaded && border === "title";
-  if (kind === "Memorable") return shaded && !!border;
-  if (kind === "Meaningful") return shaded || !!border;
-  if (kind === "Postseason") {
-    return g.sport === "CFB"
-      ? !!g.post || st.indexOf("Big Ten Championship") === 0
-      : st.indexOf("Big Ten Tournament") === 0 || st.indexOf("NCAA Tournament") === 0;
-  }
   if (kind === "Attended") return !!mx.attended;
   if (kind === "Details") {
     // the series the card itself shows: his hand tag wins over the derived one
     const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
     const hand = myTags(g.id).filter(t => FAMILY.indexOf(t) > -1);
-    const series = hand.length > 0 || FAMILY.indexOf(g.series) > -1;
+    const notreDame = g.teams.some(t => t.id === "87");
+    const series = !notreDame &&
+      (hand.length > 0 || FAMILY.indexOf(g.series) > -1);
     return (g.neutral && !st && !g.post) || series ||
       /ACC Challenge|Gavitt/.test(g.event || "");
+  }
+  if (!m.win) return false;
+  const special = shaded && border === "title";
+  if (kind === "Special") return special;
+  if (kind === "Memorable") return (shaded || !!border) && !special;
+  if (kind === "Postseason") {
+    return g.sport === "CFB"
+      ? !!g.post || st.indexOf("Big Ten Championship") === 0
+      : st.indexOf("Big Ten Tournament") === 0 || st.indexOf("NCAA Tournament") === 0;
   }
   return false;
 }
@@ -1387,8 +1401,7 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Memorable", "Meaningful", "Postseason",
-                    "Attended", "Details"]
+    const hlOpts = ["Special", "Memorable", "Postseason", "Attended", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
