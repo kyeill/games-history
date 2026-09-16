@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-091933";
+const BUILD = "20260916-092943";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1012,6 +1012,54 @@ function upcoming(g) { return !!g.upcoming; }
 function scoreText(v) { return (v === null || v === undefined) ? "" : v; }
 function isRival(t) { return RIVALS.indexOf(t.id) > -1; }
 function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
+
+/* HIGHLIGHTS on the Michigan views (his call 2026-09-16) -- WINS ONLY, and
+   never a game not yet played.
+     Special     shaded, with a maize / CFP / B1G / NCAA border
+     Memorable   shaded, with any border
+     Meaningful  shaded, or any border, or both
+     Postseason  football's bowls, the CFP and the Big Ten Championship Game;
+                 basketball's Big Ten and NCAA Tournaments (not the NIT)
+     Attended    his * in the Attended column
+     Details     a neutral site outside the postseason (MTEs included), a
+                 Home & Home / Neutral & Neutral / Home & Neutral, the Big
+                 Ten/ACC Challenge or the Gavitt Games
+   A "border" is the one HE gives in the sheet, or the championship ring a
+   title win carries on its own. The automatic grey frame on a bowl, an MTE or
+   an NCAA game is not one -- every such game has it, so it says nothing. */
+function michBorder(g) {
+  const st = g.stage || "";
+  if (st === "Big Ten Tournament | Championship" ||
+      st === "NCAA Tournament | Championship" ||
+      st === "CFP | Championship") return "title";
+  const b = String((g.mx || {}).border || "").trim().toLowerCase();
+  if (!b) return "";
+  return ["maize", "cfp", "b1g", "ncaa"].indexOf(b) > -1 ? "title" : "other";
+}
+function highlightOf(g, kind) {
+  const m = michTeam(g);
+  if (!m || !m.win || upcoming(g)) return false;
+  const mx = g.mx || {}, st = g.stage || "";
+  const shaded = !!mx.shade, border = michBorder(g);
+  if (kind === "Special") return shaded && border === "title";
+  if (kind === "Memorable") return shaded && !!border;
+  if (kind === "Meaningful") return shaded || !!border;
+  if (kind === "Postseason") {
+    return g.sport === "CFB"
+      ? !!g.post || st.indexOf("Big Ten Championship") === 0
+      : st.indexOf("Big Ten Tournament") === 0 || st.indexOf("NCAA Tournament") === 0;
+  }
+  if (kind === "Attended") return !!mx.attended;
+  if (kind === "Details") {
+    // the series the card itself shows: his hand tag wins over the derived one
+    const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
+    const hand = myTags(g.id).filter(t => FAMILY.indexOf(t) > -1);
+    const series = hand.length > 0 || FAMILY.indexOf(g.series) > -1;
+    return (g.neutral && !st && !g.post) || series ||
+      /ACC Challenge|Gavitt/.test(g.event || "");
+  }
+  return false;
+}
 // An upset: a ranked team lost to an unranked or a worse-ranked team.
 function isUpset(g) {
   if (upcoming(g)) return false;
@@ -1147,6 +1195,7 @@ function visible() {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
+  if (VIEW === "michigan" && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1335,6 +1384,14 @@ function filterChips() {
       netOpts = netOpts.concat(have.map(netOpt));
     });
     h += group("Network", select("net", "All Networks", netOpts, FILT.net));
+    // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
+    // leave any games for
+    const hlBase = visibleWithout("hl");
+    const hlOpts = ["Special", "Memorable", "Meaningful", "Postseason",
+                    "Attended", "Details"]
+      .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
+      .map(k => [k, k]);
+    h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
     return h + group("", '<button class="f" data-act="recent" aria-pressed="' +
       !!FILT.recent + '">2021-Onward</button>' + sortButton());
   }
@@ -1701,6 +1758,7 @@ async function init() {
       FILT.windows = null;
       FILT.marquee = VIEW === "tv";
       FILT.current = false; CURRENT_PREV = null;
+      FILT.hl = null;
       if (VIEW === "rivals") {
         // his Rivals default (2026-09-11): every season, newest first, opened
         // on Ohio State in football and Michigan State in basketball
