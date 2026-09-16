@@ -404,8 +404,8 @@ def hockey_stage(heads):
             return "Big Ten Tournament | " + rnd
         if "NCAA" in h and "Hockey" in h:
             rnd = ("Frozen Four" if "frozen" in low
-                   else "Regional Semifinal" if "regional semi" in low
-                   else "Regional Final" if "regional final" in low
+                   else "First Round" if "regional semi" in low
+                   else "Second Round" if "regional final" in low
                    else "Championship" if "champ" in low
                    else part or "Round")
             return "NCAA Tournament | " + rnd
@@ -424,7 +424,9 @@ B1G_HOCKEY_TOURNEY = {          # season: (first day, days between rounds)
     2013: ("2014-03-20", 1), 2014: ("2015-03-19", 1), 2015: ("2016-03-17", 1),
     2016: ("2017-03-16", 1), 2017: ("2018-03-02", 7), 2018: ("2019-03-08", 7),
     2019: ("2020-03-06", 7), 2020: ("2021-03-13", 1), 2021: ("2022-03-04", 7)}
-B1G_HOCKEY_CITY = {2013: "St. Paul", 2014: "Detroit", 2015: "St. Paul", 2016: "Detroit"}
+# the neutral years -- and the 2021 bubble in South Bend (his catch 2026-09-16)
+B1G_HOCKEY_CITY = {2013: "St. Paul", 2014: "Detroit", 2015: "St. Paul", 2016: "Detroit",
+                   2020: "South Bend"}
 NCAA_HOCKEY_START = {           # the Wednesday before the regional weekend
     2009: "2010-03-24", 2010: "2011-03-23", 2011: "2012-03-21", 2012: "2013-03-27",
     2013: "2014-03-26", 2014: "2015-03-25", 2015: "2016-03-23", 2016: "2017-03-22",
@@ -432,10 +434,38 @@ NCAA_HOCKEY_START = {           # the Wednesday before the regional weekend
 FROZEN_FOUR_CITY = {2009: "Detroit", 2010: "St. Paul", 2011: "Tampa", 2012: "Pittsburgh",
                     2013: "Philadelphia", 2014: "Boston", 2015: "Tampa", 2016: "Chicago",
                     2017: "St. Paul", 2018: "Buffalo", 2020: "Pittsburgh", 2021: "Boston"}
-NCAA_ROUNDS = ["Regional Semifinal", "Regional Final", "Frozen Four", "Championship"]
+# his names (2026-09-16): the regional games are the FIRST and SECOND ROUND
+NCAA_ROUNDS = ["First Round", "Second Round", "Frozen Four", "Championship"]
 # regional cities, per team and season, where ESPN has no venue
 NCAA_REGIONAL_CITY = {("130", 2015): "Cincinnati", ("130", 2017): "Worcester",
                       ("130", 2021): "Allentown"}
+
+
+# REGULAR-SEASON EVENTS, per team (his list, 2026-09-16) -- ESPN gives these
+# no venue or name either. The Great Lakes Invitational is a neutral-site
+# event like basketball's CBS Sports Classic; the Ice Breaker is an MTE, with
+# the MTE card and its rounds.
+HOCKEY_EVENTS = {
+    "130": [
+        {"event": "Great Lakes Invitational", "city": "Detroit",
+         "seasons": range(2013, 2020), "window": ("12-26", "01-03")},
+        {"event": "Ice Breaker", "city": "Duluth", "mte": True,
+         "dates": ("2021-10-15", "2021-10-16")},
+    ],
+}
+
+
+def hockey_event(team_id, y, day):
+    """The regular-season event a game belongs to, or None."""
+    md = day[5:]
+    for e in HOCKEY_EVENTS.get(team_id, ()):
+        if "dates" in e and day in e["dates"]:
+            return e
+        if "seasons" in e and y in e["seasons"]:
+            lo, hi = e["window"]
+            if md >= lo or md <= hi:
+                return e
+    return None
 
 
 def hockey_old_stage(team_id, y, day, conf_team_ids, ncaa_seen):
@@ -530,11 +560,20 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 continue
             tie = (not upcoming and side[0]["score"] is not None
                    and side[0]["score"] == side[1]["score"])
+            # A 0-0 "FINAL" WAS NEVER PLAYED: ESPN keeps a cancelled game that
+            # way, with no box score and no plays -- the 2021 Great Lakes
+            # Invitational game with Michigan Tech, and 12/5/2025 at Michigan
+            # State (found 2026-09-16)
+            if tie and side[0]["score"] == 0:
+                continue
+            ev = None if stage else hockey_event(team_id, y, d.strftime("%Y-%m-%d"))
             v = c.get("venue") or {}
             city = (v.get("address") or {}).get("city")
+            if ev:
+                old_city = ev["city"]
             b1g_tourney = bool(stage and stage.startswith("Big Ten"))
             neutral = bool(c.get("neutralSite")) or (post and bool(stage)) or (
-                b1g_tourney and y <= B1G_HOCKEY_NEUTRAL_UNTIL)
+                b1g_tourney and y in B1G_HOCKEY_CITY) or bool(ev)
             out.append({
                 "id": x["id"], "sport": "CHK", "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
@@ -554,7 +593,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 # Michigan's game numbers
                 "champ": "Big Ten" if b1g_tourney else None,
                 "round": heads[0] if heads else None,
-                "title": False, "event": None, "standin": False,
+                "title": False, "event": ev["event"] if ev else None,
+                "standin": False,
                 "bfri": False, "suffix": None, "opener": False,
                 "rival_loss": False, "rivals": False, "post": post,
                 "rivals_only": True, "bowl": None, "showcase": False,
@@ -564,6 +604,17 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             })
             if not out[-1]["upcoming"]:
                 out[-1].pop("upcoming")
+            if ev and ev.get("mte"):
+                # an MTE's rounds: a two-day, four-team event -- the semifinal,
+                # then the final or the third-place game by the first result
+                out[-1]["preseason"] = True
+                first = [g for g in out[:-1] if g.get("preseason")
+                         and g["season"] == y and g.get("event") == ev["event"]]
+                if not first:
+                    out[-1]["mte_round"] = "Semifinals"
+                else:
+                    won = any(t["win"] and t["id"] == team_id for t in first[-1]["teams"])
+                    out[-1]["mte_round"] = "Final" if won else "Third Place"
     return out, misses
 
 

@@ -505,7 +505,7 @@ function michCard(g, p) {
     // third row holding nothing but the network, the time and the date -- all
     // spelled out. Only these events need one: the rest say where they are in
     // their own names (Maui, Battle 4 Atlantis, Puerto Rico, Fort Myers).
-    const MTE_PLACE = ["NIT Tip-Off", "Legends Classic", "2K Classic",
+    const MTE_PLACE = ["Ice Breaker", "NIT Tip-Off", "Legends Classic", "2K Classic",
                        "Hall of Fame Tip-Off", "Roman Main Event",
                        "Players Era"];
     const wantPlace = MTE_PLACE.some(e => ev.indexOf(e) > -1);
@@ -550,7 +550,12 @@ function michCard(g, p) {
   // win when he gives them -- they do not always follow the uniform. Otherwise
   // the uniform paints them: jersey behind the score, pants behind the rank,
   // accessories as the text on both.
-  const u = (mx.uni || []).map(michColour), bx = mx.box || {};
+  // HOCKEY TRACKS NO JERSEY (his call 2026-09-16): its boxes are always
+  // Michigan blue with maize, and his Sheet needs no colour columns for it
+  const HOCKEY_BOX = { score_bg: "Blue", score_font: "Maize",
+                       rank_bg: "Blue", rank_font: "Maize" };
+  const u = (mx.uni || []).map(michColour),
+    bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : {});
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
   // CSS used to default the rank box to
   const UNSET = "#4a4a52";
