@@ -731,7 +731,7 @@ def cornell_cbb_games(seasons, teams, latest_conf):
                                   "color": info.get("color"), "alt": info.get("alt")}
                 sc = k.get("score")
                 score = sc.get("value") if isinstance(sc, dict) else sc
-                conf = "IVY" if loc in rules.IVY else "0"
+                conf = rules.CORNELL_CONF["CBB"] if loc in rules.IVY else "0"
                 prev = latest_conf.get(("CBB", tid))
                 if prev is None:
                     latest_conf[("CBB", tid)] = (d, conf)
@@ -750,7 +750,7 @@ def cornell_cbb_games(seasons, teams, latest_conf):
             out.append({
                 "id": x["id"], "sport": "CBB", "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
-                "time": d.strftime("%H:%M"), "neutral": city != "Ithaca", "ot": False,
+                "time": d.strftime("%H:%M"), "neutral": True, "ot": False,
                 "show": False, "week": None, "venue": v.get("fullName"),
                 "mq": False, "offsite": None,
                 # the Ivy tournament names its CITY plainly; the venue-for-metro

@@ -96,7 +96,7 @@ CORNELL = "172"
 CORNELL_SEASONS = {"CHK": set(range(2009, 2027)), "CBB": set(range(2009, 2027))}
 # the conference whose names Cornell's cards capitalise, as Michigan's do the
 # Big Ten's -- harvest's own codes, since ESPN's schedules carry no conference
-CORNELL_CONF = {"CHK": "ECAC", "CBB": "IVY"}
+CORNELL_CONF = {"CHK": "ECAC", "CBB": "12"}      # 12 is ESPN's Ivy League
 ECAC_HOCKEY = {"Brown", "Clarkson", "Colgate", "Cornell", "Dartmouth", "Harvard",
                "Princeton", "Quinnipiac", "Rensselaer", "St. Lawrence", "Union", "Yale"}
 IVY = {"Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Pennsylvania",

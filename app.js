@@ -1395,11 +1395,11 @@ function filterChips() {
     // teamOrder hands the pins back at the head of its Big Ten group; split
     // them out again so a bar can sit between the rivals and the rest
     const isRival = id => rivalIds.indexOf(id) > -1;
-    const pinned = mt.bigTen.filter(isRival).map(optOf);
-    const league = mt.bigTen.filter(id => !isRival(id));
+    // groups with nothing in them bring no bar (2026-09-16)
+    const groups = [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
+                    mt.power, mt.rest].filter(ids => ids.length);
     h += group("Team", select("team", "All Teams",
-      pinned.concat(pinned.length ? lined(league) : league.map(optOf),
-                    lined(mt.power), lined(mt.rest)),
+      [].concat.apply([], groups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
     // broadcast networks he watches on, a bar, then the cable tier, then
@@ -1431,7 +1431,8 @@ function filterChips() {
       if (netOpts.length) netOpts.push(["────────────", null]);
       netOpts = netOpts.concat(have.map(netOpt));
     });
-    if (sport !== "CHK")
+    // no Network filter where every game is a tournament game or TV is rare
+    if (sport !== "CHK" && VIEW !== "cornell")
       h += group("Network", select("net", "All Networks", netOpts, FILT.net));
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
@@ -1707,8 +1708,10 @@ function switchView(view) {
     FILT.post = false; FILT.winner = null;
     SORT = defaultSort();
   } else if (teamView()) {
-    // the Michigan view opens on its newest season, in schedule order
-    FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
+    // the Michigan view opens on its newest season, in schedule order --
+    // Cornell's basketball, nine tournament games in all, opens on every year
+    FILT.season = (VIEW === "cornell" && SPORT_OF[TAB] === "CBB") ? null : latestSeason();
+    FILT.week = null; FILT.month = null;
     FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
     FILT.net = null;
     SORT = defaultSort();
