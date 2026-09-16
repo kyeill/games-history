@@ -72,6 +72,23 @@ Traps found building it:
   with nothing anywhere are in colors.py.
 - **A MISSING SHEET TAB IS NOT AN ERROR**: gviz answers an unknown tab name with
   the FIRST tab. `load_sheet` skips a body identical to one already read.
+- **TEAM VIEWS HAVE A `focus`** (2026-09-16): the Michigan card serves any team.
+  Every team-view record names the team it is about; a game in two views is two
+  records, and the de-duplication signature includes `focus` so they never
+  merge. app.js reads `teamView()` / `focusId()` wherever it used to test
+  `VIEW === "michigan"`. His Sheet is keyed (focus, sport, season, date).
+- **CORNELL**: hockey 2009-10 on (Hockey tab), basketball Ivy League and NCAA
+  Tournament games only (CBB tab). ECAC Tournament rounds before 2022-23 come
+  from the NCAA regional Friday: championship weekend 5-7 days before,
+  quarterfinals 8-14, first round 15-21. ESPN's Ivy conference id is 12.
+  Ivy Tournament games are always neutral (ESPN names a home team even when
+  Cornell hosted in 2026). Cornell's regional cities for 2010, 2017 and 2018
+  are unknown -- add them to `NCAA_REGIONAL_CITY` when he gives them.
+- **`networks()` reads `media.shortName`** too: a team SCHEDULE lists TV that
+  way, not as `names`.
+- **A SHELL CHAIN MUST STOP ON A FAILED CHECK**: `node -e ... && harvest; site;
+  git push` deployed a broken app.js on 2026-09-16, because `;` carried on
+  past the failure. Use `|| exit 1` after the syntax check.
 - Ties exist (`g.tie`) and read as neither win nor loss. The hockey NCAA
   Tournament number is a RANKING, not a seed, so `playoffGame` excludes CHK.
 
