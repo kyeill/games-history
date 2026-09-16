@@ -47,6 +47,34 @@ HOCKEY always shows RANKINGS; TV only for the postseason, where it exists.
   CANNOT come from ESPN -- its summary lists 0 hits for BOTH teams in
   Verlander's 2007 no-hitter -- so they are a short list in his Sheet.
 
+## Hockey, as built (2026-09-16)
+
+DONE: Michigan hockey, 2013-14 on, under Michigan > Hockey (sport code `CHK`).
+Traps found building it:
+
+- **`hockey_games` is its own harvester**, one team schedule per season
+  (`seasontype` 2 and 3; ESPN names a hockey season for the year it ENDS). It
+  writes the same card records as Michigan basketball and never touches the
+  CFB/CBB loop. Cornell and the Rivals teams go through the same function.
+- **ESPN LABELS NO TOURNAMENT GAME BEFORE 2022-23** -- no note, no venue, the
+  postseason filed as regular season, on the schedule, scoreboard AND summary.
+  Those games are found by DATE: `B1G_HOCKEY_TOURNEY` (first day, and rounds a
+  day or a week apart) and `NCAA_HOCKEY_START` (then Regional Semifinal,
+  Regional Final, Frozen Four, Championship in order). Cities come from
+  `B1G_HOCKEY_CITY`, `FROZEN_FOUR_CITY` and `NCAA_REGIONAL_CITY` (per team --
+  Cornell's regionals need adding). 2021-22 has no notes either.
+- **Rankings are USCHO's, every season**, top 20, the poll in force on the game
+  date. Finished seasons are COMMITTED in `data/uscho/`, because the cloud
+  build would otherwise have to reach USCHO from GitHub's servers.
+  `USCHO_ALIAS` maps USCHO names to ESPN's (AIC, Lake Superior, Miami, Omaha).
+- **Colours**: ESPN's hockey team record rarely has one; basketball's (same
+  id) is tried next, and `#000000` is ESPN's PLACEHOLDER, not black. Schools
+  with nothing anywhere are in colors.py.
+- **A MISSING SHEET TAB IS NOT AN ERROR**: gviz answers an unknown tab name with
+  the FIRST tab. `load_sheet` skips a body identical to one already read.
+- Ties exist (`g.tie`) and read as neither win nor loss. The hockey NCAA
+  Tournament number is a RANKING, not a seed, so `playoffGame` excludes CHK.
+
 # Traps
 
 Each of these cost a debugging pass or would have. Do not rediscover them.
