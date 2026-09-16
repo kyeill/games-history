@@ -73,6 +73,22 @@ OVERRIDES = {
     "215": ("00653a", "Slippery Rock: green"),
     "284": ("3b2a7a", "Stonehill: purple"),
     "2627": ("4f2d7f", "Tarleton State: purple"),
+    # hockey (2026-09-16): ESPN has no colour for Clarkson in any sport
+    "2137": ("004f42", "Clarkson: green, not the gold"),
+    # ...and these hockey schools ESPN gives only its #000000 placeholder, in
+    # every sport. School colours, never the gold; the black-and-gold ones go
+    # black, like the rest.
+    "2779": ("a6192e", "St. Lawrence: scarlet"),
+    "2392": ("000000", "Michigan Tech: black, not the gold"),
+    "134": ("7a0019", "Minnesota Duluth: maroon"),
+    "2385": ("00573f", "Mercyhurst: green"),
+    "2022": ("000000", "American International: black, not the gold"),
+    "2364": ("582c83", "Minnesota State: purple"),
+    "2528": ("d6001c", "Rensselaer: cherry red"),
+    "2594": ("c8102e", "St. Cloud State: red"),
+    "2060": ("1b365d", "Bentley: navy"),
+    "2815": ("000000", "Lindenwood: black, not the gold"),
+    "285": ("003f87", "Lake Superior State: blue, not the gold"),
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),

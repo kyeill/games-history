@@ -14,7 +14,8 @@ DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 
 # ESPN conferenceId, verified historical: ESPN returns the conference the team
 # was IN at the time of the game (USC reads Pac-12 in 2021, Big Ten in 2025).
-BIG_TEN = {"CFB": "5", "CBB": "7"}
+# hockey has no ESPN conference id on its schedules; "B1GH" is harvest's own
+BIG_TEN = {"CFB": "5", "CBB": "7", "CHK": "B1GH"}
 # Football has five power conferences; basketball has SIX -- the Big East is
 # a major basketball conference with no football to speak of. His "Power
 # Five/Six", 2026-09-09.
@@ -75,7 +76,9 @@ VENUE_METROS = {
 
 
 # Cities ESPN names in a way he does not want read back.
-CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut"}
+CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
+                  # ESPN spells it out; every other St. Paul here is short
+                  "Saint Paul": "St. Paul"}
 
 
 # MICHIGAN view (his call 2026-09-11): every Michigan game from 2011 on (the
@@ -83,7 +86,10 @@ CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut"}
 # with his own details from michigan.csv and ratings.csv. It began as a trial
 # on 2023 football and 2025-26 basketball.
 MICHIGAN = "130"
-MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026))}
+MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026)),
+                    # hockey from 2013-14 (his call 2026-09-16), through the
+                    # season now starting
+                    "CHK": set(range(2013, 2027))}
 
 # How far an opponent went in the CFP or the NCAA Tournament, written the way
 # his sheet writes it: [Qtrs], [Semis], [Champs].

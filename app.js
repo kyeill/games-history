@@ -40,7 +40,7 @@ function defaultSort() {
   return (window.innerWidth || 0) >= 900 ? "asc" : "desc";
 }
 let SORT = defaultSort();
-const SPORT_OF = { cfb: "CFB", cbb: "CBB" };
+const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK" };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
 
@@ -406,7 +406,9 @@ function michColour(v) {
 
 function michCard(g, p) {
   const m = michTeam(g), opp = g.teams.find(t => t.id !== MICHIGAN) || g.teams[0];
-  const mx = g.mx || {}, lost = !upcoming(g) && !m.win;
+  // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
+  const tied = !!g.tie;
+  const mx = g.mx || {}, lost = !upcoming(g) && !m.win && !tied;
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
   // does not reach this one -- and his Case column is the only thing that
   // lifts a name into capitals (2026-09-14).
@@ -632,7 +634,7 @@ function michCard(g, p) {
   const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
-  const oppLine = '<div class="tl' + (lost ? "" : " won") + '"><span class="mstripe">' +
+  const oppLine = '<div class="tl' + (lost || tied ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
     (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
@@ -956,13 +958,13 @@ function michListHtml(list) {
   // NEWEST first it is BELOW them -- the 2025-26 NCAA tile reads after Howard,
   // the first-round game, rather than above the championship. The two edges of
   // the list need it too, for a filter that leaves a run unbounded.
-  if (asc && list[0].sport === "CBB" && phase(list[0])) out.push(tile(phase(list[0])));
+  if (asc && list[0].sport !== "CFB" && phase(list[0])) out.push(tile(phase(list[0])));
   out.push(cards[0]);
   for (let i = 1; i < list.length; i++) {
     const a = list[i - 1], b = list[i];
     const lo = Math.min(day(a.date), day(b.date)), hi = Math.max(day(a.date), day(b.date));
     const gaps = [];
-    if (a.sport === "CBB") {
+    if (a.sport !== "CFB") {
       // basketball names the tournament rather than saying "Postseason": the
       // Big Ten Tournament is not flagged postseason, so one divider could
       // only ever sit between it and the NCAA. The label is whichever side is
@@ -981,7 +983,7 @@ function michListHtml(list) {
     out.push(cards[i]);
   }
   const last = list[list.length - 1];
-  if (!asc && last.sport === "CBB" && phase(last)) out.push(tile(phase(last)));
+  if (!asc && last.sport !== "CFB" && phase(last)) out.push(tile(phase(last)));
   return out.join("");
 }
 
@@ -1079,7 +1081,7 @@ function highlightOf(g, kind) {
   if (kind === "Special") return special;
   if (kind === "Memorable") return shaded || !!border;
   if (kind === "Tournament") {
-    return g.sport === "CBB" && st.indexOf("NCAA Tournament") === 0;
+    return g.sport !== "CFB" && st.indexOf("NCAA Tournament") === 0;
   }
   return false;
 }
@@ -1404,7 +1406,8 @@ function filterChips() {
       if (netOpts.length) netOpts.push(["────────────", null]);
       netOpts = netOpts.concat(have.map(netOpt));
     });
-    h += group("Network", select("net", "All Networks", netOpts, FILT.net));
+    if (sport !== "CHK")
+      h += group("Network", select("net", "All Networks", netOpts, FILT.net));
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
@@ -1584,7 +1587,10 @@ function rivalsPost(g) {
 }
 function playoffGame(g) {
   const s = g.stage || "";
-  return s.indexOf("CFP") === 0 || s.indexOf("NCAA Tournament") === 0;
+  // HOCKEY is left out (2026-09-16): its NCAA Tournament number is the USCHO
+  // RANKING, not a seed, so it stays in the rank column like any other game
+  return s.indexOf("CFP") === 0 ||
+    (s.indexOf("NCAA Tournament") === 0 && g.sport !== "CHK");
 }
 
 // Rivals cards drop the usual borders for one coloured by the EVENT (his call
@@ -1623,7 +1629,8 @@ function quickButtons() {
 
 // Each top tab's second row: label, sport, view.
 const NAV = {
-  michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"]],
+  michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"],
+             ["Hockey", "chk", "michigan"]],
   cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
         ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],

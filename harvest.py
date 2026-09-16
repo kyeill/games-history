@@ -5,6 +5,7 @@ no daily build and nothing goes stale. `cache/` holds raw ESPN responses so a
 re-run is free.
 """
 import collections, csv, datetime as dt, io, json, os, re, sys, time
+import html as html_lib
 import unicodedata
 from zoneinfo import ZoneInfo
 import requests
@@ -41,7 +42,9 @@ def season_over(code, y):
 
 # CFB is groups=80 (FBS). CBB is groups=50 (D-I).
 SPORTS = {"CFB": ("football/college-football", "80"),
-          "CBB": ("basketball/mens-college-basketball", "50")}
+          "CBB": ("basketball/mens-college-basketball", "50"),
+          # hockey is read team by team, never off the scoreboard
+          "CHK": ("hockey/mens-college-hockey", None)}
 
 
 def get_json(url, params=None, timeout=60, tries=4):
@@ -244,6 +247,324 @@ def michigan_events(code, y):
         json.dump({"events": post}, open(os.path.join(
             CACHE, "post-%s-%d.json" % (code.lower(), y)), "w", encoding="utf-8"))
     return keep
+
+
+# ---------------------------------------------------------------------------
+# COLLEGE HOCKEY (his plan, 2026-09-16). A team view only -- no TV Windows, Key
+# Games or coverage rules -- so it is harvested on its own, TEAM BY TEAM from
+# ESPN's schedule endpoint, into the same card records the basketball Michigan
+# view uses. It never passes through the football/basketball loop above.
+# ---------------------------------------------------------------------------
+
+def hockey_schedule(team_id, y):
+    """One team's season y (y-(y+1)): the regular season and the postseason,
+    from ESPN's team schedule. ESPN names a hockey season for the year it ENDS.
+    Cached once the season is over."""
+    path = os.path.join(CACHE, "hockey-%s-%d.json" % (team_id, y))
+    if os.path.exists(path):
+        return json.load(open(path, encoding="utf-8"))["events"]
+    sport = SPORTS["CHK"][0]
+    out, seen = [], set()
+    for stype in (2, 3):
+        try:
+            got = get_json("%s/%s/teams/%s/schedule" % (BASE, sport, team_id),
+                           params={"season": y + 1, "seasontype": stype})
+        except requests.HTTPError:
+            continue
+        for x in got.get("events") or []:
+            if x.get("id") and x["id"] not in seen:
+                seen.add(x["id"])
+                x["_stype"] = stype
+                out.append(x)
+    if season_over("CHK", y):
+        json.dump({"events": out}, open(path, "w", encoding="utf-8"))
+    return out
+
+
+def hockey_team_info(team_id):
+    """Name and colours for a hockey team, which the schedule payload leaves
+    out. Cached for good in cache/hockey-teams.json."""
+    path = os.path.join(CACHE, "hockey-teams.json")
+    known = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    if team_id not in known:
+        t = {}
+        # ESPN's HOCKEY team record often has no colour at all; the same school's
+        # basketball record usually does (same id), so that is tried next
+        for sport in (SPORTS["CHK"][0], SPORTS["CBB"][0], SPORTS["CFB"][0]):
+            try:
+                got = get_json("%s/%s/teams/%s" % (BASE, sport, team_id)).get("team") or {}
+            except requests.HTTPError:
+                continue
+            for k, v in got.items():
+                if v and not t.get(k):
+                    t[k] = v
+            # "000000" is ESPN's placeholder for no colour, not a real black
+            if t.get("color") and t["color"].lower() != "000000":
+                break
+            t.pop("color", None)
+        known[team_id] = {"color": t.get("color"), "alt": t.get("alternateColor"),
+                          "location": t.get("location"), "name": t.get("displayName"),
+                          "abbr": t.get("abbreviation")}
+        os.makedirs(CACHE, exist_ok=True)
+        json.dump(known, open(path, "w", encoding="utf-8"))
+    return known[team_id]
+
+
+# USCHO names a few schools differently from ESPN's `location`: USCHO's
+# flattened name -> ESPN's. Extend as the harvest reports misses.
+USCHO_ALIAS = {"aic": "americaninternational", "lakesuperior": "lakesuperiorstate",
+               "miami": "miamioh", "nebraskaomaha": "omaha"}
+
+
+def uscho_polls(y):
+    """Every USCHO Division I men's poll of season y, oldest first, as
+    [(poll date, {flattened school name: rank})] -- top 20 only.
+
+    ESPN carries college hockey polls only from about 2021-22, so USCHO is the
+    source for every season (his call 2026-09-16), which also keeps one poll
+    throughout. A USCHO poll page for ANY date answers with the poll in force
+    that day, the whole poll embedded as JSON, so the season is walked a week at
+    a time and de-duplicated by the poll's own date.
+    """
+    # FINISHED SEASONS LIVE IN THE REPO, not the cache (2026-09-16): the 6am
+    # cloud build starts from its own cache and would otherwise have to reach
+    # USCHO from GitHub's servers, which a site like that may well refuse. Only
+    # the season in progress is fetched live.
+    path = os.path.join(HERE, "data", "uscho", "uscho-%d.json" % y)
+    if os.path.exists(path):
+        return [tuple(p) for p in json.load(open(path, encoding="utf-8"))]
+    polls = {}
+    d, end = dt.date(y, 9, 22), min(dt.date(y + 1, 4, 20), dt.date.today())
+    season = "%d%d" % (y, y + 1)
+    while d <= end:
+        try:
+            r = requests.get("https://www.uscho.com/rankings/d-i-mens-poll/%s/" % d.isoformat(),
+                             headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            body = html_lib.unescape(r.text) if r.status_code == 200 else ""
+        except requests.RequestException:
+            body = ""
+        for row in re.findall(r'\{[^{}]*"rnk":\d+[^{}]*\}', body):
+            try:
+                j = json.loads(row)
+            except ValueError:
+                continue
+            if j.get("season") != season or j.get("gender") != "m":
+                continue
+            polls.setdefault(j["PollDate"], {})[flat(j.get("shortname") or "")] = j["rnk"]
+        d += dt.timedelta(days=7)
+    out = sorted(polls.items())
+    if season_over("CHK", y) and out:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        json.dump(out, open(path, "w", encoding="utf-8"), separators=(",", ":"))
+    return out
+
+
+def uscho_rank(polls, day, location, misses):
+    """A team's USCHO rank in the poll in force on `day`, or None."""
+    best = {}
+    for date, ranks in polls:
+        if date <= day:
+            best = ranks
+        else:
+            break
+    key = flat(location or "")
+    for k, v in best.items():
+        if USCHO_ALIAS.get(k, k) == key:
+            return v
+    return None
+
+
+# The Big Ten's hockey members, by season: the league began in 2013-14 and
+# Notre Dame joined in 2017-18.
+B1G_HOCKEY = {"130", "127", "194", "135", "275", "213"}
+B1G_HOCKEY_ND_FROM = 2017
+# The Big Ten Tournament was played at a NEUTRAL arena in its first four years
+# (St. Paul, Detroit, St. Paul, Detroit: 2014-2017) and on campus since.
+B1G_HOCKEY_NEUTRAL_UNTIL = 2016
+
+
+def hockey_conf(team_id, y):
+    if team_id in B1G_HOCKEY or (team_id == rules.NOTRE_DAME and y >= B1G_HOCKEY_ND_FROM):
+        return rules.BIG_TEN["CHK"]
+    return "0"
+
+
+def hockey_stage(heads):
+    """ESPN's note, in the stage vocabulary the basketball cards already use:
+    "Big Ten - Semifinal" -> "Big Ten Tournament | Semis", and "NCAA Men's
+    Hockey Championship - Allentown Regional Final" -> "NCAA Tournament |
+    Regional Final"."""
+    for h in heads:
+        part = h.split(" - ", 1)[1] if " - " in h else ""
+        low = part.lower()
+        if h.startswith("Big Ten"):
+            rnd = ("Quarters" if "quarter" in low else "Semis" if "semi" in low
+                   else "Championship" if ("final" in low or "champ" in low)
+                   else "First Round" if "first" in low else part or "Tournament")
+            return "Big Ten Tournament | " + rnd
+        if "NCAA" in h and "Hockey" in h:
+            rnd = ("Frozen Four" if "frozen" in low
+                   else "Regional Semifinal" if "regional semi" in low
+                   else "Regional Final" if "regional final" in low
+                   else "Championship" if "champ" in low
+                   else part or "Round")
+            return "NCAA Tournament | " + rnd
+    return None
+
+
+# ESPN LABELS NO HOCKEY TOURNAMENT GAME BEFORE 2022-23 -- no note, no venue,
+# and the postseason filed as regular season -- on the schedule, the scoreboard
+# and the game summary alike (checked 2026-09-16). Those games are recognised by
+# DATE instead, from Michigan's own schedules:
+#   the Big Ten Tournament's first day, and whether its rounds were a DAY apart
+#   (the neutral-site years and the 2021 bubble) or a WEEK apart (on campus);
+#   the NCAA Tournament's opening day, after which a team's games run Regional
+#   Semifinal, Regional Final, Frozen Four, Championship.
+B1G_HOCKEY_TOURNEY = {          # season: (first day, days between rounds)
+    2013: ("2014-03-20", 1), 2014: ("2015-03-19", 1), 2015: ("2016-03-17", 1),
+    2016: ("2017-03-16", 1), 2017: ("2018-03-02", 7), 2018: ("2019-03-08", 7),
+    2019: ("2020-03-06", 7), 2020: ("2021-03-13", 1), 2021: ("2022-03-04", 7)}
+B1G_HOCKEY_CITY = {2013: "St. Paul", 2014: "Detroit", 2015: "St. Paul", 2016: "Detroit"}
+NCAA_HOCKEY_START = {           # the Wednesday before the regional weekend
+    2009: "2010-03-24", 2010: "2011-03-23", 2011: "2012-03-21", 2012: "2013-03-27",
+    2013: "2014-03-26", 2014: "2015-03-25", 2015: "2016-03-23", 2016: "2017-03-22",
+    2017: "2018-03-21", 2018: "2019-03-27", 2020: "2021-03-24", 2021: "2022-03-23"}
+FROZEN_FOUR_CITY = {2009: "Detroit", 2010: "St. Paul", 2011: "Tampa", 2012: "Pittsburgh",
+                    2013: "Philadelphia", 2014: "Boston", 2015: "Tampa", 2016: "Chicago",
+                    2017: "St. Paul", 2018: "Buffalo", 2020: "Pittsburgh", 2021: "Boston"}
+NCAA_ROUNDS = ["Regional Semifinal", "Regional Final", "Frozen Four", "Championship"]
+# regional cities, per team and season, where ESPN has no venue
+NCAA_REGIONAL_CITY = {("130", 2015): "Cincinnati", ("130", 2017): "Worcester",
+                      ("130", 2021): "Allentown"}
+
+
+def hockey_old_stage(team_id, y, day, conf_team_ids, ncaa_seen):
+    """The stage of a pre-2022-23 game, from its date alone. `ncaa_seen` counts
+    the team's NCAA games so far this season, oldest first."""
+    ncaa = NCAA_HOCKEY_START.get(y)
+    if ncaa and day >= ncaa:
+        rnd = NCAA_ROUNDS[min(ncaa_seen, 3)]
+        city = (FROZEN_FOUR_CITY.get(y) if ncaa_seen >= 2
+                else NCAA_REGIONAL_CITY.get((team_id, y)))
+        return "NCAA Tournament | " + rnd, city, True
+    first = B1G_HOCKEY_TOURNEY.get(y)
+    if first and day >= first[0] and len(conf_team_ids) == 2:
+        gap = (dt.date.fromisoformat(day) - dt.date.fromisoformat(first[0])).days // first[1]
+        rnd = ["Quarters", "Semis", "Championship"][min(gap, 2)]
+        return "Big Ten Tournament | " + rnd, B1G_HOCKEY_CITY.get(y), False
+    return None, None, False
+
+
+def hockey_games(team_id, seasons, teams, latest_conf, start, end):
+    """Every game of one team's hockey seasons as card records, plus its games
+    in the upcoming window."""
+    out = []
+    misses = set()
+    for y in seasons:
+        evs = hockey_schedule(team_id, y)
+        if not evs:
+            continue
+        polls = uscho_polls(y)
+        ncaa_seen = 0
+        evs = sorted(evs, key=lambda x: x.get("date") or "")
+        for x in evs:
+            comps = x.get("competitions") or []
+            if not comps:
+                continue
+            c = comps[0]
+            cs = c.get("competitors") or []
+            if len(cs) != 2:
+                continue
+            try:
+                d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                     .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+            except (KeyError, ValueError):
+                continue
+            status = c.get("status") or {}
+            done = (status.get("type") or {}).get("completed")
+            upcoming = not done and start <= d.date() <= end
+            if not done and not upcoming:
+                continue
+            heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
+            stage = hockey_stage(heads)
+            post = x.get("_stype") == 3
+            old_city = None
+            if not stage and y <= 2021:
+                ids = [(k.get("team") or {}).get("id") for k in cs]
+                in_conf = [i for i in ids if hockey_conf(i, y) == rules.BIG_TEN["CHK"]]
+                stage, old_city, is_ncaa = hockey_old_stage(
+                    team_id, y, d.strftime("%Y-%m-%d"), in_conf, ncaa_seen)
+                post = post or is_ncaa
+            elif stage and stage.startswith("NCAA") and y <= 2021:
+                post = True
+            if stage and stage.startswith("NCAA"):
+                ncaa_seen += 1
+            side = []
+            for k in cs:
+                t = k.get("team") or {}
+                tid = t.get("id")
+                if not tid:
+                    break
+                info = hockey_team_info(tid)
+                loc = info.get("location") or t.get("location") or t.get("displayName")
+                if tid not in teams:
+                    teams[tid] = {"name": info.get("name") or t.get("displayName"),
+                                  "short": rules.display_name(loc),
+                                  "abbr": info.get("abbr") or t.get("abbreviation"),
+                                  "color": info.get("color"), "alt": info.get("alt")}
+                else:
+                    teams[tid].setdefault("color", info.get("color"))
+                sc = k.get("score")
+                score = (sc.get("value") if isinstance(sc, dict) else sc)
+                conf = hockey_conf(tid, y)
+                prev = latest_conf.get(("CHK", tid))
+                if prev is None or d >= prev[0]:
+                    latest_conf[("CHK", tid)] = (d, conf)
+                side.append({"id": tid,
+                             "score": None if upcoming or score is None else int(score),
+                             "rank": uscho_rank(polls, d.date().isoformat(), loc, misses),
+                             "win": bool(k.get("winner")) and not upcoming,
+                             "home": k.get("homeAway") == "home",
+                             "conf": conf, "seed": None})
+            if len(side) != 2:
+                continue
+            tie = (not upcoming and side[0]["score"] is not None
+                   and side[0]["score"] == side[1]["score"])
+            v = c.get("venue") or {}
+            city = (v.get("address") or {}).get("city")
+            b1g_tourney = bool(stage and stage.startswith("Big Ten"))
+            neutral = bool(c.get("neutralSite")) or (post and bool(stage)) or (
+                b1g_tourney and y <= B1G_HOCKEY_NEUTRAL_UNTIL)
+            out.append({
+                "id": x["id"], "sport": "CHK", "season": y,
+                "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
+                "time": d.strftime("%H:%M"), "neutral": neutral,
+                "ot": (status.get("period") or 0) > 3,
+                "so": "SO" in ((status.get("type") or {}).get("shortDetail") or ""),
+                "tie": tie, "show": False, "week": None,
+                "venue": v.get("fullName"), "mq": False, "offsite": None,
+                "city": (old_city if old_city else
+                         rules.tourney_city(city, v.get("fullName"), stage, y)
+                         if stage else rules.display_city(city, v.get("fullName"))),
+                # TV only for the postseason (his call 2026-09-16)
+                "nets": sorted(set(networks(c))) if stage else [],
+                "teams": side, "header": None, "slots": [], "type": None,
+                # a Big Ten Tournament game carries the conference, as the
+                # basketball ones do -- which is also what keeps it out of
+                # Michigan's game numbers
+                "champ": "Big Ten" if b1g_tourney else None,
+                "round": heads[0] if heads else None,
+                "title": False, "event": None, "standin": False,
+                "bfri": False, "suffix": None, "opener": False,
+                "rival_loss": False, "rivals": False, "post": post,
+                "rivals_only": True, "bowl": None, "showcase": False,
+                "kickoff": False, "stage": stage,
+                "upcoming": upcoming or None,
+                "michigan": team_id == rules.MICHIGAN, "mx": {},
+            })
+            if not out[-1]["upcoming"]:
+                out[-1].pop("upcoming")
+    return out, misses
 
 
 def postseason_events(code, y):
@@ -493,7 +814,8 @@ def playoff_finish(code, y, evs):
 
 
 SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
-SHEET_TABS = {"CFB": "Michigan CFB", "CBB": "Michigan CBB"}
+SHEET_TABS = {"CFB": "Michigan CFB", "CBB": "Michigan CBB",
+              "CHK": "Michigan Hockey"}
 
 
 def sheet_season(sport, year):
@@ -527,7 +849,7 @@ def load_sheet():
     capitals and washes, so absence only means "off" once he has marked that
     season at all.
     """
-    out, used = {}, {}
+    out, used, bodies = {}, {}, {}
     for code, tab in SHEET_TABS.items():
         url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
                "?tqx=out:csv&headers=1&sheet=%s"
@@ -539,6 +861,14 @@ def load_sheet():
         except requests.RequestException as e:
             print("  WARN: could not read the %s tab (%s)" % (tab, e), file=sys.stderr)
             continue
+        # A TAB THAT DOES NOT EXIST IS NOT AN ERROR TO GVIZ: it silently answers
+        # with the FIRST tab instead (found 2026-09-16, before his Michigan
+        # Hockey tab existed). A body identical to one already read is that.
+        if body in bodies:
+            print("  WARN: no %s tab yet -- Google returned %s instead; skipped"
+                  % (tab, bodies[body]), file=sys.stderr)
+            continue
+        bodies[body] = tab
         rows = list(csv.reader(io.StringIO(body)))
         if not rows:
             continue
@@ -1755,6 +2085,13 @@ def harvest():
             added += 1
     print("  %d upcoming games (%s to %s)" % (added, start, end))
 
+    # COLLEGE HOCKEY, team by team (2026-09-16)
+    hk, hk_miss = hockey_games(rules.MICHIGAN, sorted(rules.MICHIGAN_SEASONS["CHK"]),
+                               teams, latest_conf, start, end)
+    keep += hk
+    print("  hockey: %d Michigan games, %d with a USCHO rank on either side"
+          % (len(hk), sum(1 for g in hk if any(t["rank"] for t in g["teams"]))))
+
     # ESPN RECORDS A FEW GAMES TWICE, under two event ids -- Michigan-
     # Pittsburgh on 2012-11-21 and Michigan-West Virginia on 2012-12-15, each
     # with identical date, tip and score. They were double-counted and threw
@@ -1807,8 +2144,9 @@ def harvest():
                 g["mx"]["num"] = "g%d" % count[key]
             else:
                 opp = next((t for t in g["teams"] if t["id"] != rules.MICHIGAN), None)
-                big = opp is not None and rules.nc_power(
-                    g["sport"], g["season"], opp["id"], opp.get("conf"))
+                big = (opp is not None and g["sport"] in rules.POWER_CONF_IDS
+                       and rules.nc_power(g["sport"], g["season"], opp["id"],
+                                          opp.get("conf")))
                 g["mx"]["num"] = ("NC%d" if big else "nc%d") % count[key]
     # HIS SHEET, laid over the top (2026-09-13). Per FIELD, and per season: a
     # column he has not touched for that season leaves the existing rule alone,
