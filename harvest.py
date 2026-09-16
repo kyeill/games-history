@@ -69,12 +69,46 @@ def get_json(url, params=None, timeout=60, tries=4):
             wait *= 2
 
 
+# ESPN CHANGED THE SCOREBOARD OVERNIGHT (found 2026-09-16, when the 6am build
+# died): a date RANGE ("20260801-20261231") now answers 400 "Failed to get
+# events endpoint", for both sports, and a limit of ~1000 is silently IGNORED --
+# the default 25 games come back, with no error. A single day with limit=500
+# still returns the full slate. So a range is walked one day at a time here,
+# under the old call signature, and every limit is held to 500.
+SCOREBOARD_LIMIT = 500
+
+
+def scoreboard(sport, params):
+    params = dict(params or {})
+    if "limit" in params:
+        params["limit"] = min(int(params["limit"]), SCOREBOARD_LIMIT)
+    rng = str(params.get("dates") or "")
+    if "-" not in rng:
+        return get_json(f"{BASE}/{sport}/scoreboard", params=params)
+    a, b = rng.split("-", 1)
+    day = dt.datetime.strptime(a, "%Y%m%d").date()
+    end = dt.datetime.strptime(b, "%Y%m%d").date()
+    out, seen = {"events": []}, set()
+    while day <= end:
+        params["dates"] = day.strftime("%Y%m%d")
+        got = get_json(f"{BASE}/{sport}/scoreboard", params=params)
+        for x in got.get("events") or []:
+            if x.get("id") not in seen:
+                seen.add(x.get("id"))
+                out["events"].append(x)
+        if len(got.get("events") or []) >= SCOREBOARD_LIMIT:
+            print("  WARN: %s %s hit the %d cap" % (sport, day, SCOREBOARD_LIMIT),
+                  file=sys.stderr)
+        day += dt.timedelta(days=1)
+    return out
+
+
 def fetch(sport, params, key, cacheable=True):
     os.makedirs(CACHE, exist_ok=True)
     p = os.path.join(CACHE, key + ".json")
     if cacheable and os.path.exists(p):
         return json.load(open(p, encoding="utf-8"))
-    d = get_json(f"{BASE}/{sport}/scoreboard", params=params)
+    d = scoreboard(sport, params)
     if cacheable:
         json.dump(d, open(p, "w", encoding="utf-8"))
     return d

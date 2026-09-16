@@ -275,6 +275,20 @@ the Big Ten, then the other power leagues, then everyone else, where elsewhere
 the rivals run straight into the Big Ten. `FILT.team` itself needed no change
 -- it is applied before the per-view filter, so it already worked.
 
+## ESPN's scoreboard stopped taking date ranges
+
+**2026-09-16 the 6am build died on a 400** -- "Failed to get events endpoint"
+for `dates=20260801-20261231`. ESPN had changed two things overnight, for both
+sports: ANY date range is refused, and `limit=1000` is silently IGNORED (the
+default 25 games come back with no error -- the worse of the two, since
+nothing fails). A single day with `limit=500` still returns the whole slate.
+
+`scoreboard()` now walks a range one day at a time and holds every limit to
+500, underneath the old `fetch` signature, so no call site changed and the
+cache keys are the same. Finished seasons are cached, so the cost is only the
+live season: a local harvest went to about 2.5 minutes. Symptom he saw first:
+sheet colours not appearing -- the build never got as far as reading the sheet.
+
 ## The stand-ins: games on TV Windows with no window
 
 **TWO SETS OF FOOTBALL GAMES REACH TV WINDOWS WITHOUT A WINDOW** (his call
