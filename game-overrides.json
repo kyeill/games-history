@@ -196,9 +196,11 @@
     "city": "New York"
   },
   "323500277": {
-    "event": "Brooklyn Winter Hoops"
+    "event": "Brooklyn Winter Hoops",
+    "city": ""
   },
   "400506577": {
-    "event": "Brooklyn Holiday Hoops"
+    "event": "Brooklyn Holiday Hoops",
+    "city": ""
   }
 }

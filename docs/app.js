@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-095944";
+const BUILD = "20260916-100635";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1024,9 +1024,8 @@ function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
                  border, but only on a Big Ten Tournament game or the Big Ten
                  Championship Game (a regular-season title clinch does not count)
      Memorable   WIN, shaded and/or any border -- Special games included
-     Postseason  WIN: football's bowls, the CFP and the Big Ten Championship
-                 Game; basketball's NCAA Tournament only (no Big Ten
-                 Tournament, no NIT)
+     Tournament  BASKETBALL ONLY, WIN: the NCAA Tournament (no Big Ten
+                 Tournament, no NIT). Football has no equivalent option.
      Attended    his * in the Attended column, WIN OR LOSS
      Details     WIN OR LOSS: a neutral site outside the postseason (MTEs
                  included, and a home game moved off campus -- Northwestern
@@ -1069,10 +1068,8 @@ function highlightOf(g, kind) {
   const special = shaded && border === "title";
   if (kind === "Special") return special;
   if (kind === "Memorable") return shaded || !!border;
-  if (kind === "Postseason") {
-    return g.sport === "CFB"
-      ? !!g.post || st.indexOf("Big Ten Championship") === 0
-      : st.indexOf("NCAA Tournament") === 0;
+  if (kind === "Tournament") {
+    return g.sport === "CBB" && st.indexOf("NCAA Tournament") === 0;
   }
   return false;
 }
@@ -1403,7 +1400,7 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Memorable", "Postseason", "Attended", "Details"]
+    const hlOpts = ["Special", "Memorable", "Tournament", "Attended", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
