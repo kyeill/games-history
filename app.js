@@ -1396,10 +1396,10 @@ function filterChips() {
     // them out again so a bar can sit between the rivals and the rest
     const isRival = id => rivalIds.indexOf(id) > -1;
     // groups with nothing in them bring no bar (2026-09-16)
-    const groups = [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
-                    mt.power, mt.rest].filter(ids => ids.length);
+    const teamGroups = [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
+                        mt.power, mt.rest].filter(ids => ids.length);
     h += group("Team", select("team", "All Teams",
-      [].concat.apply([], groups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
+      [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
     // broadcast networks he watches on, a bar, then the cable tier, then
