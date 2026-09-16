@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-101713";
+const BUILD = "20260916-102457";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1400,7 +1400,7 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Memorable", "Tournament", "Attended", "Details"]
+    const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));

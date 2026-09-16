@@ -1400,7 +1400,7 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Memorable", "Tournament", "Attended", "Details"]
+    const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
