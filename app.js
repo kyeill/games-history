@@ -225,6 +225,7 @@ function stageColor(g) {
       st.indexOf("Big Ten Championship") === 0) return "#0088ce";
   if (st.indexOf("NCAA Tournament") === 0) return "#4d9ae0";
   if (st.indexOf("ECAC Tournament") === 0) return "#c0053c";      // his hex, 2026-09-17
+  if (st.indexOf("Ivy Madness") === 0) return "#0f6a37";          // his hex, 2026-09-17
   return null;
 }
 

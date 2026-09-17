@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260917-094721";
+const BUILD = "20260917-094943";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -225,6 +225,7 @@ function stageColor(g) {
       st.indexOf("Big Ten Championship") === 0) return "#0088ce";
   if (st.indexOf("NCAA Tournament") === 0) return "#4d9ae0";
   if (st.indexOf("ECAC Tournament") === 0) return "#c0053c";      // his hex, 2026-09-17
+  if (st.indexOf("Ivy Madness") === 0) return "#0f6a37";          // his hex, 2026-09-17
   return null;
 }
 
