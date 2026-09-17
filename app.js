@@ -467,7 +467,11 @@ function michCard(g, p) {
                    "Big Ten Championship", "ECAC Tournament", "Ivy League Tournament"];
   const bigStage = !!g.stage && TOURNEY.some(s => g.stage.indexOf(s) === 0);
   const mteCard = !!g.preseason && !g.stage;
-  const place = g.bowl || g.offsite || (g.neutral && g.city ? g.city : "");
+  // a series card names the place and the event of ANY of its games -- the
+  // Duel in the D shares a card with the Munn game beside it
+  const placeOf = x => x.bowl || x.offsite || (x.neutral && x.city ? x.city : "");
+  const place = series ? (series.map(placeOf).find(Boolean) || "") : placeOf(g);
+  const eventName = series ? (series.map(x => x.event).find(Boolean) || null) : g.event;
   // the network and time as plain text, for the third row of those two shapes
   const netTxt = primaryNet(g.nets);
   const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : fmtTime(g.time);
@@ -756,9 +760,10 @@ function michCard(g, p) {
     // already says Orange Bowl, and Miami Gardens adds nothing to it
     bit(place, PLACE_SHORT[place], false, 3);
   }
-  if (g.event && !g.stage && !mteCard) bit(g.event);
+  if (eventName && !g.stage && !mteCard) bit(eventName);
   // harvest's own footer words -- "Ivy League" on Cornell's Ivy games
-  (g.labels || []).forEach(t => bit(t));
+  (series ? Array.from(new Set([].concat.apply([], series.map(x => x.labels || []))))
+    : (g.labels || [])).forEach(t => bit(t));
   // THE SERIES IS DERIVED at harvest (two meetings in consecutive seasons the
   // schools arranged between them) -- but a tag he wrote by hand still wins,
   // which is what keeps Texas 2024 marked when its return leg sits in 2027,
