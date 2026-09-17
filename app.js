@@ -1412,6 +1412,9 @@ function visible() {
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
+  // Cornell basketball's NCAA Tournament button (his call 2026-09-17)
+  if (teamView() && FILT.post)
+    list = list.filter(g => (g.stage || "").indexOf("NCAA Tournament") === 0);
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1611,11 +1614,19 @@ function filterChips() {
     const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
-    h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
-    // Cornell hockey has no 2021-Onward button (his call 2026-09-17)
-    return h + group("", (VIEW === "cornell" && sport === "CHK" ? "" :
-      '<button class="f" data-act="recent" aria-pressed="' + !!FILT.recent +
-      '">2021-Onward</button>') + sortButton());
+    // ...but not on Cornell basketball, nine games in all (his call 2026-09-17)
+    if (!(VIEW === "cornell" && sport === "CBB"))
+      h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
+    // Cornell hockey has no 2021-Onward button (his call 2026-09-17), and
+    // Cornell basketball has NCAA Tournament in its place
+    const extra = VIEW !== "cornell"
+      ? '<button class="f" data-act="recent" aria-pressed="' + !!FILT.recent +
+        '">2021-Onward</button>'
+      : sport === "CBB"
+        ? '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
+          '">NCAA Tournament</button>'
+        : "";
+    return h + group("", extra + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
