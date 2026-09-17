@@ -134,6 +134,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .tl{display:grid;grid-template-columns:22px 20px 1fr auto;align-items:center;
   gap:8px;padding:2px 6px 2px 7px;margin-left:-7px;border-radius:5px}
 .tl.won{background:var(--winwash)}
+/* a Rivals loss that matters fills the whole card (his call 2026-09-17) */
+.row.rwash{background:var(--winwash)}
+.row.rwash .tl.won{background:transparent}
 /* A coloured border marks a result he wants to see: Michigan won (maize), or a
    rival lost (the colour of whoever beat them). A full maize box was too loud,
    so the winner's line keeps its own wash and only the frame carries the flag.
@@ -326,8 +329,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a hockey series card: the team's own rank, under the opponent's rank column
    (22px crest + 7px gap = 29px in, 20px wide) */
 .row.mich .mrk2{position:absolute;left:29px;top:50%;transform:translateY(-50%);
-  width:20px;text-align:center;font-size:12.5px;font-weight:600;
-  font-variant-numeric:tabular-nums;line-height:1}
+  width:20px;text-align:center;font-size:13px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:inherit}
+/* ...on the same size and line height as the footer text beside it, so the
+   two share a baseline (his catch 2026-09-17: it sat low) */
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
   min-width:0;padding-left:57px}
 /* both boxes finish at the card content edge (his call 2026-09-11): the team

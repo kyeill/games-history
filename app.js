@@ -350,6 +350,7 @@ function rowHtml(g, browse) {
   return '<div class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
     (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
+    (VIEW === "rivals" && rivalsFill(g) ? " rwash" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
@@ -720,7 +721,7 @@ function michCard(g, p) {
   // on a series card the team's OWN rank reads under the opponent's, in its
   // colour -- maize, or Cornell's carnelian -- and nothing when it was unranked
   const ownRank = series && !tSeries && m.rank
-    ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#ffffff" : "#ffcb05") +
+    ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
       '">#' + m.rank + "</span>" : "";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
@@ -1789,6 +1790,29 @@ function playoffGame(g) {
   // RANKING, not a seed, so it stays in the rank column like any other game
   return s.indexOf("CFP") === 0 ||
     (s.indexOf("NCAA Tournament") === 0 && g.sport !== "CHK");
+}
+
+// A RIVALS card FILLS with the winner's colour (his call 2026-09-17) for the
+// losses that matter most: any loss to Michigan, any CFP loss, a Final Four or
+// title-game loss, and an NCAA Tournament upset -- a single-digit seed beaten
+// by a double-digit one. (Hockey Rivals, when built: Michigan wins plus Frozen
+// Four and title-game losses.)
+function rivalsFill(g) {
+  if (upcoming(g)) return false;
+  const loser = g.teams.find(t => !t.win && isRival(t));
+  if (!loser) return false;
+  const winner = g.teams.find(t => t.win);
+  if (winner && winner.id === MICHIGAN) return true;
+  const s = g.stage || "";
+  if (g.sport === "CHK") return s === "NCAA Tournament | Frozen Four" ||
+    s === "NCAA Tournament | Championship";
+  if (s.indexOf("CFP") === 0) return true;
+  if (s === "NCAA Tournament | Final Four" || s === "NCAA Tournament | Championship") return true;
+  if (s.indexOf("NCAA Tournament") === 0 && winner) {
+    const ls = seedOf(g, loser), ws = seedOf(g, winner);
+    return ls != null && ws != null && ls < 10 && ws >= 10;
+  }
+  return false;
 }
 
 // Rivals cards drop the usual borders for one coloured by the EVENT (his call
