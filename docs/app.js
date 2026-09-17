@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260917-093756";
+const BUILD = "20260917-094721";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -135,7 +135,7 @@ function stageLabel(g) {
     .replace("Round 1", "First Round")
     .replace("Round 2", "Second Round")
     .replace("Semis", "Semifinals");
-  if (/Tournament Championship$/.test(s) && !/^(NCAA|NIT)/.test(s)) {
+  if (/(Tournament|Ivy Madness) Championship$/.test(s) && !/^(NCAA|NIT)/.test(s)) {
     s = s.replace(/Championship$/, "Final");
   }
   return s;
@@ -484,7 +484,7 @@ function michCard(g, p) {
   // The ordinary bowls stay out of this set: a Citrus Bowl header already IS
   // its location, and lifting it would print the name twice.
   const TOURNEY = ["Big Ten Tournament", "NCAA Tournament", "NIT ", "CFP ",
-                   "Big Ten Championship", "ECAC Tournament", "Ivy League Tournament"];
+                   "Big Ten Championship", "ECAC Tournament", "Ivy Madness"];
   const bigStage = !!g.stage && TOURNEY.some(s => g.stage.indexOf(s) === 0);
   const mteCard = !!g.preseason && !g.stage;
   // a series card names the place and the event of ANY of its games -- the
@@ -1131,7 +1131,7 @@ function michListHtml(list) {
     const st = g.stage || "";
     return st.indexOf("Big Ten Tournament") === 0 ? "Big Ten Tournament"
       : st.indexOf("ECAC Tournament") === 0 ? "ECAC Tournament"
-      : st.indexOf("Ivy League Tournament") === 0 ? "Ivy League Tournament"
+      : st.indexOf("Ivy Madness") === 0 ? "Ivy Madness"
       : st.indexOf("NCAA Tournament") === 0 ? "NCAA Tournament"
       : st.indexOf("NIT") === 0 ? "National Invitation Tournament" : "";
   };

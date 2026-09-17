@@ -1217,7 +1217,8 @@ def cornell_cbb_games(seasons, teams, latest_conf):
                  .replace(tzinfo=dt.timezone.utc).astimezone(ET))
             if ivy:
                 low = head.split(" - ")[-1].lower()
-                stage = "Ivy League Tournament | " + (
+                # named IVY MADNESS on the cards (his call 2026-09-17)
+                stage = "Ivy Madness | " + (
                     "Semis" if "semi" in low else "Championship" if "final" in low
                     or "champ" in low else head.split(" - ")[-1])
             else:
