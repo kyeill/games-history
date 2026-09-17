@@ -660,8 +660,10 @@ def uscho_details(g, team_id, opp_loc):
         res.update(event="Great Lakes Invitational", frame=True, city=None, neutral=True)
     elif any(k in low for k in HOCKEY_MTES):
         name = next(v for k, v in HOCKEY_MTES.items() if k in low)
+        # USCHO names the final and the third-place game; an unnamed game is the
+        # semifinal only if it is the event's first -- decided in hockey_games
         rnd = ("Final" if "champ" in nlow else "Third Place" if ("third" in nlow or "3rd" in nlow)
-               else "Semifinals")
+               else None)
         res.update(event=name, mte=True, mte_round=rnd, city=note_city, neutral=True)
     # CORNELL'S THANKSGIVING GAMES AT THE GARDEN name only the event (his call
     # 2026-09-16) -- no "MSG" beside it
@@ -1118,6 +1120,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                          and g["season"] == y and g.get("event") == ev["event"]]
                 if ev.get("mte_round"):
                     out[-1]["mte_round"] = ev["mte_round"]
+                elif first and first[-1].get("tie"):
+                    pass        # after a tied first game the round cannot be told
                 elif not first:
                     out[-1]["mte_round"] = "Semifinals"
                 else:
