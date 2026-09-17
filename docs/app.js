@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-231004";
+const BUILD = "20260916-231701";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -698,7 +698,8 @@ function michCard(g, p) {
   let umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
   if (tSeries) {
     score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
-      (sWins + sLosses + sTies ? sWins + "-" + sLosses + (sTies ? "-" + sTies : "") : "") + "</span>";
+      (sWins + sLosses + sTies ? "[" + sWins + "-" + sLosses + (sTies ? "-" + sTies : "") + "]" : "") +
+      "</span>";
   } else if (series) {
     const second = series[1];
     umRank = second
@@ -778,6 +779,10 @@ function michCard(g, p) {
   } else if (mteCard) {
     // the location has gone up into the header (2026-09-14), so this row holds
     // the network, the time and the date, and has room to spell them out
+    // ...except a HOCKEY MTE whose header carries no place: Cornell's Florida
+    // College Classic and the rest name it here, first (his call 2026-09-16)
+    if (g.sport === "CHK" && place &&
+        !["Ice Breaker"].some(e => (g.event || "").indexOf(e) > -1)) bit(place);
     bit(tvTxt, netTxt, false, 4);
     bit(dateText);
   } else if (place && !ny6Bowl(g)) {
@@ -836,9 +841,15 @@ function michCard(g, p) {
   // ...REVERSED 2026-09-16: his Notes are DETAILS like any other, so they take
   // the third row on their own and the date stays up in the header. The date
   // only drops when the row would otherwise be empty.
+  // A SERIES CARD'S MONTH goes up into the header, after the days and times,
+  // whenever the bottom row has details of its own -- Home & Home, Duel in the
+  // D, Red Hot Hockey -- and fills the bottom row only when it would otherwise
+  // be empty (his call 2026-09-16)
+  let monthHead = "";
   if (series && !tSeries) {
-    parts.unshift({ t: MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4),
-                    short: "", his: false });
+    const month = MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4);
+    if (parts.length) monthHead = " | " + esc(month);
+    else parts.unshift({ t: month, short: "", his: false });
   }
   const dateDown = tSeries || (!series && (bigStage || mteCard || !parts.length));
   if (dateDown && !bigStage && !mteCard) {
@@ -951,7 +962,7 @@ function michCard(g, p) {
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
-      (dateDown || series ? "" : headDate) + "</span></div>" +
+      monthHead + (dateDown || series ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
       (mx.attended ? '<span class="mstar">*</span>' : "") + ownRank + '<span class="mdl">' +

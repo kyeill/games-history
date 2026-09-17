@@ -617,6 +617,9 @@ HOCKEY_MTES = {"icebreaker": "Ice Breaker", "ice breaker": "Ice Breaker",
                "fortress inv": "Fortress Invitational"}
 
 
+HOCKEY_NO_EVENT = {"Frozen Confines"}          # his call 2026-09-16
+
+
 def uscho_details(g, team_id, opp_loc):
     """What a USCHO record says about a game: its stage or event, its city or
     venue, and whether it was a neutral site or a conference game."""
@@ -653,8 +656,8 @@ def uscho_details(g, team_id, opp_loc):
         res.update(stage="ECAC Tournament | " + rnd, city=note_city)
     elif "great lakes" in low or nlow.startswith("gli"):
         # a neutral-site event with the MTE's grey frame, not its card
-        res.update(event="Great Lakes Invitational", frame=True,
-                   city=note_city or "Detroit", neutral=True)
+        # no city: the GLI is always Detroit (his call 2026-09-16)
+        res.update(event="Great Lakes Invitational", frame=True, city=None, neutral=True)
     elif any(k in low for k in HOCKEY_MTES):
         name = next(v for k, v in HOCKEY_MTES.items() if k in low)
         rnd = ("Final" if "champ" in nlow else "Third Place" if ("third" in nlow or "3rd" in nlow)
@@ -682,7 +685,8 @@ def uscho_details(g, team_id, opp_loc):
         # an outdoor game or a borrowed building: an event name when the note
         # carries one, otherwise the venue
         if m and head and not any(w in head.lower() for w in ARENA_WORDS):
-            res.update(event=head, city=note_city)
+            # an outdoor-game billing he does not want shown -- the city stays
+            res.update(event=None if head in HOCKEY_NO_EVENT else head, city=note_city)
         elif res["neutral"]:
             res.update(city=arena)
         else:
