@@ -618,6 +618,16 @@ HOCKEY_MTES = {"icebreaker": "Ice Breaker", "ice breaker": "Ice Breaker",
 
 
 HOCKEY_NO_EVENT = {"Frozen Confines"}          # his call 2026-09-16
+# HIS CORRECTIONS to single games (2026-09-17), by focus team and date: a key
+# present replaces what USCHO gave; "labels" adds to the footer
+HOCKEY_GAME_FIX = {
+    ("130", "2015-02-07"): {"event": None, "city": "Soldier Field"},   # MSU, outdoors
+    ("130", "2016-11-04"): {"offsite": None},                          # at Arizona State
+    ("130", "2013-12-27"): {"labels": ["Comerica Park"]},              # the 2013 GLI
+    ("130", "2013-12-28"): {"labels": ["Comerica Park"]},
+}
+# USCHO's code for each focus team, to read its score from a USCHO record
+USCHO_CODE = {"130": "um", "172": "cor"}
 # MTE rounds USCHO leaves unnamed and a tied opener cannot settle (his word)
 HOCKEY_MTE_ROUND = {("172", "2023-12-30"): "Final"}    # Adirondack: ASU was the final
 
@@ -690,7 +700,8 @@ def uscho_details(g, team_id, opp_loc):
         # carries one, otherwise the venue
         if m and head and not any(w in head.lower() for w in ARENA_WORDS):
             # an outdoor-game billing he does not want shown -- the city stays
-            res.update(event=None if head in HOCKEY_NO_EVENT else head, city=note_city)
+            res.update(event=None if head in HOCKEY_NO_EVENT else head,
+                       city=note_city or (parts[0] if parts else None))
         elif res["neutral"]:
             res.update(city=arena)
         else:
@@ -1001,13 +1012,31 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             # way, with no box score and no plays -- the 2021 Great Lakes
             # Invitational game with Michigan Tech, and 12/5/2025 at Michigan
             # State (found 2026-09-16)
-            if tie and side[0]["score"] == 0:
-                continue
             day = d.strftime("%Y-%m-%d")
             opp = next((q for q in side if q["id"] != team_id), side[0])
             opp_loc = teams[opp["id"]]["short"]
             us = uscho_match(uscho_schedule(team_id, y), day, opp_loc)
+            if tie and side[0]["score"] == 0:
+                # ...UNLESS USCHO has the result: ESPN lists 12/5/2025 at
+                # Michigan State as 0-0, and it was a 3-0 Michigan win (his
+                # catch 2026-09-17)
+                code = USCHO_CODE.get(team_id)
+                try:
+                    mine = int(us["hscore"] if us["home"] == code else us["vscore"])
+                    theirs = int(us["vscore"] if us["home"] == code else us["hscore"])
+                except (TypeError, ValueError, KeyError):
+                    continue
+                me = next(q for q in side if q["id"] == team_id)
+                me["score"], opp["score"] = mine, theirs
+                me["win"], opp["win"] = mine > theirs, theirs > mine
+                tie = mine == theirs
+                if tie and mine == 0:
+                    continue
             det = uscho_details(us, team_id, opp_loc) if us else {}
+            fix = HOCKEY_GAME_FIX.get((team_id, day), {})
+            for k in ("event", "city", "offsite"):
+                if k in fix:
+                    det[k] = fix[k]
             post = x.get("_stype") == 3
             old_city, ev = None, None
             if det.get("stage"):
@@ -1066,7 +1095,7 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             hmx = {"finish": ncaa_now.get("finish", {}).get(okey),
                    "final": uscho_final_rank(y, opp_loc),
                    "reigning": bool(okey) and okey == ncaa_before.get("champ")}
-            labels = []
+            labels = list(fix.get("labels", []))
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies
             conference = det.get("conf_game") if us else (hockey_conf(opp["id"], y) == "ECAC")

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260917-100613";
+const BUILD = "20260917-085424";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -445,8 +445,10 @@ function michCard(g, p) {
     sres = sWins > sLosses ? "win" : sWins === sLosses ? "split" : "loss";
   }
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
-  const tied = series ? (sres === "split" && !opp.rank) : !!g.tie;
-  const flatSplit = !tSeries && sres === "split" && !!opp.rank;
+  const oppRanked = series
+    ? series.some(x => (x.teams.find(t => t.id !== fid) || {}).rank) : !!opp.rank;
+  const tied = series ? (sres === "split" && !oppRanked) : !!g.tie;
+  const flatSplit = !tSeries && sres === "split" && oppRanked;
   const mx = g.mx || {};
   const lost = series ? sres === "loss" : (!upcoming(g) && !m.win && !tied);
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
@@ -690,7 +692,9 @@ function michCard(g, p) {
   const bubble = x => {
     const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
     const mark = g.sport === "CHK" && !upcoming(x) && (x.ot || x.so || x.tie);
-    return '<span class="sc mbox' + (mark ? " u" : "") + '"' + paint(top, scoreInk) + ">" +
+    const lossScore = !upcoming(x) && !x.tie && !me.win;
+    return '<span class="sc mbox' + (mark ? " u" : "") + (lossScore ? " l" : "") + '"' +
+      paint(top, scoreInk) + ">" +
       (upcoming(x) ? "" : me.score + "-" + op.score + (g.sport === "CHK" && x.so ? " (SO)" : "")) +
       "</span>";
   };
@@ -774,6 +778,7 @@ function michCard(g, p) {
       const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
       bit(upcoming(x) ? x.dow.toUpperCase() + " " + fmtDate(x.date)
         : me.score + "-" + op.score + (x.so ? " (SO)" : x.ot ? " (OT)" : ""));
+      if (!upcoming(x) && !x.tie && !me.win) parts[parts.length - 1].it = true;
     });
   } else if (bigStage) {
     // the date leads and the TV details follow it -- the reverse of an
@@ -861,7 +866,8 @@ function michCard(g, p) {
   }
   const wrap = (p, colour) => '<span class="mdet"' +
     (p.short ? ' data-short="' + esc(p.short) + '" data-trim="' + (p.pri || 5) + '"' : "") +
-    (colour ? ' style="color:' + colour + '"' : "") + ">" + esc(p.t) + "</span>";
+    (colour || p.it ? ' style="' + (colour ? "color:" + colour + ";" : "") +
+      (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
   if (SOLID[mode]) {
