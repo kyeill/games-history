@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-230818";
+const BUILD = "20260916-231004";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1063,7 +1063,9 @@ function hockeyUnits(list) {
     units.push(run.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
   }
   return units.map(games => {
-    if (!groupable(games[0])) return { g: games[0], html: rowHtml(games[0], false) };
+    // a single tournament game is an ordinary tournament card, not a series
+    if (!groupable(games[0]) || (games[0].stage && games.length === 1))
+      return { g: games[0], html: rowHtml(games[0], false) };
     const mx = Object.assign({}, games[0].mx || {});
     games.slice(1).forEach(x => {
       const o = x.mx || {};

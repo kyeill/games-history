@@ -1063,7 +1063,9 @@ function hockeyUnits(list) {
     units.push(run.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
   }
   return units.map(games => {
-    if (!groupable(games[0])) return { g: games[0], html: rowHtml(games[0], false) };
+    // a single tournament game is an ordinary tournament card, not a series
+    if (!groupable(games[0]) || (games[0].stage && games.length === 1))
+      return { g: games[0], html: rowHtml(games[0], false) };
     const mx = Object.assign({}, games[0].mx || {});
     games.slice(1).forEach(x => {
       const o = x.mx || {};
