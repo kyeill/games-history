@@ -317,6 +317,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   width:22px;text-align:center;color:#ffcb05;font-weight:700;font-size:16px;
   line-height:1}
 .row.mich.dimmed .mstar{color:#8a8a92}
+/* a hockey series card: the team's own rank, under the opponent's rank column
+   (22px crest + 7px gap = 29px in, 20px wide) */
+.row.mich .mrk2{position:absolute;left:29px;top:50%;transform:translateY(-50%);
+  width:20px;text-align:center;font-size:12.5px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:1}
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
   min-width:0;padding-left:57px}
 /* both boxes finish at the card content edge (his call 2026-09-11): the team

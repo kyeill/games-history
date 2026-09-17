@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-155039";
+const BUILD = "20260916-220155";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -411,16 +411,42 @@ function michColour(v) {
 function michCard(g, p) {
   const fid = g.focus || focusId();
   const m = g.teams.find(t => t.id === fid), opp = g.teams.find(t => t.id !== fid) || g.teams[0];
+  // HOCKEY SERIES CARDS (his call 2026-09-16): consecutive regular-season
+  // games against one opponent share a card (michListHtml groups them into
+  // g._series, oldest first; a lone game is a series of one). The result is
+  // by POINTS -- 3 a regulation win, 2 an overtime win, 1 an overtime loss, a
+  // tie shared -- so a win and an overtime loss is a series WON:
+  //   more than half   the stripe and bold
+  //   exactly half     the stripe, not bold, against a RANKED opponent;
+  //                    plain grey text against an unranked one
+  //   less than half   struck through, like any loss
+  const series = g._series || null;
+  let sres = null;
+  if (series) {
+    let mine = 0, tot = 0;
+    series.forEach(x => {
+      if (upcoming(x)) return;
+      const me = x.teams.find(t => t.id === fid);
+      tot += 3;
+      mine += x.tie ? 1.5 : me.win ? (x.ot ? 2 : 3) : (x.ot ? 1 : 0);
+    });
+    if (tot) sres = mine * 2 > tot ? "win" : mine * 2 === tot ? "split" : "loss";
+  }
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
-  const tied = !!g.tie;
-  const mx = g.mx || {}, lost = !upcoming(g) && !m.win && !tied;
+  const tied = series ? (sres === "split" && !opp.rank) : !!g.tie;
+  const flatSplit = sres === "split" && !!opp.rank;
+  const mx = g.mx || {};
+  const lost = series ? sres === "loss" : (!upcoming(g) && !m.win && !tied);
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
   // does not reach this one -- and his Case column is the only thing that
   // lifts a name into capitals (2026-09-14).
   let nm = teamName(opp, null, g.season);
   const caps = mx.caps === "Y";
   if (caps) nm = nm.toUpperCase();
-  const where = g.neutral ? "vs. " : opp.home ? "at " : "";
+  const whereOf = x => x.neutral ? "vs. " :
+    (x.teams.find(t => t.id !== fid) || {}).home ? "at " : "";
+  // a series played in two places (Duel in the D, then Munn) names neither
+  const where = series && series.some(x => whereOf(x) !== whereOf(g)) ? "" : whereOf(g);
   // the rating reads "73+"; a team no system rates reads "DII" as it is
   const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
     : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
@@ -538,7 +564,8 @@ function michCard(g, p) {
     when += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   }
   // no emoji in the header any more (his call 2026-09-13)
-  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") + when;
+  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") +
+    (series ? series.map(x => esc(x.dow) + " " + fmtTime(x.time)).join(" | ") : when);
   // The DATE goes at the end of the header -- unless the third row would be
   // empty, in which case it drops down there instead and the header ends
   // without it (his call 2026-09-13). Decided below, once the footer is known.
@@ -557,8 +584,14 @@ function michCard(g, p) {
   // accessories as the text on both.
   // HOCKEY TRACKS NO JERSEY (his call 2026-09-16): its boxes are always
   // Michigan blue with maize, and his Sheet needs no colour columns for it
+  // CORNELL'S does, from his Sheet; where those columns are blank it reads
+  // carnelian with white on the road, white with carnelian at home, and the
+  // grey placeholder at a neutral site (his call 2026-09-16)
+  const cuHome = m && m.home && !g.neutral, cuRoad = m && !m.home && !g.neutral;
   const HOCKEY_BOX = fid === CORNELL
-    ? { score_bg: "Carnelian", score_font: "White", rank_bg: "Carnelian", rank_font: "White" }
+    ? (cuRoad ? { score_bg: "Carnelian", score_font: "White", rank_bg: "Carnelian", rank_font: "White" }
+      : cuHome ? { score_bg: "White", score_font: "Carnelian", rank_bg: "White", rank_font: "Carnelian" }
+      : {})
     : { score_bg: "Blue", score_font: "Maize", rank_bg: "Blue", rank_font: "Maize" };
   const u = (mx.uni || []).map(michColour),
     bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : {});
@@ -642,9 +675,26 @@ function michCard(g, p) {
   const umText = playoffGame(g) && m.rank ? "No. " + m.rank
     : umSeed != null ? "No. " + umSeed
     : m.rank ? "#" + m.rank : "\u2013";
-  const umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
+  let umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
+  if (series) {
+    const second = series[1];
+    umRank = second
+      ? '<span class="sc mbox"' + paint(top, scoreInk) + ">" + (upcoming(second) ? ""
+        : second.teams.find(t => t.id === fid).score + "-" +
+          second.teams.find(t => t.id !== fid).score) + "</span>"
+      : "";
+  }
+  // on a series card the team's OWN rank reads under the opponent's, in its
+  // colour -- maize, or Cornell's carnelian -- and nothing when it was unranked
+  const ownRank = series && m.rank
+    ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
+      '">#' + m.rank + "</span>" : "";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
+  // MICHIGAN AGAINST CORNELL, on either team's card, bolds nothing (his call
+  // 2026-09-16)
+  const bothMine = g.sport === "CHK" && g.teams.some(t => t.id === MICHIGAN) &&
+    g.teams.some(t => t.id === CORNELL);
   const oppLine = '<div class="tl' + (lost || tied ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
@@ -707,6 +757,8 @@ function michCard(g, p) {
     bit(place, PLACE_SHORT[place], false, 3);
   }
   if (g.event && !g.stage && !mteCard) bit(g.event);
+  // harvest's own footer words -- "Ivy League" on Cornell's Ivy games
+  (g.labels || []).forEach(t => bit(t));
   // THE SERIES IS DERIVED at harvest (two meetings in consecutive seasons the
   // schools arranged between them) -- but a tag he wrote by hand still wins,
   // which is what keeps Texas 2024 marked when its return leg sits in 2027,
@@ -750,7 +802,11 @@ function michCard(g, p) {
   // ...REVERSED 2026-09-16: his Notes are DETAILS like any other, so they take
   // the third row on their own and the date stays up in the header. The date
   // only drops when the row would otherwise be empty.
-  const dateDown = bigStage || mteCard || !parts.length;
+  if (series) {
+    parts.unshift({ t: MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4),
+                    short: "", his: false });
+  }
+  const dateDown = !series && (bigStage || mteCard || !parts.length);
   if (dateDown && !bigStage && !mteCard) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
@@ -796,8 +852,11 @@ function michCard(g, p) {
   const bigWin = !!mx.shade;
   let cls = " mich mich-" + g.sport.toLowerCase() +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
+    // the existing no-bold class: the wash stays, the weight goes
+    (bothMine || flatSplit ? " flatwin" : "") +
     (g.ot ? " ot" : "") +
-    (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
+    (series ? (lost ? " rk-grey" : "")
+      : dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
   // card starts and the seed follows it.
@@ -839,9 +898,10 @@ function michCard(g, p) {
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
-      (g.preseason || bowlGame || ncaaGame ? "#8a8a92" : null);
+      // ...and the Great Lakes Invitational (g.frame) takes it too (2026-09-16)
+      (g.preseason || g.frame || bowlGame || ncaaGame ? "#8a8a92" : null);
   // ...and like an MTE it goes dashed on a loss
-  if ((g.preseason || bowlGame || ncaaGame) && lost) cls += " predash";
+  if ((g.preseason || g.frame || bowlGame || ncaaGame) && lost) cls += " predash";
   let ring = "";
   if (bc) {
     cls += " celebrate";
@@ -857,10 +917,10 @@ function michCard(g, p) {
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
-      (dateDown ? "" : headDate) + "</span></div>" +
+      (dateDown || series ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
-      (mx.attended ? '<span class="mstar">*</span>' : "") + '<span class="mdl">' +
+      (mx.attended ? '<span class="mstar">*</span>' : "") + ownRank + '<span class="mdl">' +
       chipHtml + "</span>" + umRank +
     "</div></div>";
 }
@@ -939,8 +999,45 @@ window.addEventListener("resize", () => {
    POSTSEASON where the conference title game or tournament begins. Each is a
    TILE in the grid, so
    on a desktop it takes one card's slot and three-across stays in step. */
+// Consecutive regular-season hockey games against one opponent, within three
+// days, become one card (his call 2026-09-16). Each unit is drawn from its
+// OLDEST game, carrying the pair as _series and his Sheet columns merged: a
+// shade, a border or a star on either game belongs to the series.
+function hockeyUnits(list) {
+  const units = [];
+  const groupable = g => g.sport === "CHK" && !g.stage && !g.preseason;
+  const oppOf = g => (g.teams.find(t => t.id !== (g.focus || focusId())) || {}).id;
+  const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
+  for (let i = 0; i < list.length; i++) {
+    const g = list[i], n = list[i + 1];
+    if (!groupable(g)) { units.push([g]); continue; }
+    if (n && groupable(n) && oppOf(n) === oppOf(g) && Math.abs(day(n.date) - day(g.date)) <= 3) {
+      units.push([g, n].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
+      i++;
+    } else {
+      units.push([g]);
+    }
+  }
+  return units.map(games => {
+    if (!groupable(games[0])) return { g: games[0], html: rowHtml(games[0], false) };
+    const mx = Object.assign({}, games[0].mx || {});
+    games.slice(1).forEach(x => {
+      const o = x.mx || {};
+      if (o.shade) mx.shade = o.shade;
+      if (o.attended) mx.attended = o.attended;
+      if (!mx.border && o.border) mx.border = o.border;
+      if (o.caps === "Y") mx.caps = "Y";
+      if (o.note && o.note !== mx.note) mx.note = mx.note ? mx.note + " | " + o.note : o.note;
+    });
+    const rep = Object.assign({}, games[0], { _series: games, mx: mx });
+    return { g: games[0], html: rowHtml(rep, false) };
+  });
+}
+
 function michListHtml(list) {
-  const cards = list.map(g => rowHtml(g, false));
+  const units = hockeyUnits(list);
+  const cards = units.map(u => u.html);
+  list = units.map(u => u.g);
   // no dividers under a Highlights filter (his call 2026-09-16): a bye or a
   // tournament tile means nothing between two hand-picked games
   if (FILT.season == null || list.length < 2 || FILT.hl) return cards.join("");

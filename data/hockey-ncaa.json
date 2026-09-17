@@ -1,0 +1,359 @@
+{
+ "2008": {
+  "champ": "bostonuniversity",
+  "finish": {
+   "airforce": "Rd 2",
+   "bemidjistate": "Frozen 4",
+   "bostonuniversity": "Champs",
+   "cornell": "Rd 2",
+   "denver": "Rd 1",
+   "miamioh": "Final",
+   "michigan": "Rd 1",
+   "minnesotaduluth": "Rd 2",
+   "newhampshire": "Rd 2",
+   "northdakota": "Rd 1",
+   "northeastern": "Rd 1",
+   "notredame": "Rd 1",
+   "ohiostate": "Rd 1",
+   "princeton": "Rd 1",
+   "vermont": "Frozen 4",
+   "yale": "Rd 1"
+  }
+ },
+ "2009": {
+  "champ": "bostoncollege",
+  "finish": {
+   "alabamahuntsville": "Rd 1",
+   "alaska": "Rd 1",
+   "bemidjistate": "Rd 1",
+   "bostoncollege": "Champs",
+   "cornell": "Rd 1",
+   "denver": "Rd 1",
+   "miamioh": "Frozen 4",
+   "michigan": "Rd 2",
+   "newhampshire": "Rd 2",
+   "northdakota": "Rd 1",
+   "northernmichigan": "Rd 1",
+   "rit": "Frozen 4",
+   "stcloudstate": "Rd 2",
+   "vermont": "Rd 1",
+   "wisconsin": "Final",
+   "yale": "Rd 2"
+  }
+ },
+ "2010": {
+  "champ": "minnesotaduluth",
+  "finish": {
+   "airforce": "Rd 1",
+   "bostoncollege": "Rd 1",
+   "coloradocollege": "Rd 2",
+   "denver": "Rd 2",
+   "merrimack": "Rd 1",
+   "miamioh": "Rd 1",
+   "michigan": "Final",
+   "minnesotaduluth": "Champs",
+   "newhampshire": "Rd 2",
+   "northdakota": "Frozen 4",
+   "notredame": "Frozen 4",
+   "omaha": "Rd 1",
+   "rensselaer": "Rd 1",
+   "union": "Rd 1",
+   "westernmichigan": "Rd 1",
+   "yale": "Rd 2"
+  }
+ },
+ "2011": {
+  "champ": "bostoncollege",
+  "finish": {
+   "airforce": "Rd 1",
+   "bostoncollege": "Champs",
+   "bostonuniversity": "Rd 1",
+   "cornell": "Rd 2",
+   "denver": "Rd 1",
+   "ferrisstate": "Final",
+   "maine": "Rd 1",
+   "miamioh": "Rd 1",
+   "michigan": "Rd 1",
+   "michiganstate": "Rd 1",
+   "minnesota": "Frozen 4",
+   "minnesotaduluth": "Rd 2",
+   "northdakota": "Rd 2",
+   "umasslowell": "Rd 2",
+   "union": "Frozen 4",
+   "westernmichigan": "Rd 1"
+  }
+ },
+ "2012": {
+  "champ": "yale",
+  "finish": {
+   "bostoncollege": "Rd 1",
+   "canisius": "Rd 1",
+   "denver": "Rd 1",
+   "miamioh": "Rd 2",
+   "minnesota": "Rd 1",
+   "minnesotastate": "Rd 1",
+   "newhampshire": "Rd 2",
+   "niagara": "Rd 1",
+   "northdakota": "Rd 2",
+   "notredame": "Rd 1",
+   "quinnipiac": "Final",
+   "stcloudstate": "Frozen 4",
+   "umasslowell": "Frozen 4",
+   "union": "Rd 2",
+   "wisconsin": "Rd 1",
+   "yale": "Champs"
+  }
+ },
+ "2013": {
+  "champ": "union",
+  "finish": {
+   "bostoncollege": "Frozen 4",
+   "colgate": "Rd 1",
+   "denver": "Rd 1",
+   "ferrisstate": "Rd 2",
+   "minnesota": "Final",
+   "minnesotastate": "Rd 1",
+   "northdakota": "Frozen 4",
+   "notredame": "Rd 1",
+   "providence": "Rd 2",
+   "quinnipiac": "Rd 1",
+   "robertmorris": "Rd 1",
+   "stcloudstate": "Rd 2",
+   "umasslowell": "Rd 2",
+   "union": "Champs",
+   "vermont": "Rd 1",
+   "wisconsin": "Rd 1"
+  }
+ },
+ "2014": {
+  "champ": "providence",
+  "finish": {
+   "bostoncollege": "Rd 1",
+   "bostonuniversity": "Final",
+   "denver": "Rd 2",
+   "harvard": "Rd 1",
+   "miamioh": "Rd 1",
+   "michigantech": "Rd 1",
+   "minnesota": "Rd 1",
+   "minnesotaduluth": "Rd 2",
+   "minnesotastate": "Rd 1",
+   "northdakota": "Frozen 4",
+   "omaha": "Frozen 4",
+   "providence": "Champs",
+   "quinnipiac": "Rd 1",
+   "rit": "Rd 2",
+   "stcloudstate": "Rd 2",
+   "yale": "Rd 1"
+  }
+ },
+ "2015": {
+  "champ": "northdakota",
+  "finish": {
+   "bostoncollege": "Frozen 4",
+   "bostonuniversity": "Rd 1",
+   "denver": "Frozen 4",
+   "ferrisstate": "Rd 2",
+   "harvard": "Rd 1",
+   "michigan": "Rd 2",
+   "minnesotaduluth": "Rd 2",
+   "northdakota": "Champs",
+   "northeastern": "Rd 1",
+   "notredame": "Rd 1",
+   "providence": "Rd 1",
+   "quinnipiac": "Final",
+   "rit": "Rd 1",
+   "stcloudstate": "Rd 1",
+   "umasslowell": "Rd 2",
+   "yale": "Rd 1"
+  }
+ },
+ "2016": {
+  "champ": "denver",
+  "finish": {
+   "airforce": "Rd 2",
+   "bostonuniversity": "Rd 2",
+   "cornell": "Rd 1",
+   "denver": "Champs",
+   "harvard": "Frozen 4",
+   "michigantech": "Rd 1",
+   "minnesota": "Rd 1",
+   "minnesotaduluth": "Final",
+   "northdakota": "Rd 1",
+   "notredame": "Frozen 4",
+   "ohiostate": "Rd 1",
+   "pennstate": "Rd 2",
+   "providence": "Rd 1",
+   "umasslowell": "Rd 2",
+   "union": "Rd 1",
+   "westernmichigan": "Rd 1"
+  }
+ },
+ "2017": {
+  "champ": "minnesotaduluth",
+  "finish": {
+   "airforce": "Rd 2",
+   "bostonuniversity": "Rd 2",
+   "clarkson": "Rd 1",
+   "cornell": "Rd 1",
+   "denver": "Rd 2",
+   "michigan": "Frozen 4",
+   "michigantech": "Rd 1",
+   "minnesotaduluth": "Champs",
+   "minnesotastate": "Rd 1",
+   "northeastern": "Rd 1",
+   "notredame": "Final",
+   "ohiostate": "Frozen 4",
+   "pennstate": "Rd 1",
+   "princeton": "Rd 1",
+   "providence": "Rd 2",
+   "stcloudstate": "Rd 1"
+  }
+ },
+ "2018": {
+  "champ": "minnesotaduluth",
+  "finish": {
+   "americaninternational": "Rd 2",
+   "arizonastate": "Rd 1",
+   "bowlinggreen": "Rd 1",
+   "clarkson": "Rd 1",
+   "cornell": "Rd 2",
+   "denver": "Frozen 4",
+   "harvard": "Rd 1",
+   "massachusetts": "Final",
+   "minnesotaduluth": "Champs",
+   "minnesotastate": "Rd 1",
+   "northeastern": "Rd 1",
+   "notredame": "Rd 2",
+   "ohiostate": "Rd 1",
+   "providence": "Frozen 4",
+   "quinnipiac": "Rd 2",
+   "stcloudstate": "Rd 1"
+  }
+ },
+ "2020": {
+  "champ": "massachusetts",
+  "finish": {
+   "americaninternational": "Rd 1",
+   "bemidjistate": "Rd 2",
+   "bostoncollege": "Rd 2",
+   "bostonuniversity": "Rd 1",
+   "lakesuperiorstate": "Rd 1",
+   "massachusetts": "Champs",
+   "minnesota": "Rd 2",
+   "minnesotaduluth": "Frozen 4",
+   "minnesotastate": "Frozen 4",
+   "northdakota": "Rd 2",
+   "omaha": "Rd 1",
+   "quinnipiac": "Rd 1",
+   "smichiganssupsup": "Rd 1",
+   "snotredamessupsup": "Rd 1",
+   "stcloudstate": "Final",
+   "wisconsin": "Rd 1"
+  }
+ },
+ "2021": {
+  "champ": "denver",
+  "finish": {
+   "americaninternational": "Rd 1",
+   "denver": "Champs",
+   "harvard": "Rd 1",
+   "massachusetts": "Rd 1",
+   "michigan": "Frozen 4",
+   "michigantech": "Rd 1",
+   "minnesota": "Frozen 4",
+   "minnesotaduluth": "Rd 2",
+   "minnesotastate": "Final",
+   "northdakota": "Rd 1",
+   "northeastern": "Rd 1",
+   "notredame": "Rd 2",
+   "quinnipiac": "Rd 2",
+   "stcloudstate": "Rd 1",
+   "umasslowell": "Rd 1",
+   "westernmichigan": "Rd 2"
+  }
+ },
+ "2022": {
+  "champ": "quinnipiac",
+  "finish": {
+   "bostonuniversity": "Frozen 4",
+   "canisius": "Rd 1",
+   "colgate": "Rd 1",
+   "cornell": "Rd 2",
+   "denver": "Rd 1",
+   "harvard": "Rd 1",
+   "merrimack": "Rd 1",
+   "michigan": "Frozen 4",
+   "michigantech": "Rd 1",
+   "minnesota": "Final",
+   "minnesotastate": "Rd 1",
+   "ohiostate": "Rd 2",
+   "pennstate": "Rd 2",
+   "quinnipiac": "Champs",
+   "stcloudstate": "Rd 2",
+   "westernmichigan": "Rd 1"
+  }
+ },
+ "2023": {
+  "champ": "denver",
+  "finish": {
+   "bostoncollege": "Final",
+   "bostonuniversity": "Frozen 4",
+   "cornell": "Rd 2",
+   "denver": "Champs",
+   "maine": "Rd 1",
+   "massachusetts": "Rd 1",
+   "michigan": "Frozen 4",
+   "michiganstate": "Rd 2",
+   "michigantech": "Rd 1",
+   "minnesota": "Rd 2",
+   "northdakota": "Rd 1",
+   "omaha": "Rd 1",
+   "quinnipiac": "Rd 2",
+   "rit": "Rd 1",
+   "westernmichigan": "Rd 1",
+   "wisconsin": "Rd 1"
+  }
+ },
+ "2024": {
+  "champ": "westernmichigan",
+  "finish": {
+   "bentley": "Rd 1",
+   "bostoncollege": "Rd 2",
+   "bostonuniversity": "Final",
+   "connecticut": "Rd 2",
+   "cornell": "Rd 2",
+   "denver": "Frozen 4",
+   "maine": "Rd 1",
+   "massachusetts": "Rd 2",
+   "michiganstate": "Rd 1",
+   "minnesota": "Rd 1",
+   "minnesotastate": "Rd 1",
+   "ohiostate": "Rd 1",
+   "pennstate": "Frozen 4",
+   "providence": "Rd 1",
+   "quinnipiac": "Rd 1",
+   "westernmichigan": "Champs"
+  }
+ },
+ "2025": {
+  "champ": "denver",
+  "finish": {
+   "bentley": "Rd 1",
+   "connecticut": "Rd 1",
+   "cornell": "Rd 1",
+   "dartmouth": "Rd 1",
+   "denver": "Champs",
+   "merrimack": "Rd 1",
+   "michigan": "Frozen 4",
+   "michiganstate": "Rd 2",
+   "minnesotaduluth": "Rd 2",
+   "minnesotastate": "Rd 1",
+   "northdakota": "Frozen 4",
+   "pennstate": "Rd 1",
+   "providence": "Rd 1",
+   "quinnipiac": "Rd 2",
+   "westernmichigan": "Rd 2",
+   "wisconsin": "Final"
+  }
+ }
+}

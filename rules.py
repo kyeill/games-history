@@ -82,7 +82,8 @@ CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
                   # ESPN spells it out; every other St. Paul here is short
                   "Saint Paul": "St. Paul",
                   # the 2024 hockey regional: he calls it St. Louis
-                  "Maryland Heights": "St. Louis"}
+                  "Maryland Heights": "St. Louis",
+                  "Cincinatti": "Cincinnati"}             # USCHO's spelling
 
 
 # MICHIGAN view (his call 2026-09-11): every Michigan game from 2011 on (the

@@ -89,6 +89,31 @@ Traps found building it:
 - **A SHELL CHAIN MUST STOP ON A FAILED CHECK**: `node -e ... && harvest; site;
   git push` deployed a broken app.js on 2026-09-16, because `;` carried on
   past the failure. Use `|| exit 1` after the syntax check.
+- **USCHO IS THE SOURCE OF HOCKEY DETAIL** (2026-09-16): its team season page,
+  `uscho.com/scoreboard/{michigan|cornell}/mens-hockey/YYYY-YYYY/`, embeds every
+  game with `arena_name`, `neutral`, `tourn_shortname`, `note` ("Big Ten
+  Semifinal (St. Paul, MN)", "NCAA E Reg Champ (Providence, RI)", "Red Hot
+  Hockey (...)") and `type` (b10/ec = conference, nc, ex). `uscho_match` pairs
+  it to ESPN by date (or the day before) and opponent; `uscho_details` reads the
+  stage, city, event, MTE round, GLI frame, Duel in the D and the Garden games.
+  Finished seasons are committed in `data/uscho/sched-*.json`. The date
+  heuristics above are now only the fallback for a game USCHO does not have.
+- **SEEDS** come from each tournament's Wikipedia page (bracket template, or
+  the NCAA's qualifying-teams table), kept in `data/hockey-seeds.json` by
+  tournament year; a missing current year is fetched on the next harvest. Page
+  titles changed in 2025-26 ("ECAC Hockey men's tournament"), so each has
+  fallback titles in `SEED_TITLES`.
+- **HOW OPPONENTS' SEASONS ENDED** (`mx.finish`: Rd 1, Rd 2, Frozen 4, Final,
+  Champs), the champion for the `^`, and the final USCHO rank (`mx.final`).
+  The NCAA results come from ESPN's scoreboard across the tournament dates and
+  are kept in `data/hockey-ncaa.json` ONLY when all 15 games were read (14 in
+  2020-21) -- ESPN's 502s once saved seven partial seasons.
+- **HIS HOCKEY NUMBERS** (`hockey_numbers`): non-conference games number by
+  week (games within two days share one), "NC" against Hockey East and NCHC
+  (and the Big Ten, for Cornell); conference games are "w" -- Michigan's pair
+  by opponent, the second game of a series reusing the first's number however
+  the schedule splits them (max w10 2013-17, w12 after, w10 in 2020-21);
+  Cornell's number by ECAC weekend.
 - Ties exist (`g.tie`) and read as neither win nor loss. The hockey NCAA
   Tournament number is a RANKING, not a seed, so `playoffGame` excludes CHK.
 
