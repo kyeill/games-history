@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260917-093306";
+const BUILD = "20260917-093559";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1570,8 +1570,13 @@ function filterChips() {
     // them out again so a bar can sit between the rivals and the rest
     const isRival = id => rivalIds.indexOf(id) > -1;
     // groups with nothing in them bring no bar (2026-09-16)
-    const teamGroups = [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
-                        mt.power, mt.rest].filter(ids => ids.length);
+    // CORNELL splits only conference and non-conference (his call 2026-09-17)
+    const byName = (x, y) => optOf(x)[0].localeCompare(optOf(y)[0]);
+    const teamGroups = (VIEW === "cornell"
+      ? [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
+         mt.power.concat(mt.rest).sort(byName)]
+      : [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
+         mt.power, mt.rest]).filter(ids => ids.length);
     h += group("Team", select("team", "All Teams",
       [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
       FILT.team));
