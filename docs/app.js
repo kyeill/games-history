@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-220517";
+const BUILD = "20260916-230241";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -432,9 +432,21 @@ function michCard(g, p) {
     });
     if (tot) sres = mine * 2 > tot ? "win" : mine * 2 === tot ? "split" : "loss";
   }
+  // ...but a TOURNAMENT series is won by games: the bubble reads the series
+  // score (2-1) and the bottom row each game's score (his call 2026-09-16)
+  const tSeries = !!(series && g.stage);
+  let sWins = 0, sLosses = 0, sTies = 0;
+  if (tSeries) {
+    series.forEach(x => {
+      if (upcoming(x)) return;
+      const me = x.teams.find(t => t.id === fid);
+      if (x.tie) sTies++; else if (me.win) sWins++; else sLosses++;
+    });
+    sres = sWins > sLosses ? "win" : sWins === sLosses ? "split" : "loss";
+  }
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
   const tied = series ? (sres === "split" && !opp.rank) : !!g.tie;
-  const flatSplit = sres === "split" && !!opp.rank;
+  const flatSplit = !tSeries && sres === "split" && !!opp.rank;
   const mx = g.mx || {};
   const lost = series ? sres === "loss" : (!upcoming(g) && !m.win && !tied);
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
@@ -569,7 +581,7 @@ function michCard(g, p) {
   }
   // no emoji in the header any more (his call 2026-09-13)
   const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") +
-    (series ? series.map(x => esc(x.dow) + " " + fmtTime(x.time)).join(" | ") : when);
+    (series && !tSeries ? series.map(x => esc(x.dow) + " " + fmtTime(x.time)).join(" | ") : when);
   // The DATE goes at the end of the header -- unless the third row would be
   // empty, in which case it drops down there instead and the header ends
   // without it (his call 2026-09-13). Decided below, once the footer is known.
@@ -669,7 +681,7 @@ function michCard(g, p) {
   // BOTH BUBBLES ALWAYS SHOW, an unplayed game included (his call
   // 2026-09-14) -- it is painted like any other, just with no score in it,
   // which on a card with no colours is the grey placeholder
-  const score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
+  let score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
     (upcoming(g) ? "" : m.score + "-" + opp.score) + "</span>";
   // Michigan's rank sits on the THIRD ROW, under the score and the same width
   // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
@@ -680,7 +692,10 @@ function michCard(g, p) {
     : umSeed != null ? "No. " + umSeed
     : m.rank ? "#" + m.rank : "\u2013";
   let umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
-  if (series) {
+  if (tSeries) {
+    score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
+      (sWins + sLosses + sTies ? sWins + "-" + sLosses + (sTies ? "-" + sTies : "") : "") + "</span>";
+  } else if (series) {
     const second = series[1];
     umRank = second
       ? '<span class="sc mbox"' + paint(top, scoreInk) + ">" + (upcoming(second) ? ""
@@ -690,7 +705,7 @@ function michCard(g, p) {
   }
   // on a series card the team's OWN rank reads under the opponent's, in its
   // colour -- maize, or Cornell's carnelian -- and nothing when it was unranked
-  const ownRank = series && m.rank
+  const ownRank = series && !tSeries && m.rank
     ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
       '">#' + m.rank + "</span>" : "";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
@@ -745,7 +760,13 @@ function michCard(g, p) {
   // call 2026-09-13); the short form appears only when it has to
   const PLACE_SHORT = { "Madison Square Garden": "MSG",
                         "Little Caesars Arena": "LCA" };
-  if (bigStage) {
+  if (bigStage && tSeries) {
+    series.forEach(x => {
+      const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
+      bit(upcoming(x) ? x.dow.toUpperCase() + " " + fmtDate(x.date)
+        : me.score + "-" + op.score + (x.ot ? " (OT)" : ""));
+    });
+  } else if (bigStage) {
     // the date leads and the TV details follow it -- the reverse of an
     // ordinary card, where both sit up in the header (his call 2026-09-13)
     bit(dateText);
@@ -807,11 +828,11 @@ function michCard(g, p) {
   // ...REVERSED 2026-09-16: his Notes are DETAILS like any other, so they take
   // the third row on their own and the date stays up in the header. The date
   // only drops when the row would otherwise be empty.
-  if (series) {
+  if (series && !tSeries) {
     parts.unshift({ t: MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4),
                     short: "", his: false });
   }
-  const dateDown = !series && (bigStage || mteCard || !parts.length);
+  const dateDown = tSeries || (!series && (bigStage || mteCard || !parts.length));
   if (dateDown && !bigStage && !mteCard) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
@@ -859,7 +880,7 @@ function michCard(g, p) {
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     // the existing no-bold class: the wash stays, the weight goes
     (bothMine || flatSplit ? " flatwin" : "") +
-    (g.ot ? " ot" : "") +
+    (g.ot && !series ? " ot" : "") +
     (series ? (lost ? " rk-grey" : "")
       : dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
@@ -1010,18 +1031,25 @@ window.addEventListener("resize", () => {
 // shade, a border or a star on either game belongs to the series.
 function hockeyUnits(list) {
   const units = [];
-  const groupable = g => g.sport === "CHK" && !g.stage && !g.preseason;
+  // A CONFERENCE-TOURNAMENT SERIES groups as well (his call 2026-09-16) -- the
+  // Big Ten and ECAC best-of-threes -- up to three games of the same round
+  const confSeries = g => /^(Big Ten|ECAC) Tournament/.test(g.stage || "");
+  const groupable = g => g.sport === "CHK" && !g.preseason && (!g.stage || confSeries(g));
   const oppOf = g => (g.teams.find(t => t.id !== (g.focus || focusId())) || {}).id;
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   for (let i = 0; i < list.length; i++) {
-    const g = list[i], n = list[i + 1];
+    const g = list[i];
     if (!groupable(g)) { units.push([g]); continue; }
-    if (n && groupable(n) && oppOf(n) === oppOf(g) && Math.abs(day(n.date) - day(g.date)) <= 3) {
-      units.push([g, n].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
-      i++;
-    } else {
-      units.push([g]);
+    const run = [g];
+    const max = g.stage ? 3 : 2;
+    while (run.length < max) {
+      const n = list[i + run.length], last = run[run.length - 1];
+      if (!n || !groupable(n) || oppOf(n) !== oppOf(g) || (n.stage || "") !== (g.stage || "") ||
+          Math.abs(day(n.date) - day(last.date)) > 3) break;
+      run.push(n);
     }
+    i += run.length - 1;
+    units.push(run.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
   }
   return units.map(games => {
     if (!groupable(games[0])) return { g: games[0], html: rowHtml(games[0], false) };

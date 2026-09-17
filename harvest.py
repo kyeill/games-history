@@ -920,7 +920,8 @@ def hockey_numbers(keep, teams):
                     nc_n += 1
                 last_nc = day
                 loc = (teams.get(opp["id"]) or {}).get("short")
-                big = hockey_nc_big(focus, opp["id"], loc, y)
+                # an MTE game always reads "NC" (his call 2026-09-16)
+                big = bool(g.get("preseason")) or hockey_nc_big(focus, opp["id"], loc, y)
                 g["mx"]["num"] = ("NC%d" if big else "nc%d") % nc_n
 
 
