@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260917-085856";
+const BUILD = "20260917-091314";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -224,6 +224,7 @@ function stageColor(g) {
   if (st.indexOf("Big Ten Tournament") === 0 ||
       st.indexOf("Big Ten Championship") === 0) return "#0088ce";
   if (st.indexOf("NCAA Tournament") === 0) return "#4d9ae0";
+  if (st.indexOf("ECAC Tournament") === 0) return "#c0053c";      // his hex, 2026-09-17
   return null;
 }
 
@@ -719,7 +720,7 @@ function michCard(g, p) {
   // on a series card the team's OWN rank reads under the opponent's, in its
   // colour -- maize, or Cornell's carnelian -- and nothing when it was unranked
   const ownRank = series && !tSeries && m.rank
-    ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
+    ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#ffffff" : "#ffcb05") +
       '">#' + m.rank + "</span>" : "";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
   // stops before the two boxes (his call 2026-09-11)
@@ -792,7 +793,9 @@ function michCard(g, p) {
     // College Classic and the rest name it here, first (his call 2026-09-16)
     if (g.sport === "CHK" && place &&
         !["Ice Breaker"].some(e => (g.event || "").indexOf(e) > -1)) bit(place);
-    bit(tvTxt, netTxt, false, 4);
+    // ...and Cornell's shows no time (his call 2026-09-17), only a network
+    if (fid === CORNELL && g.sport === "CHK") bit(netTxt);
+    else bit(tvTxt, netTxt, false, 4);
     bit(dateText);
   } else if (place && !ny6Bowl(g)) {
     // a NEW YEAR'S SIX bowl names no city (his call 2026-09-16): the header
@@ -857,7 +860,10 @@ function michCard(g, p) {
   let monthHead = "";
   if (series && !tSeries) {
     const month = MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4);
-    if (parts.length) monthHead = " | " + esc(month);
+    // a GLI, Duel in the D, Red Hot Hockey or Frozen Apple card carries its
+    // DATE instead (his call 2026-09-17)
+    if (series.some(x => x.dated)) monthHead = " | " + esc(fmtDate(g.date));
+    else if (parts.length) monthHead = " | " + esc(month);
     else parts.unshift({ t: month, short: "", his: false });
   }
   const dateDown = tSeries || (!series && (bigStage || mteCard || !parts.length));
@@ -1605,8 +1611,10 @@ function filterChips() {
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
-    return h + group("", '<button class="f" data-act="recent" aria-pressed="' +
-      !!FILT.recent + '">2021-Onward</button>' + sortButton());
+    // Cornell hockey has no 2021-Onward button (his call 2026-09-17)
+    return h + group("", (VIEW === "cornell" && sport === "CHK" ? "" :
+      '<button class="f" data-act="recent" aria-pressed="' + !!FILT.recent +
+      '">2021-Onward</button>') + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or

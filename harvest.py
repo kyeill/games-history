@@ -623,9 +623,12 @@ HOCKEY_NO_EVENT = {"Frozen Confines"}          # his call 2026-09-16
 HOCKEY_GAME_FIX = {
     ("130", "2015-02-07"): {"event": None, "city": "Soldier Field"},   # MSU, outdoors
     ("130", "2016-11-04"): {"offsite": None},                          # at Arizona State
-    ("130", "2013-12-27"): {"labels": ["Comerica Park"]},              # the 2013 GLI
-    ("130", "2013-12-28"): {"labels": ["Comerica Park"]},
 }
+# THE NAMED EVENTS that show their VENUE after the name and their DATE in the
+# header (his call 2026-09-17) -- the venue is USCHO's arena for the game, so
+# the 2013 GLI reads Comerica Park without being told
+VENUE_EVENTS = {"Great Lakes Invitational", "Duel in the D", "Red Hot Hockey",
+                "The Frozen Apple"}
 # USCHO's code for each focus team, to read its score from a USCHO record
 USCHO_CODE = {"130": "um", "172": "cor"}
 # MTE rounds USCHO leaves unnamed and a tied opener cannot settle (his word)
@@ -1096,6 +1099,10 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                    "final": uscho_final_rank(y, opp_loc),
                    "reigning": bool(okey) and okey == ncaa_before.get("champ")}
             labels = list(fix.get("labels", []))
+            named = bool(ev and ev.get("event") in VENUE_EVENTS)
+            arena = (us or {}).get("arena_name") or ""
+            if named and arena and arena != "NA" and arena not in labels:
+                labels.append(arena)
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies
             conference = det.get("conf_game") if us else (hockey_conf(opp["id"], y) == "ECAC")
@@ -1143,6 +1150,7 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "conf_game": det.get("conf_game") if us else None,
                 "frame": bool(ev and ev.get("frame")),
                 "labels": labels,
+                "dated": named,
             })
             if not out[-1]["upcoming"]:
                 out[-1].pop("upcoming")
