@@ -660,17 +660,19 @@ def uscho_details(g, team_id, opp_loc):
         rnd = ("Final" if "champ" in nlow else "Third Place" if ("third" in nlow or "3rd" in nlow)
                else "Semifinals")
         res.update(event=name, mte=True, mte_round=rnd, city=note_city, neutral=True)
+    # CORNELL'S THANKSGIVING GAMES AT THE GARDEN name only the event (his call
+    # 2026-09-16) -- no "MSG" beside it
     elif "red hot" in low:
-        res.update(event="Red Hot Hockey", city="Madison Square Garden", neutral=True)
+        res.update(event="Red Hot Hockey", city=None, neutral=True)
     elif "frozen apple" in low:
-        res.update(event="The Frozen Apple", city="Madison Square Garden", neutral=True)
+        res.update(event="The Frozen Apple", city=None, neutral=True)
     elif "madison square" in (arena + " " + note).lower() or "mad sq" in nlow:
         # CORNELL AT THE GARDEN is Red Hot Hockey against Boston University and
         # The Frozen Apple against anyone else (his call 2026-09-16)
         ev = None
         if team_id == rules.CORNELL:
             ev = "Red Hot Hockey" if flat(opp_loc) == "bostonuniversity" else "The Frozen Apple"
-        res.update(event=ev, city="Madison Square Garden", neutral=True)
+        res.update(event=ev, city=None if ev else "Madison Square Garden", neutral=True)
     elif (team_id == rules.MICHIGAN and flat(opp_loc) == "michiganstate"
           and any(a in (arena + " " + note).lower() for a in ("joe louis", "little caesars", "detroit"))):
         # DUEL IN THE D: Michigan-Michigan State in Detroit, every season but the
@@ -1059,8 +1061,9 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             labels = []
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies
+            conference = det.get("conf_game") if us else (hockey_conf(opp["id"], y) == "ECAC")
             if (team_id == rules.CORNELL and not stage and opp_loc in rules.IVY
-                    and opp_loc != "Cornell"):
+                    and opp_loc != "Cornell" and conference):
                 labels.append("Ivy League")
             out.append({
                 "id": x["id"], "sport": "CHK", "season": y,
@@ -1071,7 +1074,11 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "tie": tie, "show": False, "week": None,
                 "venue": v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
+                # USCHO has the last word on where a regular-season game was:
+                # ESPN's venue named Little Caesars Arena, and once East
+                # Lansing, for Duel in the D, which wants no venue at all
                 "city": (rules.CITY_OVERRIDES.get(old_city, old_city) if old_city else
+                         None if (us and not stage) else
                          rules.tourney_city(city, v.get("fullName"), stage, y)
                          if stage else rules.display_city(city, v.get("fullName"))),
                 # TV only for the postseason (his call 2026-09-16)

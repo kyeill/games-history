@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260916-230241";
+const BUILD = "20260916-230818";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -457,8 +457,12 @@ function michCard(g, p) {
   if (caps) nm = nm.toUpperCase();
   const whereOf = x => x.neutral ? "vs. " :
     (x.teams.find(t => t.id !== fid) || {}).home ? "at " : "";
-  // a series played in two places (Duel in the D, then Munn) names neither
-  const where = series && series.some(x => whereOf(x) !== whereOf(g)) ? "" : whereOf(g);
+  // A HOME-AND-AWAY SERIES -- one game each way, as Western Michigan's usually
+  // is -- reads "vs." and says which came first in the footer, in place of
+  // the Home & Home tag (his call 2026-09-16)
+  const homeAway = !!(series && series.length === 2 && !series.some(x => x.neutral) &&
+    whereOf(series[0]) !== whereOf(series[1]));
+  const where = homeAway ? "vs. " : whereOf(g);
   // the rating reads "73+"; a team no system rates reads "DII" as it is
   const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
     : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
@@ -790,8 +794,12 @@ function michCard(g, p) {
   // which is what keeps Texas 2024 marked when its return leg sits in 2027,
   // outside the archive (2026-09-14)
   const handSeries = mine.filter(t => SERIES_FAMILY.indexOf(t) > -1);
-  (handSeries.length ? handSeries : (g.series ? [g.series] : []))
-    .forEach(t => bit(t, SERIES_SHORT[t], false, 2));
+  if (homeAway) {
+    bit(whereOf(series[0]) === "at " ? "Away & Home" : "Home & Away");
+  } else {
+    (handSeries.length ? handSeries : (g.series ? [g.series] : []))
+      .forEach(t => bit(t, SERIES_SHORT[t], false, 2));
+  }
   const shows = showsOf(g);
   if (shows.indexOf("Big Noon Kickoff") > -1) bit("Big Noon Kickoff", "Big Noon", false, 1);
   if (shows.indexOf("College GameDay") > -1) bit("College GameDay", "GameDay", false, 1);
@@ -1044,7 +1052,10 @@ function hockeyUnits(list) {
     const max = g.stage ? 3 : 2;
     while (run.length < max) {
       const n = list[i + run.length], last = run[run.length - 1];
+      // a NEUTRAL-SITE game never shares a card with one that was not (his
+      // call 2026-09-16): Duel in the D keeps a card of its own, same [wX]
       if (!n || !groupable(n) || oppOf(n) !== oppOf(g) || (n.stage || "") !== (g.stage || "") ||
+          !!n.neutral !== !!g.neutral ||
           Math.abs(day(n.date) - day(last.date)) > 3) break;
       run.push(n);
     }
