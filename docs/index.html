@@ -306,10 +306,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a hockey series card: the team's own rank, under the opponent's rank column
    (22px crest + 7px gap = 29px in, 20px wide) */
 .row.mich .mrk2{position:absolute;left:29px;top:50%;transform:translateY(-50%);
-  width:20px;text-align:center;font-size:13px;font-weight:600;
-  font-variant-numeric:tabular-nums;line-height:inherit}
-/* ...on the same size and line height as the footer text beside it, so the
-   two share a baseline (his catch 2026-09-17: it sat low) */
+  width:20px;text-align:center;font-size:12.5px;font-weight:600;
+  letter-spacing:normal;font-variant-numeric:tabular-nums;line-height:inherit}
+/* ...the SAME TYPE as the opponent's rank above it (12.5px, none of the
+   footer's letter-spacing), on the footer's line height so the two share a
+   baseline (his catches 2026-09-17: it sat low, then read wide) */
 .row.mich .mdl{display:flex;flex-wrap:wrap;gap:7px;align-items:center;
   min-width:0;padding-left:57px}
 /* both boxes finish at the card content edge (his call 2026-09-11): the team
@@ -393,6 +394,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260917-093559"></script>
+<script src="app.js?v=20260917-093756"></script>
 </body>
 </html>
