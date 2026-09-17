@@ -797,7 +797,7 @@ def hockey_seed(y, stage, location):
 # data/hockey-ncaa.json by season, names flattened.
 # ---------------------------------------------------------------------------
 _NCAA = None
-HOCKEY_FINISH = {1: "Rd 1", 2: "Rd 2", 3: "Frozen 4", 4: "Final"}
+HOCKEY_FINISH = {1: "Rd 1", 2: "Rd 2", 3: "Frozen Four", 4: "Final"}   # spelled out (his call 2026-09-17)
 
 
 def _wikitext(title):
