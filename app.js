@@ -685,8 +685,16 @@ function michCard(g, p) {
   // BOTH BUBBLES ALWAYS SHOW, an unplayed game included (his call
   // 2026-09-14) -- it is painted like any other, just with no score in it,
   // which on a card with no colours is the grey placeholder
-  let score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
-    (upcoming(g) ? "" : m.score + "-" + opp.score) + "</span>";
+  // HOCKEY: a score is UNDERLINED when the game went to overtime, a shootout
+  // or ended tied, and a shootout says so -- "2-2 (SO)" (his call 2026-09-16)
+  const bubble = x => {
+    const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
+    const mark = g.sport === "CHK" && !upcoming(x) && (x.ot || x.so || x.tie);
+    return '<span class="sc mbox' + (mark ? " u" : "") + '"' + paint(top, scoreInk) + ">" +
+      (upcoming(x) ? "" : me.score + "-" + op.score + (g.sport === "CHK" && x.so ? " (SO)" : "")) +
+      "</span>";
+  };
+  let score = bubble(g);
   // Michigan's rank sits on the THIRD ROW, under the score and the same width
   // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
   // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in
@@ -702,11 +710,7 @@ function michCard(g, p) {
       "</span>";
   } else if (series) {
     const second = series[1];
-    umRank = second
-      ? '<span class="sc mbox"' + paint(top, scoreInk) + ">" + (upcoming(second) ? ""
-        : second.teams.find(t => t.id === fid).score + "-" +
-          second.teams.find(t => t.id !== fid).score) + "</span>"
-      : "";
+    umRank = second ? bubble(second) : "";
   }
   // on a series card the team's OWN rank reads under the opponent's, in its
   // colour -- maize, or Cornell's carnelian -- and nothing when it was unranked
@@ -769,7 +773,7 @@ function michCard(g, p) {
     series.forEach(x => {
       const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
       bit(upcoming(x) ? x.dow.toUpperCase() + " " + fmtDate(x.date)
-        : me.score + "-" + op.score + (x.ot ? " (OT)" : ""));
+        : me.score + "-" + op.score + (x.so ? " (SO)" : x.ot ? " (OT)" : ""));
     });
   } else if (bigStage) {
     // the date leads and the TV details follow it -- the reverse of an

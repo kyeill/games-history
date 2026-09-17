@@ -295,6 +295,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    carries no colour and no number (his call 2026-09-12) */
 /* football never reaches three digits, so its score box is narrower */
 .row.mich.mich-cfb .sc.mbox{min-width:calc(5.4ch + 16px)}
+/* hockey: overtime, a shootout or a tie underlines the score, and a shootout
+   reads "2-2 (SO)" -- so its boxes are sized for that */
+.row.mich .sc.mbox.u{text-decoration:underline;text-underline-offset:3px}
+.row.mich.mich-chk .sc.mbox,.row.mich.mich-chk .mrank{min-width:calc(8.4ch + 16px)}
 /* no background here any more (his call 2026-09-13): an unfilled box is
    painted grey inline, so a game with no uniform cannot inherit maize */
 .row.mich .mrank{min-width:calc(7.2ch + 16px)}

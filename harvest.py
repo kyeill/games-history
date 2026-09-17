@@ -618,6 +618,8 @@ HOCKEY_MTES = {"icebreaker": "Ice Breaker", "ice breaker": "Ice Breaker",
 
 
 HOCKEY_NO_EVENT = {"Frozen Confines"}          # his call 2026-09-16
+# MTE rounds USCHO leaves unnamed and a tied opener cannot settle (his word)
+HOCKEY_MTE_ROUND = {("172", "2023-12-30"): "Final"}    # Adirondack: ASU was the final
 
 
 def uscho_details(g, team_id, opp_loc):
@@ -1076,7 +1078,11 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
                 "time": d.strftime("%H:%M"), "neutral": neutral,
                 "ot": (status.get("period") or 0) > 3,
-                "so": "SO" in ((status.get("type") or {}).get("shortDetail") or ""),
+                # a SHOOTOUT: ESPN marks almost none, USCHO names every one
+                # ("Clarkson wins shootout, 3-2") in its shootout notes
+                "so": ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
+                       or bool(us and (us.get("sho_notes") or
+                                       re.search(r"shootout|\bSO\b", us.get("note") or "", re.I)))),
                 "tie": tie, "show": False, "week": None,
                 "venue": v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
@@ -1118,7 +1124,10 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 out[-1]["preseason"] = True
                 first = [g for g in out[:-1] if g.get("preseason")
                          and g["season"] == y and g.get("event") == ev["event"]]
-                if ev.get("mte_round"):
+                fixed = HOCKEY_MTE_ROUND.get((team_id, out[-1]["date"]))
+                if fixed:
+                    out[-1]["mte_round"] = fixed
+                elif ev.get("mte_round"):
                     out[-1]["mte_round"] = ev["mte_round"]
                 elif first and first[-1].get("tie"):
                     pass        # after a tied first game the round cannot be told
