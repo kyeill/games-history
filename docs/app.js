@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-143503";
+const BUILD = "20260918-144625";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -431,6 +431,39 @@ function michColour(v) {
    tournament games -- which encoded the same 109 cards his column now does.
    Two sources for one fact meant his sheet could ADD a capital but never
    remove one, so the scopes went (see NOTES.md). */
+
+/* THE LIONS' HEADER (his examples, 2026-09-18), the date always last:
+     WEEK 5 | FOX 1:00 PM | 10/5/2025                   a Sunday afternoon
+     WEEK 1 | THURSDAY NIGHT (NBC) | 9/4/2025           any night game
+     WEEK 12 | THANKSGIVING | FOX 12:30 PM | 11/23/2023
+     WEEK 17 | CHRISTMAS | NETFLIX 1:00 PM | 12/25/2025
+     WEEK 7 | LONDON | NFL NET 9:30 AM | 10/26/2014     a game abroad
+     WEEK 16 | SATURDAY | NFL NET 4:30 PM | 12/21/2024  a day game off Sunday
+     2023 NFC WILD CARD | SUN NBC 8:15 PM | 1/14/2024
+     2023 NFC CHAMPIONSHIP | SUN FOX 6:30 PM | 1/28/2024 */
+function nflHead(g) {
+  const DAY = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday",
+                Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
+  const net = primaryNet(g.nets);
+  const t = fmtTime(g.time).replace(/(am|pm)$/, " $1");
+  const tv = (net ? net + " " : "") + t;
+  const date = fmtDate(g.date);
+  if (g.stage) {
+    // the round as the NFL says it, short enough for one line on a phone
+    const rnd = g.stage.replace(" Round", "");
+    return esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + tv) + " | " + date;
+  }
+  const md = g.date.slice(5), d = +g.date.slice(8, 10);
+  const hr = +String(g.time).slice(0, 2);
+  let mid;
+  if (g.dow === "Thu" && md.slice(0, 2) === "11" && d >= 22 && d <= 28) mid = "Thanksgiving | " + tv;
+  else if (md === "12-25") mid = "Christmas | " + tv;
+  else if (g.neutral && g.city) mid = g.city + " | " + tv;
+  else if (g.time !== "TBD" && hr >= 19) mid = DAY[g.dow] + " Night" + (net ? " (" + net + ")" : "");
+  else if (g.dow !== "Sun") mid = DAY[g.dow] + " | " + tv;
+  else mid = tv;
+  return (g.week != null ? "Week " + g.week + " | " : "") + esc(mid) + " | " + date;
+}
 
 function michCard(g, p) {
   const fid = g.focus || focusId();
@@ -1015,6 +1048,15 @@ function michCard(g, p) {
   // Michigan that is the 2011 Sugar, the 2016 Orange and the 2018 Peach. A CFP
   // game played IN one of them already carries the gold through its own stage.
   const stageCol = stageColor(g);
+  // THE LIONS' CARD IS TWO LINES (his call 2026-09-18): the header carries
+  // everything, the date last, and there is no third row
+  if (g.sport === "NFL") {
+    return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
+      shade(teamColor(opp)) + ring + '">' +
+      '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + nflHead(g) +
+      "</span></div>" +
+      '<div class="teams">' + oppLine + "</div></div>";
+  }
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +

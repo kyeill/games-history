@@ -1281,6 +1281,15 @@ NFL_ROUND = {"Wild Card": "NFC Wild Card", "Divisional Round": "NFC Divisional R
              "Conference Championship": "NFC Championship", "Super Bowl": "Super Bowl"}
 
 
+def nfl_place(t):
+    """HIS NAME FOR AN NFL TEAM is its PLACE (his call 2026-09-18) -- "at Green
+    Bay" -- with the two shared cities told apart: NY Giants, NY Jets, LA Rams,
+    LA Chargers."""
+    loc = t.get("location") or t.get("displayName") or ""
+    short = {"New York": "NY", "Los Angeles": "LA"}.get(loc)
+    return short + " " + (t.get("name") or t.get("shortDisplayName") or "") if short else loc
+
+
 def nfl_teams():
     """Every NFL team's names, colours and logo, keyed "nfl-<id>"."""
     out = {}
@@ -1296,7 +1305,7 @@ def nfl_teams():
             if not logo and logos:
                 logo = logos[0].get("href")
             out["nfl-" + t["id"]] = {"name": t.get("displayName"),
-                                     "short": t.get("shortDisplayName") or t.get("name"),
+                                     "short": nfl_place(t),
                                      "abbr": t.get("abbreviation"),
                                      "color": t.get("color"), "alt": t.get("alternateColor"),
                                      "logo": logo}
@@ -1375,7 +1384,7 @@ def lions_games(teams, start):
                     t = k.get("team") or {}
                     tid = "nfl-" + t["id"]
                     teams.setdefault(tid, {"name": t.get("displayName"),
-                                           "short": t.get("shortDisplayName"),
+                                           "short": nfl_place(t),
                                            "abbr": t.get("abbreviation")})
                     sc = k.get("score")
                     score = sc.get("value") if isinstance(sc, dict) else sc
@@ -1774,7 +1783,8 @@ SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
 # (focus team, sport) -> tab
 SHEET_TABS = {("130", "CFB"): "Michigan CFB", ("130", "CBB"): "Michigan CBB",
               ("130", "CHK"): "Michigan Hockey",
-              ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB"}
+              ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB",
+              ("nfl-8", "NFL"): "Lions"}
 
 
 def sheet_season(sport, year):
