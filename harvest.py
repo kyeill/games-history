@@ -1429,7 +1429,9 @@ def lions_games(teams, start):
                     if tid == LIONS:
                         rec = next((r.get("displayValue") for r in k.get("record") or []
                                     if r.get("type") == "total"), None)
+                    was = nfl_place(t)
                     side.append({"id": tid,
+                                 **({"place": was} if was and was != teams[tid]["short"] else {}),
                                  "score": int(score) if done and score is not None else None,
                                  "rank": None, "win": bool(k.get("winner")) and bool(done),
                                  "home": k.get("homeAway") == "home", "conf": "NFL",
@@ -1474,6 +1476,201 @@ def lions_games(teams, start):
                 if not done:
                     g["upcoming"] = True
                 out.append(g)
+    return out
+
+
+# THE RED WINGS, PISTONS AND CAVALIERS (his spec 2026-09-16, built
+# 2026-09-18): playoff games, and for the two NBA teams the NBA Cup. A season
+# is filed under the year it STARTS, like college basketball (2025 = 2025-26);
+# ESPN names it for the year it ends.
+PRO_TEAMS = [
+    # (focus id, ESPN league path, ESPN team id, first season, NBA Cup too)
+    ("nhl-5", "hockey/nhl", "5", 1996, False),          # Red Wings, 1996-97 on
+    ("nba-8", "basketball/nba", "8", 2002, True),        # Pistons, 2002-03 on
+    ("nba-5", "basketball/nba", "5", 2016, True),        # Cavaliers, 2016-17 on
+]
+# ESPN's NHL standings carry NO seeds before 1999-2000; the Western and
+# Eastern Conference seeds as those playoffs were drawn (by hand, 2026-09-18)
+PRO_SEED_FIX = {
+    ("hockey/nhl", 1996): {"COL": 1, "DAL": 2, "DET": 3, "ANA": 4, "PHX": 5, "STL": 6,
+                           "EDM": 7, "CHI": 8, "NJ": 1, "BUF": 2, "PHI": 3, "FLA": 4},
+    ("hockey/nhl", 1997): {"DAL": 1, "COL": 2, "DET": 3, "STL": 4, "LA": 5, "PHX": 6,
+                           "EDM": 7, "SJ": 8, "NJ": 1, "PIT": 2, "PHI": 3, "WSH": 4},
+    ("hockey/nhl", 1998): {"DAL": 1, "COL": 2, "DET": 3, "PHX": 4, "STL": 5, "ANA": 6,
+                           "SJ": 7, "EDM": 8},
+    # ...and ESPN's 1999-2000 table is scrambled (it has Columbus and Minnesota
+    # a year early), so that season is replaced outright too
+    ("hockey/nhl", 1999): {"STL": 1, "DAL": 2, "COL": 3, "DET": 4, "LA": 5, "PHX": 6,
+                           "EDM": 7, "SJ": 8},
+}
+PRO_ROUNDS = {"hockey/nhl": ["First Round", "Second Round", "Conference Final",
+                             "Stanley Cup Final"],
+              "basketball/nba": ["First Round", "Conference Semifinals",
+                                 "Conference Finals", "NBA Finals"]}
+PRO_SPORT = {"hockey/nhl": "NHL", "basketball/nba": "NBA"}
+_PRO_SEEDS = None
+
+
+def pro_place(t):
+    """A pro team by its PLACE, the shared cities told apart -- NY Rangers,
+    LA Lakers -- as the Lions' opponents are."""
+    loc = (t.get("location") or t.get("displayName") or "").strip()
+    short = {"New York": "NY", "Los Angeles": "LA"}.get(loc)
+    return short + " " + (t.get("name") or t.get("shortDisplayName") or "") if short else loc
+
+
+def pro_teams(league, prefix):
+    out = {}
+    try:
+        got = get_json("%s/%s/teams" % (BASE, league), params={"limit": 50})
+    except requests.RequestException:
+        return out
+    for lg in got.get("sports", [{}])[0].get("leagues", []):
+        for w in lg.get("teams", []):
+            t = w.get("team") or {}
+            logos = t.get("logos") or []
+            logo = next((l["href"] for l in logos if "dark" in (l.get("rel") or [])), None)
+            if not logo and logos:
+                logo = logos[0].get("href")
+            out[prefix + t["id"]] = {"name": t.get("displayName"), "short": pro_place(t),
+                                     "abbr": t.get("abbreviation"), "color": t.get("color"),
+                                     "alt": t.get("alternateColor"), "logo": logo}
+    return out
+
+
+def pro_seeds(league, y):
+    """{abbreviation: playoff seed} for the season STARTING in y. Kept in
+    data/pro-seeds.json once worked out."""
+    global _PRO_SEEDS
+    path = os.path.join(HERE, "data", "pro-seeds.json")
+    if _PRO_SEEDS is None:
+        _PRO_SEEDS = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    key = "%s %d" % (league, y)
+    if key in _PRO_SEEDS:
+        return _PRO_SEEDS[key]
+    out = {}
+    try:
+        got = get_json("https://site.api.espn.com/apis/v2/sports/%s/standings" % league,
+                       params={"season": y + 1})
+    except requests.RequestException:
+        got = {}
+
+    def walk(o):
+        for ch in o.get("children") or []:
+            for e in (ch.get("standings") or {}).get("entries") or []:
+                st = {x.get("name"): x.get("value") for x in e.get("stats") or []}
+                if st.get("playoffSeed") and st["playoffSeed"] <= 10:
+                    out[e["team"]["abbreviation"]] = int(st["playoffSeed"])
+            walk(ch)
+    walk(got)
+    if (league, y) in PRO_SEED_FIX:
+        out = dict(PRO_SEED_FIX[(league, y)])
+    if out and dt.date.today() > dt.date(y + 1, 7, 15):
+        _PRO_SEEDS[key] = out
+        json.dump(_PRO_SEEDS, open(path, "w", encoding="utf-8"), indent=1, sort_keys=True)
+    return out
+
+
+def pro_games(teams, start):
+    """Every PLAYOFF game of the three, and the NBA Cup games of the two NBA
+    teams, as team-card records. The ROUND is the series' place in the run
+    (the first opponent is the first round), because ESPN names no round before
+    about 2008; the GAME number and the series record through that game are
+    counted the same way."""
+    out = []
+    for fid, league, tid, first, cup in PRO_TEAMS:
+        prefix = fid.split("-")[0] + "-"
+        for k, v in pro_teams(league, prefix).items():
+            teams[k] = v
+        last = upcoming_season("CBB", start)
+        for y in range(first, last + 1):
+            for stype in ((2, 3) if cup else (3,)):
+                try:
+                    got = get_json("%s/%s/teams/%s/schedule" % (BASE, league, tid),
+                                   params={"season": y + 1, "seasontype": stype})
+                except requests.RequestException:
+                    continue
+                series, opp_order = {}, []
+                evs = sorted(got.get("events") or [], key=lambda x: x.get("date") or "")
+                for x in evs:
+                    comps = x.get("competitions") or []
+                    if not comps:
+                        continue
+                    c = comps[0]
+                    cs = c.get("competitors") or []
+                    heads = [n.get("headline") or "" for n in c.get("notes") or []]
+                    cup_note = next((h for h in heads if "NBA Cup" in h or "In-Season" in h), None)
+                    if stype == 2 and not cup_note:
+                        continue
+                    if len(cs) != 2 or not (c.get("status") or {}).get("type", {}).get("completed"):
+                        continue
+                    try:
+                        d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                             .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+                    except (KeyError, ValueError):
+                        continue
+                    side = []
+                    for k in cs:
+                        t = k.get("team") or {}
+                        sc = k.get("score")
+                        score = sc.get("value") if isinstance(sc, dict) else sc
+                        # a team since moved or folded is not in ESPN's list
+                        # (the Phoenix Coyotes, the Seattle SuperSonics)
+                        if prefix + t["id"] not in teams:
+                            logos = t.get("logos") or [{}]
+                            teams[prefix + t["id"]] = {
+                                "name": t.get("displayName"), "short": pro_place(t),
+                                "abbr": t.get("abbreviation"), "color": t.get("color"),
+                                "alt": t.get("alternateColor"), "logo": logos[0].get("href")}
+                        was = pro_place(t)
+                        side.append({"id": prefix + t["id"], "abbr": t.get("abbreviation"),
+                                     # the name it played under THAT season --
+                                     # the New Jersey Nets, not Brooklyn
+                                     **({"place": was} if was and was != teams[prefix + t["id"]]["short"] else {}),
+                                     "score": int(score) if score is not None else None,
+                                     "rank": None, "win": bool(k.get("winner")),
+                                     "home": k.get("homeAway") == "home",
+                                     "conf": PRO_SPORT[league], "seed": None})
+                    if not any(q["id"] == fid for q in side):
+                        continue
+                    me = next(q for q in side if q["id"] == fid)
+                    opp = next(q for q in side if q["id"] != fid)
+                    mx = {}
+                    if stype == 3:
+                        if opp["id"] not in opp_order:
+                            opp_order.append(opp["id"])
+                        rnd_i = opp_order.index(opp["id"])
+                        w, l = series.get(opp["id"], (0, 0))
+                        w, l = (w + 1, l) if me["win"] else (w, l + 1)
+                        series[opp["id"]] = (w, l)
+                        stage = PRO_ROUNDS[league][min(rnd_i, 3)]
+                        mx.update(game=w + l, series="%d-%d" % (w, l))
+                        seeds = pro_seeds(league, y)
+                        for q in side:
+                            q["seed"] = seeds.get(q["abbr"])
+                    else:
+                        stage = "NBA Cup | " + cup_note.split(" - ")[-1].strip()
+                    for q in side:
+                        q.pop("abbr", None)
+                    v = c.get("venue") or {}
+                    out.append({
+                        "id": x["id"], "sport": PRO_SPORT[league], "season": y,
+                        "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
+                        "time": d.strftime("%H:%M"), "neutral": bool(c.get("neutralSite")),
+                        "ot": (c.get("status") or {}).get("period", 0) >
+                              (3 if league == "hockey/nhl" else 4),
+                        "so": False, "tie": False, "show": False, "week": None,
+                        "venue": v.get("fullName"), "mq": False, "offsite": None,
+                        "city": ((v.get("address") or {}).get("city")
+                                 if c.get("neutralSite") else None),
+                        "nets": sorted(set(networks(c))), "teams": side, "header": None,
+                        "slots": [], "type": None, "champ": None, "round": None,
+                        "title": False, "event": None, "standin": False, "bfri": False,
+                        "suffix": None, "opener": False, "rival_loss": False,
+                        "rivals": False, "post": stype == 3, "rivals_only": True,
+                        "bowl": None, "showcase": False, "kickoff": False,
+                        "stage": stage, "michigan": False, "focus": fid, "mx": mx,
+                        "labels": [], "dated": False})
     return out
 
 
@@ -3156,6 +3353,10 @@ def harvest():
     print("  hockey rivals: %d NCAA Tournament losses" % len(rv))
     lg = lions_games(teams, start)
     keep += lg
+    pg = pro_games(teams, start)
+    keep += pg
+    print("  Red Wings / Pistons / Cavaliers: %s games" % collections.Counter(
+        g["focus"] for g in pg).most_common())
     print("  Lions: %d games, %d Key Games" % (len(lg), sum(1 for g in lg if g["mx"].get("key"))))
     cb = cornell_cbb_games(sorted(rules.CORNELL_SEASONS["CBB"]), teams, latest_conf)
     keep += cb

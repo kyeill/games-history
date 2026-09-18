@@ -234,7 +234,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.mich-nfl .sport{justify-content:space-between;flex-wrap:nowrap}
 .row.mich.mich-nfl .hdate{text-transform:none;letter-spacing:0;color:var(--muted)}
 /* an NFL playoff opponent's seed sits bare in the rank column -- no "#" */
-.row.mich.mich-nfl .rk::before{content:none}
+.row.mich.mich-nfl .rk::before,.row.mich.mich-nhl .rk::before,
+.row.mich.mich-nba .rk::before{content:none}
+/* ...and an NFL playoff LOSS greys the opponent's seed (his call 2026-09-18) */
+.row.mich.dimmed .nseed{color:var(--muted)}
+/* NBC's chip stands out a little more on the Lions' cards */
+.row.mich.mich-nfl .t-slot.n-nbc{background:#3b3b44;border-color:#63636e;color:#ecece6}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
 /* the champion caret never takes the strikethrough (his call): an
@@ -404,6 +409,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260918-152820"></script>
+<script src="app.js?v=20260918-154944"></script>
 </body>
 </html>
