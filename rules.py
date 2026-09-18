@@ -55,6 +55,12 @@ NAME_OVERRIDES = {
 SEASON_NAMES = {"26": {"before": 2024, "name": "Ucla"}}
 
 
+# Names changed ONLY ON THE PAGE, by team id, as the file is written (his call
+# 2026-09-17). They cannot go in NAME_OVERRIDES: the harvest matches USCHO's
+# schedules and polls by name, and "Rochester Institute Tech" matches nothing.
+DISPLAY_BY_ID = {"2022": "American Intl", "178": "Rochester Institute Tech"}
+
+
 def display_name(location):
     return NAME_OVERRIDES.get(location, location)
 

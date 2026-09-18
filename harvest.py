@@ -3145,6 +3145,9 @@ def harvest():
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf
+    for tid, nm in rules.DISPLAY_BY_ID.items():
+        if tid in teams:
+            teams[tid]["short"] = nm
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "window_net": rules.WINDOW_NET,
