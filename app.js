@@ -1340,6 +1340,24 @@ function michBorder(g) {
     return "title";
   return "other";
 }
+/* THE JERSEY FILTER (Michigan football, his call 2026-09-18), from his Sheet's
+   Jersey / Pants / Acc. columns: "Blue/Maize (White)", with his names for the
+   ones that have them. In his order; a choice with no games is not offered. */
+const JERSEYS = ["Traditional", "Blue/Maize (Maize)", "Blue/Maize (White)",
+                 "All Blue", "Blue/Blue (Maize)", "Blue/Blue (White)",
+                 "White/Maize (White)", "White/Maize (Maize)", "White/Maize (Blue)",
+                 "White/Blue (White)", "White/Blue (Blue)",
+                 "All Whites", "White/White", "Maize"];
+function jerseyOf(g) {
+  const j = (g.mx || {}).jersey;
+  if (!j) return null;
+  const [top, pants, acc] = j.split("/");
+  if (top === "Maize") return "Maize";
+  if (top === "White" && pants === "White") return acc === "White" ? "All Whites" : "White/White";
+  if (top === "Blue" && pants === "Maize" && acc === "Blue") return "Traditional";
+  if (top === "Blue" && pants === "Blue" && acc === "Blue") return "All Blue";
+  return top + "/" + pants + " (" + acc + ")";
+}
 function highlightOf(g, kind) {
   const m = focusTeam(g);
   if (!m || upcoming(g)) return false;
@@ -1535,6 +1553,7 @@ function visible() {
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
+  if (teamView() && FILT.jersey) list = list.filter(g => jerseyOf(g) === FILT.jersey);
   if (proView()) {
     if (FILT.prime) list = list.filter(g => g.dow !== "Sun" ||
       (g.time !== "TBD" && g.time >= "19:00"));
@@ -1785,6 +1804,13 @@ function filterChips() {
     // ...but not on Cornell basketball, nine games in all (his call 2026-09-17)
     if (!(VIEW === "cornell" && sport === "CBB"))
       h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
+    // JERSEY, Michigan football only (2026-09-18)
+    if (VIEW === "michigan" && sport === "CFB") {
+      const jBase = visibleWithout("jersey");
+      const jOpts = JERSEYS.filter(k => k === FILT.jersey || jBase.some(g => jerseyOf(g) === k))
+        .map(k => [k, k]);
+      h += group("Jersey", select("jersey", "All Jerseys", jOpts, FILT.jersey));
+    }
     // Cornell hockey has no 2021-Onward button (his call 2026-09-17), and
     // Cornell basketball has NCAA Tournament in its place
     const extra = VIEW !== "cornell"

@@ -1873,11 +1873,16 @@ def load_sheet():
                 "shade": bool(cell("shade")), "border": cell("border"),
                 "note": cell("notes") or cell("note"),
                 "footer": cell("footer"), "box": box,
+                # THE UNIFORM, Jersey / Pants / Acc. (his columns N-P), for the
+                # Jersey filter only -- it paints nothing (2026-09-18)
+                "jersey": "/".join(cell(k).title() for k in ("jersey", "pants", "acc."))
+                          if all(cell(k) for k in ("jersey", "pants", "acc.")) else "",
             }
             flags = used.setdefault((focus, code, season), set())
             for label, flag in (("case", "case"), ("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
-                                ("note", "note"), ("footer", "footer")):
+                                ("note", "note"), ("footer", "footer"),
+                                ("jersey", "jersey")):
                 if cell(label):
                     flags.add(flag)
             if any(box.values()):
@@ -3219,6 +3224,8 @@ def harvest():
             mx["note"] = row["note"]
         if "footer" in flags:
             mx["footer"] = row["footer"]
+        if "jersey" in flags:
+            mx["jersey"] = row["jersey"]
         if "box" in flags:
             box = {k: v for k, v in row["box"].items() if v}
             if box:
