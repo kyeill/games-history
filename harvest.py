@@ -1349,6 +1349,44 @@ def nfl_key(event_id, winner_side):
     return key
 
 
+_NFL_SEEDS = None
+# ESPN's 2011 standings carry only the Giants' seed (found 2026-09-18); the NFC
+# as it finished that year
+NFL_SEED_FIX = {2011: {"nfl-9": 1, "nfl-25": 2, "nfl-18": 3, "nfl-19": 4,
+                       "nfl-1": 5, "nfl-8": 6}}
+
+
+def nfl_seeds(y):
+    """Each team's PLAYOFF SEED in season y, {"nfl-8": 3}, from ESPN's final
+    standings. Kept in data/nfl-seeds.json once the season is done."""
+    global _NFL_SEEDS
+    path = os.path.join(HERE, "data", "nfl-seeds.json")
+    if _NFL_SEEDS is None:
+        _NFL_SEEDS = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    if str(y) in _NFL_SEEDS:
+        return _NFL_SEEDS[str(y)]
+    out = {}
+    try:
+        got = get_json("https://site.api.espn.com/apis/v2/sports/football/nfl/standings",
+                       params={"season": y})
+    except requests.RequestException:
+        return out
+
+    def walk(o):
+        for ch in o.get("children") or []:
+            for e in (ch.get("standings") or {}).get("entries") or []:
+                st = {x.get("name"): x.get("value") for x in e.get("stats") or []}
+                if st.get("playoffSeed") and st["playoffSeed"] <= 7:
+                    out["nfl-" + e["team"]["id"]] = int(st["playoffSeed"])
+            walk(ch)
+    walk(got)
+    out.update(NFL_SEED_FIX.get(y, {}))
+    if out and dt.date.today() > dt.date(y + 1, 3, 1):
+        _NFL_SEEDS[str(y)] = out
+        json.dump(_NFL_SEEDS, open(path, "w", encoding="utf-8"), indent=1, sort_keys=True)
+    return out
+
+
 def lions_games(teams, start):
     """Every Lions game, 2011 on, as team-card records (focus "nfl-8")."""
     for k, v in nfl_teams().items():
@@ -1404,6 +1442,10 @@ def lions_games(teams, start):
                 stage = NFL_ROUND.get(wk.get("text")) if stype == 3 else None
                 if stype == 3 and not stage:
                     continue             # the Pro Bowl
+                if stage:
+                    seeds = nfl_seeds(y)
+                    for q in side:
+                        q["seed"] = seeds.get(q["id"])
                 v = c.get("venue") or {}
                 neutral = bool(c.get("neutralSite"))
                 mx = {}

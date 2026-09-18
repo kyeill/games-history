@@ -447,10 +447,14 @@ function nflParts(g) {
   const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
   const tv = (net ? net + " " : "") + t;
   const netCls = net ? " n-" + net.toLowerCase().replace(/[^a-z]/g, "") : "";
+  const date = fmtDate(g.date);
   if (g.stage) {
+    // the Lions' own SEED rides in the third row (his call 2026-09-18)
     const rnd = g.stage.replace(" Round", "");
-    return { head: esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + tv),
-             chips: g.neutral && g.city ? chip("champ", g.city) : "" };
+    const me = g.teams.find(x => x.id === LIONS) || {};
+    return { head: esc(g.season + " " + rnd) + " | " + date + " | " + esc(g.dow + " " + tv),
+             chips: (me.seed ? chip("grey", "No. " + me.seed + " Seed") : "") +
+               (g.neutral && g.city ? chip("champ", g.city) : "") };
   }
   const md = g.date.slice(5), d = +g.date.slice(8, 10);
   const hr = +String(g.time).slice(0, 2), timed = g.time !== "TBD";
@@ -462,7 +466,9 @@ function nflParts(g) {
   else if (g.dow !== "Sun") sit = DAY[g.dow];
   const chips = (g.neutral && g.city ? chip("champ", g.city) : "") +
     (sit ? '<span class="tag t-slot' + netCls + '">' + esc(sit) + "</span>" : "");
-  return { head: (g.week != null ? "Week " + g.week + " | " : "") + esc(tv), chips: chips };
+  // the DATE sits between the week and the TV (his call 2026-09-18)
+  return { head: (g.week != null ? "Week " + g.week + " | " : "") + date + " | " + esc(tv),
+           chips: chips };
 }
 
 function michCard(g, p) {
@@ -805,9 +811,11 @@ function michCard(g, p) {
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
     (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    // an NFL playoff opponent's SEED, bare, where a rank would sit
+    (g.sport === "NFL" && opp.seed ? '<span class="rn nseed">' + opp.seed + "</span>" : "") +
     "</span>" +
     '<span class="nm mnm"><span class="mn">' + esc(where) +
-      (seedOf(g, opp) != null ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
+      (seedOf(g, opp) != null && g.sport !== "NFL" ? '<span class="rkin">' + seedOf(g, opp) + "</span> " : "") +
       esc(nm) +
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
       // the finish or rating reads after the name again (his call 2026-09-11),
@@ -1055,7 +1063,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + nf.head +
-      '</span><span class="hdate">' + fmtDate(g.date) + "</span></div>" +
+      "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       (nf.chips ? '<div class="tags">' + nf.chips + "</div>" : "") + "</div>";
   }
@@ -1576,8 +1584,8 @@ function visible() {
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
   if (teamView() && FILT.jersey) list = list.filter(g => jerseyOf(g) === FILT.jersey);
   if (proView()) {
-    if (FILT.prime) list = list.filter(g => g.dow !== "Sun" ||
-      (g.time !== "TBD" && g.time >= "19:00"));
+    if (FILT.prime) list = list.filter(g => !g.stage && (g.dow !== "Sun" ||
+      (g.time !== "TBD" && g.time >= "19:00")));
     if (FILT.key) list = list.filter(g => (g.mx || {}).key);
   }
   // Cornell basketball's NCAA Tournament button (his call 2026-09-17), and
@@ -1768,13 +1776,20 @@ function filterChips() {
     // PRIMETIME (every Sunday-night game and every game not on a Sunday), KEY
     // GAMES (wins decided in the last two minutes or overtime) and PLAYOFFS
     if (proView()) {
+      // the division first -- Green Bay, Chicago, Minnesota -- then a bar
+      // and everyone else (his call 2026-09-18)
+      const DIV = ["nfl-9", "nfl-3", "nfl-16"];
+      const nameOf = id => (TEAMS[id] && TEAMS[id].short) || id;
+      const rest = Array.from(seen).filter(id => DIV.indexOf(id) < 0)
+        .map(id => [nameOf(id), id]).sort((a, b) => a[0].localeCompare(b[0]));
+      const div = DIV.filter(id => seen.has(id)).map(id => [nameOf(id), id]);
       h += group("Team", select("team", "All Teams",
-        Array.from(seen).map(id => [(TEAMS[id] && TEAMS[id].short) || id, id])
-          .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
+        div.concat(div.length && rest.length ? [["\u2500".repeat(12), null]] : [], rest),
+        FILT.team));
       const btn = (act, on, label) => '<button class="f" data-act="' + act +
         '" aria-pressed="' + !!on + '">' + label + "</button>";
-      return h + group("", btn("prime", FILT.prime, "Primetime") +
-        btn("key", FILT.key, "Key Games") + btn("post", FILT.post, "Playoffs") +
+      return h + group("", btn("post", FILT.post, "Playoffs") +
+        btn("key", FILT.key, "Key Games") + btn("prime", FILT.prime, "Primetime") +
         sortButton());
     }
     // COMBINED has no Team or Network filter: three sports share neither
