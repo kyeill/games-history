@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-150450";
+const BUILD = "20260918-151250";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -432,25 +432,25 @@ function michColour(v) {
    Two sources for one fact meant his sheet could ADD a capital but never
    remove one, so the scopes went (see NOTES.md). */
 
-/* THE LIONS' CARD (his calls 2026-09-18). The header is always the week and
-   the date; the third row says how the game was shown:
-     a Sunday afternoon   WEEK 5 | 10/5/2025                  [FOX 1:00 PM]
-     a SITUATION          WEEK 12 | 11/23/2023 | 12:30 PM     [Thanksgiving (FOX)]
-       -- Thursday Night, Sunday Night, Monday Night, Saturday, Thanksgiving,
-       Christmas, or any other day off Sunday, in the network's colour
-     abroad               WEEK 8 | 11/1/2015 | 9:30 AM        [London] [FOX]
-     the playoffs         2023 NFC WILD CARD | SUN NBC 8:15 PM [1/14/2024] */
+/* THE LIONS' CARD (his calls 2026-09-18), laid out like a TV Windows card:
+   the week and the TV on the left of the header, the DATE at the far right,
+   and a third row only when there is something to say -- where it was played
+   abroad, a primetime slot or a holiday (no network in those chips):
+     WEEK 16 | FOX 1:00 PM                        12/22/2024
+     WEEK 13 | CBS 12:30 PM                       11/28/2024   [Thanksgiving]
+     WEEK 8 | FOX 9:30 AM                          11/1/2015   [London]
+     2023 NFC WILD CARD | SUN NBC 8:15 PM          1/14/2024 */
 function nflParts(g) {
   const DAY = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday",
                 Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
   const net = primaryNet(g.nets);
   const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
-  const date = fmtDate(g.date);
+  const tv = (net ? net + " " : "") + t;
   const netCls = net ? " n-" + net.toLowerCase().replace(/[^a-z]/g, "") : "";
   if (g.stage) {
     const rnd = g.stage.replace(" Round", "");
-    return { head: esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + (net ? net + " " : "") + t),
-             chips: chip("grey", date) };
+    return { head: esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + tv),
+             chips: g.neutral && g.city ? chip("champ", g.city) : "" };
   }
   const md = g.date.slice(5), d = +g.date.slice(8, 10);
   const hr = +String(g.time).slice(0, 2), timed = g.time !== "TBD";
@@ -460,16 +460,9 @@ function nflParts(g) {
   else if (g.dow === "Sun" && timed && hr >= 19) sit = "Sunday Night";
   else if (g.dow === "Mon" || g.dow === "Thu") sit = DAY[g.dow] + " Night";
   else if (g.dow !== "Sun") sit = DAY[g.dow];
-  const abroad = g.neutral && g.city;
-  const wk = g.week != null ? "Week " + g.week + " | " : "";
-  if (!sit && !abroad) {
-    return { head: wk + date, chips: chip("grey", (net ? net + " " : "") + t) };
-  }
-  const chips = sit
-    ? '<span class="tag t-slot' + netCls + '">' + esc(sit + (net ? " (" + net + ")" : "")) + "</span>"
-    : chip("champ", g.city) + (net ? chip("grey", net) : "");
-  return { head: wk + date + (timed ? " | " + t : ""),
-           chips: sit && abroad ? chip("champ", g.city) + chips : chips };
+  const chips = (g.neutral && g.city ? chip("champ", g.city) : "") +
+    (sit ? '<span class="tag t-slot' + netCls + '">' + esc(sit) + "</span>" : "");
+  return { head: (g.week != null ? "Week " + g.week + " | " : "") + esc(tv), chips: chips };
 }
 
 function michCard(g, p) {
@@ -1062,9 +1055,9 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + nf.head +
-      "</span></div>" +
+      '</span><span class="hdate">' + fmtDate(g.date) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
-      '<div class="tags">' + nf.chips + "</div></div>";
+      (nf.chips ? '<div class="tags">' + nf.chips + "</div>" : "") + "</div>";
   }
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +

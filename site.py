@@ -252,6 +252,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .hdate{text-transform:uppercase;letter-spacing:.05em;padding-right:0;
   color:inherit}
 .row.mich .mnum{text-transform:none}
+/* THE LIONS' header is a TV Windows header (his call 2026-09-18): the date
+   pinned to the far right in its own quieter style */
+.row.mich.mich-nfl .sport{justify-content:space-between;flex-wrap:nowrap}
+.row.mich.mich-nfl .hdate{text-transform:none;letter-spacing:0;color:var(--muted)}
 /* the day beside a stage card's date goes up in capitals (his call) */
 .row.mich .hdow{text-transform:uppercase}
 /* the champion caret never takes the strikethrough (his call): an
