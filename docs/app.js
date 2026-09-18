@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-084641";
+const BUILD = "20260918-084846";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -469,7 +469,10 @@ function michCard(g, p) {
     whereOf(series[0]) !== whereOf(series[1]));
   const where = homeAway ? "vs. " : whereOf(g);
   // the rating reads "73+"; a team no system rates reads "DII" as it is
-  const fin = mx.finish ? mx.finish : mx.final ? "#" + mx.final
+  // ...and a BOWL shows no final ranking for the opponent (his call 2026-09-18)
+  const bowlFin = g.sport === "CFB" && !!g.stage && !playoffGame(g) &&
+    g.stage.indexOf("Big Ten Championship") !== 0;
+  const fin = mx.finish ? mx.finish : mx.final ? (bowlFin ? "" : "#" + mx.final)
     : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
@@ -710,7 +713,11 @@ function michCard(g, p) {
   const umText = playoffGame(g) && m.rank ? "No. " + m.rank
     : umSeed != null ? "No. " + umSeed
     : m.rank ? "#" + m.rank : "\u2013";
-  let umRank = '<span class="mrank"' + paint(pants, rankInk) + ">" + umText + "</span>";
+  // a LOSS italicises the rank box as well as the score, in football and
+  // basketball (his call 2026-09-18)
+  const lossRank = g.sport !== "CHK" && !upcoming(g) && !g.tie && !m.win;
+  let umRank = '<span class="mrank' + (lossRank ? " l" : "") + '"' + paint(pants, rankInk) + ">" +
+    umText + "</span>";
   if (tSeries) {
     score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
       (sWins + sLosses + sTies ? "[" + sWins + "-" + sLosses + (sTies ? "-" + sTies : "") + "]" : "") +
@@ -1259,6 +1266,9 @@ function highlightOf(g, kind) {
   const mx = g.mx || {}, st = g.stage || "";
   const shaded = !!mx.shade, border = michBorder(g);
   if (kind === "Attended") return !!mx.attended;
+  // PREGAME: College GameDay and/or Big Noon Kickoff was there (his call
+  // 2026-09-18) -- football only, losses included like its neighbours
+  if (kind === "Pregame") return g.sport === "CFB" && showsOf(g).length > 0;
   if (kind === "Details") {
     // the series the card itself shows: his hand tag wins over the derived one
     const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
@@ -1266,7 +1276,9 @@ function highlightOf(g, kind) {
     const notreDame = g.teams.some(t => t.id === "87");
     const series = !notreDame &&
       (hand.length > 0 || FAMILY.indexOf(g.series) > -1);
-    return ((g.neutral || !!g.offsite) && !st && !g.post) || series ||
+    // ...and in basketball, a College GameDay game (his call 2026-09-18)
+    const gameDay = g.sport === "CBB" && showsOf(g).indexOf("College GameDay") > -1;
+    return ((g.neutral || !!g.offsite) && !st && !g.post) || series || gameDay ||
       /ACC Challenge|Gavitt/.test(g.event || "");
   }
   if (!m.win) return false;
@@ -1617,7 +1629,7 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Details"]
+    const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Pregame", "Details"]
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     // ...but not on Cornell basketball, nine games in all (his call 2026-09-17)
