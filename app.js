@@ -84,6 +84,9 @@ function teamName(t, sport, season) {
   if (sn && season != null && season < sn.before) nm = sn.name;
   // Big Ten teams go up in caps. Membership is as of THAT SEASON, so USC is
   // capitalised from 2024 and not before.
+  // RIVALS reads in proper case, all but Michigan and Cornell (his call
+  // 2026-09-18)
+  if (VIEW === "rivals") return (t.id === MICHIGAN || t.id === CORNELL) ? nm.toUpperCase() : nm;
   const caps = VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : BIG_TEN[sport];
   return (sport && t.conf === caps) ? nm.toUpperCase() : nm;
 }
@@ -208,7 +211,7 @@ function teamLine(t, sport, season, seed, g0) {
     '<img class="crest" loading="lazy" src="' + (washedWinner(t, g0) ? crestOnColour(t) : crest(t)) +
       '" alt="">' +
     '<span class="rk">' +
-    (t.rank && !seedGame(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
+    (t.rank && !seedOnly(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
     '<span class="nm">' + inline + esc(teamName(t, sport, season)) +
     // A CONFERENCE-TOURNAMENT game carries his seed in front of the name, so
     // the poll ranking moves to AFTER it, small and grey like a Michigan card's
@@ -370,7 +373,7 @@ function rowHtml(g, browse) {
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     // a seeded game drops the rank column: the seed rides with the name
-    ((seedGame(g) || rankAfter(g)) ? " rk-no" : "") +
+    ((seedOnly(g) || rankAfter(g)) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -1817,6 +1820,11 @@ function seedGame(g) {
 function confSeeded(g) {
   return !playoffGame(g) && g.teams.some(t => t.seed != null);
 }
+// A card showing the SEED ALONE, no ranking: the CFP and the NCAA Tournament,
+// and hockey Rivals, which drops the USCHO ranking (his call 2026-09-18)
+function seedOnly(g) {
+  return !!g && (seedGame(g) || (VIEW === "rivals" && g.sport === "CHK"));
+}
 // ...where the poll rank moves AFTER the name on a seeded game -- but not in
 // HOCKEY, whose tournament cards keep the ranking in its column beside the
 // in-line seed (his call 2026-09-16)
@@ -1848,7 +1856,8 @@ function rivalsFill(g) {
   const loser = g.teams.find(t => !t.win && isRival(t));
   if (!loser) return false;
   const winner = g.teams.find(t => t.win);
-  if (winner && winner.id === MICHIGAN) return true;
+  // Michigan or Cornell beating a rival always fills (his call 2026-09-18)
+  if (winner && (winner.id === MICHIGAN || winner.id === CORNELL)) return true;
   const s = g.stage || "";
   if (g.sport === "CHK") return s === "NCAA Tournament | Frozen Four" ||
     s === "NCAA Tournament | Championship";
