@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-163438";
+const BUILD = "20260918-165413";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -999,7 +999,12 @@ function michCard(g, p) {
   // a rival, a Big Ten Tournament won -- which he has now retired in favour of
   // the Shade column. A season he has not filled in simply has no washes.
   const bigWin = !!mx.shade;
-  let cls = " mich mich-" + g.sport.toLowerCase() +
+  // a CORNELL hockey NCAA Tournament LOSS greys the seed and the ranking (his
+  // call 2026-09-18)
+  const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
+    (g.stage || "").indexOf("NCAA Tournament") === 0;
+  let cls = " mich mich-" + g.sport.toLowerCase() + (ncaaLoss ? " ncaaloss" : "") +
+    (g.sport === "MLB" && !g.post ? " mreg" : "") +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     // the existing no-bold class: the wash stays, the weight goes
     (bothMine || flatSplit ? " flatwin" : "") +
@@ -1072,11 +1077,13 @@ function michCard(g, p) {
   // THE TIGERS' REGULAR-SEASON CARD (2026-09-18): the date and TV in the
   // header, and a chip for why it is here -- Walk-Off, 11 Innings, No-Hitter
   if (g.sport === "MLB" && !g.post) {
-    const TV_NAT = ["FOX", "ESPN", "TBS", "FS1", "MLB Network", "Apple TV+", "Peacock",
-                    "Prime Video", "Netflix", "ABC", "NBC", "CBS"];
+    // NATIONAL TV ONLY on these (his call 2026-09-18); a game on the local
+    // channel alone shows its time and nothing else
+    const TV_NAT = ["FOX", "FS1", "ESPN", "ESPN2", "TBS", "MLB Network", "MLBN", "ABC", "NBC",
+                    "CBS", "Apple TV+", "Apple TV", "Peacock", "Prime Video", "Netflix",
+                    "YouTube", "Roku", "Facebook Watch"];
     const nets = g.nets || [];
-    const net = TV_NAT.find(n => nets.indexOf(n) > -1) ||
-      nets.find(n => !/MLB\.TV|ERADM|Radio|ESPN\+/.test(n)) || "";
+    const net = TV_NAT.find(n => nets.indexOf(n) > -1) || "";
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
     const chips = (mx.nohit ? chip("champ", "No-Hitter") : "") +
       (mx.walkoff ? chip("grey", "Walk-Off") : "") +
@@ -1848,7 +1855,15 @@ function filterChips() {
     // groups with nothing in them bring no bar (2026-09-16)
     // CORNELL splits only conference and non-conference (his call 2026-09-17)
     const byName = (x, y) => optOf(x)[0].localeCompare(optOf(y)[0]);
-    const teamGroups = (VIEW === "cornell"
+    // CORNELL HOCKEY: the five Ivies in his order, the rest of the ECAC, then
+    // everyone else (his call 2026-09-18)
+    const IVY_ORDER = ["Harvard", "Brown", "Dartmouth", "Princeton", "Yale"];
+    const ivyOf = id => IVY_ORDER.indexOf(optOf(id)[0]);
+    const teamGroups = (VIEW === "cornell" && sport === "CHK"
+      ? [mt.bigTen.filter(id => ivyOf(id) > -1).sort((a, b) => ivyOf(a) - ivyOf(b)),
+         mt.bigTen.filter(id => ivyOf(id) < 0).sort(byName),
+         mt.power.concat(mt.rest).sort(byName)]
+      : VIEW === "cornell"
       ? [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
          mt.power.concat(mt.rest).sort(byName)]
       : [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
@@ -1874,11 +1889,16 @@ function filterChips() {
       // and everyone else (his call 2026-09-18)
       const DIV = ["nfl-9", "nfl-3", "nfl-16"];
       const nameOf = id => (TEAMS[id] && TEAMS[id].short) || id;
-      const rest = Array.from(seen).filter(id => DIV.indexOf(id) < 0)
-        .map(id => [nameOf(id), id]).sort((a, b) => a[0].localeCompare(b[0]));
-      const div = DIV.filter(id => seen.has(id)).map(id => [nameOf(id), id]);
+      // ...then the rest of the NFC, a bar, and the AFC (his call 2026-09-18)
+      const NFC = ["22", "1", "29", "3", "6", "8", "9", "14", "16", "18", "19", "21", "25",
+                   "26", "27", "28"].map(n => "nfl-" + n);
+      const alpha = ids => ids.map(id => [nameOf(id), id]).sort((a, b) => a[0].localeCompare(b[0]));
+      const rest = Array.from(seen).filter(id => DIV.indexOf(id) < 0);
+      const groups = [DIV.filter(id => seen.has(id)).map(id => [nameOf(id), id]),
+                      alpha(rest.filter(id => NFC.indexOf(id) > -1)),
+                      alpha(rest.filter(id => NFC.indexOf(id) < 0))].filter(x => x.length);
       h += group("Team", select("team", "All Teams",
-        div.concat(div.length && rest.length ? [["\u2500".repeat(12), null]] : [], rest),
+        [].concat.apply([], groups.map((x, i) => (i ? [["\u2500".repeat(12), null]] : []).concat(x))),
         FILT.team));
       const btn = (act, on, label) => '<button class="f" data-act="' + act +
         '" aria-pressed="' + !!on + '">' + label + "</button>";
@@ -1966,10 +1986,21 @@ function filterChips() {
       (sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"]).map(optOf),
       FILT.rival)) + h;
     // only winners that would return games under the other filters
-    const w = teamOrder(sport, teamsIn(visibleWithout("winner"),
-      g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner), ["130"]);
-    h += group("Winner", select("winner", "All Winners",
-      w.bigTen.map(optOf).concat(lined(w.power), lined(w.rest)), FILT.winner));
+    const wSeen = teamsIn(visibleWithout("winner"),
+      g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner);
+    if (sport === "CHK") {
+      // HOCKEY: Michigan and Cornell first, then everyone else (his call
+      // 2026-09-18)
+      const top = ["130", "172"].filter(id => wSeen.has(id));
+      const others = Array.from(wSeen).filter(id => top.indexOf(id) < 0)
+        .sort((a, b) => optOf(a)[0].localeCompare(optOf(b)[0]));
+      h += group("Winner", select("winner", "All Winners",
+        top.map(optOf).concat(top.length ? lined(others) : others.map(optOf)), FILT.winner));
+    } else {
+      const w = teamOrder(sport, wSeen, ["130"]);
+      h += group("Winner", select("winner", "All Winners",
+        w.bigTen.map(optOf).concat(lined(w.power), lined(w.rest)), FILT.winner));
+    }
     // every hockey Rivals game is an NCAA Tournament game: no Postseason button
     return h + group("", (sport === "CHK" ? "" : postButton()) + sortButton());
   }
@@ -2263,7 +2294,8 @@ function switchView(view) {
     // hockey, fourteen games in all, opens on every rival (2026-09-18)
     FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : SPORT_OF[TAB] === "CHK" ? null : "127";
     FILT.post = false; FILT.winner = null;
-    SORT = defaultSort();
+    // hockey Rivals always opens Newest First (his call 2026-09-18)
+    SORT = SPORT_OF[TAB] === "CHK" ? "desc" : defaultSort();
   } else if (teamView()) {
     // the Michigan view opens on its newest season, in schedule order --
     // Cornell's basketball, nine tournament games in all, opens on every year

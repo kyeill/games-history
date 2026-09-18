@@ -265,6 +265,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.mich-nba .rk::before,.row.mich.mich-mlb .rk::before{content:none}
 /* ...and an NFL playoff LOSS greys the opponent's seed (his call 2026-09-18) */
 .row.mich.dimmed .nseed{color:var(--muted)}
+.row.mich.ncaaloss .rn,.row.mich.ncaaloss .rkin{color:var(--muted)}
+/* THE TIGERS' REGULAR SEASON: the opponent's colour runs the whole line,
+   through the score, which sits on it bare (his call 2026-09-18) */
+.row.mich.mreg .tl.won{background:var(--winwash);border-radius:5px;margin-left:-7px;
+  padding-right:8px}
+.row.mich.mreg .tl.won .mstripe{background:transparent}
+.row.mich.mreg .tl .sc.mbox{background:transparent!important;color:var(--ink)!important;
+  min-width:0;padding:0;font-weight:700}
 /* NBC's chip stands out a little more on the Lions' cards */
 .row.mich.mich-nfl .t-slot.n-nbc{background:#3b3b44;border-color:#63636e;color:#ecece6}
 /* the day beside a stage card's date goes up in capitals (his call) */
