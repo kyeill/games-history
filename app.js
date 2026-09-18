@@ -1288,13 +1288,37 @@ function highlightOf(g, kind) {
   if (kind === "Attended") return !!mx.attended;
   // PREGAME: College GameDay and/or Big Noon Kickoff was there (his call
   // 2026-09-18) -- football only, losses included like its neighbours
-  if (kind === "Pregame") return g.sport === "CFB" && showsOf(g).length > 0;
+  // ...and on Combined, basketball's College GameDay too (2026-09-18)
+  const combined = !SPORT_OF[TAB];
+  if (kind === "Pregame") return (g.sport === "CFB" && showsOf(g).length > 0) ||
+    (combined && g.sport === "CBB" && showsOf(g).indexOf("College GameDay") > -1);
+  // MARQUEE (Combined, his call 2026-09-18), regular season, losses included:
+  // football on a SATURDAY -- FOX at noon, CBS at 3:30, NBC or ABC in prime
+  // time, or ABC against Ohio State at any hour; basketball on FOX, CBS or NBC,
+  // or ESPN on a Saturday night from 6pm
+  if (kind === "Marquee") {
+    if (st) return false;
+    const net = primaryNet(g.nets), hr = +String(g.time).slice(0, 2);
+    if (g.sport === "CFB") {
+      if (g.dow !== "Sat") return false;
+      return (net === "FOX" && (hr === 11 || hr === 12)) ||
+        (net === "CBS" && g.time === "15:30") ||
+        ((net === "NBC" || net === "ABC") && hr >= 19) ||
+        (net === "ABC" && g.teams.some(t => t.id === "194"));
+    }
+    if (g.sport === "CBB") {
+      return ["FOX", "CBS", "NBC"].indexOf(net) > -1 ||
+        (net === "ESPN" && g.dow === "Sat" && hr >= 18);
+    }
+    return false;
+  }
   if (kind === "Details") {
     // the series the card itself shows: his hand tag wins over the derived one
     const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
     const hand = myTags(g.id).filter(t => FAMILY.indexOf(t) > -1);
     const notreDame = g.teams.some(t => t.id === "87");
-    const series = !notreDame &&
+    // (Combined leaves out hockey's series -- his call 2026-09-18)
+    const series = !notreDame && !(combined && g.sport === "CHK") &&
       (hand.length > 0 || FAMILY.indexOf(g.series) > -1);
     // ...and in basketball, a College GameDay game (his call 2026-09-18)
     const gameDay = g.sport === "CBB" && showsOf(g).indexOf("College GameDay") > -1;
@@ -1307,6 +1331,12 @@ function highlightOf(g, kind) {
   if (kind === "Memorable") return shaded || !!border;
   if (kind === "Tournament") {
     return g.sport !== "CFB" && st.indexOf("NCAA Tournament") === 0;
+  }
+  // Combined's POSTSEASON: the NCAA Tournament plus the Big Ten Championship
+  // Game and the CFP (2026-09-18)
+  if (kind === "Postseason") {
+    return (g.sport !== "CFB" && st.indexOf("NCAA Tournament") === 0) ||
+      st.indexOf("Big Ten Championship") === 0 || st.indexOf("CFP") === 0;
   }
   return false;
 }
@@ -1451,7 +1481,9 @@ function visible() {
   if (teamView() && FILT.post)
     list = list.filter(g => VIEW === "cornell"
       ? (g.stage || "").indexOf("NCAA Tournament") === 0
-      : /^(Big Ten Championship|Big Ten Tournament|CFP|NCAA Tournament)/.test(g.stage || ""));
+      : /^(Big Ten Championship|Big Ten Tournament|CFP|NCAA Tournament)/.test(g.stage || "") ||
+        // ...and every bowl (his call 2026-09-18): a football stage is a bowl
+        (g.sport === "CFB" && !!g.stage));
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1588,8 +1620,12 @@ function filterChips() {
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
   const yearFloor = sport === "CFB" ? 2021 : 2020;
-  const yearList = FILT.recent
-    ? viewSeasons.filter(y => y >= yearFloor) : viewSeasons;
+  // ...and under a Highlights choice, only the years that have one (his call
+  // 2026-09-18)
+  const hlYears = teamView() && FILT.hl
+    ? new Set(visibleWithout("season").map(g => g.season)) : null;
+  const yearList = (FILT.recent ? viewSeasons.filter(y => y >= yearFloor) : viewSeasons)
+    .filter(y => !hlYears || hlYears.has(y) || y === FILT.season);
   let h = group("Year", select("season", "All Years",
     yearList.sort((a, b) => b - a).map(y => [seasonLabel(y), y]),
     FILT.season));
@@ -1662,7 +1698,9 @@ function filterChips() {
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
     const hlBase = visibleWithout("hl");
-    const hlOpts = ["Special", "Tournament", "Memorable", "Attended", "Pregame", "Details"]
+    const hlOpts = (sport
+      ? ["Special", "Tournament", "Memorable", "Attended", "Pregame", "Details"]
+      : ["Special", "Postseason", "Memorable", "Attended", "Marquee", "Pregame", "Details"])
       .filter(k => k === FILT.hl || hlBase.some(g => highlightOf(g, k)))
       .map(k => [k, k]);
     // ...but not on Cornell basketball, nine games in all (his call 2026-09-17)
