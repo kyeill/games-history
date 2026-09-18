@@ -432,37 +432,44 @@ function michColour(v) {
    Two sources for one fact meant his sheet could ADD a capital but never
    remove one, so the scopes went (see NOTES.md). */
 
-/* THE LIONS' HEADER (his examples, 2026-09-18), the date always last:
-     WEEK 5 | FOX 1:00 PM | 10/5/2025                   a Sunday afternoon
-     WEEK 1 | THURSDAY NIGHT (NBC) | 9/4/2025           any night game
-     WEEK 12 | THANKSGIVING | FOX 12:30 PM | 11/23/2023
-     WEEK 17 | CHRISTMAS | NETFLIX 1:00 PM | 12/25/2025
-     WEEK 7 | LONDON | NFL NET 9:30 AM | 10/26/2014     a game abroad
-     WEEK 16 | SATURDAY | NFL NET 4:30 PM | 12/21/2024  a day game off Sunday
-     2023 NFC WILD CARD | SUN NBC 8:15 PM | 1/14/2024
-     2023 NFC CHAMPIONSHIP | SUN FOX 6:30 PM | 1/28/2024 */
-function nflHead(g) {
+/* THE LIONS' CARD (his calls 2026-09-18). The header is always the week and
+   the date; the third row says how the game was shown:
+     a Sunday afternoon   WEEK 5 | 10/5/2025                  [FOX 1:00 PM]
+     a SITUATION          WEEK 12 | 11/23/2023 | 12:30 PM     [Thanksgiving (FOX)]
+       -- Thursday Night, Sunday Night, Monday Night, Saturday, Thanksgiving,
+       Christmas, or any other day off Sunday, in the network's colour
+     abroad               WEEK 8 | 11/1/2015 | 9:30 AM        [London] [FOX]
+     the playoffs         2023 NFC WILD CARD | SUN NBC 8:15 PM [1/14/2024] */
+function nflParts(g) {
   const DAY = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday",
                 Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
   const net = primaryNet(g.nets);
-  const t = fmtTime(g.time).replace(/(am|pm)$/, " $1");
-  const tv = (net ? net + " " : "") + t;
+  const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
   const date = fmtDate(g.date);
+  const netCls = net ? " n-" + net.toLowerCase().replace(/[^a-z]/g, "") : "";
   if (g.stage) {
-    // the round as the NFL says it, short enough for one line on a phone
     const rnd = g.stage.replace(" Round", "");
-    return esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + tv) + " | " + date;
+    return { head: esc(g.season + " " + rnd) + " | " + esc(g.dow + " " + (net ? net + " " : "") + t),
+             chips: chip("grey", date) };
   }
   const md = g.date.slice(5), d = +g.date.slice(8, 10);
-  const hr = +String(g.time).slice(0, 2);
-  let mid;
-  if (g.dow === "Thu" && md.slice(0, 2) === "11" && d >= 22 && d <= 28) mid = "Thanksgiving | " + tv;
-  else if (md === "12-25") mid = "Christmas | " + tv;
-  else if (g.neutral && g.city) mid = g.city + " | " + tv;
-  else if (g.time !== "TBD" && hr >= 19) mid = DAY[g.dow] + " Night" + (net ? " (" + net + ")" : "");
-  else if (g.dow !== "Sun") mid = DAY[g.dow] + " | " + tv;
-  else mid = tv;
-  return (g.week != null ? "Week " + g.week + " | " : "") + esc(mid) + " | " + date;
+  const hr = +String(g.time).slice(0, 2), timed = g.time !== "TBD";
+  let sit = null;
+  if (g.dow === "Thu" && md.slice(0, 2) === "11" && d >= 22 && d <= 28) sit = "Thanksgiving";
+  else if (md === "12-25") sit = "Christmas";
+  else if (g.dow === "Sun" && timed && hr >= 19) sit = "Sunday Night";
+  else if (g.dow === "Mon" || g.dow === "Thu") sit = DAY[g.dow] + " Night";
+  else if (g.dow !== "Sun") sit = DAY[g.dow];
+  const abroad = g.neutral && g.city;
+  const wk = g.week != null ? "Week " + g.week + " | " : "";
+  if (!sit && !abroad) {
+    return { head: wk + date, chips: chip("grey", (net ? net + " " : "") + t) };
+  }
+  const chips = sit
+    ? '<span class="tag t-slot' + netCls + '">' + esc(sit + (net ? " (" + net + ")" : "")) + "</span>"
+    : chip("champ", g.city) + (net ? chip("grey", net) : "");
+  return { head: wk + date + (timed ? " | " + t : ""),
+           chips: sit && abroad ? chip("champ", g.city) + chips : chips };
 }
 
 function michCard(g, p) {
@@ -1048,14 +1055,16 @@ function michCard(g, p) {
   // Michigan that is the 2011 Sugar, the 2016 Orange and the 2018 Peach. A CFP
   // game played IN one of them already carries the gold through its own stage.
   const stageCol = stageColor(g);
-  // THE LIONS' CARD IS TWO LINES (his call 2026-09-18): the header carries
-  // everything, the date last, and there is no third row
+  // THE LIONS' CARD (his call 2026-09-18): the header, the opponent, and a
+  // third row of CHIPS like TV Windows' -- no record box
   if (g.sport === "NFL") {
+    const nf = nflParts(g);
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
-      '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + nflHead(g) +
+      '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + nf.head +
       "</span></div>" +
-      '<div class="teams">' + oppLine + "</div></div>";
+      '<div class="teams">' + oppLine + "</div>" +
+      '<div class="tags">' + nf.chips + "</div></div>";
   }
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
@@ -1343,19 +1352,38 @@ function michBorder(g) {
 /* THE JERSEY FILTER (Michigan football, his call 2026-09-18), from his Sheet's
    Jersey / Pants / Acc. columns: "Blue/Maize (White)", with his names for the
    ones that have them. In his order; a choice with no games is not offered. */
-const JERSEYS = ["Traditional", "Blue/Maize (Maize)", "Blue/Maize (White)",
-                 "All Blue", "Blue/Blue (Maize)", "Blue/Blue (White)",
-                 "White/Maize (White)", "White/Maize (Maize)", "White/Maize (Blue)",
-                 "White/Blue (White)", "White/Blue (Blue)",
-                 "All Whites", "White/White", "Maize"];
+// UNIFORMS (renamed 2026-09-18): football's list, where White/Maize (Blue)
+// is deliberately absent -- those games show only under All Uniforms -- and
+// basketball's, from the score and rank boxes of his Sheet (J-M)
+const JERSEYS = {
+  CFB: ["Traditional", "Blue/Maize (Maize)", "Blue/Maize (White)",
+        "All Blues", "Blue/Blue (Maize)", "Blue/Blue (White)",
+        "White/Maize (White)", "White/Maize (Maize)",
+        "White/Blue (White)", "White/Blue (Blue)",
+        "All Whites", "White/White", "Maize Jersey"],
+  CBB: ["Maize", "Blue", "White", "Special"]
+};
 function jerseyOf(g) {
-  const j = (g.mx || {}).jersey;
-  if (!j) return null;
-  const [top, pants, acc] = j.split("/");
-  if (top === "Maize") return "Maize";
+  if (upcoming(g)) return null;
+  const mx = g.mx || {};
+  if (g.sport === "CBB") {
+    // J (score background) names it, unless the game was SPECIAL: the two
+    // boxes differ (J vs L, K vs M), or a maize or white jersey had anything
+    // but blue lettering (his rules, 2026-09-18)
+    const b = mx.box || {};
+    const n = v => String(v || "").trim().toLowerCase();
+    const j = n(b.score_bg), k = n(b.score_font), l = n(b.rank_bg), m = n(b.rank_font);
+    if (!j) return null;
+    if (j !== l || k !== m || ((j === "maize" || j === "white") && k !== "blue")) return "Special";
+    return { maize: "Maize", blue: "Blue", white: "White" }[j] || "Special";
+  }
+  const u = mx.jersey;
+  if (!u) return null;
+  const [top, pants, acc] = u.split("/");
+  if (top === "Maize") return "Maize Jersey";
   if (top === "White" && pants === "White") return acc === "White" ? "All Whites" : "White/White";
   if (top === "Blue" && pants === "Maize" && acc === "Blue") return "Traditional";
-  if (top === "Blue" && pants === "Blue" && acc === "Blue") return "All Blue";
+  if (top === "Blue" && pants === "Blue" && acc === "Blue") return "All Blues";
   return top + "/" + pants + " (" + acc + ")";
 }
 function highlightOf(g, kind) {
@@ -1804,12 +1832,12 @@ function filterChips() {
     // ...but not on Cornell basketball, nine games in all (his call 2026-09-17)
     if (!(VIEW === "cornell" && sport === "CBB"))
       h += group("Highlights", select("hl", "All Games", hlOpts, FILT.hl));
-    // JERSEY, Michigan football only (2026-09-18)
-    if (VIEW === "michigan" && sport === "CFB") {
+    // UNIFORMS, Michigan football and basketball (2026-09-18)
+    if (VIEW === "michigan" && JERSEYS[sport]) {
       const jBase = visibleWithout("jersey");
-      const jOpts = JERSEYS.filter(k => k === FILT.jersey || jBase.some(g => jerseyOf(g) === k))
-        .map(k => [k, k]);
-      h += group("Jersey", select("jersey", "All Jerseys", jOpts, FILT.jersey));
+      const jOpts = JERSEYS[sport].filter(k => k === FILT.jersey ||
+        jBase.some(g => jerseyOf(g) === k)).map(k => [k, k]);
+      h += group("Uniforms", select("jersey", "All Uniforms", jOpts, FILT.jersey));
     }
     // Cornell hockey has no 2021-Onward button (his call 2026-09-17), and
     // Cornell basketball has NCAA Tournament in its place
