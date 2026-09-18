@@ -1626,7 +1626,13 @@ def pro_games(teams, start):
                             teams[prefix + t["id"]] = {
                                 "name": t.get("displayName"), "short": pro_place(t),
                                 "abbr": t.get("abbreviation"), "color": t.get("color"),
-                                "alt": t.get("alternateColor"), "logo": logos[0].get("href")}
+                                "alt": t.get("alternateColor"),
+                                # a team ESPN no longer lists (the Phoenix
+                                # Coyotes) still has its logo under its
+                                # abbreviation (found 2026-09-18)
+                                "logo": logos[0].get("href") or
+                                "https://a.espncdn.com/i/teamlogos/%s/500/%s.png"
+                                % (prefix[:-1], (t.get("abbreviation") or "").lower())}
                         was = pro_place(t)
                         side.append({"id": prefix + t["id"], "abbr": t.get("abbreviation"),
                                      # the name it played under THAT season --
@@ -1694,6 +1700,36 @@ TIGERS_NO_HITTERS = {"2007-06-12", "2011-05-07", "2021-05-18", "2023-07-08"}
 MLB_ROUNDS = ["ALDS", "ALCS", "World Series"]
 
 
+def mlb_lines(event_id):
+    """The inning-by-inning line of a Tigers win, {"home": [...], "away": [...]},
+    kept for good in data/mlb-lines.json."""
+    global _LINES
+    path = os.path.join(HERE, "data", "mlb-lines.json")
+    if _LINES is None:
+        _LINES = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    if event_id in _LINES:
+        return _LINES[event_id]
+    try:
+        s = get_json("%s/baseball/mlb/summary" % BASE, params={"event": event_id})
+    except requests.RequestException:
+        return None
+    cs = ((s.get("header") or {}).get("competitions") or [{}])[0].get("competitors") or []
+    out = {}
+    for k in cs:
+        out[k.get("homeAway")] = [int(l.get("displayValue") or 0) if str(l.get("displayValue") or "0").isdigit()
+                                  else 0 for l in k.get("linescores") or []]
+    if "home" not in out or "away" not in out:
+        return None
+    _LINES[event_id] = out
+    if len(_LINES) % 100 == 0:
+        json.dump(_LINES, open(path, "w", encoding="utf-8"), separators=(",", ":"), sort_keys=True)
+    return out
+
+
+_LINES = None
+LATE_ONLY = []
+
+
 def mlb_walkoff(event_id):
     """Did the home team win in its LAST TURN AT BAT? It did if it batted in
     the final inning at all -- ahead after the top half, it would not have.
@@ -1757,7 +1793,10 @@ def tigers_games(teams, start):
                         logos = t.get("logos") or [{}]
                         teams[tid] = {"name": t.get("displayName"), "short": pro_place(t),
                                       "abbr": t.get("abbreviation"), "color": t.get("color"),
-                                      "alt": t.get("alternateColor"), "logo": logos[0].get("href")}
+                                      "alt": t.get("alternateColor"),
+                                      "logo": logos[0].get("href") or
+                                      "https://a.espncdn.com/i/teamlogos/mlb/500/%s.png"
+                                      % (t.get("abbreviation") or "").lower()}
                     sc = k.get("score")
                     score = sc.get("value") if isinstance(sc, dict) else sc
                     was = pro_place(t)
@@ -1797,7 +1836,20 @@ def tigers_games(teams, start):
                         mx["extra"] = innings
                     if me["win"] and me["home"] and (innings > 9 or mlb_walkoff(x["id"])):
                         mx["walkoff"] = True
+                    # A NINTH-INNING COMEBACK (his idea 2026-09-18): a win the
+                    # Tigers were tied in or losing after eight innings
+                    if me["win"] and innings >= 9:
+                        ln = mlb_lines(x["id"])
+                        if ln and len(ln["away"]) >= 8:
+                            mine = sum((ln["home"] if me["home"] else ln["away"])[:8])
+                            theirs = sum((ln["away"] if me["home"] else ln["home"])[:8])
+                            if mine <= theirs:
+                                mx["late"] = True
                     if not mx:
+                        continue
+                    # comebacks are COUNTED, not shown, until he decides
+                    if set(mx) == {"late"}:
+                        LATE_ONLY.append(day)
                         continue
                 for q in side:
                     q.pop("abbr", None)
@@ -1819,6 +1871,9 @@ def tigers_games(teams, start):
     if _WALKOFF:
         json.dump(_WALKOFF, open(os.path.join(HERE, "data", "mlb-walkoff.json"), "w",
                                  encoding="utf-8"), indent=0, sort_keys=True)
+    if _LINES:
+        json.dump(_LINES, open(os.path.join(HERE, "data", "mlb-lines.json"), "w",
+                               encoding="utf-8"), separators=(",", ":"), sort_keys=True)
     return out
 
 
@@ -2171,7 +2226,9 @@ SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
 SHEET_TABS = {("130", "CFB"): "Michigan CFB", ("130", "CBB"): "Michigan CBB",
               ("130", "CHK"): "Michigan Hockey",
               ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB",
-              ("nfl-8", "NFL"): "Lions"}
+              ("nfl-8", "NFL"): "Lions", ("mlb-6", "MLB"): "Tigers",
+              ("nhl-5", "NHL"): "Red Wings", ("nba-8", "NBA"): "Pistons",
+              ("nba-5", "NBA"): "Cavaliers"}
 
 
 def sheet_season(sport, year):
@@ -3506,9 +3563,12 @@ def harvest():
     tg = tigers_games(teams, start)
     keep += tg
     print("  Tigers: %d games (%d walk-offs, %d extra innings, %d no-hitters, %d playoff)" % (
-        len(tg), sum(1 for g in tg if g["mx"].get("walkoff")),
+        len(tg), sum(1 for g in tg if g["mx"].get("walkoff") or g["mx"].get("late")),
         sum(1 for g in tg if g["mx"].get("extra")), sum(1 for g in tg if g["mx"].get("nohit")),
         sum(1 for g in tg if g["post"])))
+    print("  Tigers 9th-inning comebacks: %d already shown, %d more not shown; by year %s" % (
+        sum(1 for g in tg if g["mx"].get("late")), len(LATE_ONLY),
+        dict(collections.Counter(d[:4] for d in LATE_ONLY))))
     print("  Red Wings / Pistons / Cavaliers: %s games" % collections.Counter(
         g["focus"] for g in pg).most_common())
     print("  Lions: %d games, %d Key Games" % (len(lg), sum(1 for g in lg if g["mx"].get("key"))))
@@ -3847,6 +3907,13 @@ def harvest():
             hit += 1
     print("  locations matched %d shows (%d unmatched or postseason)" % (hit, miss))
 
+    # SEEDS SET BY HAND in game-overrides.json ("seeds": {team id: seed}) --
+    # the 2023 NIT, which ESPN seeds nowhere (his call 2026-09-18)
+    for g in keep:
+        sd = game_over.get(g["id"], {}).get("seeds") or {}
+        for t in g["teams"]:
+            if t["id"] in sd:
+                t["seed"] = sd[t["id"]]
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf

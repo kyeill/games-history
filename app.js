@@ -885,12 +885,17 @@ function michCard(g, p) {
     if (fid === CORNELL && g.sport === "CHK") bit(netTxt);
     else bit(tvTxt, netTxt, false, 4);
     bit(dateText);
-  } else if (place && !ny6Bowl(g)) {
+  }
+  // the EVENT first and its city after for these (his call 2026-09-18):
+  // "Jumpman Invitational | Charlotte"
+  const eventFirst = ["Jumpman Invitational"].indexOf(eventName) > -1;
+  if (eventFirst && !g.stage && !mteCard) bit(eventName);
+  if (!bigStage && !mteCard && place && !ny6Bowl(g)) {
     // a NEW YEAR'S SIX bowl names no city (his call 2026-09-16): the header
     // already says Orange Bowl, and Miami Gardens adds nothing to it
     bit(place, PLACE_SHORT[place], false, 3);
   }
-  if (eventName && !g.stage && !mteCard) bit(eventName);
+  if (eventName && !eventFirst && !g.stage && !mteCard) bit(eventName);
   // harvest's own footer words -- "Ivy League" on Cornell's Ivy games
   (series ? Array.from(new Set([].concat.apply([], series.map(x => x.labels || []))))
     : (g.labels || [])).forEach(t => bit(t));

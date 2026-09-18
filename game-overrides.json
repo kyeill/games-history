@@ -181,13 +181,13 @@
     "city": "Arlington"
   },
   "401482954": {
-    "city": ""
+    "city": "Charlotte"
   },
   "401575755": {
-    "city": ""
+    "city": "Charlotte"
   },
   "401716054": {
-    "city": ""
+    "city": "Charlotte"
   },
   "400915044": {
     "city": "New York"
@@ -206,5 +206,20 @@
   "400413111": {
     "event": "Brooklyn Winter Hoops",
     "city": ""
+  },
+  "401483167": {
+    "event": "Hall of Fame London Showcase",
+    "city": ""
+  },
+  "401526872": {
+    "seeds": {
+      "130": 3
+    }
+  },
+  "401526904": {
+    "seeds": {
+      "130": 3,
+      "238": 2
+    }
   }
 }
