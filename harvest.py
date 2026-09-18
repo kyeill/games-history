@@ -1270,6 +1270,162 @@ def hockey_rival_games(seasons, teams, latest_conf, start, end):
     return out
 
 
+# ------------------------------------------------------------------ DETROIT
+# THE LIONS (his spec 2026-09-16, built 2026-09-18): every game from 2011, with
+# TV. Pro ids clash with college ones (NFL 8 is the Lions, college 8 Arkansas),
+# so every pro team id carries its league: "nfl-8".
+NFL = "football/nfl"
+LIONS = "nfl-8"
+LIONS_FROM = 2011
+NFL_ROUND = {"Wild Card": "NFC Wild Card", "Divisional Round": "NFC Divisional Round",
+             "Conference Championship": "NFC Championship", "Super Bowl": "Super Bowl"}
+
+
+def nfl_teams():
+    """Every NFL team's names, colours and logo, keyed "nfl-<id>"."""
+    out = {}
+    try:
+        got = get_json("%s/%s/teams" % (BASE, NFL), params={"limit": 50})
+    except requests.RequestException:
+        return out
+    for lg in got.get("sports", [{}])[0].get("leagues", []):
+        for w in lg.get("teams", []):
+            t = w.get("team") or {}
+            logos = t.get("logos") or []
+            logo = next((l["href"] for l in logos if "dark" in (l.get("rel") or [])), None)
+            if not logo and logos:
+                logo = logos[0].get("href")
+            out["nfl-" + t["id"]] = {"name": t.get("displayName"),
+                                     "short": t.get("shortDisplayName") or t.get("name"),
+                                     "abbr": t.get("abbreviation"),
+                                     "color": t.get("color"), "alt": t.get("alternateColor"),
+                                     "logo": logo}
+    return out
+
+
+def nfl_key(event_id, winner_side):
+    """KEY GAMES (his rule): a WIN decided in the final 2:00 or in overtime --
+    the scoring play that put the winner ahead FOR GOOD came in the last two
+    minutes of the fourth quarter, or later. Kept for good in
+    data/nfl-key.json once worked out, so the cloud build never re-reads a
+    finished game."""
+    path = os.path.join(HERE, "data", "nfl-key.json")
+    known = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    if event_id in known:
+        return known[event_id]
+    try:
+        plays = get_json("%s/%s/summary" % (BASE, NFL),
+                         params={"event": event_id}).get("scoringPlays") or []
+    except requests.RequestException:
+        return False
+    if not plays:
+        return False
+    lead_at = None
+    prev = (0, 0)
+    for sp in plays:
+        now = (sp.get("homeScore") or 0, sp.get("awayScore") or 0)
+        mine = now[0] - now[1] if winner_side == "home" else now[1] - now[0]
+        was = prev[0] - prev[1] if winner_side == "home" else prev[1] - prev[0]
+        if mine > 0 and was <= 0:
+            lead_at = sp
+        prev = now
+    key = False
+    if lead_at:
+        per = (lead_at.get("period") or {}).get("number") or 0
+        clock = (lead_at.get("clock") or {}).get("value")
+        key = per >= 5 or (per == 4 and clock is not None and clock <= 120)
+    known[event_id] = key
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    json.dump(known, open(path, "w", encoding="utf-8"), indent=0, sort_keys=True)
+    return key
+
+
+def lions_games(teams, start):
+    """Every Lions game, 2011 on, as team-card records (focus "nfl-8")."""
+    for k, v in nfl_teams().items():
+        teams[k] = v
+    out = []
+    last_y = upcoming_season("CFB", start)
+    for y in range(LIONS_FROM, last_y + 1):
+        for stype in (2, 3):
+            try:
+                got = get_json("%s/%s/teams/8/schedule" % (BASE, NFL),
+                               params={"season": y, "seasontype": stype})
+            except requests.RequestException:
+                continue
+            for x in got.get("events") or []:
+                comps = x.get("competitions") or []
+                if not comps:
+                    continue
+                c = comps[0]
+                cs = c.get("competitors") or []
+                if len(cs) != 2:
+                    continue
+                try:
+                    d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                         .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+                except (KeyError, ValueError):
+                    continue
+                status = c.get("status") or {}
+                done = (status.get("type") or {}).get("completed")
+                if not done and d.date() < start:
+                    continue             # postponed or never played
+                side, rec = [], None
+                for k in cs:
+                    t = k.get("team") or {}
+                    tid = "nfl-" + t["id"]
+                    teams.setdefault(tid, {"name": t.get("displayName"),
+                                           "short": t.get("shortDisplayName"),
+                                           "abbr": t.get("abbreviation")})
+                    sc = k.get("score")
+                    score = sc.get("value") if isinstance(sc, dict) else sc
+                    if tid == LIONS:
+                        rec = next((r.get("displayValue") for r in k.get("record") or []
+                                    if r.get("type") == "total"), None)
+                    side.append({"id": tid,
+                                 "score": int(score) if done and score is not None else None,
+                                 "rank": None, "win": bool(k.get("winner")) and bool(done),
+                                 "home": k.get("homeAway") == "home", "conf": "NFL",
+                                 "seed": None})
+                if not any(q["id"] == LIONS for q in side):
+                    continue
+                me = next(q for q in side if q["id"] == LIONS)
+                tie = bool(done) and side[0]["score"] == side[1]["score"]
+                wk = x.get("week") or {}
+                stage = NFL_ROUND.get(wk.get("text")) if stype == 3 else None
+                if stype == 3 and not stage:
+                    continue             # the Pro Bowl
+                v = c.get("venue") or {}
+                neutral = bool(c.get("neutralSite"))
+                mx = {}
+                if rec:
+                    mx["rec"] = rec
+                if done and me["win"]:
+                    if nfl_key(x["id"], "home" if me["home"] else "away"):
+                        mx["key"] = True
+                valid = not (x.get("timeValid") is False or c.get("timeValid") is False)
+                g = {"id": x["id"], "sport": "NFL", "season": y,
+                     "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
+                     "time": d.strftime("%H:%M") if (done or valid) else "TBD",
+                     "neutral": neutral, "ot": (status.get("period") or 0) > 4,
+                     "so": False, "tie": tie, "show": False,
+                     "week": wk.get("number") if stype == 2 else None,
+                     "venue": v.get("fullName"), "mq": False, "offsite": None,
+                     "city": ((v.get("address") or {}).get("city") if neutral else None),
+                     "nets": sorted(set(networks(c))), "teams": side, "header": None,
+                     "slots": [], "type": None, "champ": None, "round": None,
+                     "title": False, "event": None, "standin": False, "bfri": False,
+                     "suffix": None, "opener": False, "rival_loss": False,
+                     "rivals": False, "post": stype == 3, "rivals_only": True,
+                     "bowl": None, "showcase": False, "kickoff": False,
+                     "stage": stage, "michigan": False, "focus": LIONS, "mx": mx,
+                     "labels": [], "dated": False}
+                if not done:
+                    g["upcoming"] = True
+                out.append(g)
+    return out
+
+
 def cornell_cbb_games(seasons, teams, latest_conf):
     """Cornell's Ivy League Tournament and NCAA Tournament games (his call
     2026-09-16) -- nothing else of its basketball seasons -- from ESPN's team
@@ -2941,6 +3097,9 @@ def harvest():
     rv = hockey_rival_games(sorted(rules.MICHIGAN_SEASONS["CHK"]), teams, latest_conf, start, end)
     keep += rv
     print("  hockey rivals: %d NCAA Tournament losses" % len(rv))
+    lg = lions_games(teams, start)
+    keep += lg
+    print("  Lions: %d games, %d Key Games" % (len(lg), sum(1 for g in lg if g["mx"].get("key"))))
     cb = cornell_cbb_games(sorted(rules.CORNELL_SEASONS["CBB"]), teams, latest_conf)
     keep += cb
     print("  Cornell: %d hockey games, %d basketball tournament games" % (len(ck), len(cb)))
@@ -2994,7 +3153,7 @@ def harvest():
     count = collections.Counter()
     for g in keep:
         focus = g.get("focus")
-        if focus and not g["post"] and not g["champ"] and g["sport"] != "CHK":
+        if focus and not g["post"] and not g["champ"] and g["sport"] in ("CFB", "CBB"):
             key = (focus, g["sport"], g["season"], len({t["conf"] for t in g["teams"]}) == 1)
             count[key] += 1
             if key[3]:

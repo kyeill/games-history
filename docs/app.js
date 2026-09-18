@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-140929";
+const BUILD = "20260918-142126";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -43,7 +43,7 @@ function defaultSort() {
 }
 let SORT = defaultSort();
 // "all" is Michigan's COMBINED view (2026-09-18): every sport at once
-const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK", all: null };
+const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK", all: null, nfl: "NFL" };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
 
@@ -63,9 +63,12 @@ function shade(hex, lighten, strength) {
 // (his call 2026-09-16). A border marked "Opponent" still uses teamColor.
 const MICH_WASH = { "87": "c99700" };
 function teamColor(t) {
-  return COLORS[t.id] || (t.color || "").replace("#", "") || "6a6a70";
+  // a PRO team ("nfl-8") takes ESPN's colour from the team list
+  const pro = t.id.indexOf("-") > 0 && TEAMS[t.id] ? TEAMS[t.id].color : null;
+  return COLORS[t.id] || (t.color || "").replace("#", "") || pro || "6a6a70";
 }
 function crest(t) {
+  if (TEAMS[t.id] && TEAMS[t.id].logo) return TEAMS[t.id].logo;
   return CRESTS[t.id] ||
     "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/" + t.id + ".png";
 }
@@ -332,13 +335,15 @@ function rowHtml(g, browse) {
         ? '<span data-short="' + esc(brief) + '">' + esc(lab) + "</span>"
         : esc(lab)) +
       " (" + esc(g.dow) + ")";
-  } else if (g.sport === "CFB") {
+  } else if (g.sport === "CFB" || g.sport === "NFL") {
     // Week 0 is a real week, so test for a MISSING week, not a falsy one
     const hasWeek = g.week != null;
     when = (hasWeek ? '<span class="wk">Week ' + g.week + "</span>" : "") +
       (label ? (hasWeek ? " | " : "") + esc(label) : "");
     // a bare "WEEK 1" off a Saturday names its day (his call 2026-09-11)
-    if (hasWeek && !label && g.dow !== "Sat") when += " (" + esc(g.dow) + ")";
+    // (an NFL week's own day is SUNDAY, so the Lions name only the others)
+    if (hasWeek && !label && g.dow !== (g.sport === "NFL" ? "Sun" : "Sat"))
+      when += " (" + esc(g.dow) + ")";
     // Browse pulls straight from ESPN, where a week number can be missing;
     // never leave the header empty.
     if (!when) when = esc(DAYS[g.dow] || g.dow);
@@ -540,7 +545,7 @@ function michCard(g, p) {
   // name already carries it. Rounds 1 and 2 read FIRST and SECOND here too.
   const stageHead = () => {
     const yr = g.post || bigStage
-      ? (g.sport === "CFB" ? g.season : g.season + 1) + " " : "";
+      ? (g.sport === "CFB" || g.sport === "NFL" ? g.season : g.season + 1) + " " : "";
     // the shared label, plus the one abbreviation this view makes on its own:
     // the Big Ten's early rounds drop the word Tournament, won or not (his
     // call 2026-09-14) -- they are the longest labels and the least interesting
@@ -637,8 +642,11 @@ function michCard(g, p) {
       : cuHome ? { score_bg: "White", score_font: "Carnelian", rank_bg: "White", rank_font: "Carnelian" }
       : {})
     : { score_bg: "Blue", score_font: "Maize", rank_bg: "Blue", rank_font: "Maize" };
+  // THE LIONS, until a Sheet tab says otherwise: Honolulu blue with silver
+  const LIONS_BOX = { score_bg: "#0076b6", score_font: "#ffffff",
+                      rank_bg: "#0076b6", rank_font: "#ffffff" };
   const u = (mx.uni || []).map(michColour),
-    bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : {});
+    bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : fid === LIONS ? LIONS_BOX : {});
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
   // CSS used to default the rank box to
   const UNSET = "#4a4a52";
@@ -726,7 +734,9 @@ function michCard(g, p) {
   // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in
   // the regular season, and a dash when Michigan was unranked.
   const umSeed = seedOf(g, m);
-  const umText = playoffGame(g) && m.rank ? "No. " + m.rank
+  // a pro team has no poll: its box holds the RECORD after the game
+  const umText = g.sport === "NFL" ? (mx.rec || "\u2013")
+    : playoffGame(g) && m.rank ? "No. " + m.rank
     : umSeed != null ? "No. " + umSeed
     : m.rank ? "#" + m.rank : "\u2013";
   // a LOSS italicises the rank box as well as the score, in football and
@@ -1246,8 +1256,13 @@ function michTeam(g) { return g.teams.find(t => t.id === MICHIGAN); }
    Tournament games). Every record of a team view carries `focus`, the team the
    card is about; a game in two teams' views is two records. */
 const CORNELL = "172";
-function teamView() { return VIEW === "michigan" || VIEW === "cornell"; }
-function focusId() { return VIEW === "cornell" ? CORNELL : MICHIGAN; }
+// THE DETROIT TEAMS are team views too (2026-09-18): the Lions' card is the
+// Michigan card, focused on "nfl-8"
+const LIONS = "nfl-8";
+const VIEW_TEAM = { michigan: "130", cornell: "172", lions: LIONS };
+function teamView() { return !!VIEW_TEAM[VIEW]; }
+function focusId() { return VIEW_TEAM[VIEW] || MICHIGAN; }
+function proView() { return VIEW === "lions"; }
 function focusTeam(g) { return g.teams.find(t => t.id === (g.focus || focusId())); }
 
 /* HIGHLIGHTS on the Michigan views (his calls 2026-09-16). Never a game not
@@ -1475,6 +1490,11 @@ function visible() {
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
+  if (proView()) {
+    if (FILT.prime) list = list.filter(g => g.dow !== "Sun" ||
+      (g.time !== "TBD" && g.time >= "19:00"));
+    if (FILT.key) list = list.filter(g => (g.mx || {}).key);
+  }
   // Cornell basketball's NCAA Tournament button (his call 2026-09-17), and
   // Michigan's POSTSEASON button (2026-09-18): the Big Ten Championship Game
   // and Tournament, the CFP and the NCAA Tournament -- not the other bowls
@@ -1483,7 +1503,7 @@ function visible() {
       ? (g.stage || "").indexOf("NCAA Tournament") === 0
       : /^(Big Ten Championship|Big Ten Tournament|CFP|NCAA Tournament)/.test(g.stage || "") ||
         // ...and every bowl (his call 2026-09-18): a football stage is a bowl
-        (g.sport === "CFB" && !!g.stage));
+        (g.sport === "CFB" && !!g.stage) || (g.sport === "NFL" && !!g.stage));
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1583,7 +1603,8 @@ function clearFilters() {
 
 function seasonLabel(y) {
   // College football is one calendar year; basketball straddles two.
-  return SPORT_OF[TAB] === "CFB" ? String(y) : y + "-" + String(y + 1).slice(2);
+  return (SPORT_OF[TAB] === "CFB" || SPORT_OF[TAB] === "NFL")
+    ? String(y) : y + "-" + String(y + 1).slice(2);
 }
 
 function filterChips() {
@@ -1658,6 +1679,19 @@ function filterChips() {
          mt.power.concat(mt.rest).sort(byName)]
       : [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
          mt.power, mt.rest]).filter(ids => ids.length);
+    // THE LIONS (his spec 2026-09-16): Year, Team, and three buttons --
+    // PRIMETIME (every Sunday-night game and every game not on a Sunday), KEY
+    // GAMES (wins decided in the last two minutes or overtime) and PLAYOFFS
+    if (proView()) {
+      h += group("Team", select("team", "All Teams",
+        Array.from(seen).map(id => [(TEAMS[id] && TEAMS[id].short) || id, id])
+          .sort((a, b) => a[0].localeCompare(b[0])), FILT.team));
+      const btn = (act, on, label) => '<button class="f" data-act="' + act +
+        '" aria-pressed="' + !!on + '">' + label + "</button>";
+      return h + group("", btn("prime", FILT.prime, "Primetime") +
+        btn("key", FILT.key, "Key Games") + btn("post", FILT.post, "Playoffs") +
+        sortButton());
+    }
     // COMBINED has no Team or Network filter: three sports share neither
     if (sport) h += group("Team", select("team", "All Teams",
       [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
@@ -1979,7 +2013,8 @@ const NAV = {
         ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
         ["Rivals", "cbb", "rivals"], ["Cornell", "cbb", "cornell"]],
-  hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]]
+  hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]],
+  detroit: [["Lions", "nfl", "lions"]]
 };
 
 function draw() {
@@ -2125,6 +2160,10 @@ async function init() {
       FILT.post = !FILT.post;
     } else if (b.dataset.act === "recent") {
       FILT.recent = !FILT.recent;
+    } else if (b.dataset.act === "prime") {
+      FILT.prime = !FILT.prime;
+    } else if (b.dataset.act === "key") {
+      FILT.key = !FILT.key;
     } else {
       SORT = SORT === "asc" ? "desc" : "asc";
     }

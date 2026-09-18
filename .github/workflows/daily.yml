@@ -83,7 +83,7 @@ jobs:
           git config user.email "actions@github.com"
           git add docs/app.js docs/games.json docs/colors.json docs/crests.json \
                   docs/index.html docs/sw.js docs/manifest.webmanifest \
-                  output/colors.json output/crests.json data/uscho || true
+                  output/colors.json output/crests.json data/uscho data/nfl-key.json || true
           if git diff --cached --quiet; then
             echo "nothing changed"
             exit 0
