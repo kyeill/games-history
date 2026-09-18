@@ -536,11 +536,13 @@ def hockey_old_stage(team_id, y, day, conf_team_ids, ncaa_seen, earlier=()):
 # Matched to ESPN's games by date and opponent. Finished seasons are committed
 # in data/uscho/, so the cloud build never needs USCHO for them.
 # ---------------------------------------------------------------------------
-USCHO_SLUG = {"130": "michigan", "172": "cornell"}
+USCHO_SLUG = {"130": "michigan", "172": "cornell",
+              # the three rivals, for Hockey Rivals (2026-09-18)
+              "127": "michigan-state", "194": "ohio-state", "87": "notre-dame"}
 USCHO_SCHED = {}
 USCHO_KEEP = ("gdate", "visitor", "home", "vis_name", "home_name", "vscore", "hscore",
               "ots", "arena_name", "neutral", "type", "tourn_shortname", "note",
-              "sho_notes", "tv", "hconf", "vconf", "complete")
+              "sho_notes", "tv", "hconf", "vconf", "complete", "starttime", "gameid")
 
 
 def uscho_schedule(team_id, y):
@@ -630,7 +632,7 @@ HOCKEY_GAME_FIX = {
 VENUE_EVENTS = {"Great Lakes Invitational", "Duel in the D", "Red Hot Hockey",
                 "The Frozen Apple"}
 # USCHO's code for each focus team, to read its score from a USCHO record
-USCHO_CODE = {"130": "um", "172": "cor"}
+USCHO_CODE = {"130": "um", "172": "cor", "127": "msu", "194": "osu", "87": "nd"}
 # MTE rounds USCHO leaves unnamed and a tied opener cannot settle (his word)
 HOCKEY_MTE_ROUND = {("172", "2023-12-30"): "Final"}    # Adirondack: ASU was the final
 
@@ -1174,6 +1176,94 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                     won = any(t["win"] and t["id"] == team_id for t in first[-1]["teams"])
                     out[-1]["mte_round"] = "Final" if won else "Third Place"
     return out, misses
+
+
+def hockey_rival_games(seasons, teams, latest_conf, start, end):
+    """HOCKEY RIVALS (his call 2026-09-18): every NCAA Tournament game Michigan
+    State, Ohio State or Notre Dame LOST -- to anyone but another of the three
+    (a rival beating a rival stays out unless he asks). Built with the same
+    per-team builder as Michigan's and Cornell's cards, from each rival's side,
+    then stripped of the team-view extras."""
+    out, seen = [], set()
+    for rid in ("127", "194", "87"):
+        games, _ = hockey_games(rid, seasons, teams, latest_conf, start, end)
+        for g in games:
+            if not (g.get("stage") or "").startswith("NCAA Tournament") or g.get("upcoming"):
+                continue
+            me = next(t for t in g["teams"] if t["id"] == rid)
+            opp = next(t for t in g["teams"] if t["id"] != rid)
+            if me["win"] or g.get("tie") or opp["id"] in ("127", "194", "87"):
+                continue
+            if g["id"] in seen:
+                continue
+            seen.add(g["id"])
+            # michigan=False even against Michigan: the flag makes a record a
+            # MICHIGAN-VIEW card (it is given focus 130 below), and this is not one
+            g.update(focus=None, rivals=True, rival_loss=True, labels=[], dated=False,
+                     michigan=False)
+            for k in ("mx", "conf_game", "frame", "num"):
+                g.pop(k, None)
+            # ESPN names no network for the older ones; USCHO usually does
+            if not g["nets"]:
+                u = uscho_match(uscho_schedule(rid, g["season"]), g["date"],
+                                teams[opp["id"]]["short"])
+                if u and re.search(r"[A-Za-z]", u.get("tv") or ""):   # "0" is none
+                    g["nets"] = [u["tv"]]
+            out.append(g)
+        # ...and the NCAA games ESPN's team schedule LEAVES OUT, from USCHO:
+        # Ohio State's 2019 regional loss to Denver is the case (found 2026-09-18)
+        code = USCHO_CODE[rid]
+        have = {(g["date"], t["id"]) for g in out for t in g["teams"] if t["id"] == rid}
+        by_name = {flat(v["short"]): k for k, v in teams.items()}
+        for y in seasons:
+            polls = None
+            for u in uscho_schedule(rid, y):
+                if not (u.get("tourn_shortname") or "").startswith("NCAA") or u.get("complete") != "Y":
+                    continue
+                day = "%s-%s-%s" % (str(u["gdate"])[:4], str(u["gdate"])[4:6], str(u["gdate"])[6:])
+                if (day, rid) in have:
+                    continue
+                home = u["home"] == code
+                try:
+                    mine, theirs = ((int(u["hscore"]), int(u["vscore"])) if home
+                                    else (int(u["vscore"]), int(u["hscore"])))
+                except (TypeError, ValueError):
+                    continue
+                oname = u["vis_name"] if home else u["home_name"]
+                okey = USCHO_ALIAS.get(flat(oname), flat(oname))
+                oid = by_name.get(okey)
+                if mine >= theirs or not oid or oid in ("127", "194", "87"):
+                    if not oid and mine < theirs:
+                        print("  WARN: hockey rival opponent %r not known" % oname, file=sys.stderr)
+                    continue
+                det = uscho_details(u, rid, teams[oid]["short"])
+                polls = polls or uscho_polls(y)
+                # USCHO's start time is local ("4:00 CT"); the cards read Eastern
+                tm = re.match(r"(\d+):(\d+)\s*([ECMP])T", u.get("starttime") or "")
+                hh = ((int(tm.group(1)) % 12 + 12 + {"E": 0, "C": 1, "M": 2, "P": 3}[tm.group(3)])
+                      if tm else 19)
+                side = []
+                for tid, sc, w in ((rid, mine, False), (oid, theirs, True)):
+                    side.append({"id": tid, "score": sc, "win": w,
+                                 "rank": uscho_rank(polls, day, teams[tid]["short"], set()),
+                                 "home": (tid == rid) == home, "conf": hockey_conf(tid, y),
+                                 "seed": hockey_seed(y, det.get("stage"), teams[tid]["short"])})
+                out.append({
+                    "id": "uscho-%s" % (u.get("gameid") or day + rid), "sport": "CHK", "season": y,
+                    "date": day, "dow": rules.DOW[dt.date.fromisoformat(day).weekday()],
+                    "time": "%02d:%s" % (hh % 24, tm.group(2) if tm else "00"),
+                    "neutral": True, "ot": bool(u.get("ots")), "so": False, "tie": False,
+                    "show": False, "week": None, "venue": u.get("arena_name"), "mq": False,
+                    "offsite": None, "city": rules.CITY_OVERRIDES.get(det.get("city"), det.get("city")),
+                    "nets": [u["tv"]] if re.search(r"[A-Za-z]", u.get("tv") or "") else [],
+                    "teams": side, "header": None,
+                    "slots": [], "type": None, "champ": None, "round": None, "title": False,
+                    "event": None, "standin": False, "bfri": False, "suffix": None,
+                    "opener": False, "rival_loss": True, "rivals": True, "post": True,
+                    "rivals_only": True, "bowl": None, "showcase": False, "kickoff": False,
+                    "stage": det.get("stage"), "michigan": False, "focus": None,
+                    "labels": [], "dated": False})
+    return out
 
 
 def cornell_cbb_games(seasons, teams, latest_conf):
@@ -2809,6 +2899,9 @@ def harvest():
     ck, _ = hockey_games(rules.CORNELL, sorted(rules.CORNELL_SEASONS["CHK"]),
                          teams, latest_conf, start, end)
     keep += ck
+    rv = hockey_rival_games(sorted(rules.MICHIGAN_SEASONS["CHK"]), teams, latest_conf, start, end)
+    keep += rv
+    print("  hockey rivals: %d NCAA Tournament losses" % len(rv))
     cb = cornell_cbb_games(sorted(rules.CORNELL_SEASONS["CBB"]), teams, latest_conf)
     keep += cb
     print("  Cornell: %d hockey games, %d basketball tournament games" % (len(ck), len(cb)))

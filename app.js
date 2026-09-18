@@ -68,6 +68,15 @@ function crest(t) {
   return CRESTS[t.id] ||
     "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/" + t.id + ".png";
 }
+// ON A FILLED RIVALS CARD the winner's crest sits on its own colour, where the
+// dark-ground logo can vanish -- Michigan's maize M on the maize fill (found
+// 2026-09-18). ESPN's light-ground logo is outlined, so it is used there.
+function washedWinner(t, g) {
+  return !!(g && VIEW === "rivals" && t.win && rivalsFill(g));
+}
+function crestOnColour(t) {
+  return CRESTS[t.id] || "https://a.espncdn.com/i/teamlogos/ncaa/500/" + t.id + ".png";
+}
 function teamName(t, sport, season) {
   let nm = (TEAMS[t.id] && TEAMS[t.id].short) || t.name || t.id;
   // a name that changes with the era -- UCLA reads "Ucla" before 2023
@@ -196,7 +205,8 @@ function teamLine(t, sport, season, seed, g0) {
   const inline = seed != null
     ? '<span class="rkin">' + seed + "</span> " : "";
   return '<div class="tl' + (t.win ? " won" : "") + '">' +
-    '<img class="crest" loading="lazy" src="' + crest(t) + '" alt="">' +
+    '<img class="crest" loading="lazy" src="' + (washedWinner(t, g0) ? crestOnColour(t) : crest(t)) +
+      '" alt="">' +
     '<span class="rk">' +
     (t.rank && !seedGame(g0) ? '<span class="rn">' + t.rank + "</span>" : "") + "</span>" +
     '<span class="nm">' + inline + esc(teamName(t, sport, season)) +
@@ -204,7 +214,7 @@ function teamLine(t, sport, season, seed, g0) {
     // the poll ranking moves to AFTER it, small and grey like a Michigan card's
     // final rating (his call 2026-09-16) -- the rank column goes, and both
     // names line up with every other card
-    (g0 && confSeeded(g0) && t.rank ? '<span class="rkaft">#' + t.rank + "</span>" : "") +
+    (g0 && rankAfter(g0) && t.rank ? '<span class="rkaft">#' + t.rank + "</span>" : "") +
     "</span>" +
     '<span class="sc">' + scoreText(t.score) + "</span></div>";
 }
@@ -360,7 +370,7 @@ function rowHtml(g, browse) {
     // otherwise an upset paints them Sports Daily's orange
     (dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "") +
     // a seeded game drops the rank column: the seed rides with the name
-    ((seedGame(g) || confSeeded(g)) ? " rk-no" : "") +
+    ((seedGame(g) || rankAfter(g)) ? " rk-no" : "") +
     '" data-id="' + g.id + '" style="--winwash:' + shade(teamColor(win)) +
     (ring ? ";--celeb:" + ring[0] + ";--celebring:" + ring[1] : "") + '">' +
     // The header row: slot label left, DATE right. The date sits here rather
@@ -1662,7 +1672,8 @@ function filterChips() {
       g => g.teams.filter(t => t.win).map(t => t.id), FILT.winner), ["130"]);
     h += group("Winner", select("winner", "All Winners",
       w.bigTen.map(optOf).concat(lined(w.power), lined(w.rest)), FILT.winner));
-    return h + group("", postButton() + sortButton());
+    // every hockey Rivals game is an NCAA Tournament game: no Postseason button
+    return h + group("", (sport === "CHK" ? "" : postButton()) + sortButton());
   }
   // Football is played in numbered weeks; basketball is not. The list follows
   // the season, since week 16 only exists in some years.
@@ -1806,6 +1817,12 @@ function seedGame(g) {
 function confSeeded(g) {
   return !playoffGame(g) && g.teams.some(t => t.seed != null);
 }
+// ...where the poll rank moves AFTER the name on a seeded game -- but not in
+// HOCKEY, whose tournament cards keep the ranking in its column beside the
+// in-line seed (his call 2026-09-16)
+function rankAfter(g) {
+  return confSeeded(g) && g.sport !== "CHK";
+}
 // The Rivals Postseason button: the CFP and the NCAA Tournament, plus the Big
 // Ten Tournament FINAL and the Big Ten Championship Game (his call 2026-09-16)
 function rivalsPost(g) {
@@ -1886,7 +1903,7 @@ const NAV = {
         ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
         ["Rivals", "cbb", "rivals"], ["Cornell", "cbb", "cornell"]],
-  hockey: [["Cornell", "chk", "cornell"]]
+  hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]]
 };
 
 function draw() {
@@ -1929,7 +1946,8 @@ function switchView(view) {
     // on Ohio State in football and Michigan State in basketball
     FILT.season = null; FILT.week = null; FILT.month = null; FILT.team = null;
     FILT.net = null;
-    FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : "127";
+    // hockey, fourteen games in all, opens on every rival (2026-09-18)
+    FILT.rival = SPORT_OF[TAB] === "CFB" ? "194" : SPORT_OF[TAB] === "CHK" ? null : "127";
     FILT.post = false; FILT.winner = null;
     SORT = defaultSort();
   } else if (teamView()) {
