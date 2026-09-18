@@ -75,6 +75,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .viewbar button{background:none;border:0;color:var(--muted);font:inherit;
   font-size:13.5px;font-weight:600;padding:6px 16px;cursor:pointer}
 .viewbar button[aria-selected="true"]{background:#2e3a48;color:#cfe0f2}
+/* five views on Detroit (2026-09-18): no name breaks in two, and on a phone
+   the buttons tighten up so the row fits */
+.viewbar button{white-space:nowrap}
+@media (max-width:480px){.viewbar button{padding:6px 10px;font-size:13px}}
 .viewbar button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
@@ -258,7 +262,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.mich-nfl .hdate{text-transform:none;letter-spacing:0;color:var(--muted)}
 /* an NFL playoff opponent's seed sits bare in the rank column -- no "#" */
 .row.mich.mich-nfl .rk::before,.row.mich.mich-nhl .rk::before,
-.row.mich.mich-nba .rk::before{content:none}
+.row.mich.mich-nba .rk::before,.row.mich.mich-mlb .rk::before{content:none}
 /* ...and an NFL playoff LOSS greys the opponent's seed (his call 2026-09-18) */
 .row.mich.dimmed .nseed{color:var(--muted)}
 /* NBC's chip stands out a little more on the Lions' cards */

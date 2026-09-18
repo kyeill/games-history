@@ -1502,6 +1502,9 @@ PRO_SEED_FIX = {
     # a year early), so that season is replaced outright too
     ("hockey/nhl", 1999): {"STL": 1, "DAL": 2, "COL": 3, "DET": 4, "LA": 5, "PHX": 6,
                            "EDM": 7, "SJ": 8},
+    # ESPN gives the 2021-22 East its seeds AFTER the play-in; the Cavaliers
+    # went into it eighth
+    ("basketball/nba", 2021): {"BKN": 7, "CLE": 8, "ATL": 9, "CHA": 10},
 }
 PRO_ROUNDS = {"hockey/nhl": ["First Round", "Second Round", "Conference Final",
                              "Stanley Cup Final"],
@@ -1551,7 +1554,7 @@ def pro_seeds(league, y):
     out = {}
     try:
         got = get_json("https://site.api.espn.com/apis/v2/sports/%s/standings" % league,
-                       params={"season": y + 1})
+                       params={"season": y if league == "baseball/mlb" else y + 1})
     except requests.RequestException:
         got = {}
 
@@ -1565,7 +1568,8 @@ def pro_seeds(league, y):
     walk(got)
     if (league, y) in PRO_SEED_FIX:
         out = dict(PRO_SEED_FIX[(league, y)])
-    if out and dt.date.today() > dt.date(y + 1, 7, 15):
+    if out and dt.date.today() > (dt.date(y, 12, 1) if league == "baseball/mlb"
+                                   else dt.date(y + 1, 7, 15)):
         _PRO_SEEDS[key] = out
         json.dump(_PRO_SEEDS, open(path, "w", encoding="utf-8"), indent=1, sort_keys=True)
     return out
@@ -1584,7 +1588,8 @@ def pro_games(teams, start):
             teams[k] = v
         last = upcoming_season("CBB", start)
         for y in range(first, last + 1):
-            for stype in ((2, 3) if cup else (3,)):
+            # 5 is the NBA PLAY-IN, counted with the playoffs (his call 2026-09-18)
+            for stype in ((2, 3, 5) if cup else (3,)):
                 try:
                     got = get_json("%s/%s/teams/%s/schedule" % (BASE, league, tid),
                                    params={"season": y + 1, "seasontype": stype})
@@ -1636,7 +1641,12 @@ def pro_games(teams, start):
                     me = next(q for q in side if q["id"] == fid)
                     opp = next(q for q in side if q["id"] != fid)
                     mx = {}
-                    if stype == 3:
+                    if stype == 5:
+                        stage = "Play-In"
+                        seeds = pro_seeds(league, y)
+                        for q in side:
+                            q["seed"] = seeds.get(q["abbr"])
+                    elif stype == 3:
                         if opp["id"] not in opp_order:
                             opp_order.append(opp["id"])
                         rnd_i = opp_order.index(opp["id"])
@@ -1667,10 +1677,148 @@ def pro_games(teams, start):
                         "slots": [], "type": None, "champ": None, "round": None,
                         "title": False, "event": None, "standin": False, "bfri": False,
                         "suffix": None, "opener": False, "rival_loss": False,
-                        "rivals": False, "post": stype == 3, "rivals_only": True,
+                        "rivals": False, "post": stype in (3, 5), "rivals_only": True,
                         "bowl": None, "showcase": False, "kickoff": False,
                         "stage": stage, "michigan": False, "focus": fid, "mx": mx,
                         "labels": [], "dated": False})
+    return out
+
+
+# THE TIGERS (his spec 2026-09-16, built 2026-09-18), 2006 on: walk-off wins,
+# extra-inning wins, no-hitters thrown by the Tigers, and every playoff game.
+TIGERS = "mlb-6"
+TIGERS_FROM = 2006
+# ESPN's box scores cannot tell a no-hitter (it lists 0 hits for BOTH teams in
+# Verlander's), so they are named here -- his list, 2026-09-18
+TIGERS_NO_HITTERS = {"2007-06-12", "2011-05-07", "2021-05-18", "2023-07-08"}
+MLB_ROUNDS = ["ALDS", "ALCS", "World Series"]
+
+
+def mlb_walkoff(event_id):
+    """Did the home team win in its LAST TURN AT BAT? It did if it batted in
+    the final inning at all -- ahead after the top half, it would not have.
+    Kept for good in data/mlb-walkoff.json."""
+    path = os.path.join(HERE, "data", "mlb-walkoff.json")
+    global _WALKOFF
+    if _WALKOFF is None:
+        _WALKOFF = json.load(open(path, encoding="utf-8")) if os.path.exists(path) else {}
+    if event_id in _WALKOFF:
+        return _WALKOFF[event_id]
+    try:
+        s = get_json("%s/baseball/mlb/summary" % BASE, params={"event": event_id})
+    except requests.RequestException:
+        return False
+    cs = ((s.get("header") or {}).get("competitions") or [{}])[0].get("competitors") or []
+    home = next((k for k in cs if k.get("homeAway") == "home"), None)
+    away = next((k for k in cs if k.get("homeAway") == "away"), None)
+    if not home or not away or not away.get("linescores"):
+        return False
+    walk = len(home.get("linescores") or []) >= len(away["linescores"])
+    _WALKOFF[event_id] = walk
+    if len(_WALKOFF) % 50 == 0:
+        json.dump(_WALKOFF, open(path, "w", encoding="utf-8"), indent=0, sort_keys=True)
+    return walk
+
+
+_WALKOFF = None
+
+
+def tigers_games(teams, start):
+    for k, v in pro_teams("baseball/mlb", "mlb-").items():
+        teams[k] = v
+    out = []
+    for y in range(TIGERS_FROM, start.year + 1):
+        for stype in (2, 3):
+            try:
+                got = get_json("%s/baseball/mlb/teams/6/schedule" % BASE,
+                               params={"season": y, "seasontype": stype})
+            except requests.RequestException:
+                continue
+            series, opp_order = {}, []
+            for x in sorted(got.get("events") or [], key=lambda x: x.get("date") or ""):
+                comps = x.get("competitions") or []
+                if not comps:
+                    continue
+                c = comps[0]
+                cs = c.get("competitors") or []
+                status = c.get("status") or {}
+                if len(cs) != 2 or not (status.get("type") or {}).get("completed"):
+                    continue
+                try:
+                    d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                         .replace(tzinfo=dt.timezone.utc).astimezone(ET))
+                except (KeyError, ValueError):
+                    continue
+                side = []
+                for k in cs:
+                    t = k.get("team") or {}
+                    tid = "mlb-" + t["id"]
+                    if tid not in teams:
+                        logos = t.get("logos") or [{}]
+                        teams[tid] = {"name": t.get("displayName"), "short": pro_place(t),
+                                      "abbr": t.get("abbreviation"), "color": t.get("color"),
+                                      "alt": t.get("alternateColor"), "logo": logos[0].get("href")}
+                    sc = k.get("score")
+                    score = sc.get("value") if isinstance(sc, dict) else sc
+                    was = pro_place(t)
+                    side.append({"id": tid, "abbr": t.get("abbreviation"),
+                                 **({"place": was} if was and was != teams[tid]["short"] else {}),
+                                 "score": int(score) if score is not None else None,
+                                 "rank": None, "win": bool(k.get("winner")),
+                                 "home": k.get("homeAway") == "home", "conf": "MLB",
+                                 "seed": None})
+                if not any(q["id"] == TIGERS for q in side):
+                    continue
+                me = next(q for q in side if q["id"] == TIGERS)
+                opp = next(q for q in side if q["id"] != TIGERS)
+                day = d.strftime("%Y-%m-%d")
+                innings = status.get("period") or 9
+                mx, stage = {}, None
+                if stype == 3:
+                    heads = [n.get("headline") or "" for n in c.get("notes") or []]
+                    if opp["id"] not in opp_order:
+                        opp_order.append(opp["id"])
+                    named = heads[0].split(" - ")[0].strip() if heads and " - " in heads[0] else ""
+                    stage = {"ALWC": "AL Wild Card", "AL WILD CARD": "AL Wild Card",
+                             "ALDS": "ALDS", "ALCS": "ALCS",
+                             "WORLD SERIES": "World Series"}.get(named.upper(), named) \
+                        if named else MLB_ROUNDS[min(opp_order.index(opp["id"]), 2)]
+                    w, l = series.get(opp["id"], (0, 0))
+                    w, l = (w + 1, l) if me["win"] else (w, l + 1)
+                    series[opp["id"]] = (w, l)
+                    mx.update(game=w + l, series="%d-%d" % (w, l))
+                    seeds = pro_seeds("baseball/mlb", y)
+                    for q in side:
+                        q["seed"] = seeds.get(q["abbr"])
+                else:
+                    if day in TIGERS_NO_HITTERS and me["win"]:
+                        mx["nohit"] = True
+                    if me["win"] and innings > 9:
+                        mx["extra"] = innings
+                    if me["win"] and me["home"] and (innings > 9 or mlb_walkoff(x["id"])):
+                        mx["walkoff"] = True
+                    if not mx:
+                        continue
+                for q in side:
+                    q.pop("abbr", None)
+                v = c.get("venue") or {}
+                out.append({
+                    "id": x["id"], "sport": "MLB", "season": y, "date": day,
+                    "dow": rules.DOW[d.weekday()], "time": d.strftime("%H:%M"),
+                    "neutral": bool(c.get("neutralSite")), "ot": innings > 9,
+                    "so": False, "tie": False, "show": False, "week": None,
+                    "venue": v.get("fullName"), "mq": False, "offsite": None,
+                    "city": ((v.get("address") or {}).get("city") if c.get("neutralSite") else None),
+                    "nets": sorted(set(networks(c))), "teams": side, "header": None,
+                    "slots": [], "type": None, "champ": None, "round": None, "title": False,
+                    "event": None, "standin": False, "bfri": False, "suffix": None,
+                    "opener": False, "rival_loss": False, "rivals": False,
+                    "post": stype == 3, "rivals_only": True, "bowl": None, "showcase": False,
+                    "kickoff": False, "stage": stage, "michigan": False, "focus": TIGERS,
+                    "mx": mx, "labels": [], "dated": False})
+    if _WALKOFF:
+        json.dump(_WALKOFF, open(os.path.join(HERE, "data", "mlb-walkoff.json"), "w",
+                                 encoding="utf-8"), indent=0, sort_keys=True)
     return out
 
 
@@ -3355,6 +3503,12 @@ def harvest():
     keep += lg
     pg = pro_games(teams, start)
     keep += pg
+    tg = tigers_games(teams, start)
+    keep += tg
+    print("  Tigers: %d games (%d walk-offs, %d extra innings, %d no-hitters, %d playoff)" % (
+        len(tg), sum(1 for g in tg if g["mx"].get("walkoff")),
+        sum(1 for g in tg if g["mx"].get("extra")), sum(1 for g in tg if g["mx"].get("nohit")),
+        sum(1 for g in tg if g["post"])))
     print("  Red Wings / Pistons / Cavaliers: %s games" % collections.Counter(
         g["focus"] for g in pg).most_common())
     print("  Lions: %d games, %d Key Games" % (len(lg), sum(1 for g in lg if g["mx"].get("key"))))
