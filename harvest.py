@@ -978,7 +978,9 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 continue
             status = c.get("status") or {}
             done = (status.get("type") or {}).get("completed")
-            upcoming = not done and start <= d.date() <= end
+            # every game still to come this season, not just the coming week
+            # (his call 2026-09-18)
+            upcoming = not done and d.date() >= start
             if not done and not upcoming:
                 continue
             heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
@@ -1114,7 +1116,9 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             out.append({
                 "id": x["id"], "sport": "CHK", "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
-                "time": d.strftime("%H:%M"), "neutral": neutral,
+                "time": ("TBD" if upcoming and (x.get("timeValid") is False or
+                                                c.get("timeValid") is False)
+                         else d.strftime("%H:%M")), "neutral": neutral,
                 "ot": (status.get("period") or 0) > 3,
                 # a SHOOTOUT: ESPN marks almost none, USCHO names every one
                 # ("Clarkson wins shootout, 3-2") in its shootout notes
@@ -1775,6 +1779,30 @@ def upcoming_events(code, start, end):
                 seen.add(x["id"])
                 out.append(x)
         d = e + dt.timedelta(days=1)
+    return out
+
+
+def michigan_rest_of_season(code, y, after):
+    """MICHIGAN'S WHOLE REMAINING SCHEDULE (his call 2026-09-18): every game
+    of the current season not yet played and past the coming-week window, from
+    ESPN's team schedule -- never cached, like the window itself."""
+    sport = SPORTS[code][0]
+    out = []
+    for stype in (2, 3):
+        try:
+            got = get_json("%s/%s/teams/%s/schedule" % (BASE, sport, rules.MICHIGAN),
+                           params={"season": y if code == "CFB" else y + 1,
+                                   "seasontype": stype})
+        except requests.RequestException:
+            continue
+        for x in got.get("events") or []:
+            try:
+                d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")
+                     .replace(tzinfo=dt.timezone.utc).astimezone(ET)).date()
+            except (KeyError, ValueError):
+                continue
+            if d > after:
+                out.append(x)
     return out
 
 
@@ -2764,6 +2792,10 @@ def harvest():
         if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
             continue
         up_evs = upcoming_events(code, start, end)
+        seen_up = {x.get("id") for x in up_evs}
+        later = [x for x in michigan_rest_of_season(code, y, end) if x.get("id") not in seen_up]
+        later_ids = {x["id"] for x in later}
+        up_evs = up_evs + later
         # the coming week is covered like any other (his call 2026-09-14)
         up_cover = set()
         if code == "CFB":
@@ -2788,7 +2820,7 @@ def harvest():
                      .replace(tzinfo=dt.timezone.utc).astimezone(ET))
             except (KeyError, ValueError):
                 continue
-            if not (start <= d.date() <= end):
+            if not (start <= d.date() <= end) and x["id"] not in later_ids:
                 continue
             nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
             side = []
@@ -2806,7 +2838,11 @@ def harvest():
                 side.append({"id": t["id"], "score": None,
                              "rank": r if r and r != 99 else None,
                              "win": False, "home": k.get("homeAway") == "home",
-                             "conf": str(t.get("conferenceId")), "seed": None})
+                             # a team SCHEDULE names no conference; the
+                             # archive's latest one for the team stands in
+                             "conf": str(t.get("conferenceId") or
+                                         (latest_conf.get((code, t["id"])) or (None, None))[1]),
+                             "seed": None})
             if len(side) != 2:
                 continue
             mich = any(s["id"] == rules.MICHIGAN for s in side)
@@ -2863,7 +2899,10 @@ def harvest():
             keep.append({
                 "id": x["id"], "sport": code, "season": y,
                 "date": d.strftime("%Y-%m-%d"), "dow": rules.DOW[d.weekday()],
-                "time": d.strftime("%H:%M"), "neutral": bool(c.get("neutralSite")),
+                # ESPN parks an unset kickoff at midnight and says so
+                "time": "TBD" if (x.get("timeValid") is False or c.get("timeValid") is False)
+                        else d.strftime("%H:%M"),
+                "neutral": bool(c.get("neutralSite")),
                 "nets": sorted(nets), "teams": side, "week": wk,
                 "slots": sorted(slots), "type": gtype, "champ": None,
                 "round": (heads[0] if heads else None), "title": False,

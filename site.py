@@ -303,6 +303,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .sc.mbox.u{text-decoration:underline;text-underline-offset:3px}
 /* a loss score is italic (his call 2026-09-17) */
 .row.mich .sc.mbox.l,.row.mich .mrank.l{font-style:italic}
+/* a regular-season win as #1 bolds the number (his call 2026-09-18) */
+.row.mich .mrank.b{font-weight:700}
 .row.mich.mich-chk .sc.mbox,.row.mich.mich-chk .mrank{min-width:calc(8.4ch + 16px)}
 /* no background here any more (his call 2026-09-13): an unfilled box is
    painted grey inline, so a game with no uniform cannot inherit maize */

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-104503";
+const BUILD = "20260918-135032";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -42,7 +42,8 @@ function defaultSort() {
   return (window.innerWidth || 0) >= 900 ? "asc" : "desc";
 }
 let SORT = defaultSort();
-const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK" };
+// "all" is Michigan's COMBINED view (2026-09-18): every sport at once
+const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK", all: null };
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
 
@@ -153,6 +154,8 @@ function stageLabel(g) {
   return s;
 }
 function fmtTime(t) {
+  // a kickoff not yet set reads TBD (2026-09-18, with the whole season loaded)
+  if (!t || t === "TBD") return "TBD";
   const p = t.split(":"), h = +p[0] % 12 || 12;
   return h + ":" + p[1] + (+p[0] < 12 ? "am" : "pm");
 }
@@ -729,8 +732,10 @@ function michCard(g, p) {
   // a LOSS italicises the rank box as well as the score, in football and
   // basketball (his call 2026-09-18)
   const lossRank = g.sport !== "CHK" && !upcoming(g) && !g.tie && !m.win;
-  let umRank = '<span class="mrank' + (lossRank ? " l" : "") + '"' + paint(pants, rankInk) + ">" +
-    umText + "</span>";
+  // a REGULAR-SEASON WIN AS #1 bolds the number (his call 2026-09-18)
+  const topWin = g.sport !== "CHK" && !g.stage && !upcoming(g) && m.win && m.rank === 1;
+  let umRank = '<span class="mrank' + (lossRank ? " l" : "") + (topWin ? " b" : "") + '"' +
+    paint(pants, rankInk) + ">" + umText + "</span>";
   if (tSeries) {
     score = '<span class="sc mbox"' + paint(top, scoreInk) + ">" +
       (sWins + sLosses + sTies ? "[" + sWins + "-" + sLosses + (sTies ? "-" + sTies : "") + "]" : "") +
@@ -1135,7 +1140,9 @@ function michListHtml(list) {
   list = units.map(u => u.g);
   // no dividers under a Highlights filter (his call 2026-09-16): a bye or a
   // tournament tile means nothing between two hand-picked games
-  if (FILT.season == null || list.length < 2 || FILT.hl) return cards.join("");
+  // ...nor under Postseason, nor on Combined, where three sports interleave
+  if (FILT.season == null || list.length < 2 || FILT.hl || FILT.post || !SPORT_OF[TAB])
+    return cards.join("");
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   const iso = n => new Date(n * 864e5).toISOString().slice(0, 10);
   const post = g => !!(g.post || g.champ);
@@ -1384,7 +1391,7 @@ function visible() {
     const e = eff(id);
     if (e.add && e.game && !list.some(g => g.id === id)) list.push(e.game);
   });
-  list = list.filter(g => g.sport === SPORT_OF[TAB]);
+  if (SPORT_OF[TAB]) list = list.filter(g => g.sport === SPORT_OF[TAB]);
   // A championship game shows on TV Windows even with no broadcast window --
   // 17 of the 46 have none, because the Big Ten title game kicks at 8pm and
   // the Pac-12 one was on a Friday. His call: they must all show.
@@ -1438,9 +1445,13 @@ function visible() {
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
-  // Cornell basketball's NCAA Tournament button (his call 2026-09-17)
+  // Cornell basketball's NCAA Tournament button (his call 2026-09-17), and
+  // Michigan's POSTSEASON button (2026-09-18): the Big Ten Championship Game
+  // and Tournament, the CFP and the NCAA Tournament -- not the other bowls
   if (teamView() && FILT.post)
-    list = list.filter(g => (g.stage || "").indexOf("NCAA Tournament") === 0);
+    list = list.filter(g => VIEW === "cornell"
+      ? (g.stage || "").indexOf("NCAA Tournament") === 0
+      : /^(Big Ten Championship|Big Ten Tournament|CFP|NCAA Tournament)/.test(g.stage || ""));
   // Rivals filters by whose loss it was, what kind of game, and who won
   if (VIEW === "rivals") {
     if (FILT.rival) list = list.filter(g => rivalLoser(g) === FILT.rival);
@@ -1496,7 +1507,11 @@ function visible() {
   const chronDesc = (a, b) => (a.date !== b.date)
     ? b.date.localeCompare(a.date)
     : (a.time !== b.time ? b.time.localeCompare(a.time) : rank(a) - rank(b));
+  // A HIGHLIGHTS list read Newest First runs the SEASONS backwards but each
+  // season forwards (his call 2026-09-18)
+  const hlDesc = teamView() && FILT.hl && SORT !== "asc";
   list.sort((a, b) => {
+    if (hlDesc) return a.season !== b.season ? b.season - a.season : chron(a, b);
     if (SORT === "asc") return chron(a, b);
     if (flatSort) return chronDesc(a, b);
     const ba = block(a), bb = block(b);
@@ -1509,7 +1524,7 @@ function visible() {
 // sports, and basketball's newest one is empty for months -- 2026-27 has no
 // games until November -- so the overall max opened the tab on nothing.
 function latestSeason() {
-  const own = GAMES.filter(g => g.sport === SPORT_OF[TAB] &&
+  const own = GAMES.filter(g => (!SPORT_OF[TAB] || g.sport === SPORT_OF[TAB]) &&
       (teamView() ? g.focus === focusId() : !g.rivals_only))
     .map(g => g.season);
   if (own.length) return Math.max.apply(null, own);
@@ -1528,6 +1543,10 @@ function clearFilters() {
     marquee: VIEW === "tv",
     week: null, month: null, team: null, rival: null, post: false, winner: null
   };
+  // Combined's opening state is every season's Special games
+  if (typeof TAB !== "undefined" && !SPORT_OF[TAB] && teamView()) {
+    FILT.season = null; FILT.hl = "Special";
+  }
 }
 
 function seasonLabel(y) {
@@ -1563,7 +1582,7 @@ function filterChips() {
 
   // only the seasons this view can show: Rivals reaches back to 2014, the
   // other views start with the archive
-  const viewSeasons = Array.from(new Set(GAMES.filter(g => g.sport === sport &&
+  const viewSeasons = Array.from(new Set(GAMES.filter(g => (!sport || g.sport === sport) &&
     (VIEW === "rivals" ? rivalsAllows(g)
       : teamView() ? g.focus === focusId() : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
@@ -1603,7 +1622,8 @@ function filterChips() {
          mt.power.concat(mt.rest).sort(byName)]
       : [mt.bigTen.filter(isRival), mt.bigTen.filter(id => !isRival(id)),
          mt.power, mt.rest]).filter(ids => ids.length);
-    h += group("Team", select("team", "All Teams",
+    // COMBINED has no Team or Network filter: three sports share neither
+    if (sport) h += group("Team", select("team", "All Teams",
       [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
@@ -1637,7 +1657,7 @@ function filterChips() {
       netOpts = netOpts.concat(have.map(netOpt));
     });
     // no Network filter where every game is a tournament game or TV is rare
-    if (sport !== "CHK" && VIEW !== "cornell")
+    if (sport && sport !== "CHK" && VIEW !== "cornell")
       h += group("Network", select("net", "All Networks", netOpts, FILT.net));
     // HIGHLIGHTS (2026-09-16), offering only the kinds the other filters
     // leave any games for
@@ -1651,7 +1671,9 @@ function filterChips() {
     // Cornell hockey has no 2021-Onward button (his call 2026-09-17), and
     // Cornell basketball has NCAA Tournament in its place
     const extra = VIEW !== "cornell"
-      ? '<button class="f" data-act="recent" aria-pressed="' + !!FILT.recent +
+      ? '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
+        '">Postseason</button>' +
+        '<button class="f" data-act="recent" aria-pressed="' + !!FILT.recent +
         '">2021-Onward</button>'
       : sport === "CBB"
         ? '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
@@ -1874,6 +1896,13 @@ function rivalsFill(g) {
 // 2026-09-11). A regular-season game has none.
 function rivalsBorder(g) {
   const s = g.stage || "";
+  // HOCKEY: a Michigan win wears maize, a Cornell win Cornell red (his call
+  // 2026-09-18)
+  if (g.sport === "CHK" && !upcoming(g)) {
+    const w = g.teams.find(t => t.win);
+    if (w && w.id === MICHIGAN) return "#ffcb05";
+    if (w && w.id === CORNELL) return "#b31b1b";
+  }
   if (s.indexOf("CFP") === 0) return "#c28c19";
   if (s.indexOf("NCAA Tournament") === 0) return "#0053b8";
   if (g.champ === "Big Ten" || s.indexOf("Big Ten ") === 0) return "#0088ce";
@@ -1907,7 +1936,7 @@ function quickButtons() {
 // Each top tab's second row: label, sport, view.
 const NAV = {
   michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"],
-             ["Hockey", "chk", "michigan"]],
+             ["Hockey", "chk", "michigan"], ["Combined", "all", "michigan"]],
   cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
         ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
@@ -1986,6 +2015,8 @@ function go(tab, view) {
     SORT = defaultSort();
     clearFilters();
     FILT.current = false; CURRENT_PREV = null;
+    // COMBINED opens on every season's Special games, newest first
+    if (!SPORT_OF[TAB]) { FILT.season = null; FILT.hl = "Special"; SORT = "desc"; }
   }
   if (view !== VIEW) switchView(view);
   draw();
