@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-215118";
+const BUILD = "20260918-215850";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -818,8 +818,12 @@ function michCard(g, p) {
   // stops before the two boxes (his call 2026-09-11)
   // MICHIGAN AGAINST CORNELL, on either team's card, bolds nothing (his call
   // 2026-09-16)
-  const bothMine = g.sport === "CHK" && g.teams.some(t => t.id === MICHIGAN) &&
-    g.teams.some(t => t.id === CORNELL);
+  const bothMine = (g.sport === "CHK" && g.teams.some(t => t.id === MICHIGAN) &&
+    g.teams.some(t => t.id === CORNELL)) ||
+    // ...and so does the CAVALIERS AGAINST THE PISTONS since 2016-17 (his call
+    // 2026-09-18)
+    (g.sport === "NBA" && g.season >= 2016 && g.teams.some(t => t.id === "nba-5") &&
+     g.teams.some(t => t.id === "nba-8"));
   const oppLine = '<div class="tl' + (lost || tied ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
@@ -1019,7 +1023,10 @@ function michCard(g, p) {
   const cuNcaa = cuCbb && (g.stage || "").indexOf("NCAA Tournament") === 0;
   const cuIvyFinal = cuCbb && g.stage === "Ivy Madness | Championship";
   const cuIvy = cuCbb && (g.stage || "").indexOf("Ivy Madness") === 0;
-  const bigWin = !!mx.shade || cuNcaa || cuIvy;
+  // an NBA CUP WIN past the group stage is filled (his call 2026-09-18)
+  const cupWin = g.sport === "NBA" && !lost && !upcoming(g) &&
+    (g.stage || "").indexOf("NBA Cup") === 0 && g.stage !== "NBA Cup | Group Play";
+  const bigWin = !!mx.shade || cuNcaa || cuIvy || cupWin;
   // a CORNELL hockey NCAA Tournament LOSS greys the seed and the ranking (his
   // call 2026-09-18)
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
@@ -1029,6 +1036,7 @@ function michCard(g, p) {
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     // the existing no-bold class: the wash stays, the weight goes
     (bothMine || flatSplit ? " flatwin" : "") +
+    (g.sport === "NBA" && bothMine ? " nobold" : "") +
     (g.ot && !series ? " ot" : "") +
     (series ? (lost ? " rk-grey" : "")
       : dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
@@ -1444,8 +1452,9 @@ function seriesView() { return proView() && VIEW !== "lions"; }
 // each team's boxes and the colour its own seed reads in
 const PRO_BOX = {
   "nhl-5": { bg: "#ce1126", fg: "#ffffff", seed: "#ff5a5f" },     // Red Wings
-  "nba-8": { bg: "#1d42ba", fg: "#ffffff", seed: "#6f9bff" },     // Pistons
-  "nba-5": { bg: "#860038", fg: "#fdbb30", seed: "#fdbb30" },     // Cavaliers
+  // his colours (2026-09-18)
+  "nba-8": { bg: "#0186a7", fg: "#ffa300", seed: "#ffa300" },     // Pistons
+  "nba-5": { bg: "#72253d", fg: "#b4985a", seed: "#b4985a" },     // Cavaliers
   "mlb-6": { bg: "#0c2340", fg: "#ffffff", seed: "#ff8a3d" }      // Tigers
 };
 function focusTeam(g) { return g.teams.find(t => t.id === (g.focus || focusId())); }

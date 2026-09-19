@@ -208,6 +208,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    flatwin is only ever set on TV Windows, so the same games keep their bold
    scores on Key Games and Rivals. */
 .row.flatwin .sc{font-weight:400}
+/* CAVALIERS AGAINST PISTONS: not even the seeds bold (his call 2026-09-18) */
+.row.nobold *{font-weight:400!important}
 /* overtime: the winning score is underlined, instead of an OT chip */
 .row.ot .tl.won .sc{text-decoration:underline;text-underline-offset:3px;
   text-decoration-thickness:2px}
