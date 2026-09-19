@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-223443";
+const BUILD = "20260918-230845";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -766,6 +766,12 @@ function michCard(g, p) {
   const exact = !mx.box && !!PRO_BOX[fid];
   const ink = (bg, fg) => bg === UNSET ? WHITE
     : fg && exact ? fg
+    // THE LIONS' SHEET COLOURS (his call 2026-09-18): a font that does not
+    // read on its box -- white on white, blue on blue, silver on blue -- takes
+    // the first Lions colour that reads there instead -- blue, white, silver,
+    // black, in that order
+    : fg && fid === LIONS ? (ratio(fg, bg) >= 3 ? fg
+      : ["#0076b6", "#ffffff", "#b0b7bc", "#000000"].find(c => ratio(c, bg) >= 3) || fg)
     : fg ? readable(fg, bg)
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = (bg, fg) => (bg ? ' style="background:' + bg + ";color:" +
@@ -1133,9 +1139,9 @@ function michCard(g, p) {
                       "NBCSN", "CNBC", "USA Net", "NBA TV", "NHL Network", "Versus", "OLN",
                       "Prime Video", "Peacock", "Netflix", "HBO Max"];
     const nets = g.nets || [];
-    const net = NATIONAL.find(n => nets.indexOf(n) > -1) ||
-      // ...and never the regional sports networks (his call 2026-09-18)
-      nets.find(n => !/ERADM|League Pass|Sunday Ticket|ESPN\+|FanDuel SN (DET|IN|OH)|^CHSN$/.test(n)) || "";
+    // NATIONAL ONLY: every regional and local channel is gone (his call
+    // 2026-09-18), so a game with no national broadcast shows its time alone
+    const net = NATIONAL.find(n => nets.indexOf(n) > -1) || "";
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
     let head;
     // a baseball season is named for its own year; the others end a year on
