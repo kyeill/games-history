@@ -2498,11 +2498,17 @@ def rating_of(code, season, team_id, teams, ratings, rated_teams):
     """His rank for that team that season. A team no rating system covers --
     the Division II and NAIA exhibition opponents -- reads "DII" instead of
     nothing, so the card says why it is blank (his call 2026-09-13)."""
-    key = flat((teams.get(team_id) or {}).get("short") or "")
-    hit = ratings.get((code, season, key))
-    if hit:
-        return hit
-    if key and code in rated_teams and key not in rated_teams[code]:
+    short = (teams.get(team_id) or {}).get("short") or ""
+    # his tabs write a school the way ESPN does -- "VCU", not the "Virginia
+    # Commonwealth" the cards spell out -- so the ESPN name is tried too (VCU
+    # read "DII", his catch 2026-09-18)
+    espn = {v: k for k, v in rules.NAME_OVERRIDES.items()}.get(short)
+    keys = [k for k in (flat(short), flat(espn or "")) if k]
+    for key in keys:
+        hit = ratings.get((code, season, key))
+        if hit:
+            return hit
+    if keys and code in rated_teams and not any(k in rated_teams[code] for k in keys):
         return "DII"
     return None
 
