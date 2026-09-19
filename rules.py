@@ -116,8 +116,10 @@ MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026))
 # How far an opponent went in the CFP or the NCAA Tournament, written the way
 # his sheet writes it: [Qtrs], [Semis], [Champs].
 FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2",
-                "Round 3": "Rd 3", "Sweet Sixteen": "Sweet 16",
-                "Elite Eight": "Elite 8", "Final Four": "Final Four",
+                # spelled out (his call 2026-09-18); the card shortens them
+                # to S16 / E8 only when the line would not fit
+                "Round 3": "Rd 3", "Sweet Sixteen": "Sweet Sixteen",
+                "Elite Eight": "Elite Eight", "Final Four": "Final Four",
                 "Quarters": "Qtrs", "Semis": "Semis", "Championship": "Final"}
 
 

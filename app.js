@@ -827,7 +827,9 @@ function michCard(g, p) {
       (mx.reigning ? '<span class="mcaret">^</span>' : "") + "</span>" +
       // the finish or rating reads after the name again (his call 2026-09-11),
       // the name giving way first when the two do not fit
-      (fin && !playoffGame(g) ? '<span class="mfin">' + esc(fin) + "</span>" : "") +
+      (fin && !playoffGame(g) ? '<span class="mfin"' +
+        ({ "Sweet Sixteen": ' data-short="S16"', "Elite Eight": ' data-short="E8"' }[fin] || "") +
+        ">" + esc(fin) + "</span>" : "") +
       "</span></span>" +
     score + "</div>";
   // THE THIRD ROW: plain grey text in the header style rather than chips (his
@@ -1092,7 +1094,8 @@ function michCard(g, p) {
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
     const chips = (mx.nohit ? chip("champ", "No-Hitter") : "") +
       (mx.walkoff ? chip("grey", "Walk-Off") : "") +
-      (mx.extra ? chip("grey", mx.extra + " Innings") : "");
+      (mx.extra ? chip("grey", mx.extra + " Innings") : "") +
+      (mx.late ? chip("grey", "Comeback") : "");
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
@@ -1173,6 +1176,16 @@ function trimStageHeads() {
 }
 
 function trimMichChips() {
+  // SWEET SIXTEEN and ELITE EIGHT after an opponent's name shorten to S16 and
+  // E8 only when the name would otherwise be cut (his call 2026-09-18)
+  document.querySelectorAll(".row.mich .mfin[data-short]").forEach(f => {
+    if (f.dataset.full) f.textContent = f.dataset.full;
+    const nm = f.parentElement && f.parentElement.querySelector(".mn");
+    if (nm && nm.scrollWidth > nm.clientWidth + 1) {
+      f.dataset.full = f.textContent;
+      f.textContent = f.dataset.short;
+    }
+  });
   // THE HEADER FIRST (his call 2026-09-14). It holds one piece of text rather
   // than a row of them, so a wrap is measured by HEIGHT against the line box,
   // not by comparing children the way the footer does.
@@ -1674,6 +1687,7 @@ function visible() {
   if (seriesView() && FILT.cup) list = list.filter(g => !g.post);
   if (seriesView() && FILT.walk) list = list.filter(g => (g.mx || {}).walkoff);
   if (seriesView() && FILT.extra) list = list.filter(g => (g.mx || {}).extra);
+  if (seriesView() && FILT.late) list = list.filter(g => (g.mx || {}).late);
   if (seriesView() && FILT.nohit) list = list.filter(g => (g.mx || {}).nohit);
   if (proView()) {
     if (FILT.prime) list = list.filter(g => !g.stage && (g.dow !== "Sun" ||
@@ -1886,7 +1900,8 @@ function filterChips() {
       return h + group("", (sport === "NBA" ? btn("post", FILT.post, "Playoffs") +
         btn("cup", FILT.cup, "NBA Cup") : "") +
         (sport === "MLB" ? btn("post", FILT.post, "Playoffs") +
-          btn("walk", FILT.walk, "Walk-Offs") + btn("extra", FILT.extra, "Extra Innings") +
+          btn("walk", FILT.walk, "Walk-Offs") + btn("late", FILT.late, "Comebacks") +
+          btn("extra", FILT.extra, "Extra Innings") +
           btn("nohit", FILT.nohit, "No-Hitters") : "") + sortButton());
     }
     if (proView()) {
@@ -2407,7 +2422,7 @@ async function init() {
       FILT.key = !FILT.key;
     } else if (b.dataset.act === "cup") {
       FILT.cup = !FILT.cup;
-    } else if (b.dataset.act === "walk" || b.dataset.act === "extra" ||
+    } else if (b.dataset.act === "walk" || b.dataset.act === "extra" || b.dataset.act === "late" ||
                b.dataset.act === "nohit") {
       FILT[b.dataset.act] = !FILT[b.dataset.act];
     } else {

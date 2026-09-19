@@ -1847,10 +1847,6 @@ def tigers_games(teams, start):
                                 mx["late"] = True
                     if not mx:
                         continue
-                    # comebacks are COUNTED, not shown, until he decides
-                    if set(mx) == {"late"}:
-                        LATE_ONLY.append(day)
-                        continue
                 for q in side:
                     q.pop("abbr", None)
                 v = c.get("venue") or {}
@@ -2217,7 +2213,15 @@ def playoff_finish(code, y, evs):
                 if rnd == "Championship":
                     out[k["team"]["id"]] = "Champs"
             else:
-                out[k["team"]["id"]] = rules.FINISH_SHORT.get(rnd, rnd or "Playoff")
+                fin = rules.FINISH_SHORT.get(rnd, rnd or "Playoff")
+                # A TOP-SIX SEED OUT IN THE FIRST WEEKEND says which seed it
+                # was -- "Rd 1 | No. 4" (his call 2026-09-18); ESPN's tournament
+                # rank IS the seed
+                seed = ((k.get("curatedRank") or {}).get("current"))
+                if (code == "CBB" and rnd in ("Round 1", "Round 2") and seed
+                        and seed <= 6):
+                    fin += " | No. %d" % seed
+                out[k["team"]["id"]] = fin
     return out
 
 
