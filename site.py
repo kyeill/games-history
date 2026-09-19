@@ -184,7 +184,10 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   display:inline-block;min-width:20px;text-align:right;margin-right:8px}
 .row.rk-no .rk{display:none}
 /* a conference-tournament card's poll ranking, after the name (2026-09-16) */
-.rkaft{margin-left:6px;font-size:12px;font-weight:400;color:var(--muted)}
+.rkaft{margin-left:6px;font-size:12px;font-weight:400;color:var(--muted);
+  /* its own box, so a struck-through name does not strike the ranking after
+     it (his call 2026-09-18) */
+  display:inline-block;text-decoration:none}
 .row.rk-no .tl{grid-template-columns:22px minmax(0,1fr) auto}
 /* In the Michigan view the seed is just another character in the line (his
    call 2026-09-11): the name size, no box, no padding -- "vs. 4 ALABAMA". The
