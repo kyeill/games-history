@@ -39,12 +39,19 @@ let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
 // button still flips it either way, and every "back to the default" below
 // asks this rather than assuming.
 function defaultSort() {
+  // ...except the MICHIGAN views, which open Oldest First on any device, bar
+  // Combined (Newest First), and Cornell hockey, Oldest First too (his calls
+  // 2026-09-18)
+  if (typeof VIEW !== "undefined") {
+    if (VIEW === "michigan") return SPORT_OF[TAB] ? "asc" : "desc";
+    if (VIEW === "cornell" && SPORT_OF[TAB] === "CHK") return "asc";
+  }
   return (window.innerWidth || 0) >= 900 ? "asc" : "desc";
 }
-let SORT = defaultSort();
 // "all" is Michigan's COMBINED view (2026-09-18): every sport at once
 const SPORT_OF = { cfb: "CFB", cbb: "CBB", chk: "CHK", all: null, nfl: "NFL",
                    nhl: "NHL", nba: "NBA", mlb: "MLB" };
+let SORT = defaultSort();
 // Key Games opens on the upset category -- it is the longest list and the one
 // he actually came for. TV Windows opens unfiltered.
 
@@ -1005,7 +1012,14 @@ function michCard(g, p) {
   // It used to fall back to rules of my own -- postseason, a conference title,
   // a rival, a Big Ten Tournament won -- which he has now retired in favour of
   // the Shade column. A season he has not filled in simply has no washes.
-  const bigWin = !!mx.shade;
+  // CORNELL BASKETBALL (his call 2026-09-18): every NCAA Tournament win and
+  // every Ivy Madness win is filled; an NCAA win takes an NCAA-blue border and
+  // an Ivy Madness FINAL won takes Ivy green
+  const cuCbb = fid === CORNELL && g.sport === "CBB" && !lost && !upcoming(g);
+  const cuNcaa = cuCbb && (g.stage || "").indexOf("NCAA Tournament") === 0;
+  const cuIvyFinal = cuCbb && g.stage === "Ivy Madness | Championship";
+  const cuIvy = cuCbb && (g.stage || "").indexOf("Ivy Madness") === 0;
+  const bigWin = !!mx.shade || cuNcaa || cuIvy;
   // a CORNELL hockey NCAA Tournament LOSS greys the seed and the ranking (his
   // call 2026-09-18)
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
@@ -1056,6 +1070,7 @@ function michCard(g, p) {
   const bowlGame = g.sport === "CFB" && !!st &&
     st.indexOf("Big Ten Championship") !== 0;
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
+    : cuNcaa ? "#4d9ae0" : cuIvyFinal ? "#0f6a37"
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
@@ -1388,6 +1403,13 @@ function bigViewAllows(g) {
 // this a game that has not kicked off reads as a Michigan loss, because
 // "did not win" and "lost" are the same test everywhere else.
 function upcoming(g) { return !!g.upcoming; }
+// today through the coming Sunday (today itself on a Sunday), as YYYY-MM-DD
+function weekEnd() {
+  const d = new Date();
+  d.setDate(d.getDate() + (7 - d.getDay()) % 7);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
 // A score that does not exist yet must render as NOTHING. Concatenating null
 // into markup prints the word "null", which is how the first upcoming cards
 // went out reading "null null" (2026-09-12).
@@ -1680,6 +1702,13 @@ function visible() {
   // the NIT). A preseason MTE has no stage and stays.
   if (FILT.net) {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
+  }
+  // TV WINDOWS AND KEY GAMES look only as far as the coming Sunday (his call
+  // 2026-09-18) -- the Michigan views load the whole season ahead, but these
+  // two lists stop at the end of this week
+  if (VIEW === "tv" || VIEW === "big") {
+    const end = weekEnd();
+    list = list.filter(g => !upcoming(g) || g.date <= end);
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
   if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
