@@ -1023,10 +1023,7 @@ function michCard(g, p) {
   const cuNcaa = cuCbb && (g.stage || "").indexOf("NCAA Tournament") === 0;
   const cuIvyFinal = cuCbb && g.stage === "Ivy Madness | Championship";
   const cuIvy = cuCbb && (g.stage || "").indexOf("Ivy Madness") === 0;
-  // an NBA CUP WIN past the group stage is filled (his call 2026-09-18)
-  const cupWin = g.sport === "NBA" && !lost && !upcoming(g) &&
-    (g.stage || "").indexOf("NBA Cup") === 0 && g.stage !== "NBA Cup | Group Play";
-  const bigWin = !!mx.shade || cuNcaa || cuIvy || cupWin;
+  const bigWin = !!mx.shade || cuNcaa || cuIvy;
   // a CORNELL hockey NCAA Tournament LOSS greys the seed and the ranking (his
   // call 2026-09-18)
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-215850";
+const BUILD = "20260918-220142";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1023,10 +1023,7 @@ function michCard(g, p) {
   const cuNcaa = cuCbb && (g.stage || "").indexOf("NCAA Tournament") === 0;
   const cuIvyFinal = cuCbb && g.stage === "Ivy Madness | Championship";
   const cuIvy = cuCbb && (g.stage || "").indexOf("Ivy Madness") === 0;
-  // an NBA CUP WIN past the group stage is filled (his call 2026-09-18)
-  const cupWin = g.sport === "NBA" && !lost && !upcoming(g) &&
-    (g.stage || "").indexOf("NBA Cup") === 0 && g.stage !== "NBA Cup | Group Play";
-  const bigWin = !!mx.shade || cuNcaa || cuIvy || cupWin;
+  const bigWin = !!mx.shade || cuNcaa || cuIvy;
   // a CORNELL hockey NCAA Tournament LOSS greys the seed and the ranking (his
   // call 2026-09-18)
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
