@@ -1134,7 +1134,8 @@ function michCard(g, p) {
                       "Prime Video", "Peacock", "Netflix", "HBO Max"];
     const nets = g.nets || [];
     const net = NATIONAL.find(n => nets.indexOf(n) > -1) ||
-      nets.find(n => !/ERADM|League Pass|Sunday Ticket|ESPN\+/.test(n)) || "";
+      // ...and never the regional sports networks (his call 2026-09-18)
+      nets.find(n => !/ERADM|League Pass|Sunday Ticket|ESPN\+|FanDuel SN (DET|IN|OH)|^CHSN$/.test(n)) || "";
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
     let head;
     // a baseball season is named for its own year; the others end a year on
@@ -1747,7 +1748,12 @@ function visible() {
   if (proView()) {
     if (FILT.prime) list = list.filter(g => !g.stage && (g.dow !== "Sun" ||
       (g.time !== "TBD" && g.time >= "19:00")));
-    if (FILT.key) list = list.filter(g => (g.mx || {}).key);
+    // KEY GAMES are his: a WIN he has shaded and/or bordered in the Sheet (his
+    // call 2026-09-18), no longer the scoring-play rule
+    if (FILT.key) list = list.filter(g => {
+      const mx = g.mx || {}, me = g.teams.find(t => t.id === LIONS);
+      return me && me.win && !upcoming(g) && (!!mx.shade || !!String(mx.border || "").trim());
+    });
   }
   // Cornell basketball's NCAA Tournament button (his call 2026-09-17), and
   // Michigan's POSTSEASON button (2026-09-18): the Big Ten Championship Game
