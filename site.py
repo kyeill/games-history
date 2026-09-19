@@ -274,7 +274,7 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* THE TIGERS' REGULAR SEASON: the opponent's colour runs the whole line,
    through the score, which sits on it bare (his call 2026-09-18) */
 .row.mich.mreg .tl.won{background:var(--winwash);border-radius:5px;margin-left:-7px;
-  padding-right:8px}
+  padding-left:7px;padding-right:8px}
 .row.mich.mreg .tl.won .mstripe{background:transparent}
 .row.mich.mreg .tl .sc.mbox{background:transparent!important;color:var(--ink)!important;
   min-width:0;padding:0;font-weight:700}

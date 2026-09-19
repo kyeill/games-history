@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-222532";
+const BUILD = "20260918-222934";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -761,7 +761,11 @@ function michCard(g, p) {
   };
   // a card he has given no colours reads WHITE on the grey placeholder (his
   // call 2026-09-14) rather than picking maize or navy by contrast
+  // a PRO TEAM'S OWN COLOURS are used exactly as he gave them, with no
+  // contrast nudge (the Pistons' orange read grey-brown, his catch 2026-09-18)
+  const exact = !mx.box && !!PRO_BOX[fid];
   const ink = (bg, fg) => bg === UNSET ? WHITE
+    : fg && exact ? fg
     : fg ? readable(fg, bg)
     : ratio("#00274c", bg) >= ratio("#ffcb05", bg) ? "#00274c" : "#ffcb05";
   const paint = (bg, fg) => (bg ? ' style="background:' + bg + ";color:" +
@@ -1112,10 +1116,8 @@ function michCard(g, p) {
     const nets = g.nets || [];
     const net = TV_NAT.find(n => nets.indexOf(n) > -1) || "";
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
-    const chips = (mx.nohit ? chip("champ", "No-Hitter") : "") +
-      (mx.walkoff ? chip("grey", "Walk-Off") : "") +
-      (mx.extra ? chip("grey", mx.extra + " Innings") : "") +
-      (mx.late ? chip("grey", "Comeback") : "");
+    // NO-HITTER is the only chip left (his call 2026-09-18)
+    const chips = mx.nohit ? chip("champ", "No-Hitter") : "";
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
@@ -1953,8 +1955,8 @@ function filterChips() {
       return h + group("", (sport === "NBA" ? btn("post", FILT.post, "Playoffs") +
         btn("cup", FILT.cup, "NBA Cup") : "") +
         (sport === "MLB" ? btn("post", FILT.post, "Playoffs") +
-          btn("walk", FILT.walk, "Walk-Offs") + btn("late", FILT.late, "Comebacks") +
-          btn("extra", FILT.extra, "Extra Innings") +
+          // Comebacks and Extra Innings buttons removed (his call 2026-09-18)
+          btn("walk", FILT.walk, "Walk-Offs") +
           btn("nohit", FILT.nohit, "No-Hitters") : "") + sortButton());
     }
     if (proView()) {
