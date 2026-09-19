@@ -1403,6 +1403,13 @@ function bigViewAllows(g) {
 // this a game that has not kicked off reads as a Michigan loss, because
 // "did not win" and "lost" are the same test everywhere else.
 function upcoming(g) { return !!g.upcoming; }
+// this week's Monday, as YYYY-MM-DD
+function weekStart() {
+  const d = new Date();
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
 // today through the coming Sunday (today itself on a Sunday), as YYYY-MM-DD
 function weekEnd() {
   const d = new Date();
@@ -1665,7 +1672,10 @@ function visible() {
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
-         || g.showcase || g.kickoff || g.standin)
+         || g.showcase || g.kickoff || g.standin
+         // a KEY GAME is on TV Windows too (his call 2026-09-18) -- never
+         // Marquee, or it would have been here already
+         || (g.type && bigViewAllows(g)))
       : (g.type && bigViewAllows(g)));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
@@ -1674,14 +1684,22 @@ function visible() {
   if (VIEW === "tv" && SPORT_OF[TAB] === "CBB") {
     list = list.filter(g => {
       const m = +g.date.slice(5, 7);
-      return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase;
+      return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase ||
+        (g.type && bigViewAllows(g));
     });
   }
   // CURRENT (his call 2026-09-16): every TV Windows game in the LATEST week
   // there is, the coming one included. Football's week is its number;
   // basketball has none, so its week is Monday to Sunday around the latest
   // game -- the same span the upcoming window runs to.
-  if (VIEW === "tv" && FILT.current && list.length) {
+  // ...CURRENT IS NOW THIS WEEK, Monday to Sunday by the calendar (his call
+  // 2026-09-18), not the latest week in the data. Only a week with nothing in
+  // it -- basketball in September -- falls back to the latest one there is.
+  const thisWeek = VIEW === "tv" && FILT.current
+    ? list.filter(g => g.date >= weekStart() && g.date <= weekEnd()) : [];
+  if (thisWeek.length) {
+    list = thisWeek;
+  } else if (VIEW === "tv" && FILT.current && list.length) {
     if (SPORT_OF[TAB] === "CFB") {
       const key = g => g.week == null ? -1 : g.season * 100 + g.week;
       const top = Math.max.apply(null, list.map(key));
@@ -2361,6 +2379,17 @@ function switchView(view) {
     FILT.net = null;
     if (leaving === "michigan" || leaving === "cornell") SORT = defaultSort();
   }
+  // TV WINDOWS OPENS ON CURRENT, oldest first (his call 2026-09-18); turning
+  // Current off gives back the old opening -- the newest season, Marquee on
+  if (VIEW === "tv") enterCurrent();
+}
+function enterCurrent() {
+  CURRENT_PREV = { filt: Object.assign({}, FILT, { current: false }), sort: SORT };
+  FILT = { season: null, week: null, month: null, type: null,
+           windows: null, team: null, marquee: false, rival: null,
+           post: false, winner: null, net: null, recent: false,
+           current: true };
+  SORT = "asc";
 }
 function go(tab, view) {
   if (tab !== TAB) {
@@ -2424,12 +2453,7 @@ async function init() {
     if (b.dataset.act === "current") {
       if (!FILT.current) {
         // everything else off, oldest first -- the week reads in order
-        CURRENT_PREV = { filt: Object.assign({}, FILT), sort: SORT };
-        FILT = { season: null, week: null, month: null, type: null,
-                 windows: null, team: null, marquee: false, rival: null,
-                 post: false, winner: null, net: null, recent: false,
-                 current: true };
-        SORT = "asc";
+        enterCurrent();
       } else {
         if (CURRENT_PREV) { FILT = CURRENT_PREV.filt; SORT = CURRENT_PREV.sort; }
         FILT.current = false;
