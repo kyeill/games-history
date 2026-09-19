@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260918-205941";
+const BUILD = "20260918-210103";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2384,7 +2384,9 @@ function switchView(view) {
   if (VIEW === "tv") enterCurrent();
 }
 function enterCurrent() {
-  CURRENT_PREV = { filt: Object.assign({}, FILT, { current: false }), sort: SORT };
+  // (the state it gives back is Marquee's: this season, oldest first)
+  CURRENT_PREV = { filt: Object.assign({}, FILT, { current: false }),
+                   sort: FILT.marquee ? "asc" : SORT };
   FILT = { season: null, week: null, month: null, type: null,
            windows: null, team: null, marquee: false, rival: null,
            post: false, winner: null, net: null, recent: false,
@@ -2465,6 +2467,15 @@ async function init() {
     if (b.dataset.act !== "sort") { FILT.current = false; CURRENT_PREV = null; }
     if (b.dataset.act === "marquee") {
       FILT.marquee = !FILT.marquee;
+      // MARQUEE opens on the current season, oldest first (his call 2026-09-18)
+      // -- the latest season with a game PLAYED, so basketball in September
+      // opens on last season, not on next season's schedule
+      if (FILT.marquee) {
+        const played = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only &&
+          !upcoming(g)).map(g => g.season);
+        FILT.season = played.length ? Math.max.apply(null, played) : latestSeason();
+        SORT = "asc";
+      }
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
     } else if (b.dataset.act === "recent") {
