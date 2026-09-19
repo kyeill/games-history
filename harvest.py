@@ -1487,7 +1487,7 @@ PRO_TEAMS = [
     # (focus id, ESPN league path, ESPN team id, first season, NBA Cup too)
     ("nhl-5", "hockey/nhl", "5", 1996, False),          # Red Wings, 1996-97 on
     ("nba-8", "basketball/nba", "8", 2002, True),        # Pistons, 2002-03 on
-    ("nba-5", "basketball/nba", "5", 2016, True),        # Cavaliers, 2016-17 on
+    ("nba-5", "basketball/nba", "5", 2017, True),        # Cavaliers, 2017-18 on (2016-17 dropped, his call 2026-09-18)
 ]
 # ESPN's NHL standings carry NO seeds before 1999-2000; the Western and
 # Eastern Conference seeds as those playoffs were drawn (by hand, 2026-09-18)
