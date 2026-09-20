@@ -761,6 +761,11 @@ LEVEL_BANDS = [(20, 25, 5), (11, 19, 4), (6, 10, 2)]
 def _level(a, b):
     """Are these two ranks level enough that neither can upset the other?"""
     lo, hi = min(a, b), max(a, b)
+    # ONE SPOT APART is level wherever it happens (his call 2026-09-20) --
+    # #17 over #16 is no upset -- except inside the top five, where every
+    # place is worth something
+    if hi - lo == 1 and hi > 5:
+        return True
     return any(lo >= s and hi <= e and hi - lo <= g for s, e, g in LEVEL_BANDS)
 
 

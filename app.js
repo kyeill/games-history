@@ -1590,10 +1590,22 @@ function highlightOf(g, kind) {
   return false;
 }
 // An upset: a ranked team lost to an unranked or a worse-ranked team.
+/* LEVEL RANKS -- rules.py's LEVEL_BANDS, and its one-spot rule (his call
+   2026-09-20). Two teams this close cannot upset one another, so the game is a
+   Ranked Game and its numbers stay BLUE on TV Windows and Key Games. */
+const LEVEL_BANDS = [[20, 25, 5], [11, 19, 4], [6, 10, 2]];
+function levelRanks(a, b) {
+  const lo = Math.min(a, b), hi = Math.max(a, b);
+  if (hi - lo === 1 && hi > 5) return true;
+  return LEVEL_BANDS.some(x => lo >= x[0] && hi <= x[1] && hi - lo <= x[2]);
+}
 function isUpset(g) {
   if (upcoming(g)) return false;
   const w = g.teams.find(t => t.win), l = g.teams.find(t => !t.win);
-  return !!(w && l && l.rank && (!w.rank || w.rank > l.rank));
+  if (!(w && l && l.rank && (!w.rank || w.rank > l.rank))) return false;
+  // football's Ranked Game rule: a level pair is no upset (his call
+  // 2026-09-20) -- Ole Miss over LSU reads blue on both views
+  return !(g.sport === "CFB" && w.rank && levelRanks(w.rank, l.rank));
 }
 
 /* A result he does not want to relive: a rival won, or Michigan lost. Both
@@ -2404,7 +2416,12 @@ function enterCurrent() {
   // (the state it gives back is Marquee's: this season, oldest first)
   CURRENT_PREV = { filt: Object.assign({}, FILT, { current: false }),
                    sort: FILT.marquee ? (SPORT_OF[TAB] === "CBB" ? "desc" : "asc") : SORT };
-  FILT = { season: null, week: null, month: null, type: null,
+  // ...and CURRENT CARRIES THE SEASON (his call 2026-09-20): the Year filter
+  // reads this season, the latest one with a game played
+  const played = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only &&
+    !upcoming(g)).map(g => g.season);
+  FILT = { season: played.length ? Math.max.apply(null, played) : latestSeason(),
+           week: null, month: null, type: null,
            windows: null, team: null, marquee: false, rival: null,
            post: false, winner: null, net: null, recent: false,
            current: true };
