@@ -128,7 +128,13 @@ FINISH_SHORT = {"First Four": "First Four", "Round 1": "Rd 1", "Round 2": "Rd 2"
 # ...and BARCLAYS CENTER, which he wants read as Brooklyn wherever it turns up
 # (2026-09-14) -- ESPN already calls the city Brooklyn, so dropping the venue
 # substitution is the whole fix
-CITY_NOT_VENUE = {"Credit Union 1 Arena", "Barclays Center"}
+# ...and Northwestern's lakefront ground, whose full name he never wants on a
+# card at all (his call 2026-09-20): it names no city and no chip of its own.
+# NOT_OFFSITE keeps it off the location chip as well -- Northwestern played
+# few enough games there for the rare-venue rule to mistake it for a Wrigley.
+NOT_OFFSITE = {"Northwestern Medicine Field at Martin Stadium"}
+CITY_NOT_VENUE = {"Credit Union 1 Arena", "Barclays Center",
+                  "Northwestern Medicine Field at Martin Stadium"}
 
 # The 2021 NCAA Tournament was played entirely in Indiana, so those cards carry
 # venues rather than cities -- in the short form he uses (his call 2026-09-14).

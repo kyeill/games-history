@@ -2936,7 +2936,8 @@ def offsite_games(evs):
         usual, times = seen.most_common(1)[0]
         # The last two guards protect an IN-PROGRESS season, where a team may
         # have played too few home games for "usual" to mean anything yet.
-        if name != usual and seen[name] <= 2 and times > seen[name]                 and sum(seen.values()) >= 4:
+        if (name not in rules.NOT_OFFSITE and name != usual and seen[name] <= 2
+                and times > seen[name] and sum(seen.values()) >= 4):
             out[gid] = name
     return out
 
