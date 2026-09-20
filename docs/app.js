@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-150739";
+const BUILD = "20260920-151714";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1599,13 +1599,20 @@ function levelRanks(a, b) {
   if (hi - lo === 1 && hi > 5) return true;
   return LEVEL_BANDS.some(x => lo >= x[0] && hi <= x[1] && hi - lo <= x[2]);
 }
+// a REGULAR-SEASON game: the postseason reads its rankings literally
+function regularSeason(g) {
+  return !(g.post || g.bowl || g.stage || g.title || g.champ);
+}
 function isUpset(g) {
   if (upcoming(g)) return false;
   const w = g.teams.find(t => t.win), l = g.teams.find(t => !t.win);
   if (!(w && l && l.rank && (!w.rank || w.rank > l.rank))) return false;
-  // football's Ranked Game rule: a level pair is no upset (his call
-  // 2026-09-20) -- Ole Miss over LSU reads blue on both views
-  return !(g.sport === "CFB" && w.rank && levelRanks(w.rank, l.rank));
+  // the Ranked Game rule, both sports (his call 2026-09-20): a level pair is
+  // no upset -- Ole Miss over LSU reads blue. REGULAR SEASON ONLY, and only on
+  // TV Windows and Key Games; the Michigan and Rivals views read the rankings
+  // as they stand
+  const soft = (VIEW === "tv" || VIEW === "big") && regularSeason(g);
+  return !(soft && w.rank && levelRanks(w.rank, l.rank));
 }
 
 /* A result he does not want to relive: a rival won, or Michigan lost. Both

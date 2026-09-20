@@ -770,7 +770,7 @@ def _level(a, b):
 
 
 def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
-              b1g_tourney_run=False):
+              b1g_tourney_run=False, postseason=False):
     """The game's category, or None. Kyle's definitions, 2026-09-09 -- and
     they DIFFER by sport, which is why the app's dropdown follows the sport
     toggle. `rank_*` are None when unranked. A game gets at most one category,
@@ -816,7 +816,11 @@ def game_type(sport, rank_win, rank_lose, has_big_ten, p5_title=False,
         top10 = rank_win <= 10 and rank_lose <= 10
         if not (top10 or has_big_ten):
             return title_fallback(rank_win, rank_lose) if p5_title else None
-        if rank_win > rank_lose and not _level(rank_win, rank_lose):
+        # LEVEL IS A REGULAR-SEASON IDEA (his call 2026-09-20): in the
+        # postseason the rankings are read literally, so a lower-ranked winner
+        # is an upset however close the two were
+        if rank_win > rank_lose and not (not postseason and
+                                         _level(rank_win, rank_lose)):
             return "Ranked Upsets"
         return "Ranked Games"
 

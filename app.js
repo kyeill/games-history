@@ -1599,13 +1599,20 @@ function levelRanks(a, b) {
   if (hi - lo === 1 && hi > 5) return true;
   return LEVEL_BANDS.some(x => lo >= x[0] && hi <= x[1] && hi - lo <= x[2]);
 }
+// a REGULAR-SEASON game: the postseason reads its rankings literally
+function regularSeason(g) {
+  return !(g.post || g.bowl || g.stage || g.title || g.champ);
+}
 function isUpset(g) {
   if (upcoming(g)) return false;
   const w = g.teams.find(t => t.win), l = g.teams.find(t => !t.win);
   if (!(w && l && l.rank && (!w.rank || w.rank > l.rank))) return false;
-  // football's Ranked Game rule: a level pair is no upset (his call
-  // 2026-09-20) -- Ole Miss over LSU reads blue on both views
-  return !(g.sport === "CFB" && w.rank && levelRanks(w.rank, l.rank));
+  // the Ranked Game rule, both sports (his call 2026-09-20): a level pair is
+  // no upset -- Ole Miss over LSU reads blue. REGULAR SEASON ONLY, and only on
+  // TV Windows and Key Games; the Michigan and Rivals views read the rankings
+  // as they stand
+  const soft = (VIEW === "tv" || VIEW === "big") && regularSeason(g);
+  return !(soft && w.rank && levelRanks(w.rank, l.rank));
 }
 
 /* A result he does not want to relive: a rival won, or Michigan lost. Both

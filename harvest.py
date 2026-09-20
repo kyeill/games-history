@@ -3190,7 +3190,8 @@ def harvest():
                     gtype = rules.game_type(code, rank_of(win[0]),
                                             rank_of(lose[0]), bt in confs,
                                             p5_title=title,
-                                            b1g_tourney_run=b1g_run)
+                                            b1g_tourney_run=b1g_run,
+                                            postseason=postseason)
                 # a named event (Battle 4 Atlantis, SEC Quarterfinals) for the
                 # blue chip, when it is not already a Power Five title
                 # An event name is kept only when more than two teams played
