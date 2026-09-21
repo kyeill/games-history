@@ -1420,10 +1420,10 @@ function keyShows(g) {
   // such a game is here only if a category, a Michigan win or a rival's loss
   // puts it here
   if (g.type) return true;
-  // ...and those two reach back only to 2021, the CFP left out (his call
-  // 2026-09-20)
-  if (upcoming(g) || g.season < 2021 || (g.stage || "").indexOf("CFP") === 0)
-    return false;
+  // ...and those two reach back only to 2021, with no CFP game and no bowl
+  // (his calls 2026-09-20); a conference title game still arrives on its own
+  // category above
+  if (upcoming(g) || g.season < 2021 || g.bowl || g.stage) return false;
   const m = michTeam(g);
   if (m && m.win) return true;
   return g.teams.some(t => isRival(t) && !t.win);
