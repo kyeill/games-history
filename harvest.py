@@ -2228,7 +2228,7 @@ def playoff_finish(code, y, evs):
 SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
 # (focus team, sport) -> tab
 SHEET_TABS = {("130", "CFB"): "Michigan CFB", ("130", "CBB"): "Michigan CBB",
-              ("130", "CHK"): "Michigan Hockey",
+              ("130", "CHK"): "Michigan HKY",       # his tab's name (2026-09-21)
               ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB",
               ("nfl-8", "NFL"): "Lions", ("mlb-6", "MLB"): "Tigers",
               ("nhl-5", "NHL"): "Red Wings", ("nba-8", "NBA"): "Pistons",
