@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-210542";
+const BUILD = "20260920-212358";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1416,7 +1416,10 @@ function keyShows(g) {
   // FOOTBALL ONLY (his call 2026-09-20): basketball's Key Games stays the
   // categories and nothing else
   if (g.sport !== "CFB") return !!g.type;
-  if (g.type || g.mq) return true;
+  // a MARQUEE WINDOW is not a qualification of its own (his call 2026-09-20):
+  // such a game is here only if a category, a Michigan win or a rival's loss
+  // puts it here
+  if (g.type) return true;
   const m = michTeam(g);
   if (m && m.win && !upcoming(g)) return true;
   return !upcoming(g) && g.teams.some(t => isRival(t) && !t.win);

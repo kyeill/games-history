@@ -1416,7 +1416,10 @@ function keyShows(g) {
   // FOOTBALL ONLY (his call 2026-09-20): basketball's Key Games stays the
   // categories and nothing else
   if (g.sport !== "CFB") return !!g.type;
-  if (g.type || g.mq) return true;
+  // a MARQUEE WINDOW is not a qualification of its own (his call 2026-09-20):
+  // such a game is here only if a category, a Michigan win or a rival's loss
+  // puts it here
+  if (g.type) return true;
   const m = michTeam(g);
   if (m && m.win && !upcoming(g)) return true;
   return !upcoming(g) && g.teams.some(t => isRival(t) && !t.win);
