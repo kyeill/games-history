@@ -1845,7 +1845,10 @@ function visible() {
   if (FILT.marquee) list = list.filter(g => g.mq);
   // UPSETS: the two upset categories on football's Key Games (his call
   // 2026-09-20)
-  if (FILT.upset) list = list.filter(g => /Upsets$/.test(g.type || ""));
+  // ...and the games brought onto the tab without a category of their own --
+  // Michigan over Oklahoma in Week 2 -- when the ranks make them upsets too
+  // (his call 2026-09-20)
+  if (FILT.upset) list = list.filter(g => /Upsets$/.test(g.type || "") || isUpset(g));
   // HIS RECENT STRETCH (2026-09-14): football from 2021, basketball from the
   // 2020-21 season -- which is season 2020 in the file, a basketball season
   // being named for the year it starts in.
