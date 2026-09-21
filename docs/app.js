@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-205516";
+const BUILD = "20260920-210153";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -373,7 +373,7 @@ function rowHtml(g, browse) {
   // was too loud, so the winner's line keeps its own wash either way.
   let flag = celebrated(g);
   let ring = flag ? celebrateColor(g) : null;
-  if (VIEW === "big" && flag) {
+  if (VIEW === "big" && flag && g.sport === "CFB") {
     ring = keyRing(g);
     flag = !!ring;
   }
@@ -1413,6 +1413,9 @@ function rankedBefore(g) {
    WIN all belong, on top of the games with a type. */
 function keyShows(g) {
   if (!bigViewAllows(g)) return false;
+  // FOOTBALL ONLY (his call 2026-09-20): basketball's Key Games stays the
+  // categories and nothing else
+  if (g.sport !== "CFB") return !!g.type;
   if (g.type || g.mq) return true;
   const m = michTeam(g);
   if (m && m.win && !upcoming(g)) return true;
@@ -1733,7 +1736,8 @@ function visible() {
     // KEY GAMES reaches the games kept for the Michigan and Rivals views too
     // (his call 2026-09-20): a Michigan win or a rival's loss belongs here
     // whether or not it had a window or a category of its own
-    : VIEW === "big" ? keyShows(g)
+    : VIEW === "big" ? (g.sport === "CFB" ? keyShows(g)
+                        : !g.rivals_only && g.type && bigViewAllows(g))
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
@@ -1741,7 +1745,8 @@ function visible() {
          // a KEY GAME is on TV Windows too (his call 2026-09-18) -- never
          // Marquee, or it would have been here already -- but only one that
          // qualified BEFORE the week (2026-09-20)
-         || (g.type && bigViewAllows(g) && rankedBefore(g)))
+         || (g.type && bigViewAllows(g) &&
+             (g.sport !== "CFB" || rankedBefore(g))))
       : keyShows(g));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
@@ -1751,7 +1756,7 @@ function visible() {
     list = list.filter(g => {
       const m = +g.date.slice(5, 7);
       return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase ||
-        (g.type && bigViewAllows(g) && rankedBefore(g));
+        (g.type && bigViewAllows(g));
     });
   }
   // CURRENT (his call 2026-09-16): every TV Windows game in the LATEST week
@@ -1838,6 +1843,9 @@ function visible() {
   // windows the button ticks, so it stacks with the window dropdown instead
   // of pretending to be it. Nothing rides along any more.
   if (FILT.marquee) list = list.filter(g => g.mq);
+  // UPSETS: the two upset categories on football's Key Games (his call
+  // 2026-09-20)
+  if (FILT.upset) list = list.filter(g => /Upsets$/.test(g.type || ""));
   // HIS RECENT STRETCH (2026-09-14): football from 2021, basketball from the
   // 2020-21 season -- which is season 2020 in the file, a basketball season
   // being named for the year it starts in.
@@ -1911,7 +1919,8 @@ function clearFilters() {
     windows: null,
     // TV Windows opens on Marquee -- the games he plans a weekend around
     marquee: VIEW === "tv",
-    week: null, month: null, team: null, rival: null, post: false, winner: null
+    week: null, month: null, team: null, rival: null, post: false, winner: null,
+    upset: false
   };
   // Combined's opening state is every season's Special games
   if (typeof TAB !== "undefined" && !SPORT_OF[TAB] && teamView()) {
@@ -2406,8 +2415,13 @@ function quickButtons() {
       !!FILT.current + '">Current</button>' : "") +
     // Marquee games are simply IN Key Games now, so the button goes (his
     // call 2026-09-20)
-    (VIEW === "big" ? "" : '<button class="f" data-act="marquee" aria-pressed="' +
-      marqueeOn() + '">Marquee Windows</button>') +
+    (VIEW === "big" && SPORT_OF[TAB] === "CFB" ? ""
+      : '<button class="f" data-act="marquee" aria-pressed="' +
+        marqueeOn() + '">Marquee Windows</button>') +
+    // UPSETS (his call 2026-09-20): the two upset categories, nothing else
+    (VIEW === "big" && SPORT_OF[TAB] === "CFB"
+      ? '<button class="f" data-act="upset" aria-pressed="' + !!FILT.upset +
+        '">Upsets</button>' : "") +
     sortButton();
 }
 
@@ -2491,8 +2505,8 @@ function switchView(view) {
   if (VIEW === "tv") enterCurrent();
   // KEY GAMES OPENS ON THE LATEST COMPLETED WEEK, oldest first (his call
   // 2026-09-20) -- football by week number, basketball by nothing, it has none
-  if (VIEW === "big") {
-    const done = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only &&
+  if (VIEW === "big" && SPORT_OF[TAB] === "CFB") {
+    const done = GAMES.filter(g => g.sport === SPORT_OF[TAB] &&
       !upcoming(g) && keyShows(g));
     if (done.length) {
       FILT.season = Math.max.apply(null, done.map(g => g.season));
@@ -2603,6 +2617,8 @@ async function init() {
         // ...basketball Newest First (his call 2026-09-18)
         SORT = SPORT_OF[TAB] === "CBB" ? "desc" : "asc";
       }
+    } else if (b.dataset.act === "upset") {
+      FILT.upset = !FILT.upset;
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
     } else if (b.dataset.act === "recent") {
