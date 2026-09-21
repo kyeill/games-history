@@ -95,6 +95,16 @@ OVERRIDES = {
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),
+    # PRO TEAMS in their other colour (his calls 2026-09-21) -- each is ESPN's
+    # own alternateColor for the team
+    "mlb-5": ("e31937", "Guardians: red, not the navy"),
+    "mlb-2": ("bd3039", "Red Sox: red, not the navy"),
+    "mlb-18": ("eb6e1f", "Astros: orange, not the navy"),
+    "nfl-14": ("ffd100", "Rams: yellow, not the blue"),
+    "nfl-26": ("69be28", "Seahawks: green, not the navy"),
+    "nfl-7": ("fc4c02", "Broncos: orange, not the navy"),
+    "nba-11": ("ffd520", "Pacers: yellow, not the navy"),
+    "nba-18": ("f58426", "Knicks: orange, not the blue"),
 }
 
 NEAR_BLACK = 36      # luminance below this reads as black on a light wash
