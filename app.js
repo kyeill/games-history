@@ -993,6 +993,15 @@ function michCard(g, p) {
       (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
+  // A NOTE WITH ITS OWN PIPES stripes by piece, not word by word (his call
+  // 2026-09-21): "Stripe Out | B1G Expansion" reads Stripe Out in blue, B1G
+  // Expansion in maize, and a grey pipe between
+  if (mode === "stripe") {
+    const pieces = [].concat.apply([], parts.map(p => p.t.indexOf(" | ") > -1
+      ? p.t.split(" | ").map(t => Object.assign({}, p, { t: t, short: "" })) : [p]));
+    parts.length = 0;
+    pieces.forEach(p => parts.push(p));
+  }
   if (SOLID[mode]) {
     chipHtml = parts.map(p => wrap(p, SOLID[mode])).join(SEP);
   } else if (mode === "stripe" && parts.length > 1) {
