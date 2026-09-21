@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-212358";
+const BUILD = "20260920-213205";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1420,18 +1420,26 @@ function keyShows(g) {
   // such a game is here only if a category, a Michigan win or a rival's loss
   // puts it here
   if (g.type) return true;
+  // ...and those two reach back only to 2021, the CFP left out (his call
+  // 2026-09-20)
+  if (upcoming(g) || g.season < 2021 || (g.stage || "").indexOf("CFP") === 0)
+    return false;
   const m = michTeam(g);
-  if (m && m.win && !upcoming(g)) return true;
-  return !upcoming(g) && g.teams.some(t => isRival(t) && !t.win);
+  if (m && m.win) return true;
+  return g.teams.some(t => isRival(t) && !t.win);
 }
-/* ...and those additions are quieter: a Michigan win keeps its maize border
-   only when the game earned its place some other way (a category or a Marquee
-   window), and a rival's loss keeps its border only when the game is one the
-   Rivals tab would show. */
+/* ...and a border is rarer here than elsewhere (his call 2026-09-20): MICHIGAN
+   earns one by beating a ranked team or winning its conference title game, a
+   RIVAL by losing while ranked or losing its conference title game. Nothing
+   else on this tab is framed. */
 function keyRing(g) {
   const m = michTeam(g);
-  if (m) return (g.type || g.mq) ? celebrateColor(g) : null;
-  return rivalsAllows(g) ? celebrateColor(g) : null;
+  if (m) {
+    const beat = g.teams.find(t => t.id !== MICHIGAN);
+    return (g.title || (beat && beat.rank)) ? celebrateColor(g) : null;
+  }
+  const rival = g.teams.find(t => isRival(t) && !t.win);
+  return (g.title || (rival && rival.rank)) ? celebrateColor(g) : null;
 }
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
