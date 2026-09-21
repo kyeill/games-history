@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260921-094658";
+const BUILD = "20260921-095241";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -222,7 +222,8 @@ function teamLine(t, sport, season, seed, g0) {
   // poll ranking, so it is as narrow as "#25".
   const inline = seed != null
     ? '<span class="rkin">' + seed + "</span> " : "";
-  return '<div class="tl' + (t.win ? " won" : "") + '">' +
+  return '<div class="tl' + (t.win || (g0 && t.id === MICHIGAN && michAhead(g0))
+    ? " won" : "") + '">' +
     '<img class="crest" loading="lazy" src="' + (washedWinner(t, g0) ? crestOnColour(t) : crest(t)) +
       '" alt="">' +
     '<span class="rk">' +
@@ -257,9 +258,17 @@ function stageColor(g) {
   return null;
 }
 
+// MICHIGAN'S UPCOMING GAME wears a winner's stripe on TV Windows and Key
+// Games until it is played (his call 2026-09-21); after that the ordinary
+// rules take over
+function michAhead(g) {
+  return upcoming(g) && (VIEW === "tv" || VIEW === "big") &&
+    g.teams.some(t => t.id === MICHIGAN);
+}
 function rowHtml(g, browse) {
   const home = g.teams[0], away = g.teams[1];
-  const win = home.win ? home : away;
+  const win = michAhead(g) ? g.teams.find(t => t.id === MICHIGAN)
+    : home.win ? home : away;
   const tags = [];
   // No game-type label on any card, either view (his call 2026-09-09). The
   // field still drives the Game Type filter.
