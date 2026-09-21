@@ -3260,9 +3260,15 @@ def harvest():
                     or any(ap.get(k["team"]["id"]) for k in cs)
                     or rules.is_marquee(code, nets, d, slots, big_ten=(bt in confs),
                                         tourney=tourney))
+                # KEY GAMES WANTS EVERY RIVAL LOSS (his call 2026-09-20):
+                # football from 2021 on, so a bad Michigan State season is
+                # complete there. These are kept with `rivals` still false, so
+                # the Rivals tab is unchanged -- eleven Michigan State losses
+                # and one Notre Dame one were simply never stored before.
+                key_loss = code == "CFB" and rival_loss and y >= 2021
                 # every Michigan game in a Michigan-view season is kept, whatever
                 # else is true of it
-                if not normal and not rivals and not mich:
+                if not normal and not rivals and not mich and not key_loss:
                     continue
                 # kept ONLY for Rivals or the Michigan view (a bowl, an early
                 # tournament round, a Michigan game no rule admits): strip
