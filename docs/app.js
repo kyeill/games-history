@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-202719";
+const BUILD = "20260920-203430";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1943,11 +1943,15 @@ function filterChips() {
     // Cornell has no rivals pinned; its own league leads the list instead
     const rivalIds = VIEW === "cornell" ? []
       : sport === "CFB" ? ["194", "127", "87"] : ["127", "194", "87"];
+    // COMBINED lists every opponent of the three sports in basketball's order
+    // (his call 2026-09-20)
+    const allSports = !sport;
     const seen = teamsIn(visibleWithout("team"),
       g => g.teams.map(t => t.id), FILT.team);
     seen.delete(focusId());
-    const mt = teamOrder(sport, seen, rivalIds,
-      VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : null);
+    const mt = teamOrder(allSports ? null : sport, seen, rivalIds,
+      VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : null,
+      allSports ? "CBB" : null);
     const optOf = id => [(TEAMS[id] && TEAMS[id].short) || id, id];
     const lined = ids => ids.length
       ? [["─".repeat(12), null]].concat(ids.map(optOf)) : [];
@@ -2035,8 +2039,9 @@ function filterChips() {
         btn("key", FILT.key, "Key Games") + btn("prime", FILT.prime, "Primetime") +
         sortButton());
     }
-    // COMBINED has no Team or Network filter: three sports share neither
-    if (sport) h += group("Team", select("team", "All Teams",
+    // COMBINED has a Team filter of its own (his call 2026-09-20); the
+    // Network one stays out, three sports sharing no windows
+    h += group("Team", select("team", "All Teams",
       [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
@@ -2204,14 +2209,17 @@ function filterChips() {
    move -- Stanford's is a 2023 Pac-12 game; that game is only the fallback.
    Declared inside the function, not as top-level consts, because init() runs
    before later top-level consts are initialised (see clearFilters). */
-function teamOrder(sport, allowed, pinsOverride, leadConf) {
+function teamOrder(sport, allowed, pinsOverride, leadConf, confSport) {
+  // COMBINED passes no sport and asks for basketball's order (his call
+  // 2026-09-20): every sport's opponents, filed by their basketball league
+  const key = confSport || sport;
   const PINS = { CFB: ["130", "194", "127", "87"],   // Michigan, Ohio State, Michigan State, Notre Dame
                  CBB: ["130", "127", "194"] };       // Michigan, Michigan State, Ohio State
   const POWER = { CFB: ["1", "8", "4"],              // ACC, SEC, Big 12
                   CBB: ["2", "23", "8", "4"] };      // ACC, SEC, Big 12, Big East
   const latest = {};
   GAMES.forEach(g => {
-    if (g.sport !== sport) return;
+    if (sport && g.sport !== sport) return;
     g.teams.forEach(t => {
       if (!latest[t.id] || g.date > latest[t.id].date)
         latest[t.id] = { date: g.date, conf: t.conf };
@@ -2220,12 +2228,12 @@ function teamOrder(sport, allowed, pinsOverride, leadConf) {
   const name = id => (TEAMS[id] && TEAMS[id].short) || id;
   const byName = (a, b) => name(a).localeCompare(name(b));
   const ok = id => !allowed || allowed.has(id);
-  const pins = (pinsOverride || PINS[sport] || []).filter(id => latest[id] && ok(id));
+  const pins = (pinsOverride || PINS[key] || []).filter(id => latest[id] && ok(id));
   const others = Object.keys(latest).filter(id => pins.indexOf(id) < 0 && ok(id));
   const confOf = id =>
-    (TEAMS[id] && TEAMS[id].conf && TEAMS[id].conf[sport]) || latest[id].conf;
-  const inBigTen = id => confOf(id) === (leadConf || BIG_TEN[sport]);
-  const inPower = id => (POWER[sport] || []).indexOf(confOf(id)) > -1;
+    (TEAMS[id] && TEAMS[id].conf && TEAMS[id].conf[key]) || latest[id].conf;
+  const inBigTen = id => confOf(id) === (leadConf || BIG_TEN[key]);
+  const inPower = id => (POWER[key] || []).indexOf(confOf(id)) > -1;
   return {
     bigTen: pins.concat(others.filter(inBigTen).sort(byName)),
     power: others.filter(id => !inBigTen(id) && inPower(id)).sort(byName),
