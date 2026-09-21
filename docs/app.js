@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-202534";
+const BUILD = "20260920-202719";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1974,7 +1974,10 @@ function filterChips() {
     // PRIMETIME (every Sunday-night game and every game not on a Sunday), KEY
     // GAMES (wins decided in the last two minutes or overtime) and PLAYOFFS
     if (seriesView()) {
-      const nameOf = id => (TEAMS[id] && TEAMS[id].short) || id;
+      // ...and the Cubs are named in this list, so his two Chicagos are not
+      // both "Chicago" (his call 2026-09-20)
+      const nameOf = id => id === "mlb-16" ? "Chi Cubs"
+        : (TEAMS[id] && TEAMS[id].short) || id;
       /* HIS ORDERS FOR THESE DROPDOWNS (2026-09-20), a bar between sections and
          alphabetical inside any section he did not name:
            Tigers     Cleveland, Chicago, Minnesota, Kansas City | rest of the

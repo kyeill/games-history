@@ -1974,7 +1974,10 @@ function filterChips() {
     // PRIMETIME (every Sunday-night game and every game not on a Sunday), KEY
     // GAMES (wins decided in the last two minutes or overtime) and PLAYOFFS
     if (seriesView()) {
-      const nameOf = id => (TEAMS[id] && TEAMS[id].short) || id;
+      // ...and the Cubs are named in this list, so his two Chicagos are not
+      // both "Chicago" (his call 2026-09-20)
+      const nameOf = id => id === "mlb-16" ? "Chi Cubs"
+        : (TEAMS[id] && TEAMS[id].short) || id;
       /* HIS ORDERS FOR THESE DROPDOWNS (2026-09-20), a bar between sections and
          alphabetical inside any section he did not name:
            Tigers     Cleveland, Chicago, Minnesota, Kansas City | rest of the
