@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260920-151714";
+const BUILD = "20260920-202534";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1975,8 +1975,31 @@ function filterChips() {
     // GAMES (wins decided in the last two minutes or overtime) and PLAYOFFS
     if (seriesView()) {
       const nameOf = id => (TEAMS[id] && TEAMS[id].short) || id;
+      /* HIS ORDERS FOR THESE DROPDOWNS (2026-09-20), a bar between sections and
+         alphabetical inside any section he did not name:
+           Tigers     Cleveland, Chicago, Minnesota, Kansas City | rest of the
+                      AL | the NL
+           Red Wings  Colorado, Chicago | the East | the West
+         Leagues and conferences are read as they stand today, so Houston is an
+         AL team throughout and Milwaukee a National League one. */
+      const AL = ["1", "2", "3", "4", "5", "6", "7", "9", "10", "11", "12", "13",
+                  "14", "18", "30"].map(n => "mlb-" + n);
+      const EAST = ["1", "2", "5", "7", "10", "11", "12", "13", "14", "15", "16",
+                    "20", "21", "23", "26", "29"].map(n => "nhl-" + n);
+      const HEAD = { "mlb-6": ["mlb-5", "mlb-4", "mlb-9", "mlb-7"],
+                     "nhl-5": ["nhl-17", "nhl-4"] }[focusId()] || [];
+      const SPLIT = { "mlb-6": AL, "nhl-5": EAST }[focusId()];
+      const alpha = ids => ids.map(id => [nameOf(id), id])
+        .sort((a, b) => a[0].localeCompare(b[0]));
+      const rest = Array.from(seen).filter(id => HEAD.indexOf(id) < 0);
+      const groups = (SPLIT
+        ? [HEAD.filter(id => seen.has(id)).map(id => [nameOf(id), id]),
+           alpha(rest.filter(id => SPLIT.indexOf(id) > -1)),
+           alpha(rest.filter(id => SPLIT.indexOf(id) < 0))]
+        : [alpha(Array.from(seen))]).filter(x => x.length);
       h += group("Team", select("team", "All Teams",
-        Array.from(seen).map(id => [nameOf(id), id]).sort((a, b) => a[0].localeCompare(b[0])),
+        [].concat.apply([], groups.map((x, i) =>
+          (i ? [["─".repeat(12), null]] : []).concat(x))),
         FILT.team));
       const btn = (act, on, label) => '<button class="f" data-act="' + act +
         '" aria-pressed="' + !!on + '">' + label + "</button>";
