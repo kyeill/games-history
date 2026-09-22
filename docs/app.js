@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-114615";
+const BUILD = "20260922-143644";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -632,7 +632,9 @@ function michCard(g, p) {
   if (bigStage) {
     // the round, then WHERE it was played; the date and the TV details have
     // gone down to the third row
-    when = stageHead() + (place ? " | " + esc(place) : "");
+    when = stageHead() + (place ? " | " + esc(place) : "") +
+      // GAME 2 (1-1) on a split tournament series (his call 2026-09-22)
+      (g._gm ? " | Game " + g._gm.n + (g._gm.rec ? " (" + esc(g._gm.rec) + ")" : "") : "");
   } else if (mteCard) {
     // the event, then the round within it -- his Round column, blank until he
     // fills it in, and then the header is simply the event
@@ -1335,10 +1337,29 @@ function hockeyUnits(list) {
     i += run.length - 1;
     units.push(run.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
   }
-  return units.map(games => {
+  const out = [];
+  units.forEach(games => {
     // a single tournament game is an ordinary tournament card, not a series
-    if (!groupable(games[0]) || (games[0].stage && games.length === 1))
-      return { g: games[0], html: rowHtml(games[0], false) };
+    if (!groupable(games[0]) || (games[0].stage && games.length === 1)) {
+      out.push({ g: games[0], html: rowHtml(games[0], false) });
+      return;
+    }
+    // A BEST-OF-THREE TOURNAMENT SERIES IS ONE CARD PER GAME (his call
+    // 2026-09-22), so each game wears the colours of its OWN Sheet row; the
+    // header names the game and the series score through it
+    if (games[0].stage) {
+      let w = 0, l = 0, t = 0;
+      games.forEach((x, i) => {
+        const me = x.teams.find(q => q.id === (VIEW === "cornell" ? CORNELL : MICHIGAN));
+        if (!upcoming(x)) {
+          if (x.tie) t++; else if (me && me.win) w++; else l++;
+        }
+        const rec = upcoming(x) ? "" : w + "-" + l + (t ? "-" + t : "");
+        out.push({ g: x, html: rowHtml(Object.assign({}, x,
+          { _gm: { n: i + 1, rec: rec } }), false) });
+      });
+      return;
+    }
     const mx = Object.assign({}, games[0].mx || {});
     games.slice(1).forEach(x => {
       const o = x.mx || {};
@@ -1349,8 +1370,9 @@ function hockeyUnits(list) {
       if (o.note && o.note !== mx.note) mx.note = mx.note ? mx.note + " | " + o.note : o.note;
     });
     const rep = Object.assign({}, games[0], { _series: games, mx: mx });
-    return { g: games[0], html: rowHtml(rep, false) };
+    out.push({ g: games[0], html: rowHtml(rep, false) });
   });
+  return out;
 }
 
 function michListHtml(list) {
