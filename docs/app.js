@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-113017";
+const BUILD = "20260922-113908";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -834,8 +834,9 @@ function michCard(g, p) {
   // A MICHIGAN HOCKEY REGULAR-SEASON GAME OUTSIDE A SERIES -- an MTE like the
   // 2021 Ice Breaker -- reads like the series around it (his call 2026-09-22):
   // no rank box, Michigan's rank in maize beside the footer instead
-  const hkySingle = g.sport === "CHK" && fid === MICHIGAN && !series &&
-    !g.post && !g.stage;
+  // ...and Cornell's the same way (his call 2026-09-22)
+  const hkySingle = g.sport === "CHK" && (fid === MICHIGAN || fid === CORNELL) &&
+    !series && !g.post && !g.stage;
   if (hkySingle) umRank = "";
   const ownRank = ((series && !tSeries) || hkySingle) && m.rank
     ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
