@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-100739";
+const BUILD = "20260922-100309";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1133,13 +1133,11 @@ function michCard(g, p) {
   // THE TIGERS' REGULAR-SEASON CARD (2026-09-18): the date and TV in the
   // header, and a chip for why it is here -- Walk-Off, 11 Innings, No-Hitter
   if (g.sport === "MLB" && !g.post) {
-    // NATIONAL TV ONLY on these (his call 2026-09-18); a game on the local
-    // channel alone shows its time and nothing else
-    const TV_NAT = ["FOX", "FS1", "ESPN", "ESPN2", "TBS", "MLB Network", "MLBN", "ABC", "NBC",
-                    "CBS", "Apple TV+", "Apple TV", "Peacock", "Prime Video", "Netflix",
-                    "YouTube", "Roku", "Facebook Watch"];
+    // NATIONAL TV ONLY on these (his call 2026-09-18), by his definition of
+    // national (2026-09-22) -- no MLB Network; a game on the local channel
+    // alone shows its time and nothing else
     const nets = g.nets || [];
-    const net = TV_NAT.find(n => nets.indexOf(n) > -1) || "";
+    const net = PRO_NATIONAL.find(n => nets.indexOf(n) > -1) || "";
     const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
     // NO-HITTER is the only chip left (his call 2026-09-18)
     const chips = mx.nohit ? chip("champ", "No-Hitter") : "";
@@ -1149,6 +1147,19 @@ function michCard(g, p) {
       esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       (chips ? '<div class="tags">' + chips + "</div>" : "") + "</div>";
+  }
+  // A PISTONS OR RED WINGS REGULAR-SEASON GAME -- kept for being on national
+  // TV (his call 2026-09-22) -- reads like the Tigers': the date, the day, the
+  // network and the time in the header, the opponent below, nothing else
+  if ((g.sport === "NHL" || g.sport === "NBA") && !g.post && !g.stage) {
+    const nets = g.nets || [];
+    const net = PRO_NATIONAL.find(n => nets.indexOf(n) > -1) || "";
+    const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
+    return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
+      shade(teamColor(opp)) + ring + '">' +
+      '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
+      esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
+      '<div class="teams">' + oppLine + "</div></div>";
   }
   if (g.sport === "NHL" || g.sport === "NBA" || g.sport === "MLB") {
     // the NATIONAL broadcast when there was one; a local or regional channel
@@ -1513,6 +1524,11 @@ function proView() {
   return ["tigers", "lions", "redwings", "pistons", "cavaliers"].indexOf(VIEW) > -1;
 }
 // the three PLAYOFF teams (and the NBA Cup): their own card and filters
+// rules.py's PRO_NATIONAL: what counts as national TV for the Detroit
+// teams' regular seasons (his definition, 2026-09-22)
+const PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2",
+  "NBCSN", "truTV", "CNBC", "USA Net", "USA", "Versus", "OLN", "Apple TV", "Apple TV+",
+  "Peacock", "Prime Video", "Netflix", "YouTube", "Roku", "Facebook Watch"];
 function seriesView() { return proView() && VIEW !== "lions"; }
 // each team's boxes and the colour its own seed reads in
 const PRO_BOX = {

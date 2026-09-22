@@ -1589,7 +1589,9 @@ def pro_games(teams, start):
         last = upcoming_season("CBB", start)
         for y in range(first, last + 1):
             # 5 is the NBA PLAY-IN, counted with the playoffs (his call 2026-09-18)
-            for stype in ((2, 3, 5) if cup else (3,)):
+            nat_from = rules.PRO_NATIONAL_FROM.get(fid)
+            want_reg = nat_from is not None and y >= nat_from
+            for stype in ((2, 3, 5) if cup else (2, 3) if want_reg else (3,)):
                 try:
                     got = get_json("%s/%s/teams/%s/schedule" % (BASE, league, tid),
                                    params={"season": y + 1, "seasontype": stype})
@@ -1605,7 +1607,10 @@ def pro_games(teams, start):
                     cs = c.get("competitors") or []
                     heads = [n.get("headline") or "" for n in c.get("notes") or []]
                     cup_note = next((h for h in heads if "NBA Cup" in h or "In-Season" in h), None)
-                    if stype == 2 and not cup_note:
+                    # a REGULAR-SEASON game is kept on national TV alone (his
+                    # call 2026-09-22) -- the Pistons and the Red Wings, 2013-14 on
+                    national = want_reg and bool(set(networks(c)) & set(rules.PRO_NATIONAL))
+                    if stype == 2 and not cup_note and not national:
                         continue
                     if len(cs) != 2 or not (c.get("status") or {}).get("type", {}).get("completed"):
                         continue
@@ -1664,8 +1669,11 @@ def pro_games(teams, start):
                         seeds = pro_seeds(league, y)
                         for q in side:
                             q["seed"] = seeds.get(q["abbr"])
-                    else:
+                    elif cup_note:
                         stage = "NBA Cup | " + cup_note.split(" - ")[-1].strip()
+                    else:
+                        stage = None
+                        mx["nat"] = True
                     for q in side:
                         q.pop("abbr", None)
                     v = c.get("venue") or {}
@@ -1845,6 +1853,11 @@ def tigers_games(teams, start):
                             theirs = sum((ln["away"] if me["home"] else ln["home"])[:8])
                             if mine <= theirs:
                                 mx["late"] = True
+                    # ...and every NATIONAL TV game from 2011 (his call
+                    # 2026-09-22), whatever the result
+                    if (y >= rules.PRO_NATIONAL_FROM[TIGERS]
+                            and set(networks(c)) & set(rules.PRO_NATIONAL)):
+                        mx["nat"] = True
                     if not mx:
                         continue
                 for q in side:

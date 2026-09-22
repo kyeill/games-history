@@ -84,6 +84,18 @@ VENUE_METROS = {
 
 
 # Cities ESPN names in a way he does not want read back.
+# NATIONAL TV for the Detroit teams' regular seasons (his definition,
+# 2026-09-22): broadcast and cable networks, plus Apple TV, Peacock and Prime
+# Video. NOT the league channels (MLB Network, NBA TV, NHL Network), ESPN+,
+# Hulu, HBO Max or Disney+, and nothing regional. The order is the order a
+# header prefers when a game lists more than one.
+PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2",
+                "NBCSN", "truTV", "CNBC", "USA Net", "USA", "Versus", "OLN",
+                "Apple TV", "Apple TV+", "Peacock", "Prime Video", "Netflix",
+                "YouTube", "Roku", "Facebook Watch"]
+# from when (the season's starting year) each team's national games are kept
+PRO_NATIONAL_FROM = {"mlb-6": 2011, "nba-8": 2013, "nhl-5": 2013}
+
 CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
                   # ESPN spells it out; every other St. Paul here is short
                   "Saint Paul": "St. Paul",
