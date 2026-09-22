@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-100309";
+const BUILD = "20260922-103151";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1144,7 +1144,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       (chips ? '<div class="tags">' + chips + "</div>" : "") + "</div>";
   }
@@ -1158,7 +1158,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div></div>";
   }
   if (g.sport === "NHL" || g.sport === "NBA" || g.sport === "MLB") {

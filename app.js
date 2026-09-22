@@ -1144,7 +1144,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       (chips ? '<div class="tags">' + chips + "</div>" : "") + "</div>";
   }
@@ -1158,7 +1158,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + (net ? net + " " : "") + t) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div></div>";
   }
   if (g.sport === "NHL" || g.sport === "NBA" || g.sport === "MLB") {
