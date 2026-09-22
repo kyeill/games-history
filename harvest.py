@@ -1102,6 +1102,27 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             hmx = {"finish": ncaa_now.get("finish", {}).get(okey),
                    "final": uscho_final_rank(y, opp_loc),
                    "reigning": bool(okey) and okey == ncaa_before.get("champ")}
+            # WHO WON THE SHOOTOUT (his call 2026-09-22): almost every college
+            # shootout goes down as a TIE, so the card cannot tell a shootout
+            # won from one lost without USCHO's note -- "Clarkson wins
+            # shootout, 3-2", "COR wins SO 2-1". The name before "win" is
+            # matched against both teams, by full name and by the first three
+            # letters, and anything it cannot place is left unknown.
+            sho_win = None
+            sho_note = (us or {}).get("sho_notes") or ""
+            m_sho = re.match(r"\s*([A-Za-z .'&-]+?)\s+wins?\b", sho_note, re.I)
+            if m_sho:
+                who = flat(m_sho.group(1))
+                def _match(q):
+                    names = [flat(teams[q["id"]]["short"]),
+                             flat(teams[q["id"]]["name"] or "")]
+                    return who in [n for n in names if n] or (
+                        len(who) >= 3 and any(n.startswith(who) for n in names if n))
+                me_q = next((q for q in side if q["id"] == team_id), None)
+                if me_q and _match(me_q):
+                    sho_win = True
+                elif _match(opp):
+                    sho_win = False
             labels = list(fix.get("labels", []))
             named = bool(ev and ev.get("event") in VENUE_EVENTS)
             arena = (us or {}).get("arena_name") or ""
@@ -1125,7 +1146,7 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "so": ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
                        or bool(us and (us.get("sho_notes") or
                                        re.search(r"shootout|\bSO\b", us.get("note") or "", re.I)))),
-                "tie": tie, "show": False, "week": None,
+                "tie": tie, "sho_win": sho_win, "show": False, "week": None,
                 "venue": v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
                 # USCHO has the last word on where a regular-season game was:

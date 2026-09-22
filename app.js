@@ -805,10 +805,17 @@ function michCard(g, p) {
     // ...and on the Red Wings' playoff cards (his call 2026-09-18)
     const mark = (g.sport === "CHK" || g.sport === "NHL") && !upcoming(x) &&
       (x.ot || x.so || x.tie);
-    const lossScore = !upcoming(x) && !x.tie && !me.win;
+    // A SHOOTOUT reads in brackets -- "[2-2]" -- still underlined, and the
+    // team that LOST the shootout has it italic like any other defeat (his
+    // call 2026-09-22). Most college shootouts go down as ties, so the loser
+    // comes from USCHO's note (sho_win); an unknown one stays upright.
+    const shoot = g.sport === "CHK" && !upcoming(x) && x.so;
+    const lossScore = !upcoming(x) && ((!x.tie && !me.win) ||
+      (shoot && x.sho_win === false));
     return '<span class="sc mbox' + (mark ? " u" : "") + (lossScore ? " l" : "") + '"' +
       paint(xTop, xInk) + ">" +
-      (upcoming(x) ? "" : me.score + "-" + op.score + (g.sport === "CHK" && x.so ? " (SO)" : "")) +
+      (upcoming(x) ? "" : shoot ? "[" + me.score + "-" + op.score + "]"
+        : me.score + "-" + op.score) +
       "</span>";
   };
   let score = bubble(g);
