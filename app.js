@@ -1112,15 +1112,23 @@ function michCard(g, p) {
   // Championship Game is left out, which carries his own blue.
   const bowlGame = g.sport === "CFB" && !!st &&
     st.indexOf("Big Ten Championship") !== 0;
+  // A BIG TEN TOURNAMENT DEFEAT is dashed grey like a bowl (his call
+  // 2026-09-22): basketball's every loss, and hockey's LOST GAMES IN A LOST
+  // SERIES -- a win inside a lost series, or a loss inside one Michigan went
+  // on to win, keeps its plain frame
+  const b1gTourney = st.indexOf("Big Ten Tournament") === 0;
+  const bttLoss = b1gTourney && lost && !upcoming(g) &&
+    (g.sport === "CBB" || (g.sport === "CHK" && (!g._gm || g._gm.lost)));
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
     : cuNcaa ? "#4d9ae0" : cuIvyFinal ? "#0f6a37"
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
       // 2026-09-13), dashed when the game was lost
       // ...and the Great Lakes Invitational (g.frame) takes it too (2026-09-16)
-      (g.preseason || g.frame || bowlGame || ncaaGame ? "#8a8a92" : null);
+      (g.preseason || g.frame || bowlGame || ncaaGame || bttLoss ? "#8a8a92" : null);
   // ...and like an MTE it goes dashed on a loss
-  if ((g.preseason || g.frame || bowlGame || ncaaGame) && lost) cls += " predash";
+  if (((g.preseason || g.frame || bowlGame || ncaaGame) && lost) || bttLoss)
+    cls += " predash";
   let ring = "";
   if (bc) {
     cls += " celebrate";
@@ -1348,6 +1356,15 @@ function hockeyUnits(list) {
     // 2026-09-22), so each game wears the colours of its OWN Sheet row; the
     // header names the game and the series score through it
     if (games[0].stage) {
+      // did the SERIES end in defeat? each card needs to know, for the dashed
+      // frame a lost series wears (his call 2026-09-22)
+      let fw = 0, fl = 0;
+      games.forEach(x => {
+        if (upcoming(x) || x.tie) return;
+        const me = x.teams.find(q => q.id === (VIEW === "cornell" ? CORNELL : MICHIGAN));
+        if (me && me.win) fw++; else fl++;
+      });
+      const seriesLost = fl > fw;
       let w = 0, l = 0, t = 0;
       games.forEach((x, i) => {
         const me = x.teams.find(q => q.id === (VIEW === "cornell" ? CORNELL : MICHIGAN));
@@ -1356,7 +1373,7 @@ function hockeyUnits(list) {
         }
         const rec = upcoming(x) ? "" : w + "-" + l + (t ? "-" + t : "");
         out.push({ g: x, html: rowHtml(Object.assign({}, x,
-          { _gm: { n: i + 1, rec: rec } }), false) });
+          { _gm: { n: i + 1, rec: rec, lost: seriesLost } }), false) });
       });
       return;
     }
