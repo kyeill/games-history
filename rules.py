@@ -93,18 +93,24 @@ VENUE_METROS = {
 # id, from his own memory. False is a shootout lost; None means the game was
 # no shootout at all -- 10/12/2024 at Arizona State ended in overtime.
 SHOOTOUT_FIX = {
-    "331229311": True,    # 12/29/2013 Cornell at Maine
-    "381123130": True,    # 11/23/2018 Michigan vs Wisconsin
-    "381207130": True,    # 12/7/2018  Michigan vs Minnesota
-    "390223130": False,   # 2/23/2019  Michigan vs Ohio State
-    "400106507": False,   # 1/4/2020   Cornell at Providence
-    "400118213": True,    # 1/18/2020  Michigan at Penn State
+    # True = shootout won, False = shootout lost, None = NO SHOOTOUT at all
+    "331229311": True,    # 12/29/2013 Cornell at Maine (Florida College Classic)
+    "501483702": True,    # 12/30/2022 Cornell vs American Intl
+    "400118213": None,    # 1/18/2020  Michigan at Penn State -- 3x3 OT, not a shootout
+    "381123130": None,    # 11/23/2018 Michigan vs Wisconsin -- 3x3 OT
+    "381207130": None,    # 12/7/2018  Michigan vs Minnesota -- 3x3 OT
+    "390223130": None,    # 2/23/2019  Michigan vs Ohio State -- 3x3 OT
+    "400106507": False,   # 1/4/2020   Cornell at Providence (Fortress Invitational)
     "501485894": False,   # 2/11/2023  Cornell at Colgate
     "501489293": False,   # 2/16/2023  Michigan at Ohio State
     "501489299": False,   # 2/24/2023  Michigan vs Notre Dame
     "401599000": False,   # 10/21/2023 Michigan vs Ohio State
     "401623980": False,   # 12/30/2023 Cornell at Arizona State
-    "401712129": None,    # 10/12/2024 Michigan at Arizona State -- OT, no shootout
+    "401712129": None,    # 10/12/2024 Michigan at Arizona State -- overtime, no shootout
+    # double-overtime PLAYOFF games ESPN marked SO (his call 2026-09-22)
+    "320309172": None,    # 3/9/2012   Cornell vs Dartmouth, ECAC quarterfinal
+    "330319514": None,    # 3/17/2013  Cornell at Quinnipiac, ECAC quarterfinal
+    "340320130": None,    # 3/20/2014  Michigan vs Penn State, Big Ten quarterfinal
 }
 
 PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2",

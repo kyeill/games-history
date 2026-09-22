@@ -1343,7 +1343,10 @@ function hockeyUnits(list) {
   // A CONFERENCE-TOURNAMENT SERIES groups as well (his call 2026-09-16) -- the
   // Big Ten and ECAC best-of-threes -- up to three games of the same round
   const confSeries = g => /^(Big Ten|ECAC) Tournament/.test(g.stage || "");
-  const groupable = g => g.sport === "CHK" && !g.preseason && (!g.stage || confSeries(g));
+  // MICHIGAN STATE IS NEVER COMBINED (his call 2026-09-22): each game of the
+  // weekend gets its own card, both carrying the same week number
+  const groupable = g => g.sport === "CHK" && !g.preseason &&
+    !g.teams.some(t => t.id === "127") && (!g.stage || confSeries(g));
   const oppOf = g => (g.teams.find(t => t.id !== (g.focus || focusId())) || {}).id;
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   for (let i = 0; i < list.length; i++) {

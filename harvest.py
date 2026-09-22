@@ -624,6 +624,10 @@ HOCKEY_NO_EVENT = {"Frozen Confines"}          # his call 2026-09-16
 # present replaces what USCHO gave; "labels" adds to the footer
 HOCKEY_GAME_FIX = {
     ("130", "2015-02-07"): {"event": None, "city": "Soldier Field"},   # MSU, outdoors
+    # 2026-27 WESTERN MICHIGAN is a home and away, the return leg outdoors at
+    # Waldo Stadium (his call 2026-09-22)
+    ("130", "2026-10-23"): {"series": "Home & Away"},
+    ("130", "2027-01-30"): {"series": "Home & Away", "offsite": "Waldo Stadium"},
     ("130", "2016-11-04"): {"offsite": None},                          # at Arizona State
 }
 # THE NAMED EVENTS that show their VENUE after the name and their DATE in the
@@ -1041,7 +1045,7 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                     continue
             det = uscho_details(us, team_id, opp_loc) if us else {}
             fix = HOCKEY_GAME_FIX.get((team_id, day), {})
-            for k in ("event", "city", "offsite"):
+            for k in ("event", "city", "offsite", "series"):
                 if k in fix:
                     det[k] = fix[k]
             post = x.get("_stype") == 3
@@ -1135,6 +1139,19 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies
             conference = det.get("conf_game") if us else (hockey_conf(opp["id"], y) == "ECAC")
+            # WHEN A SHOOTOUT COUNTS (his rule 2026-09-22): from 2025-26 every
+            # one has a winner. Before that it settled nothing outside a
+            # CONFERENCE game, a tournament (MTE) or the postseason -- those
+            # games are simply ties, with no winner and no brackets. His own
+            # answers in SHOOTOUT_FIX always win.
+            shootout = ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
+                        or bool(us and (us.get("sho_notes") or
+                                        re.search(r"shootout|\bSO\b",
+                                                  us.get("note") or "", re.I))))
+            if hand_sho:
+                shootout = rules.SHOOTOUT_FIX[x["id"]] is not None
+            elif shootout and y < 2025 and not (stage or ev or conference):
+                shootout, sho_win = False, None
             if (team_id == rules.CORNELL and not stage and opp_loc in rules.IVY
                     and opp_loc != "Cornell" and conference):
                 labels.append("Ivy League")
@@ -1147,12 +1164,13 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "ot": (status.get("period") or 0) > 3,
                 # a SHOOTOUT: ESPN marks almost none, USCHO names every one
                 # ("Clarkson wins shootout, 3-2") in its shootout notes
-                "so": (False if hand_sho and sho_win is None else ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
-                       or bool(us and (us.get("sho_notes") or
-                                       re.search(r"shootout|\bSO\b", us.get("note") or "", re.I))))),
+                "so": shootout,
                 "tie": tie, "sho_win": sho_win, "show": False, "week": None,
                 "venue": v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
+                # a series he has named by hand (2026-09-22); the Michigan pass
+                # that derives them leaves a game that already has one alone
+                **({"series": det["series"]} if det.get("series") else {}),
                 # USCHO has the last word on where a regular-season game was:
                 # ESPN's venue named Little Caesars Arena, and once East
                 # Lansing, for Duel in the D, which wants no venue at all
