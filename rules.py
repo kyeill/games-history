@@ -92,6 +92,19 @@ VENUE_METROS = {
 # SHOOTOUTS USCHO LEAVES UNNAMED (his answers 2026-09-22): who won, by game
 # id, from his own memory. False is a shootout lost; None means the game was
 # no shootout at all -- 10/12/2024 at Arizona State ended in overtime.
+# THE EXTRA SESSION, when it was not a shootout (his call 2026-09-22): every
+# Big Ten game has a winner, and before 2025-26 the conference decided a tied
+# game in 3-on-3 overtime for its extra point. True = Michigan won it.
+EXTRA_POINT = {
+    "381123130": True,    # 11/23/2018 vs Wisconsin  -- Michigan scores in 3x3 OT
+    "381207130": True,    # 12/7/2018  vs Minnesota  -- Michigan scores in 3x3 OT
+    "390223130": False,   # 2/23/2019  vs Ohio State -- Ohio State scores in 3x3 OT
+    "400118213": True,    # 1/18/2020  at Penn State -- Michigan scores in 3x3 OT
+    "391108130": False,   # 11/8/2019  vs Minnesota -- his answer, nothing in the data
+    # 12/31/2018 vs Michigan State, the GLI third-place game, stays a TIE:
+    # a consolation game decides nothing (his call 2026-09-22)
+}
+
 SHOOTOUT_FIX = {
     # True = shootout won, False = shootout lost, None = NO SHOOTOUT at all
     "331229311": True,    # 12/29/2013 Cornell at Maine (Florida College Classic)

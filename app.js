@@ -810,8 +810,9 @@ function michCard(g, p) {
     // call 2026-09-22). Most college shootouts go down as ties, so the loser
     // comes from USCHO's note (sho_win); an unknown one stays upright.
     const shoot = g.sport === "CHK" && !upcoming(x) && x.so;
-    const lossScore = !upcoming(x) && ((!x.tie && !me.win) ||
-      (shoot && x.sho_win === false));
+    // ...and a Big Ten tie decided in 3-on-3 overtime reads as a defeat too,
+    // without the brackets a shootout earns (his call 2026-09-22)
+    const lossScore = !upcoming(x) && ((!x.tie && !me.win) || x.sho_win === false);
     return '<span class="sc mbox' + (mark ? " u" : "") + (lossScore ? " l" : "") + '"' +
       paint(xTop, xInk) + ">" +
       (upcoming(x) ? "" : shoot ? "[" + me.score + "-" + op.score + "]"

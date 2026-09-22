@@ -1131,6 +1131,9 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                     sho_win = False
             if hand_sho:
                 sho_win = rules.SHOOTOUT_FIX[x["id"]]
+            # a tie decided in 3-on-3 overtime still HAS a winner (2026-09-22)
+            if x["id"] in rules.EXTRA_POINT:
+                sho_win = rules.EXTRA_POINT[x["id"]]
             labels = list(fix.get("labels", []))
             named = bool(ev and ev.get("event") in VENUE_EVENTS)
             arena = (us or {}).get("arena_name") or ""
