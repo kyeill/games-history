@@ -1116,9 +1116,12 @@ function michCard(g, p) {
   // 2026-09-22): basketball's every loss, and hockey's LOST GAMES IN A LOST
   // SERIES -- a win inside a lost series, or a loss inside one Michigan went
   // on to win, keeps its plain frame
-  const b1gTourney = st.indexOf("Big Ten Tournament") === 0;
+  // ...and Cornell's ECAC Tournament and the NIT the same way (his call
+  // 2026-09-22)
+  const b1gTourney = st.indexOf("Big Ten Tournament") === 0 ||
+    st.indexOf("ECAC Tournament") === 0 || st.indexOf("NIT") === 0;
   const bttLoss = b1gTourney && lost && !upcoming(g) &&
-    (g.sport === "CBB" || (g.sport === "CHK" && (!g._gm || g._gm.lost)));
+    (g.sport !== "CHK" || !g._gm || g._gm.lost);
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
     : cuNcaa ? "#4d9ae0" : cuIvyFinal ? "#0f6a37"
     : michColour(mx.border) || finalRing ||
