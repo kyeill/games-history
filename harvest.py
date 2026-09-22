@@ -1110,6 +1110,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             # letters, and anything it cannot place is left unknown.
             sho_win = None
             sho_note = (us or {}).get("sho_notes") or ""
+            # HIS OWN ANSWERS for the shootouts USCHO never named (2026-09-22)
+            hand_sho = x["id"] in rules.SHOOTOUT_FIX
             m_sho = re.match(r"\s*([A-Za-z .'&-]+?)\s+wins?\b", sho_note, re.I)
             if m_sho:
                 who = flat(m_sho.group(1))
@@ -1123,6 +1125,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                     sho_win = True
                 elif _match(opp):
                     sho_win = False
+            if hand_sho:
+                sho_win = rules.SHOOTOUT_FIX[x["id"]]
             labels = list(fix.get("labels", []))
             named = bool(ev and ev.get("event") in VENUE_EVENTS)
             arena = (us or {}).get("arena_name") or ""
@@ -1143,9 +1147,9 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "ot": (status.get("period") or 0) > 3,
                 # a SHOOTOUT: ESPN marks almost none, USCHO names every one
                 # ("Clarkson wins shootout, 3-2") in its shootout notes
-                "so": ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
+                "so": (False if hand_sho and sho_win is None else ("SO" in ((status.get("type") or {}).get("shortDetail") or "")
                        or bool(us and (us.get("sho_notes") or
-                                       re.search(r"shootout|\bSO\b", us.get("note") or "", re.I)))),
+                                       re.search(r"shootout|\bSO\b", us.get("note") or "", re.I))))),
                 "tie": tie, "sho_win": sho_win, "show": False, "week": None,
                 "venue": v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
