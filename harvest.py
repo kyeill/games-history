@@ -2229,7 +2229,7 @@ SHEET_ID = "1yLrd2BOhtLqS0YZLGBlBlDiypMhGjNJ5nw8fVs1nZu0"
 # (focus team, sport) -> tab
 SHEET_TABS = {("130", "CFB"): "Michigan CFB", ("130", "CBB"): "Michigan CBB",
               ("130", "CHK"): "Michigan HKY",       # his tab's name (2026-09-21)
-              ("172", "CHK"): "Cornell Hockey", ("172", "CBB"): "Cornell CBB",
+              ("172", "CHK"): "Cornell HKY", ("172", "CBB"): "Cornell CBB",
               ("nfl-8", "NFL"): "Lions", ("mlb-6", "MLB"): "Tigers",
               ("nhl-5", "NHL"): "Red Wings", ("nba-8", "NBA"): "Pistons",
               ("nba-5", "NBA"): "Cavaliers"}
@@ -2310,6 +2310,14 @@ def load_sheet():
                 i = col.get(label)
                 return (raw[i] or "").strip() if i is not None and i < len(raw) else ""
             season, date = sheet_season(code, cell("year")), sheet_date(cell("date"))
+            # A BLANK YEAR takes its season from the date (2026-09-21): his
+            # Cornell HKY tab fills the Year in for its first three seasons
+            # only. Football is one calendar year from August; the winter
+            # sports run July to June.
+            if season is None and date:
+                y, m = int(date[:4]), int(date[5:7])
+                season = ((y if m >= 8 else y - 1) if code in ("CFB", "NFL")
+                          else y if code == "MLB" else (y if m >= 7 else y - 1))
             if season is None or date is None:
                 continue
             box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
