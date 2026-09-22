@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-161338";
+const BUILD = "20260922-162032";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1706,6 +1706,11 @@ function highlightOf(g, kind) {
   if (kind === "Details") {
     // the series the card itself shows: his hand tag wins over the derived one
     const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
+    // ...and a pair he does not count as one at all (his call 2026-09-22):
+    // Michigan's 2025 home-and-away weekend with Western Michigan
+    const NO_SERIES = ["401821720", "401821721"];
+    if (NO_SERIES.indexOf(g.id) > -1) return (g.neutral || !!g.offsite) &&
+      !(g.stage || "") && !g.post;
     const hand = myTags(g.id).filter(t => FAMILY.indexOf(t) > -1);
     const notreDame = g.teams.some(t => t.id === "87");
     // (Combined leaves out hockey's series -- his call 2026-09-18)

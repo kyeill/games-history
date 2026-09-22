@@ -1706,6 +1706,11 @@ function highlightOf(g, kind) {
   if (kind === "Details") {
     // the series the card itself shows: his hand tag wins over the derived one
     const FAMILY = ["Home & Home", "Neutral & Neutral", "Home & Neutral"];
+    // ...and a pair he does not count as one at all (his call 2026-09-22):
+    // Michigan's 2025 home-and-away weekend with Western Michigan
+    const NO_SERIES = ["401821720", "401821721"];
+    if (NO_SERIES.indexOf(g.id) > -1) return (g.neutral || !!g.offsite) &&
+      !(g.stage || "") && !g.post;
     const hand = myTags(g.id).filter(t => FAMILY.indexOf(t) > -1);
     const notreDame = g.teams.some(t => t.id === "87");
     // (Combined leaves out hockey's series -- his call 2026-09-18)
