@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260922-145505";
+const BUILD = "20260922-153131";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1118,8 +1118,10 @@ function michCard(g, p) {
   // on to win, keeps its plain frame
   // ...and Cornell's ECAC Tournament and the NIT the same way (his call
   // 2026-09-22)
+  // ...and Ivy Madness, its FINAL alone (his call 2026-09-22)
   const b1gTourney = st.indexOf("Big Ten Tournament") === 0 ||
-    st.indexOf("ECAC Tournament") === 0 || st.indexOf("NIT") === 0;
+    st.indexOf("ECAC Tournament") === 0 || st.indexOf("NIT") === 0 ||
+    st === "Ivy Madness | Championship";
   const bttLoss = b1gTourney && lost && !upcoming(g) &&
     (g.sport !== "CHK" || !g._gm || g._gm.lost);
   const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
