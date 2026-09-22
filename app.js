@@ -794,14 +794,20 @@ function michCard(g, p) {
   // which on a card with no colours is the grey placeholder
   // HOCKEY: a score is UNDERLINED when the game went to overtime, a shootout
   // or ended tied, and a shootout says so -- "2-2 (SO)" (his call 2026-09-16)
+  // EACH GAME OF A SERIES WEARS ITS OWN ROW'S SCORE COLOURS (his call
+  // 2026-09-22): the Friday box from the Friday row, the Saturday box from
+  // the Saturday row, and the card's own colours where a row leaves them blank
   const bubble = x => {
+    const xb = (x.mx && x.mx.box) || {};
+    const xTop = michColour(xb.score_bg) || top;
+    const xInk = michColour(xb.score_font) || (xb.score_bg ? null : scoreInk);
     const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
     // ...and on the Red Wings' playoff cards (his call 2026-09-18)
     const mark = (g.sport === "CHK" || g.sport === "NHL") && !upcoming(x) &&
       (x.ot || x.so || x.tie);
     const lossScore = !upcoming(x) && !x.tie && !me.win;
     return '<span class="sc mbox' + (mark ? " u" : "") + (lossScore ? " l" : "") + '"' +
-      paint(top, scoreInk) + ">" +
+      paint(xTop, xInk) + ">" +
       (upcoming(x) ? "" : me.score + "-" + op.score + (g.sport === "CHK" && x.so ? " (SO)" : "")) +
       "</span>";
   };
