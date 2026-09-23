@@ -1172,7 +1172,13 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 "time": ("TBD" if upcoming and (x.get("timeValid") is False or
                                                 c.get("timeValid") is False)
                          else d.strftime("%H:%M")), "neutral": neutral,
-                "ot": (status.get("period") or 0) > 3,
+                # OVERTIME: ESPN misses plenty of them -- the 2013 Ferris State
+                # tie among others -- so USCHO's overtime count settles it, and
+                # a 3-on-3 or shootout note means overtime too (his catch
+                # 2026-09-23)
+                "ot": ((status.get("period") or 0) > 3
+                       or str((us or {}).get("ots") or "0").strip() not in ("", "0")
+                       or bool(sho_note) or shootout),
                 # a SHOOTOUT: ESPN marks almost none, USCHO names every one
                 # ("Clarkson wins shootout, 3-2") in its shootout notes
                 "so": shootout,
