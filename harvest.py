@@ -3933,9 +3933,19 @@ def harvest():
         return ("neutral" if g.get("neutral")
                 else "away" if opp.get("home") else "home")
 
+    # A WEEKEND SET IS NOT A HOME-AND-HOME LEG (his call 2026-09-23): hockey's
+    # two-game weekends are ordinary scheduling, so neither game pairs with a
+    # meeting in another season. That takes Ferris State 2017 out of the family
+    # and every Western Michigan home-and-away weekend out of Details.
+    def _weekend(games, g):
+        return any(x is not g and abs(
+            (dt.date.fromisoformat(x["date"]) - dt.date.fromisoformat(g["date"])).days) <= 3
+            for x in games)
+
     series = 0
     for games in cand.values():
         games.sort(key=lambda x: x["date"])
+        games = [g for g in games if not _weekend(games, g)]
         for i, a_ in enumerate(games):
             for b_ in games[i + 1:]:
                 if b_["season"] - a_["season"] != 1:
