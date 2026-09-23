@@ -626,6 +626,10 @@ HOCKEY_GAME_FIX = {
     ("130", "2015-02-07"): {"event": None, "city": "Soldier Field"},   # MSU, outdoors
     # 2026-27 WESTERN MICHIGAN is a home and away, the return leg outdoors at
     # Waldo Stadium (his call 2026-09-22)
+    # the 2021 GLI was a two-team SHOWCASE at Yost, not a neutral-site
+    # tournament: the card names the event and nothing else (his call
+    # 2026-09-23)
+    ("130", "2021-12-29"): {"event": "Great Lakes Invitational", "neutral": False},
     ("130", "2026-10-23"): {"series": "Home & Away"},
     ("130", "2027-01-30"): {"series": "Home & Away", "offsite": "Waldo Stadium"},
     ("130", "2016-11-04"): {"offsite": None},                          # at Arizona State
@@ -1041,11 +1045,14 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 me["score"], opp["score"] = mine, theirs
                 me["win"], opp["win"] = mine > theirs, theirs > mine
                 tie = mine == theirs
-                if tie and mine == 0:
+                # ...and a REAL scoreless tie is kept when USCHO calls the game
+                # complete: Michigan Tech 0-0 at the 2021 GLI Showcase (his
+                # catch 2026-09-23)
+                if tie and mine == 0 and str(us.get("complete") or "").upper() != "Y":
                     continue
             det = uscho_details(us, team_id, opp_loc) if us else {}
             fix = HOCKEY_GAME_FIX.get((team_id, day), {})
-            for k in ("event", "city", "offsite", "series"):
+            for k in ("event", "city", "offsite", "series", "neutral"):
                 if k in fix:
                     det[k] = fix[k]
             post = x.get("_stype") == 3
@@ -1137,7 +1144,8 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             labels = list(fix.get("labels", []))
             named = bool(ev and ev.get("event") in VENUE_EVENTS)
             arena = (us or {}).get("arena_name") or ""
-            if named and arena and arena != "NA" and arena not in labels:
+            # ...a HOME game names no arena, however the event is billed
+            if named and neutral and arena and arena != "NA" and arena not in labels:
                 labels.append(arena)
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260923-100634";
+const BUILD = "20260923-140135";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -918,6 +918,12 @@ function michCard(g, p) {
   // call 2026-09-13); the short form appears only when it has to
   const PLACE_SHORT = { "Madison Square Garden": "MSG",
                         "Little Caesars Arena": "LCA" };
+  // HOCKEY HAS NO ROOM FOR THE ASTERISK -- the left gutter holds the rank --
+  // so a game he attended says so in the footer instead (his call 2026-09-23)
+  const attGm = mx.attGames || [];
+  if (g.sport === "CHK" && mx.attended)
+    bit("Attended" + (series && series.length > 1 && attGm.length &&
+        attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : ""), "", true, 1);
   if (bigStage && tSeries) {
     series.forEach(x => {
       const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
@@ -1246,7 +1252,8 @@ function michCard(g, p) {
       monthHead + (dateDown || series ? "" : headDate) + "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
-      (mx.attended ? '<span class="mstar">*</span>' : "") + ownRank + '<span class="mdl">' +
+      (mx.attended && g.sport !== "CHK" ? '<span class="mstar">*</span>' : "") +
+      ownRank + '<span class="mdl">' +
       chipHtml + "</span>" + umRank +
     "</div></div>";
 }
@@ -1400,6 +1407,9 @@ function hockeyUnits(list) {
       return;
     }
     const mx = Object.assign({}, games[0].mx || {});
+    // WHICH GAME HE WAS AT (his call 2026-09-23): a weekend card names it,
+    // "Attended Gm2", so the merged flag remembers the game numbers
+    mx.attGames = games.map((x, i) => ((x.mx || {}).attended ? i + 1 : 0)).filter(Boolean);
     games.slice(1).forEach(x => {
       const o = x.mx || {};
       if (o.shade) mx.shade = o.shade;
