@@ -375,10 +375,8 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich .tags.mdets{padding-right:0}
 /* the separator reads like the header's own bar */
 .row.mich .msep{color:var(--muted)}
-/* the ATTENDED note closes the footer, pushed to its right edge (his call
+/* ...and it reads in the footer's own grey, never maize (his call
    2026-09-23) */
-.row.mich .matt{color:#ffcb05}
-.row.mich.dimmed .matt{color:#8a8a92}
 /* a preseason tournament LOSS: the grey frame goes dashed (his call
    2026-09-13), so a win and a loss in the same tournament read apart */
 .row.mich.predash{border-style:dashed}
