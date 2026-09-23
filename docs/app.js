@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260923-151951";
+const BUILD = "20260923-153204";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1039,7 +1039,7 @@ function michCard(g, p) {
   if (dateDown && !bigStage && !mteCard) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
-  const wrap = (p, colour) => '<span class="mdet"' +
+  const wrap = (p, colour) => '<span class="mdet' + (p.att ? " matt" : "") + '"' +
     (p.short ? ' data-short="' + esc(p.short) + '" data-trim="' + (p.pri || 5) + '"' : "") +
     (colour || p.it ? ' style="' + (colour ? "color:" + colour + ";" : "") +
       (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
@@ -1051,6 +1051,9 @@ function michCard(g, p) {
         attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : "") : "";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
+  // ATTENDED closes the details like any other, behind a pipe (his call
+  // 2026-09-23): "Home & Home | Attended"
+  if (attText) parts.push({ t: attText, short: "", his: true, att: true });
   // A NOTE WITH ITS OWN PIPES stripes by piece, not word by word (his call
   // 2026-09-21): "Stripe Out | B1G Expansion" reads Stripe Out in blue, B1G
   // Expansion in maize, and a grey pipe between
@@ -1274,8 +1277,7 @@ function michCard(g, p) {
     '<div class="tags mdets">' +
       (mx.attended && g.sport !== "CHK" ? '<span class="mstar">*</span>' : "") +
       ownRank + '<span class="mdl">' +
-      chipHtml + (attText ? '<span class="mdet matt">' + esc(attText) + "</span>" : "") +
-      "</span>" + umRank +
+      chipHtml + "</span>" + umRank +
     "</div></div>";
 }
 
