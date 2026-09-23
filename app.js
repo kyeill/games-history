@@ -506,20 +506,35 @@ function michCard(g, p) {
   //                    plain grey text against an unranked one
   //   less than half   struck through, like any loss
   const series = g._series || null;
+  /* POINTS DECIDE THE CARD (his rule 2026-09-23), one game or two, the way
+     the Big Ten counts a weekend: a win in regulation is 3, a win in overtime
+     or the shootout 2, a loss there 1, a loss in regulation 0, and a tie
+     nobody won 1.5 each. More points reads BOLD, fewer reads struck through,
+     and level points are settled by who won the extra sessions -- a shootout
+     win breaks the tie. Only a card level on both counts stays plain. */
   let sres = null;
-  if (series) {
-    let mine = 0, tot = 0;
-    series.forEach(x => {
+  {
+    const games = series || [g];
+    let mine = 0, theirs = 0, myX = 0, theirX = 0;
+    games.forEach(x => {
       if (upcoming(x)) return;
       const me = x.teams.find(t => t.id === fid);
-      tot += 3;
-      // A TIE WITH A WINNER counts like the Big Ten counts it (his call
-      // 2026-09-23): the extra session is worth the overtime win or loss
-      mine += x.tie
-        ? (x.sho_win === true ? 2 : x.sho_win === false ? 1 : 1.5)
-        : me.win ? (x.ot ? 2 : 3) : (x.ot ? 1 : 0);
+      const extra = x.ot || x.so;
+      if (x.tie) {
+        if (x.sho_win === true) { mine += 2; theirs += 1; myX++; }
+        else if (x.sho_win === false) { mine += 1; theirs += 2; theirX++; }
+        else { mine += 1.5; theirs += 1.5; }
+      } else if (me && me.win) {
+        mine += extra ? 2 : 3; theirs += extra ? 1 : 0;
+        if (extra) myX++;
+      } else {
+        mine += extra ? 1 : 0; theirs += extra ? 2 : 3;
+        if (extra) theirX++;
+      }
     });
-    if (tot) sres = mine * 2 > tot ? "win" : mine * 2 === tot ? "split" : "loss";
+    if (games.some(x => !upcoming(x)))
+      sres = mine > theirs ? "win" : mine < theirs ? "loss"
+        : myX > theirX ? "win" : myX < theirX ? "loss" : "split";
   }
   // ...but a TOURNAMENT series is won by games: the bubble reads the series
   // score (2-1) and the bottom row each game's score (his call 2026-09-16)
@@ -536,14 +551,10 @@ function michCard(g, p) {
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
   const oppRanked = series
     ? series.some(x => (x.teams.find(t => t.id !== fid) || {}).rank) : !!opp.rank;
-  // ...and on a single card a tie he won reads as a WIN, one he lost as a
-  // LOSS; only a tie nobody won stays level (his call 2026-09-23)
-  const tied = series ? (sres === "split" && !oppRanked)
-    : (!!g.tie && g.sho_win == null);
+  const tied = sres === "split" && !oppRanked;
   const flatSplit = !tSeries && sres === "split" && oppRanked;
   const mx = g.mx || {};
-  const lost = series ? sres === "loss"
-    : (!upcoming(g) && !tied && (g.tie ? g.sho_win === false : !m.win));
+  const lost = sres === "loss";
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
   // does not reach this one -- and his Case column is the only thing that
   // lifts a name into capitals (2026-09-14).
@@ -595,7 +606,9 @@ function michCard(g, p) {
   // ESPN lists no broadcast at all for 20 basketball games -- early-season
   // ones against small schools. They now show the TIME alone rather than an
   // em dash standing in for a network (his call 2026-09-14).
-  const tvBits = ' | ' +
+  // a card with ONE game runs the day into its time -- "FRIDAY 7:05PM" --
+  // with no pipe between them (his call 2026-09-23)
+  const tvBits = (g.sport === "CHK" && !g._series ? ' ' : ' | ') +
     (netTxt ? '<span' + col(p.netCol) + ">" + esc(netTxt) + "</span> " : "") +
     '<span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   // SEPTEMBER 21 is his date: a Michigan WIN that day spells itself out --
@@ -928,10 +941,6 @@ function michCard(g, p) {
                         "Little Caesars Arena": "LCA" };
   // HOCKEY HAS NO ROOM FOR THE ASTERISK -- the left gutter holds the rank --
   // so a game he attended says so in the footer instead (his call 2026-09-23)
-  const attGm = mx.attGames || [];
-  if (g.sport === "CHK" && mx.attended)
-    bit("Attended" + (series && series.length > 1 && attGm.length &&
-        attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : ""), "", true, 1);
   if (bigStage && tSeries) {
     series.forEach(x => {
       const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
@@ -1037,6 +1046,12 @@ function michCard(g, p) {
     (p.short ? ' data-short="' + esc(p.short) + '" data-trim="' + (p.pri || 5) + '"' : "") +
     (colour || p.it ? ' style="' + (colour ? "color:" + colour + ";" : "") +
       (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
+  // ...and the ATTENDED note closes the row, hard against the boxes (his
+  // call 2026-09-23)
+  const attGm = mx.attGames || [];
+  const attText = g.sport === "CHK" && mx.attended
+    ? "Attended" + (series && series.length > 1 && attGm.length &&
+        attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : "") : "";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
   // A NOTE WITH ITS OWN PIPES stripes by piece, not word by word (his call
@@ -1262,7 +1277,8 @@ function michCard(g, p) {
     '<div class="tags mdets">' +
       (mx.attended && g.sport !== "CHK" ? '<span class="mstar">*</span>' : "") +
       ownRank + '<span class="mdl">' +
-      chipHtml + "</span>" + umRank +
+      chipHtml + (attText ? '<span class="mdet matt">' + esc(attText) + "</span>" : "") +
+      "</span>" + umRank +
     "</div></div>";
 }
 
