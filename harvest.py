@@ -2396,7 +2396,10 @@ def load_sheet():
             box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
                    "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
             out[(focus, code, season, date)] = {
-                "name": cell("opponent"), "attended": bool(cell("attended")),
+                # HIS OWN WORD from the Attended column (2026-09-23): "Gm1" or
+                # "Gm2" names the game of a weekend he was at, anything else
+                # (an x) just marks the card
+                "name": cell("opponent"), "attended": cell("attended") or False,
                 # his CASE column: "UPPER" puts the opponent in capitals
                 "case": cell("case"),
                 "shade": bool(cell("shade")), "border": cell("border"),

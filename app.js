@@ -1045,10 +1045,17 @@ function michCard(g, p) {
       (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
   // ...and the ATTENDED note closes the row, hard against the boxes (his
   // call 2026-09-23)
-  const attGm = mx.attGames || [];
+  /* ATTENDED (his calls 2026-09-23): the footer says so, and names the game
+     when his Attended cell does -- "Gm1", "Gm2". An x, or anything else, just
+     reads "Attended". */
+  const attWord = v => {
+    const m = /gm\s*([12])/i.exec(String(v == null ? "" : v));
+    return m ? "Gm" + m[1] : "";
+  };
+  const attGms = (series || [g]).map(x => attWord((x.mx || {}).attended))
+    .filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   const attText = g.sport === "CHK" && mx.attended
-    ? "Attended" + (series && series.length > 1 && attGm.length &&
-        attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : "") : "";
+    ? "Attended" + (attGms.length ? " " + attGms.join(" & ") : "") : "";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
   // ATTENDED closes the details like any other, behind a pipe (his call

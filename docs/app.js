@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260923-153900";
+const BUILD = "20260923-154624";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1045,10 +1045,17 @@ function michCard(g, p) {
       (p.it ? "font-style:italic" : "") + '"' : "") + ">" + esc(p.t) + "</span>";
   // ...and the ATTENDED note closes the row, hard against the boxes (his
   // call 2026-09-23)
-  const attGm = mx.attGames || [];
+  /* ATTENDED (his calls 2026-09-23): the footer says so, and names the game
+     when his Attended cell does -- "Gm1", "Gm2". An x, or anything else, just
+     reads "Attended". */
+  const attWord = v => {
+    const m = /gm\s*([12])/i.exec(String(v == null ? "" : v));
+    return m ? "Gm" + m[1] : "";
+  };
+  const attGms = (series || [g]).map(x => attWord((x.mx || {}).attended))
+    .filter(Boolean).filter((v, i, a) => a.indexOf(v) === i);
   const attText = g.sport === "CHK" && mx.attended
-    ? "Attended" + (series && series.length > 1 && attGm.length &&
-        attGm.length < series.length ? " Gm" + attGm.join(" & Gm") : "") : "";
+    ? "Attended" + (attGms.length ? " " + attGms.join(" & ") : "") : "";
   const SEP = '<span class="msep">|</span>';
   let chipHtml;
   // ATTENDED closes the details like any other, behind a pipe (his call
