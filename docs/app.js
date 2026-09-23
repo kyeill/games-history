@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260923-150138";
+const BUILD = "20260923-150426";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -723,12 +723,9 @@ function michCard(g, p) {
   // CORNELL'S does, from his Sheet; where those columns are blank it reads
   // carnelian with white on the road, white with carnelian at home, and the
   // grey placeholder at a neutral site (his call 2026-09-16)
-  const cuHome = m && m.home && !g.neutral, cuRoad = m && !m.home && !g.neutral;
-  const HOCKEY_BOX = fid === CORNELL
-    ? (cuRoad ? { score_bg: "Carnelian", score_font: "White", rank_bg: "Carnelian", rank_font: "White" }
-      : cuHome ? { score_bg: "White", score_font: "Carnelian", rank_bg: "White", rank_font: "Carnelian" }
-      : {})
-    : { score_bg: "Blue", score_font: "Maize", rank_bg: "Blue", rank_font: "Maize" };
+  // A GAME HIS SHEET HAS NOT COLOURED READS GREY (his call 2026-09-23),
+  // played or not: no home-and-road default, no school colours standing in
+  const HOCKEY_BOX = {};
   // THE LIONS, until a Sheet tab says otherwise: Honolulu blue with silver
   const LIONS_BOX = { score_bg: "#0076b6", score_font: "#ffffff",
                       rank_bg: "#0076b6", rank_font: "#ffffff" };
