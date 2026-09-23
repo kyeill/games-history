@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260923-140135";
+const BUILD = "20260923-141327";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -513,7 +513,11 @@ function michCard(g, p) {
       if (upcoming(x)) return;
       const me = x.teams.find(t => t.id === fid);
       tot += 3;
-      mine += x.tie ? 1.5 : me.win ? (x.ot ? 2 : 3) : (x.ot ? 1 : 0);
+      // A TIE WITH A WINNER counts like the Big Ten counts it (his call
+      // 2026-09-23): the extra session is worth the overtime win or loss
+      mine += x.tie
+        ? (x.sho_win === true ? 2 : x.sho_win === false ? 1 : 1.5)
+        : me.win ? (x.ot ? 2 : 3) : (x.ot ? 1 : 0);
     });
     if (tot) sres = mine * 2 > tot ? "win" : mine * 2 === tot ? "split" : "loss";
   }
@@ -532,10 +536,14 @@ function michCard(g, p) {
   // hockey can end level (2026-09-16): a TIE is neither dimmed nor bold
   const oppRanked = series
     ? series.some(x => (x.teams.find(t => t.id !== fid) || {}).rank) : !!opp.rank;
-  const tied = series ? (sres === "split" && !oppRanked) : !!g.tie;
+  // ...and on a single card a tie he won reads as a WIN, one he lost as a
+  // LOSS; only a tie nobody won stays level (his call 2026-09-23)
+  const tied = series ? (sres === "split" && !oppRanked)
+    : (!!g.tie && g.sho_win == null);
   const flatSplit = !tSeries && sres === "split" && oppRanked;
   const mx = g.mx || {};
-  const lost = series ? sres === "loss" : (!upcoming(g) && !m.win && !tied);
+  const lost = series ? sres === "loss"
+    : (!upcoming(g) && !tied && (g.tie ? g.sho_win === false : !m.win));
   // Proper Case is the DEFAULT here -- the Big Ten rule of the other views
   // does not reach this one -- and his Case column is the only thing that
   // lifts a name into capitals (2026-09-14).
@@ -1781,6 +1789,9 @@ function isUpset(g) {
 function dimmed(g) {
   if (upcoming(g)) return false;
   const m = michTeam(g);
+  // a hockey TIE MICHIGAN WON in the shootout or 3-on-3 is no defeat (his
+  // call 2026-09-23)
+  if (m && !m.win && g.tie && g.sho_win === true) return false;
   return (m && !m.win) || g.teams.some(t => isRival(t) && t.win);
 }
 // The STRIKETHROUGH is narrower than dimmed (his call 2026-09-12): it marks a
