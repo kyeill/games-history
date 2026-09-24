@@ -94,13 +94,14 @@ function confOptions(pool) {
     ? [["─".repeat(12), null]].concat(list.map(c => [c, "conf:" + c])) : [];
 }
 function confMenu() {
-  if (!SPORT_OF[TAB]) return CONF_MENU.ALL;
+  if (!SPORT_OF[TAB]) return ["Big Ten"].concat(CONF_MENU.ALL);
   if (SPORT_OF[TAB] === "CHK")
-    return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL : CONF_MENU.CHK;
+    return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL
+      : ["Big Ten"].concat(CONF_MENU.CHK);
   const list = CONF_MENU[SPORT_OF[TAB]] || [];
-  // the CFB and CBB tabs lead with the BIG TEN (his call 2026-09-24); a
-  // Michigan view does not -- every game there is Michigan's already
-  return teamView() ? list : ["Big Ten"].concat(list);
+  // EVERY list leads with the BIG TEN (his calls 2026-09-24) -- on a Michigan
+  // view it picks out the conference games
+  return ["Big Ten"].concat(list);
 }
 function confOf(g, t) {
   return ((CONF_LABEL[g.sport] || {})[String(t.conf)]) || "";

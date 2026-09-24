@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260924-093219";
+const BUILD = "20260924-093605";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -94,13 +94,14 @@ function confOptions(pool) {
     ? [["─".repeat(12), null]].concat(list.map(c => [c, "conf:" + c])) : [];
 }
 function confMenu() {
-  if (!SPORT_OF[TAB]) return CONF_MENU.ALL;
+  if (!SPORT_OF[TAB]) return ["Big Ten"].concat(CONF_MENU.ALL);
   if (SPORT_OF[TAB] === "CHK")
-    return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL : CONF_MENU.CHK;
+    return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL
+      : ["Big Ten"].concat(CONF_MENU.CHK);
   const list = CONF_MENU[SPORT_OF[TAB]] || [];
-  // the CFB and CBB tabs lead with the BIG TEN (his call 2026-09-24); a
-  // Michigan view does not -- every game there is Michigan's already
-  return teamView() ? list : ["Big Ten"].concat(list);
+  // EVERY list leads with the BIG TEN (his calls 2026-09-24) -- on a Michigan
+  // view it picks out the conference games
+  return ["Big Ten"].concat(list);
 }
 function confOf(g, t) {
   return ((CONF_LABEL[g.sport] || {})[String(t.conf)]) || "";
