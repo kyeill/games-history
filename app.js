@@ -19,7 +19,7 @@ let FILT = { season: null, week: null, month: null, type: null, windows: null,
               net: null, recent: false };
 // what the filters were before CURRENT was pressed, so releasing it puts them
 // back (his call 2026-09-16)
-let CURRENT_PREV = null;
+let CURRENT_PREV = null, COMB_PREV = null;
 
 /* Season order, not calendar order: a basketball season runs Nov to Apr. */
 const MONTHS = ["January", "February", "March", "April", "May", "June",
@@ -2361,12 +2361,15 @@ function filterChips() {
         ? '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
           '">NCAA Tournament</button>'
         : "";
-    // COMBINED: a bubble that drops hockey out of the mix (his call
-    // 2026-09-24)
+    // COMBINED: CURRENT opens this season across all three sports, in date
+    // order (his call 2026-09-24), and sits between 2021-Onward and Hockey
+    const curBtn = (!sport && teamView())
+      ? '<button class="f" data-act="combcur" aria-pressed="' + !!FILT.combcur +
+        '">Current</button>' : "";
     const hkyBtn = (!sport && teamView())
       ? '<button class="f" data-act="nohky" aria-pressed="' + !FILT.nohky +
         '">Hockey</button>' : "";
-    return h + group("", extra + hkyBtn + sortButton());
+    return h + group("", extra + curBtn + hkyBtn + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
@@ -2872,6 +2875,25 @@ async function init() {
         FILT.season = played.length ? Math.max.apply(null, played) : latestSeason();
         // ...basketball Newest First (his call 2026-09-18)
         SORT = SPORT_OF[TAB] === "CBB" ? "desc" : "asc";
+      }
+    } else if (b.dataset.act === "combcur") {
+      FILT.combcur = !FILT.combcur;
+      if (FILT.combcur) {
+        // the newest season with a game PLAYED, in any of the three sports
+        COMB_PREV = { hl: FILT.hl, season: FILT.season, nohky: FILT.nohky,
+                      post: FILT.post, recent: FILT.recent, team: FILT.team, sort: SORT };
+        const played = GAMES.filter(g => g.focus === focusId() && !upcoming(g))
+          .map(g => g.season);
+        FILT.season = played.length ? Math.max.apply(null, played) : latestSeason();
+        FILT.hl = null; FILT.nohky = false; FILT.post = false; FILT.recent = false;
+        FILT.team = null;
+        SORT = "asc";
+      } else if (COMB_PREV) {
+        FILT.hl = COMB_PREV.hl; FILT.season = COMB_PREV.season;
+        FILT.nohky = COMB_PREV.nohky; FILT.post = COMB_PREV.post;
+        FILT.recent = COMB_PREV.recent; FILT.team = COMB_PREV.team;
+        SORT = COMB_PREV.sort;
+        COMB_PREV = null;
       }
     } else if (b.dataset.act === "nohky") {
       FILT.nohky = !FILT.nohky;
