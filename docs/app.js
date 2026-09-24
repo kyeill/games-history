@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260924-100623";
+const BUILD = "20260924-083541";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2749,6 +2749,43 @@ async function init() {
     const b = e.target.closest("button[data-view]");
     if (b) go(b.dataset.tab, b.dataset.view);
   });
+
+  /* SWIPING BETWEEN VIEWS ON A PHONE (his call 2026-09-24). A horizontal drag
+     across the cards walks the second row -- Tigers to Lions to Red Wings --
+     and rolls into the next top tab at either end, so the whole site is one
+     line of views. A swipe must be clearly sideways (60px across, and more
+     than twice the up-and-down) or an ordinary scroll would trigger it, and a
+     drag that starts on a dropdown or a button is left alone. */
+  const TOPS = Object.keys(NAV);
+  function stepView(dir) {
+    const flat = [];
+    TOPS.forEach(t => NAV[t].forEach(v => flat.push([t, v[1], v[2]])));
+    let i = flat.findIndex(v => v[0] === TOP && v[1] === TAB && v[2] === VIEW);
+    if (i < 0) return;
+    i += dir;
+    if (i < 0 || i >= flat.length) return;
+    TOP = flat[i][0];
+    go(flat[i][1], flat[i][2]);
+  }
+  let tx = 0, ty = 0, tracking = false;
+  document.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1 || e.target.closest("select,button,input,a")) {
+      tracking = false;
+      return;
+    }
+    tracking = true;
+    tx = e.touches[0].clientX;
+    ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener("touchend", e => {
+    if (!tracking) return;
+    tracking = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return;
+    stepView(dx < 0 ? 1 : -1);
+    window.scrollTo(0, 0);
+  }, { passive: true });
   document.getElementById("filters").addEventListener("click", e => {
     const b = e.target.closest("button.f[data-act]");
     if (!b) return;
