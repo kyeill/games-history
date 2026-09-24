@@ -76,11 +76,13 @@ const MICH_WASH = { "87": "c99700" };
    SEASON -- the conference on the game, never today's alignment -- so Houston
    reads AAC before 2023 and Big XII after. */
 const CONF_MENU = {
-  CFB: ["SEC", "Big XII", "ACC", "Pac-12", "MAC", "MW", "AAC", "CUSA", "SBC"],
-  CBB: ["SEC", "ACC", "Big XII", "Big East", "Pac-12", "MAC", "AAC", "A10", "MW", "MVC"],
+  CFB: ["SEC", "Big XII", "ACC", "Pac-12", "MAC", "Mountain West", "American"],
+  CBB: ["SEC", "ACC", "Big XII", "Big East", "Pac-12", "MAC", "American",
+        "Atlantic 10", "Mountain West"],
   CHK: ["Hockey East", "NCHC", "ECAC", "CCHA", "Atlantic"],
   CHK_CORNELL: ["Hockey East", "NCHC", "Big Ten", "CCHA", "Atlantic"],
-  ALL: ["SEC", "Big XII", "ACC", "Big East", "Pac-12", "MAC", "MW", "AAC"],
+  ALL: ["SEC", "Big XII", "ACC", "Big East", "Pac-12", "MAC", "Mountain West",
+        "American"],
 };
 // the options themselves: a bar, then his conferences for this view, each one
 // kept only when the list would return games under the other filters
@@ -95,7 +97,10 @@ function confMenu() {
   if (!SPORT_OF[TAB]) return CONF_MENU.ALL;
   if (SPORT_OF[TAB] === "CHK")
     return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL : CONF_MENU.CHK;
-  return CONF_MENU[SPORT_OF[TAB]] || [];
+  const list = CONF_MENU[SPORT_OF[TAB]] || [];
+  // the CFB and CBB tabs lead with the BIG TEN (his call 2026-09-24); a
+  // Michigan view does not -- every game there is Michigan's already
+  return teamView() ? list : ["Big Ten"].concat(list);
 }
 function confOf(g, t) {
   return ((CONF_LABEL[g.sport] || {})[String(t.conf)]) || "";
@@ -2052,6 +2057,12 @@ function visible() {
     list = list.filter(g =>
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
+  // COMBINED shows PLAYED GAMES ONLY (his call 2026-09-24), and can drop
+  // hockey altogether
+  if (teamView() && !SPORT_OF[TAB]) {
+    list = list.filter(g => !upcoming(g));
+    if (FILT.nohky) list = list.filter(g => g.sport !== "CHK");
+  }
   if (FILT.team && String(FILT.team).indexOf("conf:") === 0) {
     const want = String(FILT.team).slice(5);
     list = list.filter(g => confsIn(g).indexOf(want) > -1);
@@ -2350,7 +2361,12 @@ function filterChips() {
         ? '<button class="f" data-act="post" aria-pressed="' + !!FILT.post +
           '">NCAA Tournament</button>'
         : "";
-    return h + group("", extra + sortButton());
+    // COMBINED: a bubble that drops hockey out of the mix (his call
+    // 2026-09-24)
+    const hkyBtn = (!sport && teamView())
+      ? '<button class="f" data-act="nohky" aria-pressed="' + !FILT.nohky +
+        '">Hockey</button>' : "";
+    return h + group("", extra + hkyBtn + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
@@ -2857,6 +2873,8 @@ async function init() {
         // ...basketball Newest First (his call 2026-09-18)
         SORT = SPORT_OF[TAB] === "CBB" ? "desc" : "asc";
       }
+    } else if (b.dataset.act === "nohky") {
+      FILT.nohky = !FILT.nohky;
     } else if (b.dataset.act === "upset") {
       FILT.upset = !FILT.upset;
     } else if (b.dataset.act === "post") {

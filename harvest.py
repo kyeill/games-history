@@ -2657,6 +2657,61 @@ def rank_of(c):
     return None if v in (None, 0, 99) else v
 
 
+# ---------------------------------------------------------------------------
+# WHICH CONFERENCE A TEAM WAS IN THAT SEASON (his call 2026-09-24). ESPN's
+# scoreboard gives a team's conference TODAY, not the one it played in -- a
+# 2011 San Diego State game reads Pac-12 because the Aztecs join it in 2026
+# (his catch). The core API keeps the real membership per season, one call per
+# conference, so it is walked once and cached in data/conf-map.json.
+# ---------------------------------------------------------------------------
+CONF_MAP_FILE = os.path.join(HERE, "data", "conf-map.json")
+_CONF_MAP = (json.load(open(CONF_MAP_FILE, encoding="utf-8"))
+             if os.path.exists(CONF_MAP_FILE) else {})
+CORE_LEAGUE = {"CFB": "football/leagues/college-football",
+               "CBB": "basketball/leagues/mens-college-basketball"}
+CORE = "http://sports.core.api.espn.com/v2/sports"
+
+
+def conf_map(code, season):
+    """{team id: conference id} as the season was actually played."""
+    key = "%s-%d" % (code, season)
+    if key in _CONF_MAP:
+        return _CONF_MAP[key]
+    out = {}
+    base = "%s/%s/seasons/%d/types/2/groups" % (CORE, CORE_LEAGUE[code], season)
+    try:
+        top = get_json(base, params={"limit": 100}).get("items", [])
+        for ref in top:
+            g = get_json(ref["$ref"])
+            kids = get_json(g["children"]["$ref"], params={"limit": 200}).get("items", [])                 if g.get("children") else []
+            for kref in kids:
+                k = get_json(kref["$ref"])
+                confs = [k]
+                if k.get("children"):
+                    confs += [get_json(x["$ref"]) for x in
+                              get_json(k["children"]["$ref"],
+                                       params={"limit": 200}).get("items", [])]
+                for c in confs:
+                    if not c.get("teams"):
+                        continue
+                    for t in get_json(c["teams"]["$ref"],
+                                      params={"limit": 200}).get("items", []):
+                        tid = t["$ref"].split("/teams/")[1].split("?")[0]
+                        out[tid] = str(c["id"])
+    except (requests.RequestException, KeyError, ValueError) as e:
+        print("  WARN: no conference map for %s (%s)" % (key, e), file=sys.stderr)
+        return {}
+    _CONF_MAP[key] = out
+    return out
+
+
+def save_conf_map():
+    if _CONF_MAP:
+        os.makedirs(os.path.dirname(CONF_MAP_FILE), exist_ok=True)
+        json.dump(_CONF_MAP, open(CONF_MAP_FILE, "w", encoding="utf-8"),
+                  separators=(",", ":"), sort_keys=True)
+
+
 def networks(comp):
     out = []
     for b in comp.get("broadcasts") or []:
@@ -4035,6 +4090,15 @@ def harvest():
         for t in g["teams"]:
             if t["id"] in sd:
                 t["seed"] = sd[t["id"]]
+    # THE CONFERENCE EACH TEAM PLAYED IN THAT SEASON (his call 2026-09-24),
+    # from ESPN's core API rather than the scoreboard's current-day answer
+    for g in keep:
+        if g["sport"] in CORE_LEAGUE:
+            cmap = conf_map(g["sport"], g["season"])
+            for t in g["teams"]:
+                if cmap.get(t["id"]):
+                    t["conf"] = cmap[t["id"]]
+    save_conf_map()
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf

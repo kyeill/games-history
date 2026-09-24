@@ -132,11 +132,11 @@ SHOOTOUT_FIX = {
 # groups by NAME, which is what lets Combined mix the three sports.
 CONF_LABEL = {
     "CFB": {"1": "ACC", "4": "Big XII", "5": "Big Ten", "8": "SEC", "9": "Pac-12",
-            "12": "CUSA", "15": "MAC", "17": "MW", "18": "Independent",
-            "37": "SBC", "151": "AAC"},
-    "CBB": {"2": "ACC", "3": "A10", "4": "Big East", "7": "Big Ten", "8": "Big XII",
+            "12": "CUSA", "15": "MAC", "17": "Mountain West", "18": "Independent",
+            "37": "SBC", "151": "American"},
+    "CBB": {"2": "ACC", "3": "Atlantic 10", "4": "Big East", "7": "Big Ten", "8": "Big XII",
             "11": "CUSA", "12": "Ivy", "14": "MAC", "18": "MVC", "21": "Pac-12",
-            "23": "SEC", "29": "WCC", "44": "MW", "62": "AAC"},
+            "23": "SEC", "29": "WCC", "44": "Mountain West", "62": "American"},
     # USCHO's codes, mapped to the names he uses
     "CHK": {"B1GH": "Big Ten", "ECAC": "ECAC", "HEA": "Hockey East", "NCHC": "NCHC",
             "WCHA": "WCHA", "AHA": "Atlantic", "CCHA": "CCHA", "CHA": "CHA"},
