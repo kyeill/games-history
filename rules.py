@@ -126,6 +126,25 @@ SHOOTOUT_FIX = {
     "340320130": None,    # 3/20/2014  Michigan vs Penn State, Big Ten quarterfinal
 }
 
+# THE CONFERENCE FILTER (his call 2026-09-24). A game carries the conference
+# each team was in THAT SEASON -- ESPN's own id for football and basketball,
+# USCHO's code for hockey -- so these maps only have to name them. The app
+# groups by NAME, which is what lets Combined mix the three sports.
+CONF_LABEL = {
+    "CFB": {"1": "ACC", "4": "Big XII", "5": "Big Ten", "8": "SEC", "9": "Pac-12",
+            "12": "CUSA", "15": "MAC", "17": "MW", "18": "Independent",
+            "37": "SBC", "151": "AAC"},
+    "CBB": {"2": "ACC", "3": "A10", "4": "Big East", "7": "Big Ten", "8": "Big XII",
+            "11": "CUSA", "12": "Ivy", "14": "MAC", "18": "MVC", "21": "Pac-12",
+            "23": "SEC", "29": "WCC", "44": "MW", "62": "AAC"},
+    # USCHO's codes, mapped to the names he uses
+    "CHK": {"B1GH": "Big Ten", "ECAC": "ECAC", "HEA": "Hockey East", "NCHC": "NCHC",
+            "WCHA": "WCHA", "AHA": "Atlantic", "CCHA": "CCHA", "CHA": "CHA"},
+}
+# USCHO conference code -> the code kept on a game
+USCHO_CONF = {"b10": "B1GH", "ec": "ECAC", "he": "HEA", "nt": "NCHC", "wc": "WCHA",
+              "ah": "AHA", "cc": "CCHA", "cc2": "CCHA", "ch": "CHA"}
+
 PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2",
                 "NBCSN", "truTV", "CNBC", "USA Net", "USA", "Versus", "OLN",
                 "Apple TV", "Apple TV+", "Peacock", "Prime Video", "Netflix",

@@ -27,7 +27,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
                 "December"];
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
-let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {};
+let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -70,6 +70,42 @@ function shade(hex, lighten, strength) {
 // Dame's card stays antique gold there while the rest of the site reads navy
 // (his call 2026-09-16). A border marked "Opponent" still uses teamColor.
 const MICH_WASH = { "87": "c99700" };
+/* THE CONFERENCE FILTER (his call 2026-09-24). Each view lists the
+   conferences he cares about, in his order, under a bar at the foot of the
+   Teams dropdown. A game counts when a team was in that conference THAT
+   SEASON -- the conference on the game, never today's alignment -- so Houston
+   reads AAC before 2023 and Big XII after. */
+const CONF_MENU = {
+  CFB: ["SEC", "Big XII", "ACC", "Pac-12", "MAC", "MW", "AAC", "CUSA", "SBC"],
+  CBB: ["SEC", "ACC", "Big XII", "Big East", "Pac-12", "MAC", "AAC", "A10", "MW", "MVC"],
+  CHK: ["Hockey East", "NCHC", "ECAC", "CCHA", "Atlantic"],
+  CHK_CORNELL: ["Hockey East", "NCHC", "Big Ten", "CCHA", "Atlantic"],
+  ALL: ["SEC", "Big XII", "ACC", "Big East", "Pac-12", "MAC", "MW", "AAC"],
+};
+// the options themselves: a bar, then his conferences for this view, each one
+// kept only when the list would return games under the other filters
+function confOptions(pool) {
+  const have = new Set();
+  (pool || []).forEach(g => confsIn(g).forEach(c => have.add(c)));
+  const list = confMenu().filter(c => have.has(c) || FILT.team === "conf:" + c);
+  return list.length
+    ? [["─".repeat(12), null]].concat(list.map(c => [c, "conf:" + c])) : [];
+}
+function confMenu() {
+  if (!SPORT_OF[TAB]) return CONF_MENU.ALL;
+  if (SPORT_OF[TAB] === "CHK")
+    return VIEW === "cornell" ? CONF_MENU.CHK_CORNELL : CONF_MENU.CHK;
+  return CONF_MENU[SPORT_OF[TAB]] || [];
+}
+function confOf(g, t) {
+  return ((CONF_LABEL[g.sport] || {})[String(t.conf)]) || "";
+}
+// the conferences a game can be filtered by: the opponents' own, never the
+// focus team's (a Michigan view lists who Michigan played)
+function confsIn(g) {
+  return g.teams.filter(t => !teamView() || t.id !== focusId())
+    .map(t => confOf(g, t)).filter(Boolean);
+}
 function teamColor(t) {
   // a PRO team ("nfl-8") takes ESPN's colour from the team list
   const pro = t.id.indexOf("-") > 0 && TEAMS[t.id] ? TEAMS[t.id].color : null;
@@ -2016,7 +2052,10 @@ function visible() {
     list = list.filter(g =>
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
   if (FILT.type) list = list.filter(g => g.type === FILT.type);
-  if (FILT.team) list = list.filter(g =>
+  if (FILT.team && String(FILT.team).indexOf("conf:") === 0) {
+    const want = String(FILT.team).slice(5);
+    list = list.filter(g => confsIn(g).indexOf(want) > -1);
+  } else if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
   // Same kickoff minute: the bigger network leads (his order).
   const rank = g => {
@@ -2246,7 +2285,8 @@ function filterChips() {
     // COMBINED has a Team filter of its own (his call 2026-09-20); the
     // Network one stays out, three sports sharing no windows
     h += group("Team", select("team", "All Teams",
-      [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf))),
+      [].concat.apply([], teamGroups.map((ids, i) => i ? lined(ids) : ids.map(optOf)))
+        .concat(confOptions(visibleWithout("team"))),
       FILT.team));
     // THE NETWORK, in HIS order, which differs by sport (2026-09-14): the
     // broadcast networks he watches on, a bar, then the cable tier, then
@@ -2398,7 +2438,8 @@ function filterChips() {
   const withLine = ids => ids.length
     ? [["─".repeat(12), null]].concat(ids.map(teamOpt)) : [];
   h += group("Team", select("team", "All Teams",
-    teamList.bigTen.map(teamOpt).concat(withLine(teamList.power), withLine(teamList.rest)),
+    teamList.bigTen.map(teamOpt).concat(withLine(teamList.power), withLine(teamList.rest),
+      confOptions(visibleWithout("team"))),
     FILT.team));
   h += group("", quickButtons());
   return h;
@@ -2724,6 +2765,7 @@ async function init() {
   HEADER_TINT = r[0].header_tint || {};
   NET_TINT = r[0].net_tint || {};
   BIG_TEN = r[0].big_ten || {};
+  CONF_LABEL = r[0].conf_label || {};
   TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};
@@ -2762,8 +2804,9 @@ async function init() {
     TOPS.forEach(t => NAV[t].forEach(v => flat.push([t, v[1], v[2]])));
     let i = flat.findIndex(v => v[0] === TOP && v[1] === TAB && v[2] === VIEW);
     if (i < 0) return;
-    i += dir;
-    if (i < 0 || i >= flat.length) return;
+    // ...and the ends WRAP (his call 2026-09-24): past the last Detroit team
+    // comes Michigan football again
+    i = (i + dir + flat.length) % flat.length;
     TOP = flat[i][0];
     go(flat[i][1], flat[i][2]);
   }

@@ -1051,6 +1051,15 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 if tie and mine == 0 and str(us.get("complete") or "").upper() != "Y":
                     continue
             det = uscho_details(us, team_id, opp_loc) if us else {}
+            # THE CONFERENCE AT THE TIME (his call 2026-09-24): USCHO names the
+            # home and visiting conferences on every row, which is the only
+            # source that follows a team through a move (Notre Dame to the Big
+            # Ten, Bowling Green to the new CCHA)
+            for q in side:
+                code = rules.USCHO_CONF.get(str(
+                    (us or {}).get("hconf" if q["home"] else "vconf") or "").lower())
+                if code:
+                    q["conf"] = code
             fix = HOCKEY_GAME_FIX.get((team_id, day), {})
             for k in ("event", "city", "offsite", "series", "neutral"):
                 if k in fix:
@@ -4038,6 +4047,7 @@ def harvest():
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
                "big_ten": rules.BIG_TEN, "season_names": rules.SEASON_NAMES,
+               "conf_label": rules.CONF_LABEL,
                "team_conf": {"172": rules.CORNELL_CONF},
                "net_priority": rules.NET_PRIORITY,
                "seasons": sorted({g["season"] for g in keep})},
