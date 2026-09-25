@@ -3544,7 +3544,7 @@ def harvest():
                            else 0 if x["id"] in wk0
                            else (x.get("week") or {}).get("number"))
                 head_txt = (rules.cfb_header(card_slots, d, forced, season=y,
-                                             week=week_no)
+                                             week=week_no, nets=nets)
                             if code == "CFB" else None)
                 # the 2021-22 SEC game has no window to name it
                 if sec_cbs and not head_txt:
@@ -3739,7 +3739,8 @@ def harvest():
                 "nets": sorted(nets), "teams": side, "week": wk,
                 "slots": sorted(slots), "type": gtype, "champ": None,
                 "round": (heads[0] if heads else None), "title": False,
-                "header": ((rules.cfb_header(sorted(slots), d, season=y, week=wk)
+                "header": ((rules.cfb_header(sorted(slots), d, season=y, week=wk,
+                                            nets=nets)
                             or (rules.SEC_ON_CBS["label"] if sec_cbs else None))
                            if code == "CFB" else None),
                 "venue": v.get("fullName"),

@@ -412,7 +412,7 @@ SEC_ON_CBS = {"season": 2023, "window": "CBS B1G Time", "weeks": (3, 13),
               "label": "SEC on CBS"}
 
 
-def cfb_header(slots, d, forced=False, season=None, week=None):
+def cfb_header(slots, d, forced=False, season=None, week=None, nets=()):
     """The label after the date on a football card.
 
     It is USUALLY the window's own name, but ABC is the exception: the window
@@ -429,6 +429,13 @@ def cfb_header(slots, d, forced=False, season=None, week=None):
                 and week is not None and s["weeks"][0] <= week <= s["weeks"][1]):
             return s["label"]
         return named[0]
+    # NBC PRIMETIME (his call 2026-09-25). NBC has no football window before
+    # 2023 -- the package was Notre Dame's alone -- so a night game on it went
+    # unlabelled. Prior to 2020 it now names itself the way ABC does: Michigan
+    # at Notre Dame in 2012, 2014 and 2018.
+    if (season is not None and season < 2020 and "NBC" in set(nets)
+            and _mins(d) >= 19 * 60):
+        return "NBC Primetime"
     if "ABC Saturday" not in slots:
         return None
     t = _mins(d)

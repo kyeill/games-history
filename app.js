@@ -870,8 +870,12 @@ function michCard(g, p) {
     const xTop = michColour(xb.score_bg) || top;
     const xInk = michColour(xb.score_font) || (xb.score_bg ? null : scoreInk);
     const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
-    // ...and on the Red Wings' playoff cards (his call 2026-09-18)
-    const mark = (g.sport === "CHK" || g.sport === "NHL") && !upcoming(x) &&
+    // ...and on the Red Wings' playoff cards (his call 2026-09-18), and on
+    // football and basketball as well (his call 2026-09-25): an overtime game
+    // is underlined whether Michigan won it or lost it, so 2016 at Ohio State
+    // reads underlined and italic both.
+    const UNDERLINE_OT = ["CHK", "NHL", "CFB", "CBB"];
+    const mark = UNDERLINE_OT.indexOf(g.sport) > -1 && !upcoming(x) &&
       (x.ot || x.so || x.tie);
     // A SHOOTOUT reads in brackets -- "[2-2]" -- still underlined, and the
     // team that LOST the shootout has it italic like any other defeat (his
