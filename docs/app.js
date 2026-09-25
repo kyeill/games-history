@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260924-100650";
+const BUILD = "20260925-073541";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -457,7 +457,10 @@ function rowHtml(g, browse) {
     '<div class="teams">' + teamLine(away, g.sport, g.season, seedOf(g, away), g) +
       teamLine(home, g.sport, g.season, seedOf(g, home), g) + "</div>" +
     // network on the away team's line, time on the home team's
-    '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
+    // ABC READS RED on a football card (his call 2026-09-25); every other
+    // network keeps the card's own colour
+    '<div class="meta"><div class="mrow"' +
+      col(g.sport === "CFB" && primaryNet(g.nets) === "ABC" ? "#e03a3a" : netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
       col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></div>";

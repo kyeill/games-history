@@ -457,7 +457,10 @@ function rowHtml(g, browse) {
     '<div class="teams">' + teamLine(away, g.sport, g.season, seedOf(g, away), g) +
       teamLine(home, g.sport, g.season, seedOf(g, home), g) + "</div>" +
     // network on the away team's line, time on the home team's
-    '<div class="meta"><div class="mrow"' + col(netCol) + ">" +
+    // ABC READS RED on a football card (his call 2026-09-25); every other
+    // network keeps the card's own colour
+    '<div class="meta"><div class="mrow"' +
+      col(g.sport === "CFB" && primaryNet(g.nets) === "ABC" ? "#e03a3a" : netCol) + ">" +
       esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
       col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></div>";

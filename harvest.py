@@ -2712,6 +2712,51 @@ def save_conf_map():
                   separators=(",", ":"), sort_keys=True)
 
 
+# ---------------------------------------------------------------------------
+# THE KICKOFF HE PLANNED AROUND (his call 2026-09-25). A game that moves after
+# it is scheduled -- Alabama and Florida State pushed off ABC's Saturday night
+# onto ESPN2 by weather -- would otherwise lose its window and fall off TV
+# Windows entirely. So every UPCOMING game's date, time and networks are
+# written down the first time a build sees them, and a played game reads back
+# what was intended rather than what happened.
+KICKOFF_FILE = os.path.join(HERE, "data", "kickoff.json")
+_KICKOFF = (json.load(open(KICKOFF_FILE, encoding="utf-8"))
+            if os.path.exists(KICKOFF_FILE) else {})
+
+
+def kickoff_remember(games):
+    """Record an upcoming game's slot once, and give a played one its slot back."""
+    changed = 0
+    for g in games:
+        if g["sport"] not in ("CFB", "CBB"):
+            continue
+        gid = g["id"]
+        if g.get("upcoming"):
+            if gid not in _KICKOFF:
+                _KICKOFF[gid] = {"date": g["date"], "time": g["time"],
+                                 "dow": g["dow"], "nets": list(g.get("nets") or [])}
+            continue
+        was = _KICKOFF.get(gid)
+        if not was:
+            continue
+        if (g["date"], g["time"], sorted(g.get("nets") or [])) != \
+                (was["date"], was["time"], sorted(was.get("nets") or [])):
+            changed += 1
+        g["date"], g["time"], g["dow"] = was["date"], was["time"], was["dow"]
+        if was.get("nets"):
+            g["nets"] = list(was["nets"])
+    if changed:
+        print("  %d games kept the kickoff they were scheduled for" % changed)
+    return changed
+
+
+def kickoff_save():
+    if _KICKOFF:
+        os.makedirs(os.path.dirname(KICKOFF_FILE), exist_ok=True)
+        json.dump(_KICKOFF, open(KICKOFF_FILE, "w", encoding="utf-8"),
+                  separators=(",", ":"), sort_keys=True)
+
+
 def networks(comp):
     out = []
     for b in comp.get("broadcasts") or []:
@@ -3232,6 +3277,13 @@ def harvest():
 
                 d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") \
                       .replace(tzinfo=dt.timezone.utc).astimezone(ET)
+                # THE KICKOFF IT WAS SCHEDULED FOR (his call 2026-09-25): a game
+                # moved afterwards keeps the slot he planned around, so the
+                # window rules below judge that one
+                was = _KICKOFF.get(x["id"])
+                if was:
+                    d = dt.datetime.strptime(was["date"] + " " + was["time"],
+                                             "%Y-%m-%d %H:%M").replace(tzinfo=ET)
                 # Regulation is 4 quarters of football, 2 halves of
                 # basketball; any period beyond that is overtime.
                 period = (c.get("status") or {}).get("period") or 0
@@ -3251,7 +3303,7 @@ def harvest():
                 # Oregon-Oklahoma State on Disney+/ESPNEWS when it was on ESPN,
                 # and a fill-only override could never correct that -- it only
                 # applied when ESPN listed nothing at all.
-                nets = set(net_overrides.get(x["id"], ())) or set(networks(c))
+                nets = set(net_overrides.get(x["id"], ())) or                     set((was or {}).get("nets") or ()) or set(networks(c))
                 ranks = [rank_of(k) for k in cs]
                 # a rival loss with no ranking on either side asks that week's
                 # AP poll, because ESPN drops some old rankings (see ap_ranks)
@@ -4099,6 +4151,9 @@ def harvest():
                 if cmap.get(t["id"]):
                     t["conf"] = cmap[t["id"]]
     save_conf_map()
+    # remember every upcoming kickoff, so a game moved later keeps this slot
+    kickoff_remember(keep)
+    kickoff_save()
     for (code, tid), (_, conf) in latest_conf.items():
         if tid in teams:
             teams[tid].setdefault("conf", {})[code] = conf
