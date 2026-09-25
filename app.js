@@ -1827,12 +1827,12 @@ function highlightOf(g, kind) {
     return ((g.neutral || !!g.offsite) && !st && !g.post) || series || gameDay ||
       /ACC Challenge|Gavitt/.test(g.event || "");
   }
-  // A TIE MICHIGAN WON in the shootout or in 3-on-3 counts as a win here
-  // (his call 2026-09-25), exactly as it escapes the italics elsewhere: the
-  // 2/9/2018 game at Michigan State is one he shaded and wants under
-  // Memorable.
-  const won = m.win || (g.sport === "CHK" && g.tie && g.sho_win === true);
-  if (!won) return false;
+  // HIS SHEET DECIDES THIS (his call 2026-09-25): he never shades or borders
+  // a defeat, so the only work left here is keeping defeats out -- and a TIE
+  // is not one, unless he lost the shootout, which reads as a defeat
+  // everywhere else. That is what brings 2/9/2018 at Michigan State back.
+  const lost = !m.win && (!g.tie || g.sho_win === false);
+  if (lost) return false;
   const special = shaded && border === "title";
   if (kind === "Special") return special;
   if (kind === "Memorable") return shaded || !!border;
