@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260925-085124";
+const BUILD = "20260925-085602";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -111,6 +111,10 @@ function confOf(g, t) {
 function confsIn(g) {
   return g.teams.filter(t => !teamView() || t.id !== focusId())
     .map(t => confOf(g, t)).filter(Boolean);
+}
+// A 7PM-OR-LATER START (his call 2026-09-25), the Michigan tab's Primetime
+function primetime(g) {
+  return g.time !== "TBD" && g.time >= "19:00";
 }
 function teamColor(t) {
   // a PRO team ("nfl-8") takes ESPN's colour from the team list
@@ -1991,7 +1995,14 @@ function visible() {
   // on CBS, not for the NCAA Tournament games CBS happened to carry, so any
   // game with a STAGE is out (a bowl, the CFP, the Big Ten or NCAA Tournament,
   // the NIT). A preseason MTE has no stage and stays.
-  if (FILT.net) {
+  // ...and two questions that are not about a network at all, but that he
+  // asks of the same dropdown (his call 2026-09-25): MARQUEE, the games he
+  // plans a weekend around, and PRIMETIME, a 7pm-or-later start. Both are
+  // about the game itself rather than who carried it, so unlike a network
+  // they keep the postseason.
+  if (FILT.net === "mq:") list = list.filter(g => g.mq);
+  else if (FILT.net === "prime:") list = list.filter(primetime);
+  else if (FILT.net) {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
   }
   // TV WINDOWS AND KEY GAMES look only as far as the coming Sunday (his call
@@ -2333,6 +2344,19 @@ function filterChips() {
       if (netOpts.length) netOpts.push(["────────────", null]);
       netOpts = netOpts.concat(have.map(netOpt));
     });
+    // MARQUEE and PRIMETIME sit under a bar of their own at the foot of the
+    // list (his call 2026-09-25). Basketball takes Marquee alone -- a 7pm tip
+    // is most of its schedule, so the question does not sort anything. Neither
+    // appears where no game would come back.
+    const extraNet = (sport === "CFB"
+      ? [["Marquee", "mq:"], ["Primetime", "prime:"]]
+      : sport === "CBB" ? [["Marquee", "mq:"]] : [])
+      .filter(o => o[1] === FILT.net || visibleWithout("net")
+        .some(o[1] === "mq:" ? (g => !!g.mq) : primetime));
+    if (extraNet.length) {
+      if (netOpts.length) netOpts.push(["─".repeat(12), null]);
+      netOpts = netOpts.concat(extraNet);
+    }
     // no Network filter where every game is a tournament game or TV is rare
     if (sport && sport !== "CHK" && VIEW !== "cornell")
       h += group("Network", select("net", "All Networks", netOpts, FILT.net));
