@@ -112,9 +112,10 @@ function confsIn(g) {
   return g.teams.filter(t => !teamView() || t.id !== focusId())
     .map(t => confOf(g, t)).filter(Boolean);
 }
-// A 7PM-OR-LATER START (his call 2026-09-25), the Michigan tab's Primetime
+// A 7PM-OR-LATER START (his call 2026-09-25), the Michigan tab's Primetime.
+// The postseason stays out, as it does for a network.
 function primetime(g) {
-  return g.time !== "TBD" && g.time >= "19:00";
+  return !g.stage && g.time !== "TBD" && g.time >= "19:00";
 }
 function teamColor(t) {
   // a PRO team ("nfl-8") takes ESPN's colour from the team list
@@ -1997,10 +1998,9 @@ function visible() {
   // the NIT). A preseason MTE has no stage and stays.
   // ...and two questions that are not about a network at all, but that he
   // asks of the same dropdown (his call 2026-09-25): MARQUEE, the games he
-  // plans a weekend around, and PRIMETIME, a 7pm-or-later start. Both are
-  // about the game itself rather than who carried it, so unlike a network
-  // they keep the postseason.
-  if (FILT.net === "mq:") list = list.filter(g => g.mq);
+  // plans a weekend around, and PRIMETIME, a 7pm-or-later start. They drop
+  // the postseason exactly as a network does (his call 2026-09-25).
+  if (FILT.net === "mq:") list = list.filter(g => g.mq && !g.stage);
   else if (FILT.net === "prime:") list = list.filter(primetime);
   else if (FILT.net) {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
