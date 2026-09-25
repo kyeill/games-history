@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260925-130741";
+const BUILD = "20260925-143358";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1430,15 +1430,22 @@ window.addEventListener("resize", () => {
 // days, become one card (his call 2026-09-16). Each unit is drawn from its
 // OLDEST game, carrying the pair as _series and his Sheet columns merged: a
 // shade, a border or a star on either game belongs to the series.
-function hockeyUnits(list) {
+// A CONFERENCE-TOURNAMENT SERIES groups as well (his call 2026-09-16) -- the
+// Big Ten and ECAC best-of-threes -- up to three games of the same round
+function hockeyConfSeries(g) {
+  return /^(Big Ten|ECAC) Tournament/.test(g.stage || "");
+}
+// MICHIGAN STATE IS NEVER COMBINED (his call 2026-09-22): each game of the
+// weekend gets its own card, both carrying the same week number
+function groupable(g) {
+  return g.sport === "CHK" && !g.preseason &&
+    !g.teams.some(t => t.id === "127") && (!g.stage || hockeyConfSeries(g));
+}
+// The runs of games a card can be built from -- the grouping alone, so the
+// HIGHLIGHTS filter can ask its question of a whole card (his catch
+// 2026-09-25) instead of splitting a weekend in half.
+function hockeyGroups(list) {
   const units = [];
-  // A CONFERENCE-TOURNAMENT SERIES groups as well (his call 2026-09-16) -- the
-  // Big Ten and ECAC best-of-threes -- up to three games of the same round
-  const confSeries = g => /^(Big Ten|ECAC) Tournament/.test(g.stage || "");
-  // MICHIGAN STATE IS NEVER COMBINED (his call 2026-09-22): each game of the
-  // weekend gets its own card, both carrying the same week number
-  const groupable = g => g.sport === "CHK" && !g.preseason &&
-    !g.teams.some(t => t.id === "127") && (!g.stage || confSeries(g));
   const oppOf = g => (g.teams.find(t => t.id !== (g.focus || focusId())) || {}).id;
   const day = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 864e5;
   for (let i = 0; i < list.length; i++) {
@@ -1458,6 +1465,11 @@ function hockeyUnits(list) {
     i += run.length - 1;
     units.push(run.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)));
   }
+  return units;
+}
+
+function hockeyUnits(list) {
+  const units = hockeyGroups(list);
   const out = [];
   units.forEach(games => {
     // a single tournament game is an ordinary tournament card, not a series
@@ -1815,7 +1827,12 @@ function highlightOf(g, kind) {
     return ((g.neutral || !!g.offsite) && !st && !g.post) || series || gameDay ||
       /ACC Challenge|Gavitt/.test(g.event || "");
   }
-  if (!m.win) return false;
+  // A TIE MICHIGAN WON in the shootout or in 3-on-3 counts as a win here
+  // (his call 2026-09-25), exactly as it escapes the italics elsewhere: the
+  // 2/9/2018 game at Michigan State is one he shaded and wants under
+  // Memorable.
+  const won = m.win || (g.sport === "CHK" && g.tie && g.sho_win === true);
+  if (!won) return false;
   const special = shaded && border === "title";
   if (kind === "Special") return special;
   if (kind === "Memorable") return shaded || !!border;
@@ -2017,7 +2034,21 @@ function visible() {
     list = list.filter(g => !upcoming(g) || g.date <= end);
   }
   if (FILT.season != null) list = list.filter(g => g.season === FILT.season);
-  if (teamView() && FILT.hl) list = list.filter(g => highlightOf(g, FILT.hl));
+  if (teamView() && FILT.hl) {
+    // A WEEKEND IS ONE CARD (his catch 2026-09-25): asking of each game
+    // separately broke the pairs apart -- Ohio State 2019 and Penn State 2020
+    // came back with the Saturday game gone and half a card left. Either game
+    // qualifying now keeps both. A tournament series is one card per game, so
+    // it shares nothing.
+    const keep = new Set();
+    hockeyGroups(list.slice().sort((a, b) =>
+      (a.date + a.time).localeCompare(b.date + b.time))).forEach(run => {
+      const hit = run.filter(x => highlightOf(x, FILT.hl));
+      if (!hit.length) return;
+      (run.length > 1 && run[0].stage ? hit : run).forEach(x => keep.add(x.id));
+    });
+    list = list.filter(g => keep.has(g.id));
+  }
   if (teamView() && FILT.jersey) list = list.filter(g => jerseyOf(g) === FILT.jersey);
   if (seriesView() && FILT.cup) list = list.filter(g => !g.post);
   if (seriesView() && FILT.walk) list = list.filter(g => (g.mx || {}).walkoff);
