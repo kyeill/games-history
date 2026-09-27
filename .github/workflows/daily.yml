@@ -1,9 +1,17 @@
 name: Daily build
 
 # 6am EASTERN, every day (his call 2026-09-12). GitHub schedules in UTC only,
-# so this fires at both 10:00 and 11:00 UTC and the job itself bails unless it
-# is really 6am in New York -- that keeps one run a day across daylight saving
-# instead of drifting an hour twice a year.
+# so this fires at both 10:00 and 11:00 UTC and the job decides which run is
+# the day's build -- that keeps one run a day across daylight saving instead of
+# drifting an hour twice a year.
+#
+# IT USED TO DEMAND THE HOUR BE EXACTLY 6 (his catch 2026-09-27: "yesterday's
+# games didn't seem to load"). GitHub runs a scheduled job when it has room,
+# and from 2026-09-25 it was handing these out three and four hours late, so
+# every run woke at 9, 10 or 11am, failed the test and skipped -- three days
+# with no build at all and nobody to say so. The rule now is the one he
+# actually wants: build on the first run of the NY day at or after 6am that
+# has not already built.
 on:
   schedule:
     - cron: "0 10 * * *"
@@ -21,20 +29,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Is it 6am in New York?
+      # the history is needed to see whether today's build already ran
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
+
+      - name: Has today's build run yet?
         id: clock
         run: |
+          today=$(TZ=America/New_York date +%Y-%m-%d)
           hour=$(TZ=America/New_York date +%H)
-          echo "New York hour: $hour"
-          if [ "$hour" != "06" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            echo "not 6am -- skipping"
-            echo "go=no" >> "$GITHUB_OUTPUT"
-          else
+          echo "New York: $today, hour $hour"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "go=yes" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
-
-      - uses: actions/checkout@v4
-        if: steps.clock.outputs.go == 'yes'
+          if [ "$((10#$hour))" -lt 6 ]; then
+            echo "before 6am -- leaving it to the later run"
+            echo "go=no" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git log -30 --format=%s | grep -q "^Daily build $today"; then
+            echo "already built today -- skipping"
+            echo "go=no" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "go=yes" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5
         if: steps.clock.outputs.go == 'yes'
