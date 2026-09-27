@@ -12,10 +12,22 @@ name: Daily build
 # with no build at all and nobody to say so. The rule now is the one he
 # actually wants: build on the first run of the NY day at or after 6am that
 # has not already built.
+#
+# IT ALSO HAS TO FIX ITSELF (his call 2026-09-27: "can you just automatically
+# handle it when it fails"). So the day gets FIVE chances rather than two, and
+# because each run builds only if the day has not been built yet, the extra
+# ones cost nothing on a normal day and quietly catch up on a bad one -- a
+# late hand-out from GitHub, a dead ESPN response, a half-second network
+# blip. The site itself carries a build stamp, so a build always leaves a
+# commit behind and the check below can never mistake a silent failure for a
+# day's work already done.
 on:
   schedule:
-    - cron: "0 10 * * *"
-    - cron: "0 11 * * *"
+    - cron: "0 10 * * *"      # 6am EDT / 5am EST -- the intended one
+    - cron: "0 11 * * *"      # 7am EDT / 6am EST
+    - cron: "0 13 * * *"      # and three catch-up runs, for a day that broke
+    - cron: "0 16 * * *"
+    - cron: "0 20 * * *"
   workflow_dispatch:          # the Run workflow button, any time
 
 permissions:
@@ -79,9 +91,11 @@ jobs:
           restore-keys: |
             espn-cache-
 
+      # ...and one flaky ESPN response should not cost the day a build: try
+      # again a minute later before giving the day up to the next catch-up run
       - name: Harvest
         if: steps.clock.outputs.go == 'yes'
-        run: python harvest.py
+        run: python harvest.py || (echo "harvest failed -- trying once more" && sleep 60 && python harvest.py)
 
       # new teams get a wash colour without being asked for (his standing
       # question, settled 2026-09-12)
