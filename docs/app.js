@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260928-153610";
+const BUILD = "20260928-155830";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -786,18 +786,25 @@ function michCard(g, p) {
   // A GAME HIS SHEET HAS NOT COLOURED READS GREY (his call 2026-09-23),
   // played or not: no home-and-road default, no school colours standing in
   const HOCKEY_BOX = {};
-  // THE LIONS, until a Sheet tab says otherwise: Honolulu blue with silver
-  const LIONS_BOX = { score_bg: "#0076b6", score_font: "#ffffff",
-                      rank_bg: "#0076b6", rank_font: "#ffffff" };
+  // THE LIONS TAKE THE PLACEHOLDER GREY UNTIL HE SAYS OTHERWISE (his call
+  // 2026-09-28) -- Honolulu blue used to stand in, which read as a colour he
+  // had chosen rather than one he had not.
   const u = (mx.uni || []).map(michColour),
-    bx = mx.box || (g.sport === "CHK" ? HOCKEY_BOX : fid === LIONS ? LIONS_BOX
+    bx = mx.box || (g.sport === "CHK" || fid === LIONS ? HOCKEY_BOX
       : PRO_BOX[fid] ? { score_bg: PRO_BOX[fid].bg, score_font: PRO_BOX[fid].fg,
                          rank_bg: PRO_BOX[fid].bg, rank_font: PRO_BOX[fid].fg } : {});
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
   // CSS used to default the rank box to
   const UNSET = "#4a4a52";
-  const top = michColour(bx.score_bg) || u[0] || UNSET;
-  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
+  // HIS SILVER READS TOO LIGHT ON A DARK CARD (his call 2026-09-28): the
+  // Tigers' #c4ced4 is the team's real silver, and right on a cap, but as a
+  // score bubble it is nearly white. It is stepped down here rather than in
+  // his Sheet, where the value is also what the colour IS.
+  const DARKER = { "#c4ced4": "#8a949c",      // the Tigers' silver
+                   "#b0b7bc": "#7d8286" };    // the Lions', stepped the same way
+  const boxCol = v => { const c = michColour(v); return c && (DARKER[c.toLowerCase()] || c); };
+  const top = boxCol(bx.score_bg) || u[0] || UNSET;
+  const pants = boxCol(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
   const uniAcc = u.length >= 3 ? u[2] : null;
   const scoreInk = michColour(bx.score_font) || uniAcc;
   const rankInk = michColour(bx.rank_font) || uniAcc;
@@ -877,7 +884,7 @@ function michCard(g, p) {
   // the Saturday row, and the card's own colours where a row leaves them blank
   const bubble = x => {
     const xb = (x.mx && x.mx.box) || {};
-    const xTop = michColour(xb.score_bg) || top;
+    const xTop = boxCol(xb.score_bg) || top;
     const xInk = michColour(xb.score_font) || (xb.score_bg ? null : scoreInk);
     const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
     // ...and on the Red Wings' playoff cards (his call 2026-09-18), and on
