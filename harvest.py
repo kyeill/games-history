@@ -4049,40 +4049,57 @@ def harvest():
     # bracket's doing, an MTE is the event's, and a Big Ten/ACC Challenge or
     # Gavitt game is the leagues' -- none of those is a series, and he tags
     # none of them. tags.json still overrides this per game.
+    # CORNELL IS READ THE SAME WAY (his call 2026-09-28), against its own
+    # league rather than the Big Ten.
+    OWN_CONF = {rules.MICHIGAN: rules.BIG_TEN, rules.CORNELL: rules.CORNELL_CONF}
     cand = collections.defaultdict(list)
     for g in keep:
-        if not g.get("michigan") or g.get("stage") or g.get("preseason"):
+        fid = g.get("focus")
+        if fid not in OWN_CONF or g.get("stage") or g.get("preseason"):
             continue
         if g.get("event"):
             continue
-        opp = next((s for s in g["teams"] if s["id"] != rules.MICHIGAN), None)
-        if not opp or opp.get("conf") == rules.BIG_TEN[g["sport"]]:
+        opp = next((s for s in g["teams"] if s["id"] != fid), None)
+        if not opp or opp.get("conf") == (OWN_CONF[fid] or {}).get(g["sport"]):
             continue
-        cand[(g["sport"], opp["id"])].append(g)
+        cand[(fid, g["sport"], opp["id"])].append(g)
 
-    def _side(g):
-        opp = next(s for s in g["teams"] if s["id"] != rules.MICHIGAN)
+    def _side(fid, g):
+        opp = next(s for s in g["teams"] if s["id"] != fid)
         return ("neutral" if g.get("neutral")
                 else "away" if opp.get("home") else "home")
 
-    # A WEEKEND SET IS NOT A HOME-AND-HOME LEG (his call 2026-09-23): hockey's
-    # two-game weekends are ordinary scheduling, so neither game pairs with a
-    # meeting in another season. That takes Ferris State 2017 out of the family
-    # and every Western Michigan home-and-away weekend out of Details.
-    def _weekend(games, g):
-        return any(x is not g and abs(
-            (dt.date.fromisoformat(x["date"]) - dt.date.fromisoformat(g["date"])).days) <= 3
-            for x in games)
+    # WHAT PAIRS IS A WEEKEND, NOT A GAME (his call 2026-09-28). Hockey's
+    # contracts are written in weekends: Cornell hosted Michigan State for two
+    # in 2018 and played two at East Lansing in 2019, which is as much a
+    # home-and-home as football's single games. Reading game by game could not
+    # see it, because his 2026-09-23 call threw out every game that was part
+    # of a weekend. So consecutive games collapse into a SET first, and two
+    # sets pair only when they are the SAME SIZE and each is played entirely
+    # on one side -- which is what still keeps Ferris State 2017 (one game
+    # against a weekend) and the split home-and-away weekends out.
+    def _sets(games):
+        out = []
+        for g in sorted(games, key=lambda x: x["date"]):
+            if out and (dt.date.fromisoformat(g["date"])
+                        - dt.date.fromisoformat(out[-1][-1]["date"])).days <= 3:
+                out[-1].append(g)
+            else:
+                out.append([g])
+        return out
 
     series = 0
-    for games in cand.values():
-        games.sort(key=lambda x: x["date"])
-        games = [g for g in games if not _weekend(games, g)]
-        for i, a_ in enumerate(games):
-            for b_ in games[i + 1:]:
-                if b_["season"] - a_["season"] != 1:
+    for (fid, _sport, _opp), games in cand.items():
+        sets = _sets(games)
+        for i, a_ in enumerate(sets):
+            for b_ in sets[i + 1:]:
+                if b_[0]["season"] - a_[0]["season"] != 1 or len(a_) != len(b_):
                     continue
-                ka, kb = _side(a_), _side(b_)
+                sa = {_side(fid, x) for x in a_}
+                sb = {_side(fid, x) for x in b_}
+                if len(sa) > 1 or len(sb) > 1:
+                    continue
+                ka, kb = sa.pop(), sb.pop()
                 if ka == "neutral" and kb == "neutral":
                     lab = "Neutral & Neutral"
                 elif {ka, kb} == {"home", "away"}:
@@ -4091,7 +4108,7 @@ def harvest():
                     # a MATCHED pair or nothing: two homes, two aways, or one
                     # home and one neutral is coincidence, not a contract
                     continue
-                for g in (a_, b_):
+                for g in a_ + b_:
                     if not g.get("series"):
                         g["series"] = lab
                         series += 1
