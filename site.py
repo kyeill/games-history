@@ -578,9 +578,15 @@ def build():
     else:
         crests = {}
     missing = [t for t in data["teams"] if t not in crests]
-    if missing:
-        print("measuring %d crests..." % len(missing))
-        crests.update(crest_urls(missing))
+    # ...and his own answer wins over anything measured, for a school ESPN has
+    # no crest for at all (2026-09-28)
+    import rules
+    stale = {k: v for k, v in rules.CREST_OVERRIDES.items() if crests.get(k) != v}
+    if missing or stale:
+        if missing:
+            print("measuring %d crests..." % len(missing))
+            crests.update(crest_urls(missing))
+        crests.update(rules.CREST_OVERRIDES)
         json.dump(crests, open(crests_path, "w", encoding="utf-8"),
                   separators=(",", ":"), sort_keys=True)
 

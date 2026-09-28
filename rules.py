@@ -145,6 +145,15 @@ CONF_LABEL = {
 USCHO_CONF = {"b10": "B1GH", "ec": "ECAC", "he": "HEA", "nt": "NCHC", "wc": "WCHA",
               "ah": "AHA", "cc": "CCHA", "cc2": "CCHA", "ch": "CHA"}
 
+# A SCHOOL ESPN HAS NO CREST FOR (his call 2026-09-28). Alabama Huntsville
+# dropped hockey in 2021 and ESPN never carried a logo for it -- both the dark
+# and the plain variant 404 -- which left Cornell's four meetings with a broken
+# image. The school's own athletics site serves one, hotlinked exactly as every
+# ESPN crest is.
+CREST_OVERRIDES = {
+    "2008": "https://uahchargers.com/images/logos/site/site.png",   # Alabama Huntsville
+}
+
 PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2",
                 "NBCSN", "truTV", "CNBC", "USA Net", "USA", "Versus", "OLN",
                 "Apple TV", "Apple TV+", "Peacock", "Prime Video", "Netflix",
