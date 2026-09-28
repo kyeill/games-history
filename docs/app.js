@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260928-155830";
+const BUILD = "20260928-160803";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -786,22 +786,26 @@ function michCard(g, p) {
   // A GAME HIS SHEET HAS NOT COLOURED READS GREY (his call 2026-09-23),
   // played or not: no home-and-road default, no school colours standing in
   const HOCKEY_BOX = {};
-  // THE LIONS TAKE THE PLACEHOLDER GREY UNTIL HE SAYS OTHERWISE (his call
-  // 2026-09-28) -- Honolulu blue used to stand in, which read as a colour he
-  // had chosen rather than one he had not.
+  // WHERE HIS SHEET SPEAKS AT ALL, SILENCE MEANS GREY (his call 2026-09-28).
+  // A team he colours game by game -- the Tigers, the Lions, the Red Wings --
+  // takes the placeholder wherever he has not, exactly as Michigan does;
+  // Honolulu blue and Tigers navy used to stand in, which read as colours he
+  // had chosen rather than ones he had not. A team with no colours of his
+  // anywhere keeps the one set for it, since nothing else would paint its box.
   const u = (mx.uni || []).map(michColour),
-    bx = mx.box || (g.sport === "CHK" || fid === LIONS ? HOCKEY_BOX
+    bx = mx.box || (g.sport === "CHK" || sheetBoxed(fid) ? HOCKEY_BOX
       : PRO_BOX[fid] ? { score_bg: PRO_BOX[fid].bg, score_font: PRO_BOX[fid].fg,
                          rank_bg: PRO_BOX[fid].bg, rank_font: PRO_BOX[fid].fg } : {});
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
   // CSS used to default the rank box to
   const UNSET = "#4a4a52";
   // HIS SILVER READS TOO LIGHT ON A DARK CARD (his call 2026-09-28): the
-  // Tigers' #c4ced4 is the team's real silver, and right on a cap, but as a
-  // score bubble it is nearly white. It is stepped down here rather than in
-  // his Sheet, where the value is also what the colour IS.
-  const DARKER = { "#c4ced4": "#8a949c",      // the Tigers' silver
-                   "#b0b7bc": "#7d8286" };    // the Lions', stepped the same way
+  // Tigers' #c4ced4 and the Lions' #b0b7bc are the teams' real silver, right
+  // on a cap but nearly white as a score bubble. Both land on the grey his
+  // own "Gray" keyword gives, so one tab cannot drift from the other -- he
+  // has since written Gray into the Tigers' cells, which is the tidier place
+  // for it, and the Lions' can follow whenever he likes.
+  const DARKER = { "#c4ced4": "#8a8a92", "#b0b7bc": "#8a8a92" };
   const boxCol = v => { const c = michColour(v); return c && (DARKER[c.toLowerCase()] || c); };
   const top = boxCol(bx.score_bg) || u[0] || UNSET;
   const pants = boxCol(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
@@ -1763,6 +1767,17 @@ const PRO_BOX = {
   "mlb-6": { bg: "#0c2340", fg: "#ffffff", seed: "#ff8a3d" }      // Tigers
 };
 function focusTeam(g) { return g.teams.find(t => t.id === (g.focus || focusId())); }
+// Which teams his Sheet colours AT ALL -- read once from the data, so the day
+// he colours a Pistons game their whole tab starts reading his columns
+// instead of the fallback (his call 2026-09-28).
+let SHEET_BOXED = null;
+function sheetBoxed(fid) {
+  if (!SHEET_BOXED) {
+    SHEET_BOXED = new Set();
+    GAMES.forEach(x => { if (x.focus && (x.mx || {}).box) SHEET_BOXED.add(x.focus); });
+  }
+  return SHEET_BOXED.has(fid);
+}
 
 /* HIGHLIGHTS on the Michigan views (his calls 2026-09-16). Never a game not
    yet played.
