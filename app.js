@@ -1201,7 +1201,11 @@ function michCard(g, p) {
     (bothMine || flatSplit ? " flatwin" : "") +
     (g.sport === "NBA" && bothMine ? " nobold" : "") +
     (g.ot && !series ? " ot" : "") +
-    (series ? (lost ? " rk-grey" : "")
+    // THE OPPONENT'S RANKING GREYS ON ANYTHING THAT IS NOT A WIN (his call
+    // 2026-09-27): a tie as well as a defeat, a shootout he won included. The
+    // only number that keeps its colour is one he beat.
+    (sres && sres !== "win" ? " rk-grey"
+      : series ? ""
       : dimmed(g) ? " rk-grey" : isUpset(g) ? " rk-upset" : "");
   // NOTE: no rk-no here. A Michigan card KEEPS its rank column on a seeded
   // game, empty (his call 2026-09-11), so the vs. starts where every other
