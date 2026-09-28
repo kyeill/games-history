@@ -25,6 +25,9 @@ OUT = os.path.join(HERE, "output")
 # Only where ESPN is WRONG, not merely dark. Keep this list short: a rule that
 # needs many exceptions is the wrong rule.
 OVERRIDES = {
+    # ESPN carries no colour at all for the Coyotes, so every Red Wings series
+    # against them washed grey (his catch 2026-09-28)
+    "nhl-24": ("862633", "Phoenix Coyotes: ESPN has no colour; this is the brick red"),
     "183": ("f76900", "Syracuse: ESPN returns navy #000e54; the school is orange"),
     "251": ("bf5700", "Texas: ESPN's #af5c37 is a muddy tan, not burnt orange"),
     # His call 2026-09-09, overruling the note above about washes wanting the

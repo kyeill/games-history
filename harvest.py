@@ -4200,6 +4200,16 @@ def harvest():
     for tid, nm in rules.DISPLAY_BY_ID.items():
         if tid in teams:
             teams[tid]["short"] = nm
+    for tid, col in rules.TEAM_COLORS.items():
+        if tid in teams and not teams[tid].get("color"):
+            teams[tid]["color"] = col
+    # the identity a club wore THAT SEASON, onto the games it played then
+    for g in keep:
+        for t in g["teams"]:
+            for era in rules.TEAM_ERAS.get(t["id"], ()):
+                if g.get("season") is not None and g["season"] <= era["last"]:
+                    t["color"], t["logo"] = era["color"], era["logo"]
+                    t.setdefault("place", era["short"])
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "window_net": rules.WINDOW_NET,

@@ -58,7 +58,23 @@ SEASON_NAMES = {"26": {"before": 2024, "name": "Ucla"}}
 # Names changed ONLY ON THE PAGE, by team id, as the file is written (his call
 # 2026-09-17). They cannot go in NAME_OVERRIDES: the harvest matches USCHO's
 # schedules and polls by name, and "Rochester Institute Tech" matches nothing.
-DISPLAY_BY_ID = {"2022": "American Intl", "178": "Rochester Institute Tech"}
+DISPLAY_BY_ID = {"2022": "American Intl", "178": "Rochester Institute Tech",
+                 "nba-12": "LA Clippers"}          # "LA" alone (his call 2026-09-28)
+
+# A FRANCHISE THAT MOVED (his call 2026-09-28). ESPN hands out TODAY'S crest
+# and colours whatever season a game was played in, so the Nets wore Brooklyn
+# black through the series the Pistons beat them in, in New Jersey. Each entry
+# is the identity worn up to and including `last`, written onto those games'
+# own team sides as they are harvested -- the team list itself still describes
+# the club as it stands now.
+TEAM_ERAS = {
+    "nba-17": [{"last": 2011, "short": "New Jersey", "color": "ce1141",
+                "logo": "https://a.espncdn.com/i/teamlogos/nba/500-dark/njn.png"}],
+}
+
+# ...and a club ESPN carries no colour for at all: the Coyotes' brick red,
+# which left every Red Wings series against them washed grey (2026-09-28)
+TEAM_COLORS = {"nhl-24": "862633"}
 
 
 def display_name(location):

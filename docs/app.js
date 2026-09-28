@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260928-162441";
+const BUILD = "20260928-164121";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -120,9 +120,13 @@ function primetime(g) {
 function teamColor(t) {
   // a PRO team ("nfl-8") takes ESPN's colour from the team list
   const pro = t.id.indexOf("-") > 0 && TEAMS[t.id] ? TEAMS[t.id].color : null;
-  return COLORS[t.id] || (t.color || "").replace("#", "") || pro || "6a6a70";
+  // the colour the club wore THAT SEASON comes first (2026-09-28): it is set
+  // on the game's own team side, and only for a franchise that has moved
+  return (t.color || "").replace("#", "") || COLORS[t.id] || pro || "6a6a70";
 }
 function crest(t) {
+  // the crest the club wore THAT SEASON, where the two differ (2026-09-28)
+  if (t.logo) return t.logo;
   if (TEAMS[t.id] && TEAMS[t.id].logo) return TEAMS[t.id].logo;
   return CRESTS[t.id] ||
     "https://a.espncdn.com/i/teamlogos/ncaa/500-dark/" + t.id + ".png";
