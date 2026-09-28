@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260927-175750";
+const BUILD = "20260927-203156";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2874,23 +2874,22 @@ async function init() {
     if (b) go(b.dataset.tab, b.dataset.view);
   });
 
-  /* SWIPING BETWEEN VIEWS ON A PHONE (his call 2026-09-24). A horizontal drag
-     across the cards walks the second row -- Tigers to Lions to Red Wings --
-     and rolls into the next top tab at either end, so the whole site is one
-     line of views. A swipe must be clearly sideways (60px across, and more
-     than twice the up-and-down) or an ordinary scroll would trigger it, and a
-     drag that starts on a dropdown or a button is left alone. */
+  /* SWIPING BETWEEN TABS ON A PHONE (his call 2026-09-27, narrowing the one
+     he made on 2026-09-24). A horizontal drag across the cards walks the TOP
+     row -- Michigan, CFB, CBB, HKY, Detroit -- and wraps at either end,
+     landing on each tab's first view exactly as tapping the tab does. It used
+     to walk every view of every tab instead, which made crossing Detroit five
+     swipes wide; the second row is left to his fingers. A swipe must be
+     clearly sideways (60px across, and more than twice the up-and-down) or an
+     ordinary scroll would trigger it, and a drag that starts on a dropdown or
+     a button is left alone. */
   const TOPS = Object.keys(NAV);
-  function stepView(dir) {
-    const flat = [];
-    TOPS.forEach(t => NAV[t].forEach(v => flat.push([t, v[1], v[2]])));
-    let i = flat.findIndex(v => v[0] === TOP && v[1] === TAB && v[2] === VIEW);
+  function stepTab(dir) {
+    const i = TOPS.indexOf(TOP);
     if (i < 0) return;
-    // ...and the ends WRAP (his call 2026-09-24): past the last Detroit team
-    // comes Michigan football again
-    i = (i + dir + flat.length) % flat.length;
-    TOP = flat[i][0];
-    go(flat[i][1], flat[i][2]);
+    TOP = TOPS[(i + dir + TOPS.length) % TOPS.length];
+    const first = NAV[TOP][0];
+    go(first[1], first[2]);
   }
   let tx = 0, ty = 0, tracking = false;
   document.addEventListener("touchstart", e => {
@@ -2908,7 +2907,7 @@ async function init() {
     const t = e.changedTouches[0];
     const dx = t.clientX - tx, dy = t.clientY - ty;
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return;
-    stepView(dx < 0 ? 1 : -1);
+    stepTab(dx < 0 ? 1 : -1);
     window.scrollTo(0, 0);
   }, { passive: true });
   document.getElementById("filters").addEventListener("click", e => {
