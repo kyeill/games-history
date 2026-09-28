@@ -248,19 +248,21 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* ...and an NFL playoff LOSS greys the opponent's seed (his call 2026-09-18) */
 .row.mich.dimmed .nseed{color:var(--muted)}
 .row.mich.ncaaloss .rk,.row.mich.ncaaloss .rn,.row.mich.ncaaloss .rkin{color:var(--muted)}
-/* THE TIGERS' REGULAR SEASON: the opponent's colour runs the whole line,
-   through the score, which sits on it bare (his call 2026-09-18) */
-.row.mich.mreg .tl.won{background:var(--winwash);border-radius:5px;margin-left:-7px;
+/* THE BANDED CARD: the opponent's colour runs the whole line, through the
+   score, which sits on it bare. The Tigers' regular season (his call
+   2026-09-18) and, since 2026-09-27, every Cornell hockey card -- he colours
+   no score box there, so a win is the band and nothing else carries one. */
+.row.mich.band .tl.won{background:var(--winwash);border-radius:5px;margin-left:-7px;
   padding-left:7px;padding-right:0}
-.row.mich.mreg .tl.won .mstripe{background:transparent}
+.row.mich.band .tl.won .mstripe{background:transparent}
 /* THE SCORE KEEPS THE PLAYOFF BOX'S GEOMETRY (his catch 2026-09-27), only
    without its colour: the same width, the same padding, the same centred
    figures and the same weight. Shrinking the box to the text is what pushed
    these numbers right of the playoff ones -- a number now lands in exactly
    the spot it would land in on a playoff card. */
-.row.mich.mreg .tl .sc.mbox{background:transparent!important;color:var(--ink)!important}
+.row.mich.band .tl .sc.mbox{background:transparent!important;color:var(--ink)!important}
 /* ...and a LOSS reads like a playoff loss too: grey rather than white */
-.row.mich.mreg .tl:not(.won) .sc.mbox{color:var(--muted)!important}
+.row.mich.band .tl:not(.won) .sc.mbox{color:var(--muted)!important}
 /* NBC's chip stands out a little more on the Lions' cards */
 .row.mich.mich-nfl .t-slot.n-nbc{background:#3b3b44;border-color:#63636e;color:#ecece6}
 /* the day beside a stage card's date goes up in capitals (his call) */
@@ -342,10 +344,11 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.dimmed .mstar{color:#8a8a92}
 /* a hockey series card: the team's own rank, under the opponent's rank column
    (22px crest + 7px gap = 29px in, 20px wide) */
-/* ...a pixel up from centre, so the digits sit on the footer's baseline
-   rather than a shade below it (his catch 2026-09-22) */
+/* ...ON the footer's baseline. A flat -50% leaves the digits a third of a
+   pixel high and the pixel he once asked for overshot by more than one, which
+   is what he saw on Cornell (his catch 2026-09-27); this lands them level. */
 .row.mich .mrk2{position:absolute;left:29px;top:50%;
-  transform:translateY(calc(-50% - 1px));
+  transform:translateY(calc(-50% + 0.3px));
   width:20px;text-align:center;font-size:12.5px;font-weight:600;
   letter-spacing:normal;font-variant-numeric:tabular-nums;line-height:inherit}
 /* ...the SAME TYPE as the opponent's rank above it (12.5px, none of the
@@ -437,6 +440,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260927-204035"></script>
+<script src="app.js?v=20260927-205010"></script>
 </body>
 </html>

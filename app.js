@@ -546,6 +546,12 @@ function nflParts(g) {
 function michCard(g, p) {
   const fid = g.focus || focusId();
   const m = g.teams.find(t => t.id === fid), opp = g.teams.find(t => t.id !== fid) || g.teams[0];
+  /* CORNELL HOCKEY TAKES THE TIGERS' TREATMENT (his call 2026-09-27). He
+     colours no score box there, so the card says it another way: a WIN runs
+     the opponent's colour across the whole line, through a bare score, and a
+     tie or a defeat carries no background at all. Its own number moves beside
+     the footer on every card -- see cuNum below. */
+  const cuPlain = g.sport === "CHK" && fid === CORNELL;
   // HOCKEY SERIES CARDS (his call 2026-09-16): consecutive regular-season
   // games against one opponent share a card (michListHtml groups them into
   // g._series, oldest first; a lone game is a series of one). The result is
@@ -926,7 +932,16 @@ function michCard(g, p) {
   const hkySingle = g.sport === "CHK" && (fid === MICHIGAN || fid === CORNELL) &&
     !series && !g.post && !g.stage;
   if (hkySingle) umRank = "";
-  const ownRank = ((series && !tSeries) || hkySingle) && m.rank
+  // CORNELL CARRIES NO RANK BOX AT ALL (his call 2026-09-27) -- its number
+  // sits beside the footer on every card, the poll ranking in the regular
+  // season and, in the postseason, its SEED as a bare figure: no "#" and no
+  // "No.", which is what that box used to print.
+  if (cuPlain) umRank = "";
+  const cuNum = !cuPlain ? "" : seedOf(g, m) != null ? String(seedOf(g, m))
+    : m.rank ? "#" + m.rank : "";
+  const ownRank = cuPlain
+    ? (cuNum ? '<span class="mrk2" style="color:#b31b1b">' + esc(cuNum) + "</span>" : "")
+    : ((series && !tSeries) || hkySingle) && m.rank
     ? '<span class="mrk2" style="color:' + (fid === CORNELL ? "#b31b1b" : "#ffcb05") +
       '">#' + m.rank + "</span>" : "";
   // TEAM LINE: the colour stripe runs from the crest through the rating and
@@ -939,7 +954,11 @@ function michCard(g, p) {
     // 2026-09-18)
     (g.sport === "NBA" && g.season >= 2016 && g.teams.some(t => t.id === "nba-5") &&
      g.teams.some(t => t.id === "nba-8"));
-  const oppLine = '<div class="tl' + (lost || tied ? "" : " won") + '"><span class="mstripe">' +
+  // ...and on a Cornell card only a WIN wears the band -- in regulation, in
+  // overtime or in the shootout (his call 2026-09-27). A tie carries none,
+  // even against a ranked team, where every other view still washes a split.
+  const oppLine = '<div class="tl' +
+    ((cuPlain ? sres !== "win" : (lost || tied)) ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
     (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
@@ -1171,7 +1190,7 @@ function michCard(g, p) {
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
     (g.stage || "").indexOf("NCAA Tournament") === 0;
   let cls = " mich mich-" + g.sport.toLowerCase() + (ncaaLoss ? " ncaaloss" : "") +
-    (g.sport === "MLB" && !g.post ? " mreg" : "") +
+    (g.sport === "MLB" && !g.post || cuPlain ? " band" : "") +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     // the existing no-bold class: the wash stays, the weight goes
     (bothMine || flatSplit ? " flatwin" : "") +
@@ -1439,7 +1458,12 @@ function hockeyConfSeries(g) {
 // weekend gets its own card, both carrying the same week number
 function groupable(g) {
   return g.sport === "CHK" && !g.preseason &&
-    !g.teams.some(t => t.id === "127") && (!g.stage || hockeyConfSeries(g));
+    !g.teams.some(t => t.id === "127") &&
+    // CORNELL IS NEVER COMBINED EITHER (his call 2026-09-27): a weekend gets
+    // two cards. Its ECAC series still runs through the grouping, which is
+    // what splits it one card per game and writes "Game 2 (1-0)".
+    !(VIEW === "cornell" && !g.stage) &&
+    (!g.stage || hockeyConfSeries(g));
 }
 // The runs of games a card can be built from -- the grouping alone, so the
 // HIGHLIGHTS filter can ask its question of a whole card (his catch
