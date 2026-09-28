@@ -1204,8 +1204,10 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                          None if (us and not stage) else
                          rules.tourney_city(city, v.get("fullName"), stage, y)
                          if stage else rules.display_city(city, v.get("fullName"))),
-                # TV only for the postseason (his call 2026-09-16)
-                "nets": sorted(set(networks(c))) if stage else [],
+                # TV only for the postseason (his call 2026-09-16), and his
+                # own answer first where ESPN has none (2026-09-28)
+                "nets": sorted(set(net_override(x["id"]) or networks(c)))
+                        if stage else [],
                 "teams": side, "header": None, "slots": [], "type": None,
                 # a Big Ten Tournament game carries the conference, as the
                 # basketball ones do -- which is also what keeps it out of
@@ -2958,6 +2960,19 @@ def load_overrides():
     raw = json.load(open(path, encoding="utf-8"))
     return {k: v for k, v in raw.items()
             if not k.startswith("_") and isinstance(v, list)}
+
+
+_NET_OVER = None
+
+
+def net_override(game_id):
+    """The networks he supplied for one game, if any -- hockey reads this too
+    (his call 2026-09-28): ESPN carries no broadcast at all for Cornell's older
+    NCAA regionals, so the channel comes from him."""
+    global _NET_OVER
+    if _NET_OVER is None:
+        _NET_OVER = load_network_overrides()
+    return _NET_OVER.get(str(game_id)) or []
 
 
 def load_network_overrides():

@@ -1,51 +1,35 @@
 {
-  "_comment": "Networks for games ESPN records wrongly or not at all. Game id -> network names as ESPN writes them (FOX, CBS, ESPN, FS1, BTN, Peacock). These now REPLACE whatever ESPN says rather than only filling a blank (his call 2026-09-13: Oregon-Oklahoma State was listed as Disney+/ESPNEWS but was on ESPN). Read BEFORE the window rules run, so a network here can place a game in a window. Run `python harvest.py && python site.py` afterwards.",
-  "401000999": [
-    "ESPN"
+  "300326172": [
+    "ESPNU"
   ],
-  "401082563": [
-    "CBS"
+  "320323130": [
+    "ESPNU"
   ],
-  "401112217": [
-    "BTN"
-  ],
-  "401376643": [
-    "FS1"
-  ],
-  "401414550": [
-    "FOX"
-  ],
-  "401588605": [
-    "Peacock"
-  ],
-  "401731040": [
-    "FOX"
-  ],
-  "401856782": [
-    "ESPN"
-  ],
-  "400506577": [
-    "FS1"
-  ],
-  "400853989": [
-    "AXS"
-  ],
-  "400854122": [
-    "AXS"
-  ],
-  "401263418": [
-    "BTN"
-  ],
-  "401263376": [
-    "FOX"
+  "320326222": [
+    "ESPNU"
   ],
   "323140130": [
     "B1G+"
   ],
-  "400509954": [
-    "B1G+"
+  "370327349": [
+    "ESPN3"
+  ],
+  "380324172": [
+    "ESPNEWS"
+  ],
+  "390330111": [
+    "ESPNEWS"
+  ],
+  "390331172": [
+    "ESPN2"
+  ],
+  "400506577": [
+    "FS1"
   ],
   "400508200": [
+    "B1G+"
+  ],
+  "400509954": [
     "B1G+"
   ],
   "400595362": [
@@ -53,6 +37,12 @@
   ],
   "400830619": [
     "B1G+"
+  ],
+  "400853989": [
+    "AXS"
+  ],
+  "400854122": [
+    "AXS"
   ],
   "400915042": [
     "B1G+"
@@ -66,11 +56,32 @@
   "400986356": [
     "B1G+"
   ],
+  "401000999": [
+    "ESPN"
+  ],
   "401082447": [
     "B1G+"
   ],
+  "401082563": [
+    "CBS"
+  ],
+  "401112217": [
+    "BTN"
+  ],
   "401166090": [
     "B1G+"
+  ],
+  "401263376": [
+    "FOX"
+  ],
+  "401263418": [
+    "BTN"
+  ],
+  "401376643": [
+    "FS1"
+  ],
+  "401414550": [
+    "FOX"
   ],
   "401483369": [
     "B1G+"
@@ -80,5 +91,15 @@
   ],
   "401577629": [
     "B1G+"
-  ]
+  ],
+  "401588605": [
+    "Peacock"
+  ],
+  "401731040": [
+    "FOX"
+  ],
+  "401856782": [
+    "ESPN"
+  ],
+  "_comment": "Networks for games ESPN records wrongly or not at all. Game id -> network names as ESPN writes them (FOX, CBS, ESPN, FS1, BTN, Peacock). These now REPLACE whatever ESPN says rather than only filling a blank (his call 2026-09-13: Oregon-Oklahoma State was listed as Disney+/ESPNEWS but was on ESPN). Read BEFORE the window rules run, so a network here can place a game in a window. Run `python harvest.py && python site.py` afterwards."
 }
