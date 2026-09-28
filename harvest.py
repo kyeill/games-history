@@ -2331,10 +2331,17 @@ def sheet_season(sport, year):
 
 
 def sheet_date(s):
-    """His Date column, M/D/YY."""
+    """His Date column, M/D/YY.
+
+    A TWO-DIGIT YEAR PIVOTS AT 50 (his catch 2026-09-28: "how come you didn't
+    pick up any of my pre-2000 Red Wings colors"). Everything used to take a
+    "20" in front, so 4/16/97 read as 2097 and the whole 1990s -- both Stanley
+    Cups among them -- matched no game at all and lost its colours in silence.
+    """
     try:
         m, d, y = (s or "").strip().split("/")
-        y = "20" + y if len(y) == 2 else y
+        if len(y) == 2:
+            y = ("19" if int(y) >= 50 else "20") + y
         return "%s-%02d-%02d" % (y, int(m), int(d))
     except (ValueError, AttributeError):
         return None

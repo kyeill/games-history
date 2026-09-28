@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260928-160803";
+const BUILD = "20260928-162441";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -799,16 +799,12 @@ function michCard(g, p) {
   // the placeholder until his sheet is filled: a quiet grey, not the maize the
   // CSS used to default the rank box to
   const UNSET = "#4a4a52";
-  // HIS SILVER READS TOO LIGHT ON A DARK CARD (his call 2026-09-28): the
-  // Tigers' #c4ced4 and the Lions' #b0b7bc are the teams' real silver, right
-  // on a cap but nearly white as a score bubble. Both land on the grey his
-  // own "Gray" keyword gives, so one tab cannot drift from the other -- he
-  // has since written Gray into the Tigers' cells, which is the tidier place
-  // for it, and the Lions' can follow whenever he likes.
-  const DARKER = { "#c4ced4": "#8a8a92", "#b0b7bc": "#8a8a92" };
-  const boxCol = v => { const c = michColour(v); return c && (DARKER[c.toLowerCase()] || c); };
-  const top = boxCol(bx.score_bg) || u[0] || UNSET;
-  const pants = boxCol(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
+  // (the silver he had in these cells read nearly white as a score bubble, so
+  // it was darkened here for a day; he has since written "Gray" into the
+  // Tigers' and the Lions' cells instead, which is the tidier place for it,
+  // and the substitution is gone again -- 2026-09-28)
+  const top = michColour(bx.score_bg) || u[0] || UNSET;
+  const pants = michColour(bx.rank_bg) || (u.length >= 3 ? u[1] : u[0]) || UNSET;
   const uniAcc = u.length >= 3 ? u[2] : null;
   const scoreInk = michColour(bx.score_font) || uniAcc;
   const rankInk = michColour(bx.rank_font) || uniAcc;
@@ -888,7 +884,7 @@ function michCard(g, p) {
   // the Saturday row, and the card's own colours where a row leaves them blank
   const bubble = x => {
     const xb = (x.mx && x.mx.box) || {};
-    const xTop = boxCol(xb.score_bg) || top;
+    const xTop = michColour(xb.score_bg) || top;
     const xInk = michColour(xb.score_font) || (xb.score_bg ? null : scoreInk);
     const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
     // ...and on the Red Wings' playoff cards (his call 2026-09-18), and on
@@ -1210,7 +1206,14 @@ function michCard(g, p) {
   const ncaaLoss = fid === CORNELL && g.sport === "CHK" && lost &&
     (g.stage || "").indexOf("NCAA Tournament") === 0;
   let cls = " mich mich-" + g.sport.toLowerCase() + (ncaaLoss ? " ncaaloss" : "") +
-    (g.sport === "MLB" && !g.post || cuPlain ? " band" : "") +
+    // THE BANDED CARD, everywhere a pro game is not a playoff game (his call
+    // 2026-09-28): the Tigers' regular season, the Red Wings' and the
+    // Pistons' national-TV nights, and every NBA Cup game, Pistons or
+    // Cavaliers. A win runs the opponent's colour across the line through a
+    // bare score; a defeat goes grey and italic.
+    (g.sport === "MLB" && !g.post || cuPlain ||
+      ((g.sport === "NHL" || g.sport === "NBA") && !g.post &&
+       (!g.stage || g.stage.indexOf("NBA Cup") === 0)) ? " band" : "") +
     (bigWin ? " mwash" : "") + (lost ? " dimmed" : "") +
     // the existing no-bold class: the wash stays, the weight goes
     (bothMine || flatSplit ? " flatwin" : "") +
