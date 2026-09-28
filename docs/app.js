@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260927-205010";
+const BUILD = "20260927-205504";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -961,7 +961,12 @@ function michCard(g, p) {
     ((cuPlain ? sres !== "win" : (lost || tied)) ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
-    (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    // AN NCAA TOURNAMENT GAME SHOWS THE SEED ALONE (his call 2026-09-27): the
+    // seed already sits in front of the opponent's name, so the poll ranking
+    // beside it says the same thing twice. Hockey is the case that reached
+    // here -- basketball's NCAA games drop the column through seedGame.
+    (opp.rank && !seedGame(g) && (g.stage || "").indexOf("NCAA Tournament") !== 0
+      ? '<span class="rn">' + opp.rank + "</span>" : "") +
     // an NFL playoff opponent's SEED, bare, where a rank would sit
     (["NFL", "NHL", "NBA", "MLB"].indexOf(g.sport) > -1 && opp.seed
       ? '<span class="rn nseed">' + opp.seed + "</span>" : "") +

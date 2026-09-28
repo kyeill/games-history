@@ -961,7 +961,12 @@ function michCard(g, p) {
     ((cuPlain ? sres !== "win" : (lost || tied)) ? "" : " won") + '"><span class="mstripe">' +
     '<img class="crest" loading="lazy" src="' + crest(opp) + '" alt="">' +
     '<span class="rk">' +
-    (opp.rank && !seedGame(g) ? '<span class="rn">' + opp.rank + "</span>" : "") +
+    // AN NCAA TOURNAMENT GAME SHOWS THE SEED ALONE (his call 2026-09-27): the
+    // seed already sits in front of the opponent's name, so the poll ranking
+    // beside it says the same thing twice. Hockey is the case that reached
+    // here -- basketball's NCAA games drop the column through seedGame.
+    (opp.rank && !seedGame(g) && (g.stage || "").indexOf("NCAA Tournament") !== 0
+      ? '<span class="rn">' + opp.rank + "</span>" : "") +
     // an NFL playoff opponent's SEED, bare, where a rank would sit
     (["NFL", "NHL", "NBA", "MLB"].indexOf(g.sport) > -1 && opp.seed
       ? '<span class="rn nseed">' + opp.seed + "</span>" : "") +
