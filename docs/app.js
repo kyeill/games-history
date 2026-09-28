@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260928-145152";
+const BUILD = "20260928-151955";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1260,7 +1260,13 @@ function michCard(g, p) {
     st === "Ivy Madness | Championship";
   const bttLoss = b1gTourney && lost && !upcoming(g) &&
     (g.sport !== "CHK" || !g._gm || g._gm.lost);
-  const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
+  // QUINNIPIAC'S FRAME READS YELLOW ON A CORNELL HOCKEY CARD (his call
+  // 2026-09-28): the Bobcats' navy is all but the card's own ground, so an
+  // "Opponent" border disappeared into it. Their gold instead -- the SHADING
+  // is untouched, this is the frame alone.
+  const CU_RING = { "2514": "#e8c34a" };      // Quinnipiac
+  const bc = bword === "opponent"
+    ? (cuPlain && CU_RING[opp.id]) || brighten(teamColor(opp), 130)
     : cuNcaa ? "#4d9ae0" : cuIvyFinal ? "#0f6a37"
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call

@@ -1260,7 +1260,13 @@ function michCard(g, p) {
     st === "Ivy Madness | Championship";
   const bttLoss = b1gTourney && lost && !upcoming(g) &&
     (g.sport !== "CHK" || !g._gm || g._gm.lost);
-  const bc = bword === "opponent" ? brighten(teamColor(opp), 130)
+  // QUINNIPIAC'S FRAME READS YELLOW ON A CORNELL HOCKEY CARD (his call
+  // 2026-09-28): the Bobcats' navy is all but the card's own ground, so an
+  // "Opponent" border disappeared into it. Their gold instead -- the SHADING
+  // is untouched, this is the frame alone.
+  const CU_RING = { "2514": "#e8c34a" };      // Quinnipiac
+  const bc = bword === "opponent"
+    ? (cuPlain && CU_RING[opp.id]) || brighten(teamColor(opp), 130)
     : cuNcaa ? "#4d9ae0" : cuIvyFinal ? "#0f6a37"
     : michColour(mx.border) || finalRing ||
       // a PRESEASON TOURNAMENT carries a grey frame of its own (his call
