@@ -657,7 +657,11 @@ function michCard(g, p) {
   const place = series ? (series.map(placeOf).find(Boolean) || "") : placeOf(g);
   const eventName = series ? (series.map(x => x.event).find(Boolean) || null) : g.event;
   // the network and time as plain text, for the third row of those two shapes
-  const netTxt = primaryNet(g.nets);
+  // CORNELL NAMES NO BROADCAST BUT THE NCAA TOURNAMENT'S (his call
+  // 2026-09-27): ESPN+ carries nearly everything else it plays, which tells
+  // him nothing he wants on a card.
+  const netTxt = cuPlain && (g.stage || "").indexOf("NCAA Tournament") !== 0
+    ? "" : primaryNet(g.nets);
   const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : fmtTime(g.time);
   // ESPN lists no broadcast at all for 20 basketball games -- early-season
   // ones against small schools. They now show the TIME alone rather than an
