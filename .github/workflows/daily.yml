@@ -23,6 +23,15 @@ name: Daily build
 # day's work already done.
 on:
   schedule:
+    # Asked for hours EARLY on purpose. Through late September GitHub was
+    # handing this account's scheduled runs out four and five hours late in
+    # both repos, and on 28 September none fired at all before 8am Eastern.
+    # Delayed, these land in the morning; run on time they arrive at 1, 2 and
+    # 3am Eastern and the "before 6am" test below drops them, so being wrong
+    # about the delay costs nothing.
+    - cron: "13 5 * * *"
+    - cron: "11 6 * * *"
+    - cron: "7 7 * * *"
     - cron: "0 10 * * *"      # 6am EDT / 5am EST -- the intended one
     - cron: "0 11 * * *"      # 7am EDT / 6am EST
     - cron: "0 13 * * *"      # and three catch-up runs, for a day that broke
