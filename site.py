@@ -278,6 +278,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mich.mreg .tl.won .mstripe{background:transparent}
 .row.mich.mreg .tl .sc.mbox{background:transparent!important;color:var(--ink)!important;
   min-width:0;padding:0;font-weight:700}
+/* ...and a REGULAR-SEASON LOSS reads like a playoff one (his call 2026-09-27):
+   the score grey and unbolded instead of white and heavy. The score also sits
+   where a playoff card's box puts it -- the won line's right padding now runs
+   on every line, so a win and a loss land in the same column. */
+.row.mich.mreg .tl{padding-right:8px}
+.row.mich.mreg .tl:not(.won) .sc.mbox{font-weight:400;color:var(--muted)!important}
 /* NBC's chip stands out a little more on the Lions' cards */
 .row.mich.mich-nfl .t-slot.n-nbc{background:#3b3b44;border-color:#63636e;color:#ecece6}
 /* the day beside a stage card's date goes up in capitals (his call) */
