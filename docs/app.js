@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-112228";
+const BUILD = "20260929-153744";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -28,6 +28,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
+let FINAL_RANK = {};
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -215,6 +216,82 @@ function stageLabel(g) {
     s = s.replace(/Championship$/, "Final");
   }
   return s;
+}
+/* THE SEASON LINE (his call 2026-09-29). With ONE season chosen on a
+   Michigan view, the count at the top of the page gives way to how the season
+   went: how far he got, then the conference.
+
+     CFP Semis (13-1) | B1G CHAMPIONS (9-0)
+     NCAA Sweet Sixteen (No. 4, 25-8) | B1G (14-6) | BTT CHAMPIONS (No. 3)
+
+   Everything here is read from the games themselves -- the rounds from their
+   stages, the records from their results -- except the final ranking, which
+   comes from the polls (see harvest's final_rank) and stands in when he
+   reached no round of his own. */
+function seasonRound(games, prefix) {
+  // the LAST stage game of a run, which is the furthest he got
+  const run = games.filter(g => (g.stage || "").indexOf(prefix) === 0 && !upcoming(g));
+  if (!run.length) return null;
+  const last = run[run.length - 1];
+  const me = last.teams.find(t => t.id === focusId());
+  return { game: last, won: !!(me && me.win), seed: seedOf(last, me) };
+}
+function seasonLine() {
+  const fid = focusId(), sport = SPORT_OF[TAB];
+  const games = GAMES.filter(g => g.sport === sport && g.focus === fid &&
+    g.season === FILT.season && !upcoming(g));
+  if (!games.length) return null;
+  const mine = g => g.teams.find(t => t.id === fid) || {};
+  // the OVERALL record, ties and all -- hockey keeps its third number
+  let w = 0, l = 0, t = 0;
+  games.forEach(g => { if (g.tie) t++; else if (mine(g).win) w++; else l++; });
+  const rec = w + "-" + l + (t ? "-" + t : "");
+  // ...and the CONFERENCE record, the regular season only
+  const conf = (BIG_TEN || {})[sport];
+  let cw = 0, cl = 0, ct = 0, any = false;
+  games.forEach(g => {
+    if (g.stage || g.post) return;
+    const opp = g.teams.find(q => q.id !== fid) || {};
+    if (!conf || opp.conf !== conf) return;
+    any = true;
+    if (g.tie) ct++; else if (mine(g).win) cw++; else cl++;
+  });
+  // the round a stage names, in his short forms -- "Semis", not "Semifinals"
+  const tail = g => ((g.stage || "").split(" | ")[1] || g.stage || "");
+  const parts = [];
+  // 1. THE NATIONAL POSTSEASON: the furthest round, or where he finished
+  const nat = sport === "CFB" ? seasonRound(games, "CFP")
+    : seasonRound(games, "NCAA Tournament");
+  const natName = sport === "CFB" ? "CFP" : "NCAA";
+  if (nat) {
+    const round = tail(nat.game).replace(/^Championship$/, "Final");
+    // the SEED belongs to basketball and hockey; football's playoff had none
+    // until 2024 and he does not want one there (his call 2026-09-29)
+    const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
+    parts.push(nat.won && round === "Final" ? "NATIONAL CHAMPION (" + seed + rec + ")"
+      : natName + " " + round + " (" + seed + rec + ")");
+  } else {
+    const fr = FINAL_RANK[sport + "-" + FILT.season] || {};
+    const n = fr.cfp || fr.ap;
+    const which = fr.cfp ? "CFP" : "AP";
+    parts.push(n ? which + " No. " + n + " (" + rec + ")" : rec);
+  }
+  // 2. THE CONFERENCE, and whether he won it
+  if (any || conf) {
+    const title = seasonRound(games, "Big Ten Championship");
+    parts.push((title && title.won ? "B1G CHAMPIONS" : "B1G") +
+      (any ? " (" + cw + "-" + cl + (ct ? "-" + ct : "") + ")" : ""));
+  }
+  // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
+  if (sport === "CBB" || sport === "CHK") {
+    const btt = seasonRound(games, "Big Ten Tournament");
+    if (btt) {
+      const round = tail(btt.game).replace(/^Championship$/, "Final");
+      const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
+      parts.push((btt.won && round === "Final" ? "BTT CHAMPIONS" : "BTT " + round) + seed);
+    }
+  }
+  return parts.join(" | ");
 }
 function fmtTime(t) {
   // a kickoff not yet set reads TBD (2026-09-18, with the whole season loaded)
@@ -2802,8 +2879,10 @@ function draw() {
     (v[1] === TAB && v[2] === VIEW) + '">' + v[0] + "</button>").join("");
   document.getElementById("filters").innerHTML = filterChips();
   const list = visible();
+  // the count gives way to the season line where there is one (2026-09-29)
+  const line = teamView() && SPORT_OF[TAB] && FILT.season != null ? seasonLine() : null;
   document.getElementById("count").textContent =
-    list.length.toLocaleString() + " games";
+    line || (list.length.toLocaleString() + " games");
   document.getElementById("list").innerHTML = list.length
     ? (teamView() ? michListHtml(list)
       : list.map(g => rowHtml(g, false)).join(""))
@@ -2920,6 +2999,7 @@ async function init() {
   NET_TINT = r[0].net_tint || {};
   BIG_TEN = r[0].big_ten || {};
   CONF_LABEL = r[0].conf_label || {};
+  FINAL_RANK = r[0].final_rank || {};
   TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};

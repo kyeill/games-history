@@ -2149,6 +2149,59 @@ def ap_ranks(code, y, week):
 POLL_SERIES = {}      # (code, season, poll) -> [(date, ranks)] in week order
 
 
+# ---------------------------------------------------------------------------
+# WHERE MICHIGAN FINISHED (his call 2026-09-29). The season line at the top of
+# a Michigan view names the furthest round he reached, and where he did not
+# reach one it names his FINAL RANKING instead -- the committee's last CFP
+# ranking from 2014, the AP after the bowls before that, and for basketball
+# the last AP of the regular season. Kept in data/final-rank.json once a
+# season is over, so the daily build never re-reads fifteen years of polls.
+FINAL_RANK_FILE = os.path.join(HERE, "data", "final-rank.json")
+_FINAL_RANK = (json.load(open(FINAL_RANK_FILE, encoding="utf-8"))
+               if os.path.exists(FINAL_RANK_FILE) else {})
+
+
+def _poll_rank(code, season, poll, stype, weeks):
+    """Michigan's place in one poll, or None. `weeks` is tried in order."""
+    for week in weeks:
+        try:
+            r = requests.get("%s/%s/seasons/%d/types/%d/weeks/%d/rankings/%d"
+                             % (CORE, POLL_PATHS[code], season, stype, week, poll),
+                             timeout=30)
+        except requests.RequestException:
+            return None
+        if r.status_code != 200:
+            continue
+        for t in (r.json().get("ranks") or []):
+            m = re.search(r"/teams/([0-9]+)", (t.get("team") or {}).get("$ref", ""))
+            if m and m.group(1) == rules.MICHIGAN:
+                return t.get("current")
+        if r.json().get("ranks"):
+            return None                  # the poll exists; he is simply not in it
+    return None
+
+
+def final_rank(code, season):
+    """{"ap": n|None, "cfp": n|None} for one Michigan season."""
+    key = "%s-%d" % (code, season)
+    if key in _FINAL_RANK:
+        return _FINAL_RANK[key]
+    got = {"ap": _poll_rank(code, season, 1, 3, [1])}
+    if code == "CFB" and season >= 2014:
+        got["cfp"] = _poll_rank(code, season, 21, 2, [17, 16, 15])
+    y = season if code == "CFB" else season
+    if season_over(code, y):
+        _FINAL_RANK[key] = got           # only a finished season is remembered
+    return got
+
+
+def final_rank_save():
+    if _FINAL_RANK:
+        os.makedirs(os.path.dirname(FINAL_RANK_FILE), exist_ok=True)
+        json.dump(_FINAL_RANK, open(FINAL_RANK_FILE, "w", encoding="utf-8"),
+                  separators=(",", ":"), sort_keys=True)
+
+
 def poll_series(code, season, poll=1):
     """Every week of one poll for one season, each with the DATE it came out,
     cached under cache/polls/. Poll 1 is the AP; 21 is the CFP committee.
@@ -4210,8 +4263,21 @@ def harvest():
                 if g.get("season") is not None and g["season"] <= era["last"]:
                     t["color"], t["logo"] = era["color"], era["logo"]
                     t.setdefault("place", era["short"])
+    # WHERE HE FINISHED, season by season (2026-09-29): the season line reads
+    # this when he reached no postseason round of his own
+    fr = {}
+    for g in keep:
+        if g.get("focus") != rules.MICHIGAN or g["sport"] not in ("CFB", "CBB"):
+            continue
+        k = "%s-%d" % (g["sport"], g["season"])
+        if k not in fr:
+            fr[k] = final_rank(g["sport"], g["season"])
+    final_rank_save()
+    print("  final rankings for %d Michigan seasons" % len(fr))
+
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
+               "final_rank": fr,
                "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
