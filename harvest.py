@@ -2168,7 +2168,13 @@ _FINAL_RANK = (json.load(open(FINAL_RANK_FILE, encoding="utf-8"))
 
 
 def _poll_rank(code, season, poll, stype, weeks):
-    """Michigan's place in one poll, or None. `weeks` is tried in order."""
+    """Michigan's place in one poll, or None. `weeks` is tried in order.
+
+    ESPN dates a basketball season by the year it ENDS (his catch 2026-09-29:
+    2014-15 was reading #7, which was the 2013-14 team's finish).
+    """
+    if code == "CBB":
+        season += 1
     for week in weeks:
         try:
             r = requests.get("%s/%s/seasons/%d/types/%d/weeks/%d/rankings/%d"

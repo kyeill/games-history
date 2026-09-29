@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-164647";
+const BUILD = "20260929-165708";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -285,19 +285,28 @@ function seasonLine() {
     // the SEED belongs to basketball and hockey; football's playoff had none
     // until 2024 and he does not want one there (his call 2026-09-29)
     const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
-    /* HOW DEEP A RUN HAS TO BE TO WEAR ITS COLOUR (his call 2026-09-29):
+    /* HOW DEEP A RUN HAS TO BE TO WEAR ITS COLOUR (his calls 2026-09-29):
        every CFP game is gold, because reaching it at all is the achievement;
        basketball turns blue at the Sweet Sixteen and hockey at the Frozen
        Four, the point at which each tournament stops being a first weekend.
-       A title is bold on top of that. The NIT is never painted. */
+       A run that ended before then is MAIZE -- it still got him there. A
+       title is bold on top of the colour, and the NIT is never painted. */
     const DEEP = { CBB: ["Sweet Sixteen", "Elite Eight", "Final Four", "Final"],
                    CHK: ["Frozen Four", "Final"] };
+    const deep = (DEEP[sport] || []).indexOf(round) > -1;
     const colour = sport === "CFB" ? "#c28c19"
-      : natName === "NCAA" && (DEEP[sport] || []).indexOf(round) > -1 ? "#4d9ae0"
-      : null;
+      : natName !== "NCAA" ? null
+      : deep ? "#4d9ae0" : "#ffcb05";
+    /* HOW IT READS (his calls 2026-09-29): the NCAA Tournament goes without
+       saying, so only its FINAL names it; the rounds he remembers by name go
+       up in capitals. Football keeps the CFP in front of its rounds. */
+    const CAPS = ["Final Four", "Frozen Four", "Final", "Semis"];
+    const label = (sport === "CFB" ? "CFP " : natName === "NIT" ? "NIT "
+      : round === "Final" ? "NCAA " : "") +
+      (CAPS.indexOf(round) > -1 ? round.toUpperCase() : round);
     const text = nat.won && round === "Final"
       ? "NATIONAL CHAMPIONS (" + seed + rec + ")"
-      : natName + " " + round + " (" + seed + rec + ")";
+      : label + " (" + seed + rec + ")";
     parts.push(colour ? win(colour, text, nat.won && round === "Final") : esc(text));
   } else {
     // ...or where he finished: the number alone, and NR when he finished
@@ -306,7 +315,12 @@ function seasonLine() {
     // and USCHO's last for hockey.
     const fr = FINAL_RANK[sport + "-" + FILT.season] || {};
     const n = fr.cfp || fr.ap;
-    parts.push(esc((n ? "#" + n : "NR") + " (" + rec + ")"));
+    // ...and a NEW YEAR'S SIX BOWL is the season's achievement where there
+    // was no playoff to reach, so the ranking wears maize (his call
+    // 2026-09-29): 2011, 2016 and 2018
+    const ny6 = sport === "CFB" && games.some(ny6Bowl);
+    const text = (n ? "#" + n : "NR") + " (" + rec + ")";
+    parts.push(ny6 ? win("#ffcb05", text) : esc(text));
   }
   // 2. THE CONFERENCE: where he finished in it, and the DIVISION he finished
   // in where there was one -- "2nd B1G East", "t-5th B1G" (his call
@@ -329,17 +343,20 @@ function seasonLine() {
     const cRec = place ? place.record : cw + "-" + cl + (ct ? "-" + ct : "");
     const name = "B1G" + (place && place.division ? " " + place.division : "");
     const title = seasonRound(games, "Big Ten Championship");
-    let head;
+    // A SHARED TITLE READS AS A PLACE, not as a championship (his call
+    // 2026-09-29): "t-1st B1G", in maize. Only a title of his own is blue.
+    let head, colour = null;
     if (sport === "CFB") {
       head = title && title.won ? "B1G CHAMPIONS"
         : place ? ordinal(place.place, place.tied) + " " + name : name;
-    } else if (place && place.place === 1) {
-      head = place.tied ? "B1G CO-CHAMPIONS" : "B1G CHAMPIONS";
+    } else if (place && place.place === 1 && !place.tied) {
+      head = "B1G CHAMPIONS";
     } else {
       head = place ? ordinal(place.place, place.tied) + " " + name : name;
+      if (place && place.place === 1) colour = "#ffcb05";
     }
-    // ...and a conference title reads in Big Ten blue (his call 2026-09-29)
-    parts.push(/CHAMPIONS/.test(head) ? win("#0088ce", head + " (" + cRec + ")")
+    parts.push(/CHAMPIONS/.test(head) ? win("#0088ce", head + " (" + cRec + ")", true)
+      : colour ? win(colour, head + " (" + cRec + ")")
       : esc(head + " (" + cRec + ")"));
   }
   // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
@@ -348,8 +365,11 @@ function seasonLine() {
     if (btt) {
       const round = tail(btt.game).replace(/^Championship$/, "Final");
       const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
-      const bttHead = btt.won && round === "Final" ? "BTT CHAMPIONS" : "BTT " + round;
-      parts.push(/CHAMPIONS/.test(bttHead) ? win("#0088ce", bttHead + seed)
+      const bttHead = btt.won && round === "Final" ? "BTT CHAMPIONS"
+        : "BTT " + (round === "Final" ? "FINAL" : round);
+      // ...and reaching the FINAL and losing it is maize (his call 2026-09-29)
+      parts.push(/CHAMPIONS/.test(bttHead) ? win("#0088ce", bttHead + seed, true)
+        : round === "Final" ? win("#ffcb05", bttHead + seed)
         : esc(bttHead + seed));
     }
   }
