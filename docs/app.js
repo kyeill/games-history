@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-162409";
+const BUILD = "20260929-162627";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -267,24 +267,38 @@ function seasonLine() {
     any = true;
     if (g.tie) ct++; else if (mine(g).win) cw++; else cl++;
   });
-  // the round a stage names, in his short forms -- "Semis", not "Semifinals"
-  const tail = g => ((g.stage || "").split(" | ")[1] || g.stage || "");
+  // the round a stage names, in his short forms -- "Semis", not
+  // "Semifinals" -- but an early round spelled out (his call 2026-09-29)
+  const tail = g => ((g.stage || "").split(" | ")[1] || g.stage || "")
+    .replace(/^Round 1$/, "First Round").replace(/^Round 2$/, "Second Round");
   const parts = [];
-  // 1. THE NATIONAL POSTSEASON: the furthest round, or where he finished
+  // 1. THE NATIONAL POSTSEASON: the furthest round, or where he finished --
+  // and where he missed it, the NIT still says how far he got (his call
+  // 2026-09-29, for 2022-23)
   const nat = sport === "CFB" ? seasonRound(games, "CFP")
-    : seasonRound(games, "NCAA Tournament");
-  const natName = sport === "CFB" ? "CFP" : "NCAA";
+    : seasonRound(games, "NCAA Tournament") ||
+      (sport === "CBB" ? seasonRound(games, "NIT") : null);
+  const natName = sport === "CFB" ? "CFP"
+    : nat && (nat.game.stage || "").indexOf("NIT") === 0 ? "NIT" : "NCAA";
   if (nat) {
     const round = tail(nat.game).replace(/^Championship$/, "Final");
     // the SEED belongs to basketball and hockey; football's playoff had none
     // until 2024 and he does not want one there (his call 2026-09-29)
     const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
-    // A TITLE WEARS ITS TOURNAMENT'S COLOUR AND ITS WEIGHT (his call
-    // 2026-09-29): the CFP's gold, the NCAA Tournament's blue.
-    parts.push(nat.won && round === "Final"
-      ? win(sport === "CFB" ? "#c28c19" : "#4d9ae0",
-            "NATIONAL CHAMPIONS (" + seed + rec + ")", true)
-      : esc(natName + " " + round + " (" + seed + rec + ")"));
+    /* HOW DEEP A RUN HAS TO BE TO WEAR ITS COLOUR (his call 2026-09-29):
+       every CFP game is gold, because reaching it at all is the achievement;
+       basketball turns blue at the Sweet Sixteen and hockey at the Frozen
+       Four, the point at which each tournament stops being a first weekend.
+       A title is bold on top of that. The NIT is never painted. */
+    const DEEP = { CBB: ["Sweet Sixteen", "Elite Eight", "Final Four", "Final"],
+                   CHK: ["Frozen Four", "Final"] };
+    const colour = sport === "CFB" ? "#c28c19"
+      : natName === "NCAA" && (DEEP[sport] || []).indexOf(round) > -1 ? "#4d9ae0"
+      : null;
+    const text = nat.won && round === "Final"
+      ? "NATIONAL CHAMPIONS (" + seed + rec + ")"
+      : natName + " " + round + " (" + seed + rec + ")";
+    parts.push(colour ? win(colour, text, nat.won && round === "Final") : esc(text));
   } else {
     // ...or where he finished: the number alone, and NR when he finished
     // outside it (his call 2026-09-29). Which poll it came from is not worth
