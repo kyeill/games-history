@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-161233";
+const BUILD = "20260929-162409";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -228,6 +228,11 @@ function stageLabel(g) {
    stages, the records from their results -- except the final ranking, which
    comes from the polls (see harvest's final_rank) and stands in when he
    reached no round of his own. */
+// a piece of the season line that celebrates something (2026-09-29)
+function win(colour, text, bold) {
+  return '<span style="color:' + colour + (bold ? ";font-weight:700" : "") +
+    '">' + esc(text) + "</span>";
+}
 function ordinal(n, tied) {
   const tens = n % 100, ones = n % 10;
   const suffix = (tens >= 11 && tens <= 13) ? "th"
@@ -274,8 +279,12 @@ function seasonLine() {
     // the SEED belongs to basketball and hockey; football's playoff had none
     // until 2024 and he does not want one there (his call 2026-09-29)
     const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
-    parts.push(nat.won && round === "Final" ? "NATIONAL CHAMPIONS (" + seed + rec + ")"
-      : natName + " " + round + " (" + seed + rec + ")");
+    // A TITLE WEARS ITS TOURNAMENT'S COLOUR AND ITS WEIGHT (his call
+    // 2026-09-29): the CFP's gold, the NCAA Tournament's blue.
+    parts.push(nat.won && round === "Final"
+      ? win(sport === "CFB" ? "#c28c19" : "#4d9ae0",
+            "NATIONAL CHAMPIONS (" + seed + rec + ")", true)
+      : esc(natName + " " + round + " (" + seed + rec + ")"));
   } else {
     // ...or where he finished: the number alone, and NR when he finished
     // outside it (his call 2026-09-29). Which poll it came from is not worth
@@ -283,7 +292,7 @@ function seasonLine() {
     // and USCHO's last for hockey.
     const fr = FINAL_RANK[sport + "-" + FILT.season] || {};
     const n = fr.cfp || fr.ap;
-    parts.push((n ? "#" + n : "NR") + " (" + rec + ")");
+    parts.push(esc((n ? "#" + n : "NR") + " (" + rec + ")"));
   }
   // 2. THE CONFERENCE: where he finished in it, and the DIVISION he finished
   // in where there was one -- "2nd B1G East", "t-5th B1G" (his call
@@ -304,7 +313,9 @@ function seasonLine() {
     } else {
       head = place ? ordinal(place.place, place.tied) + " " + name : name;
     }
-    parts.push(head + " (" + cRec + ")");
+    // ...and a conference title reads in Big Ten blue (his call 2026-09-29)
+    parts.push(/CHAMPIONS/.test(head) ? win("#0088ce", head + " (" + cRec + ")")
+      : esc(head + " (" + cRec + ")"));
   }
   // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
   if (sport === "CBB" || sport === "CHK") {
@@ -312,7 +323,9 @@ function seasonLine() {
     if (btt) {
       const round = tail(btt.game).replace(/^Championship$/, "Final");
       const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
-      parts.push((btt.won && round === "Final" ? "BTT CHAMPIONS" : "BTT " + round) + seed);
+      const bttHead = btt.won && round === "Final" ? "BTT CHAMPIONS" : "BTT " + round;
+      parts.push(/CHAMPIONS/.test(bttHead) ? win("#0088ce", bttHead + seed)
+        : esc(bttHead + seed));
     }
   }
   return parts.join(" | ");
@@ -2905,8 +2918,8 @@ function draw() {
   const list = visible();
   // the count gives way to the season line where there is one (2026-09-29)
   const line = teamView() && SPORT_OF[TAB] && FILT.season != null ? seasonLine() : null;
-  document.getElementById("count").textContent =
-    line || (list.length.toLocaleString() + " games");
+  document.getElementById("count").innerHTML =
+    line || esc(list.length.toLocaleString() + " games");
   document.getElementById("list").innerHTML = list.length
     ? (teamView() ? michListHtml(list)
       : list.map(g => rowHtml(g, false)).join(""))
