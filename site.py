@@ -54,6 +54,12 @@ header{display:flex;align-items:baseline;gap:9px;padding:18px 0 10px}
 h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
 .count{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums;
   line-height:1.2}
+/* THE SEASON LINE STACKS ON A PHONE (his call 2026-09-29): one part a line,
+   and the bars that separated them go with the single line */
+@media (max-width:700px){
+  .count .spart{display:block}
+  .count .ssep{display:none}
+}
 .spacer{flex:1}
 .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);
   border-radius:7px;padding:4px 9px;font:inherit;font-size:13px;cursor:pointer}

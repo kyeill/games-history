@@ -257,8 +257,10 @@ function seasonLine() {
   let w = 0, l = 0, t = 0;
   games.forEach(g => { if (g.tie) t++; else if (mine(g).win) w++; else l++; });
   const rec = w + "-" + l + (t ? "-" + t : "");
-  // ...and the CONFERENCE record, the regular season only
-  const conf = (BIG_TEN || {})[sport];
+  // ...and the CONFERENCE record, the regular season only. CORNELL answers
+  // to the ECAC rather than the Big Ten (his call 2026-09-29).
+  const cornell = fid === CORNELL;
+  const conf = cornell ? (TEAM_CONF[CORNELL] || {})[sport] : (BIG_TEN || {})[sport];
   let cw = 0, cl = 0, ct = 0, any = false;
   games.forEach(g => {
     if (g.stage || g.post) return;
@@ -327,21 +329,27 @@ function seasonLine() {
   // 2026-09-29). First place reads CHAMPIONS, shared first CO-CHAMPIONS;
   // football answers to its title game instead, which is what decides the
   // conference there.
-  /* HOCKEY'S PLACE IS ITS TOURNAMENT SEED (his call 2026-09-29, after the
+  /* ...AND SO IS CORNELL'S (2026-09-29): the ECAC seeds its tournament by
+     the same standings, so the seed is the finish there too.
+     HOCKEY'S PLACE IS ITS TOURNAMENT SEED (his call 2026-09-29, after the
      table was built and thrown away). ESPN carries no Big Ten hockey
      standings, and the table USCHO's schedules give cannot reproduce the
      conference's own -- its shootout results are half missing, and the
      ordering rule changed along the way, so five of thirteen seasons came out
      a place wrong. The Big Ten seeds its tournament BY those standings, so
      the seed is the finish, and it is already on the cards. */
+  // the conference tournament of whichever conference he is in
+  const cupName = cornell ? "ECAC Tournament" : "Big Ten Tournament";
+  const cupShort = cornell ? "ECAC Tournament" : "BTT";
   const bttSeed = sport === "CHK"
-    ? (seasonRound(games, "Big Ten Tournament") || {}).seed : null;
+    ? (seasonRound(games, cupName) || {}).seed : null;
   const place = CONF_PLACE[sport + "-" + FILT.season] ||
     (bttSeed != null ? { place: bttSeed, tied: false, division: null,
                          record: cw + "-" + cl + (ct ? "-" + ct : "") } : null);
   if (any || place) {
     const cRec = place ? place.record : cw + "-" + cl + (ct ? "-" + ct : "");
-    const name = "B1G" + (place && place.division ? " " + place.division : "");
+    const name = (cornell ? "ECAC" : "B1G") +
+      (place && place.division ? " " + place.division : "");
     const title = seasonRound(games, "Big Ten Championship");
     // A SHARED TITLE READS AS A PLACE, not as a championship (his call
     // 2026-09-29): "t-1st B1G", in maize. Only a title of his own is blue.
@@ -350,30 +358,51 @@ function seasonLine() {
       head = title && title.won ? "B1G CHAMPIONS"
         : place ? ordinal(place.place, place.tied) + " " + name : name;
     } else if (place && place.place === 1 && !place.tied) {
-      head = "B1G CHAMPIONS";
+      head = name + " CHAMPIONS";
     } else {
       head = place ? ordinal(place.place, place.tied) + " " + name : name;
       if (place && place.place === 1) colour = "#ffcb05";
     }
-    parts.push(/CHAMPIONS/.test(head) ? win("#0088ce", head + " (" + cRec + ")", true)
+    // the ECAC's own red where it is his conference, the Big Ten's blue
+    // otherwise -- the same two the cards and the tiles use (2026-09-29)
+    const confBlue = cornell ? "#c0053c" : "#0088ce";
+    parts.push(/CHAMPIONS/.test(head) ? win(confBlue, head + " (" + cRec + ")", true)
       : colour ? win(colour, head + " (" + cRec + ")")
       : esc(head + " (" + cRec + ")"));
+    /* THE IVY LEAGUE SITS BETWEEN THEM (his call 2026-09-29), in its own
+       green: the six Ivies play each other inside the ECAC, and harvest marks
+       those games, so the record is read straight off them. */
+    if (cornell) {
+      let iw = 0, il = 0, it = 0;
+      games.forEach(g => {
+        if ((g.labels || []).indexOf("Ivy League") < 0) return;
+        if (g.tie) it++; else if (mine(g).win) iw++; else il++;
+      });
+      if (iw + il + it) {
+        parts.push(win("#0f6a37",
+          "Ivy (" + iw + "-" + il + (it ? "-" + it : "") + ")"));
+      }
+    }
   }
   // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
   if (sport === "CBB" || sport === "CHK") {
-    const btt = seasonRound(games, "Big Ten Tournament");
+    const btt = seasonRound(games, cupName);
     if (btt) {
       const round = tail(btt.game).replace(/^Championship$/, "Final");
       const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
-      const bttHead = btt.won && round === "Final" ? "BTT CHAMPIONS"
-        : "BTT " + (round === "Final" ? "FINAL" : round);
+      const bttHead = btt.won && round === "Final" ? cupShort + " CHAMPIONS"
+        : cupShort + " " + (round === "Final" ? "FINAL" : round);
       // ...and reaching the FINAL and losing it is maize (his call 2026-09-29)
-      parts.push(/CHAMPIONS/.test(bttHead) ? win("#0088ce", bttHead + seed, true)
+      parts.push(/CHAMPIONS/.test(bttHead)
+        ? win(cornell ? "#c0053c" : "#0088ce", bttHead + seed, true)
         : round === "Final" ? win("#ffcb05", bttHead + seed)
         : esc(bttHead + seed));
     }
   }
-  return parts.join(" | ");
+  // EACH PART ON ITS OWN LINE ON A PHONE (his call 2026-09-29): the bars
+  // between them go with the single line they were holding together.
+  return parts.map(x => '<span class="spart">' + x + "</span>")
+    .join('<span class="ssep"> | </span>');
 }
 function fmtTime(t) {
   // a kickoff not yet set reads TBD (2026-09-18, with the whole season loaded)
