@@ -28,7 +28,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
-let FINAL_RANK = {}, CONF_PLACE = {};
+let FINAL_RANK = {}, CONF_PLACE = {}, CHAMPS = {};
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -232,6 +232,72 @@ function stageLabel(g) {
 function win(colour, text, bold) {
   return '<span style="color:' + colour + (bold ? ";font-weight:700" : "") +
     '">' + esc(text) + "</span>";
+}
+/* WHO WON THAT SEASON (his call 2026-09-29). TV Windows and Key Games are
+   not his team's views, so with one season chosen they name the champions of
+   it instead of counting games: the national champion, the Big Ten champion,
+   and in basketball the tournament winner too.
+
+   MICHIGAN goes up in capitals, bold and maize. Ohio State, Michigan State
+   and Notre Dame are struck through. Any other Big Ten team that won the
+   national title is capitalised, because that is the achievement being named.
+   Everyone else keeps their own colour -- never a yellow one, which belongs
+   to Michigan alone. */
+function bigTenTeam(id, sport, season) {
+  const conf = (BIG_TEN || {})[sport];
+  return !!conf && GAMES.some(g => g.sport === sport && g.season === season &&
+    g.teams.some(t => t.id === id && t.conf === conf));
+}
+function champColour(id) {
+  const raw = teamColor({ id: id });
+  const hex = "#" + String(raw).replace("#", "");
+  const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const hi = Math.max.apply(null, c), lo = Math.min.apply(null, c);
+  const d = hi - lo;
+  let h = 0;
+  if (d) {
+    h = hi === c[0] ? ((c[1] - c[2]) / d + (c[1] < c[2] ? 6 : 0))
+      : hi === c[1] ? (c[2] - c[0]) / d + 2 : (c[0] - c[1]) / d + 4;
+    h *= 60;
+  }
+  // a yellow keeps the page's one yellow for Michigan, so it gives way to the
+  // team's second colour, or to grey where that is yellow too
+  const yellow = x => x >= 38 && x <= 72 && d > 0.25;
+  if (!yellow(h)) return brighten(hex, 150);
+  const alt = (TEAMS[id] || {}).alt;
+  return alt ? brighten("#" + alt.replace("#", ""), 150) : "#b4b4ae";
+}
+function champPart(t, sport, season, national) {
+  if (!t || !t[0]) return null;
+  const id = t[0];
+  const mich = id === MICHIGAN;
+  const rival = RIVALS.indexOf(id) > -1;
+  // the capitals mark the achievement: Michigan wherever it appears, and a
+  // Big Ten team that won the NATIONAL title (his call 2026-09-29) -- not
+  // merely one that won the conference, which is what that slot is for
+  const caps = mich || (national && bigTenTeam(id, sport, season));
+  const nm = caps ? String(t[1]).toUpperCase() : t[1];
+  const style = mich ? "color:#ffcb05;font-weight:700"
+    : "color:" + champColour(id) + (rival ? ";text-decoration:line-through" : "");
+  return '<span style="' + style + '">' + esc(nm) + "</span>";
+}
+function champLine() {
+  const sport = SPORT_OF[TAB];
+  const ch = CHAMPS[sport + "-" + FILT.season];
+  if (!ch) return null;
+  const part = (t, nat) => champPart(t, sport, FILT.season, nat);
+  const out = [];
+  if (ch.nat) out.push(part(ch.nat, true));
+  // a SHARED Big Ten title names everyone who won it, slashed together
+  if ((ch.conf || []).length) {
+    // (map hands its callback an INDEX too, which read as "this is the
+    //  national champion" and capitalised the second name -- 2026-09-29)
+    out.push((ch.conf || []).map(t => part(t)).filter(Boolean).join("/"));
+  }
+  if (sport === "CBB" && ch.cup) out.push(part(ch.cup));
+  if (!out.length) return null;
+  return out.map(x => '<span class="spart">' + x + "</span>")
+    .join('<span class="ssep"> | </span>');
 }
 function ordinal(n, tied) {
   const tens = n % 100, ones = n % 10;
@@ -2991,7 +3057,10 @@ function draw() {
   document.getElementById("filters").innerHTML = filterChips();
   const list = visible();
   // the count gives way to the season line where there is one (2026-09-29)
-  const line = teamView() && SPORT_OF[TAB] && FILT.season != null ? seasonLine() : null;
+  const line = FILT.season == null ? null
+    : teamView() && SPORT_OF[TAB] ? seasonLine()
+    : (VIEW === "tv" || VIEW === "big") && (SPORT_OF[TAB] === "CFB" || SPORT_OF[TAB] === "CBB")
+      ? champLine() : null;
   document.getElementById("count").innerHTML =
     line || esc(list.length.toLocaleString() + " games");
   document.getElementById("list").innerHTML = list.length
@@ -3112,6 +3181,7 @@ async function init() {
   CONF_LABEL = r[0].conf_label || {};
   FINAL_RANK = r[0].final_rank || {};
   CONF_PLACE = r[0].conf_place || {};
+  CHAMPS = r[0].champs || {};
   TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};

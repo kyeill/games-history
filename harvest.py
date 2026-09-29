@@ -2238,6 +2238,22 @@ STANDINGS_PATH = {"CFB": "football/college-football",
                   "CBB": "basketball/mens-college-basketball"}
 
 
+def _conf_record(entry):
+    """A standings entry's CONFERENCE record. ESPN lists "vsconf" and "total"
+    in no fixed order, and picking whichever came first was reading overall
+    records -- which is how 2011-12 lost two of its three co-champions (his
+    catch 2026-09-29)."""
+    stats = {q.get("type"): q.get("displayValue") for q in entry.get("stats") or []}
+    rec = stats.get("vsconf") or stats.get("total")
+    if not rec or "-" not in rec:
+        return None
+    try:
+        w, l = (int(x) for x in rec.split("-")[:2])
+    except ValueError:
+        return None
+    return rec, w, l
+
+
 def _conf_groups(node):
     """Every group in a standings tree that actually has teams in it."""
     out = []
@@ -2272,18 +2288,10 @@ def conf_place(code, season):
         table = []
         for e in grp["standings"]["entries"]:
             tid = str((e.get("team") or {}).get("id") or "")
-            rec = next((q.get("displayValue") for q in e.get("stats") or []
-                        if q.get("type") == "vsconf"), None)
-            if not rec:
-                rec = next((q.get("displayValue") for q in e.get("stats") or []
-                            if q.get("type") == "total"), None)
-            if not rec:
+            got = _conf_record(e)
+            if not got:
                 continue
-            w, l = (rec.split("-") + ["0"])[:2]
-            try:
-                w, l = int(w), int(l)
-            except ValueError:
-                continue
+            rec, w, l = got
             table.append((tid, w, l, rec))
         me = next((t for t in table if t[0] == rules.MICHIGAN), None)
         if not me:
@@ -2315,6 +2323,159 @@ def conf_place_save():
     if _CONF_PLACE:
         os.makedirs(os.path.dirname(CONF_PLACE_FILE), exist_ok=True)
         json.dump(_CONF_PLACE, open(CONF_PLACE_FILE, "w", encoding="utf-8"),
+                  separators=(",", ":"), sort_keys=True)
+
+
+# ---------------------------------------------------------------------------
+# WHO WON WHAT, season by season (his call 2026-09-29). The TV Windows and Key
+# Games tabs name the champions of the season being read rather than counting
+# its games: the national champion, the Big Ten champion, and in basketball
+# the Big Ten Tournament winner as well. ESPN files each of those as an
+# ordinary game with a note on it, so each is found once and kept in
+# data/champs.json.
+CHAMPS_FILE = os.path.join(HERE, "data", "champs.json")
+_CHAMPS = (json.load(open(CHAMPS_FILE, encoding="utf-8"))
+           if os.path.exists(CHAMPS_FILE) else {})
+SB = "https://site.api.espn.com/apis/site/v2/sports/%s/scoreboard"
+SB_PATH = {"CFB": "football/college-football",
+           "CBB": "basketball/mens-college-basketball"}
+
+
+def _winner_of(js, pattern, last=False):
+    """The winner of the game whose note matches, as [id, name].
+
+    `last` takes the LATEST such game: a football postseason list carries
+    January's title game for the season before as well as this one's (2026-09-29).
+    """
+    found = None
+    for ev in sorted(js.get("events") or [], key=lambda e: e.get("date") or ""):
+        c = (ev.get("competitions") or [{}])[0]
+        note = " / ".join(n.get("headline") or "" for n in c.get("notes") or [])
+        if not re.search(pattern, note, re.I):
+            continue
+        w = next((q for q in c.get("competitors") or [] if q.get("winner")), None)
+        if w:
+            t = w.get("team") or {}
+            found = [str(t.get("id") or ""),
+                     t.get("shortDisplayName") or t.get("location") or ""]
+            if not last:
+                return found
+    return found
+
+
+def _sb(code, **params):
+    try:
+        r = requests.get(SB % SB_PATH[code], params=params, timeout=40)
+        return r.json() if r.status_code == 200 else {}
+    except (requests.RequestException, ValueError):
+        return {}
+
+
+def _weekends(y, m1, d1, m2, d2):
+    """The Saturdays and Sundays in a window -- when a conference final falls."""
+    d, end, out = dt.date(y, m1, d1), dt.date(y, m2, d2), []
+    while d <= end:
+        if d.weekday() >= 5:
+            out.append(d)
+        d += dt.timedelta(days=1)
+    return out
+
+
+def season_champs(code, season):
+    """{"nat": [id, name], "conf": [[id, name], ...], "cup": [id, name]}"""
+    key = "%s-%d" % (code, season)
+    if key in _CHAMPS:
+        return _CHAMPS[key]
+    got = {"nat": None, "conf": [], "cup": None}
+    if code == "CFB":
+        # the national title is played in JANUARY, so it belongs to the year
+        # after the season ESPN files it under
+        # THE LAST GAME OF THE BOWL SEASON IS THE TITLE GAME (2026-09-29):
+        # asking the scoreboard by year answers with the wrong January -- it
+        # files a postseason under the calendar year its bowls START in and
+        # truncates at the limit -- so the core API's postseason week is read
+        # instead, where the final is always the last event.
+        got["nat"] = _cfb_champion(season)
+        w = _winner_of(_sb("CFB", dates=season, seasontype=2, groups=5, limit=400),
+                       r"Big Ten Championship")
+        if w:
+            got["conf"] = [w]
+    else:
+        for d in (dt.date(season + 1, 4, 1) + dt.timedelta(days=i) for i in range(10)):
+            if d.weekday() != 0:          # the final is always a Monday
+                continue
+            w = _winner_of(_sb("CBB", dates=d.strftime("%Y%m%d"), groups=50, limit=100),
+                           r"National Championship")
+            if w:
+                got["nat"] = w
+                break
+        # a conference final is a Sunday, but the 2018 one at the Garden was
+        # played on a Sunday in early March and others have slipped to a
+        # Saturday -- both days of every weekend in the window are tried
+        for d in _weekends(season + 1, 2, 25, 3, 20):
+            w = _winner_of(_sb("CBB", dates=d.strftime("%Y%m%d"), groups=7, limit=100),
+                           r"Big Ten\s+(Men.s\s+)?Tournament\s*-\s*(Final|Championship)\s*$")
+            if w:
+                got["cup"] = w
+                break
+        # ...and the REGULAR-SEASON champions come from the table, where a
+        # shared title is normal (his call 2026-09-29)
+        got["conf"] = _b1g_regular(season)
+    if season_over(code, season):
+        _CHAMPS[key] = got
+    return got
+
+
+def _cfb_champion(season):
+    """[id, name] for whoever won the last bowl of the season."""
+    try:
+        evs = get_json("%s/football/leagues/college-football/seasons/%d/types/3/weeks/1/events"
+                       % (CORE, season), params={"limit": 100}).get("items") or []
+        if not evs:
+            return None
+        game = get_json(evs[-1]["$ref"])
+        comp = (game.get("competitions") or [{}])[0]
+        w = next((q for q in comp.get("competitors") or [] if q.get("winner")), None)
+        if not w:
+            return None
+        tid = str(w.get("id") or "")
+        team = get_json((w.get("team") or {}).get("$ref", ""))
+        return [tid, team.get("shortDisplayName") or team.get("location") or tid]
+    except (requests.RequestException, KeyError, ValueError, IndexError):
+        return None
+
+
+def _b1g_regular(season):
+    """Whoever finished top of the Big Ten table, shared titles and all."""
+    try:
+        r = requests.get("https://site.api.espn.com/apis/v2/sports/%s/standings"
+                         % SB_PATH["CBB"],
+                         params={"season": season + 1, "group": rules.BIG_TEN["CBB"]},
+                         timeout=30)
+        j = r.json() if r.status_code == 200 else {}
+    except (requests.RequestException, ValueError):
+        return []
+    best, out = None, []
+    for grp in _conf_groups(j):
+        for e in grp["standings"]["entries"]:
+            t = e.get("team") or {}
+            got = _conf_record(e)
+            if not got:
+                continue
+            _rec, w, l = got
+            pct = w / (w + l) if w + l else 0
+            if best is None or pct > best + 1e-9:
+                best, out = pct, []
+            if abs(pct - best) < 1e-9:
+                out.append([str(t.get("id") or ""),
+                            t.get("shortDisplayName") or t.get("location") or ""])
+    return out
+
+
+def champs_save():
+    if _CHAMPS:
+        os.makedirs(os.path.dirname(CHAMPS_FILE), exist_ok=True)
+        json.dump(_CHAMPS, open(CHAMPS_FILE, "w", encoding="utf-8"),
                   separators=(",", ":"), sort_keys=True)
 
 
@@ -4392,14 +4553,21 @@ def harvest():
             got = conf_place(g["sport"], g["season"])
             if got:
                 cp[k] = got
+    ch = {}
+    for y in sorted({g["season"] for g in keep if g["sport"] in ("CFB", "CBB")}):
+        for code in ("CFB", "CBB"):
+            if any(g["sport"] == code and g["season"] == y for g in keep):
+                ch["%s-%d" % (code, y)] = season_champs(code, y)
     final_rank_save()
     conf_place_save()
+    champs_save()
+    print("  champions for %d seasons" % len(ch))
     print("  final rankings for %d Michigan seasons, %d conference finishes"
           % (len(fr), len(cp)))
 
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
-               "final_rank": fr, "conf_place": cp,
+               "final_rank": fr, "conf_place": cp, "champs": ch,
                "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
