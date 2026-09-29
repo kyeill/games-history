@@ -549,6 +549,12 @@ def uscho_schedule(team_id, y):
     slug = USCHO_SLUG.get(team_id)
     if not slug:
         return []
+    return uscho_rows(slug, y)
+
+
+def uscho_rows(slug, y):
+    """One school's USCHO season, by its slug -- the Big Ten table below reads
+    six schools this app has no ids for (2026-09-29)."""
     if (slug, y) in USCHO_SCHED:
         return USCHO_SCHED[(slug, y)]
     path = os.path.join(HERE, "data", "uscho", "sched-%s-%d.json" % (slug, y))

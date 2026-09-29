@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-162627";
+const BUILD = "20260929-164647";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -313,7 +313,18 @@ function seasonLine() {
   // 2026-09-29). First place reads CHAMPIONS, shared first CO-CHAMPIONS;
   // football answers to its title game instead, which is what decides the
   // conference there.
-  const place = CONF_PLACE[sport + "-" + FILT.season];
+  /* HOCKEY'S PLACE IS ITS TOURNAMENT SEED (his call 2026-09-29, after the
+     table was built and thrown away). ESPN carries no Big Ten hockey
+     standings, and the table USCHO's schedules give cannot reproduce the
+     conference's own -- its shootout results are half missing, and the
+     ordering rule changed along the way, so five of thirteen seasons came out
+     a place wrong. The Big Ten seeds its tournament BY those standings, so
+     the seed is the finish, and it is already on the cards. */
+  const bttSeed = sport === "CHK"
+    ? (seasonRound(games, "Big Ten Tournament") || {}).seed : null;
+  const place = CONF_PLACE[sport + "-" + FILT.season] ||
+    (bttSeed != null ? { place: bttSeed, tied: false, division: null,
+                         record: cw + "-" + cl + (ct ? "-" + ct : "") } : null);
   if (any || place) {
     const cRec = place ? place.record : cw + "-" + cl + (ct ? "-" + ct : "");
     const name = "B1G" + (place && place.division ? " " + place.division : "");
