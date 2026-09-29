@@ -2182,10 +2182,21 @@ def _poll_rank(code, season, poll, stype, weeks):
 
 
 def final_rank(code, season):
-    """{"ap": n|None, "cfp": n|None} for one Michigan season."""
+    """{"ap": n|None, "cfp": n|None} for one Michigan season.
+
+    HOCKEY takes the last USCHO poll of the season instead (his call
+    2026-09-29) -- ESPN carries no college hockey poll worth the name, and
+    USCHO's is already cached for the rankings on the cards.
+    """
     key = "%s-%d" % (code, season)
     if key in _FINAL_RANK:
         return _FINAL_RANK[key]
+    if code == "CHK":
+        polls = uscho_polls(season)
+        got = {"ap": (polls[-1][1].get("michigan") if polls else None)}
+        if polls and season_over(code, season):
+            _FINAL_RANK[key] = got
+        return got
     got = {"ap": _poll_rank(code, season, 1, 3, [1])}
     if code == "CFB" and season >= 2014:
         got["cfp"] = _poll_rank(code, season, 21, 2, [17, 16, 15])
@@ -2199,6 +2210,99 @@ def final_rank_save():
     if _FINAL_RANK:
         os.makedirs(os.path.dirname(FINAL_RANK_FILE), exist_ok=True)
         json.dump(_FINAL_RANK, open(FINAL_RANK_FILE, "w", encoding="utf-8"),
+                  separators=(",", ":"), sort_keys=True)
+
+
+# ---------------------------------------------------------------------------
+# WHERE HE FINISHED IN THE CONFERENCE (his call 2026-09-29): the season line
+# names his place -- "2nd B1G East", "t-5th B1G" -- and calls him champion
+# where he finished first. ESPN's standings carry the conference record and
+# the group a team sat in, which is also where football's DIVISION name comes
+# from. Kept in data/conf-place.json once a season is over.
+CONF_PLACE_FILE = os.path.join(HERE, "data", "conf-place.json")
+_CONF_PLACE = (json.load(open(CONF_PLACE_FILE, encoding="utf-8"))
+               if os.path.exists(CONF_PLACE_FILE) else {})
+STANDINGS_PATH = {"CFB": "football/college-football",
+                  "CBB": "basketball/mens-college-basketball"}
+
+
+def _conf_groups(node):
+    """Every group in a standings tree that actually has teams in it."""
+    out = []
+    if (node.get("standings") or {}).get("entries"):
+        out.append(node)
+    for ch in node.get("children") or []:
+        out += _conf_groups(ch)
+    return out
+
+
+def conf_place(code, season):
+    """Michigan's place in the Big Ten that season.
+
+    {"place": 2, "tied": false, "group": "Big Ten - East", "record": "8-1"}
+    """
+    key = "%s-%d" % (code, season)
+    if key in _CONF_PLACE:
+        return _CONF_PLACE[key]
+    got = None
+    # ESPN dates a basketball season by the year it ENDS (2026-09-29): its
+    # "2021" standings are the 2020-21 table this app calls 2020
+    yr = season + 1 if code == "CBB" else season
+    try:
+        r = requests.get("https://site.api.espn.com/apis/v2/sports/%s/standings"
+                         % STANDINGS_PATH[code],
+                         params={"season": yr, "group": rules.BIG_TEN[code]},
+                         timeout=30)
+        j = r.json() if r.status_code == 200 else {}
+    except (requests.RequestException, ValueError, KeyError):
+        j = {}
+    for grp in _conf_groups(j):
+        table = []
+        for e in grp["standings"]["entries"]:
+            tid = str((e.get("team") or {}).get("id") or "")
+            rec = next((q.get("displayValue") for q in e.get("stats") or []
+                        if q.get("type") == "vsconf"), None)
+            if not rec:
+                rec = next((q.get("displayValue") for q in e.get("stats") or []
+                            if q.get("type") == "total"), None)
+            if not rec:
+                continue
+            w, l = (rec.split("-") + ["0"])[:2]
+            try:
+                w, l = int(w), int(l)
+            except ValueError:
+                continue
+            table.append((tid, w, l, rec))
+        me = next((t for t in table if t[0] == rules.MICHIGAN), None)
+        if not me:
+            continue
+        def pct(t):
+            n = t[1] + t[2]
+            return t[1] / n if n else 0.0
+        better = sum(1 for t in table if pct(t) > pct(me))
+        tied = sum(1 for t in table if t[0] != rules.MICHIGAN and pct(t) == pct(me))
+        # THE DIVISION IS NAMED BY ITS ERA, not by ESPN, which files the
+        # 2011-13 Legends and Leaders under East and West (2026-09-29). The
+        # MEMBERSHIP it returns is right -- Michigan sits with Nebraska and
+        # Minnesota in 2012 -- so only the label is replaced.
+        div = None
+        if code == "CFB":
+            if 2011 <= season <= 2013:
+                div = "Legends"
+            elif 2014 <= season <= 2023:
+                div = "East" if "East" in (grp.get("name") or "") else "West"
+        got = {"place": better + 1, "tied": bool(tied),
+               "group": grp.get("name") or "", "division": div, "record": me[3]}
+        break
+    if got and season_over(code, season):
+        _CONF_PLACE[key] = got
+    return got
+
+
+def conf_place_save():
+    if _CONF_PLACE:
+        os.makedirs(os.path.dirname(CONF_PLACE_FILE), exist_ok=True)
+        json.dump(_CONF_PLACE, open(CONF_PLACE_FILE, "w", encoding="utf-8"),
                   separators=(",", ":"), sort_keys=True)
 
 
@@ -4265,19 +4369,25 @@ def harvest():
                     t.setdefault("place", era["short"])
     # WHERE HE FINISHED, season by season (2026-09-29): the season line reads
     # this when he reached no postseason round of his own
-    fr = {}
+    fr, cp = {}, {}
     for g in keep:
-        if g.get("focus") != rules.MICHIGAN or g["sport"] not in ("CFB", "CBB"):
+        if g.get("focus") != rules.MICHIGAN or g["sport"] not in ("CFB", "CBB", "CHK"):
             continue
         k = "%s-%d" % (g["sport"], g["season"])
         if k not in fr:
             fr[k] = final_rank(g["sport"], g["season"])
+        if k not in cp and g["sport"] in STANDINGS_PATH:
+            got = conf_place(g["sport"], g["season"])
+            if got:
+                cp[k] = got
     final_rank_save()
-    print("  final rankings for %d Michigan seasons" % len(fr))
+    conf_place_save()
+    print("  final rankings for %d Michigan seasons, %d conference finishes"
+          % (len(fr), len(cp)))
 
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
-               "final_rank": fr,
+               "final_rank": fr, "conf_place": cp,
                "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,

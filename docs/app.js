@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-153744";
+const BUILD = "20260929-161233";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -28,7 +28,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June",
 function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
-let FINAL_RANK = {};
+let FINAL_RANK = {}, CONF_PLACE = {};
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -228,6 +228,12 @@ function stageLabel(g) {
    stages, the records from their results -- except the final ranking, which
    comes from the polls (see harvest's final_rank) and stands in when he
    reached no round of his own. */
+function ordinal(n, tied) {
+  const tens = n % 100, ones = n % 10;
+  const suffix = (tens >= 11 && tens <= 13) ? "th"
+    : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
+  return (tied ? "t-" : "") + n + suffix;
+}
 function seasonRound(games, prefix) {
   // the LAST stage game of a run, which is the furthest he got
   const run = games.filter(g => (g.stage || "").indexOf(prefix) === 0 && !upcoming(g));
@@ -268,19 +274,37 @@ function seasonLine() {
     // the SEED belongs to basketball and hockey; football's playoff had none
     // until 2024 and he does not want one there (his call 2026-09-29)
     const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
-    parts.push(nat.won && round === "Final" ? "NATIONAL CHAMPION (" + seed + rec + ")"
+    parts.push(nat.won && round === "Final" ? "NATIONAL CHAMPIONS (" + seed + rec + ")"
       : natName + " " + round + " (" + seed + rec + ")");
   } else {
+    // ...or where he finished: the number alone, and NR when he finished
+    // outside it (his call 2026-09-29). Which poll it came from is not worth
+    // the room -- the CFP committee's last from 2014, the AP before that,
+    // and USCHO's last for hockey.
     const fr = FINAL_RANK[sport + "-" + FILT.season] || {};
     const n = fr.cfp || fr.ap;
-    const which = fr.cfp ? "CFP" : "AP";
-    parts.push(n ? which + " No. " + n + " (" + rec + ")" : rec);
+    parts.push((n ? "#" + n : "NR") + " (" + rec + ")");
   }
-  // 2. THE CONFERENCE, and whether he won it
-  if (any || conf) {
+  // 2. THE CONFERENCE: where he finished in it, and the DIVISION he finished
+  // in where there was one -- "2nd B1G East", "t-5th B1G" (his call
+  // 2026-09-29). First place reads CHAMPIONS, shared first CO-CHAMPIONS;
+  // football answers to its title game instead, which is what decides the
+  // conference there.
+  const place = CONF_PLACE[sport + "-" + FILT.season];
+  if (any || place) {
+    const cRec = place ? place.record : cw + "-" + cl + (ct ? "-" + ct : "");
+    const name = "B1G" + (place && place.division ? " " + place.division : "");
     const title = seasonRound(games, "Big Ten Championship");
-    parts.push((title && title.won ? "B1G CHAMPIONS" : "B1G") +
-      (any ? " (" + cw + "-" + cl + (ct ? "-" + ct : "") + ")" : ""));
+    let head;
+    if (sport === "CFB") {
+      head = title && title.won ? "B1G CHAMPIONS"
+        : place ? ordinal(place.place, place.tied) + " " + name : name;
+    } else if (place && place.place === 1) {
+      head = place.tied ? "B1G CO-CHAMPIONS" : "B1G CHAMPIONS";
+    } else {
+      head = place ? ordinal(place.place, place.tied) + " " + name : name;
+    }
+    parts.push(head + " (" + cRec + ")");
   }
   // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
   if (sport === "CBB" || sport === "CHK") {
@@ -3000,6 +3024,7 @@ async function init() {
   BIG_TEN = r[0].big_ten || {};
   CONF_LABEL = r[0].conf_label || {};
   FINAL_RANK = r[0].final_rank || {};
+  CONF_PLACE = r[0].conf_place || {};
   TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};
