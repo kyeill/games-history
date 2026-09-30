@@ -31,12 +31,16 @@ header{display:flex;align-items:baseline;gap:9px;padding:18px 0 10px}
 h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
 .count{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums;
   line-height:1.2}
-/* THE SEASON LINE STACKS ON A PHONE (his call 2026-09-29): one part a line,
-   and the bars that separated them go with the single line */
+/* THE SEASON LINE STACKS ON A PHONE (his calls 2026-09-29, 2026-09-30): one
+   part a line, the bars that separated them gone with the single line, and
+   the RECORDS dropped -- they were what pushed the line over its width and
+   the title onto a second row. The title never wraps now either. */
 @media (max-width:700px){
   .count .spart{display:block}
-  .count .ssep{display:none}
+  .count .ssep,.count .srec{display:none}
 }
+h1{white-space:nowrap}
+.count .srole{opacity:.72}
 .spacer{flex:1}
 .iconbtn{background:none;border:1px solid var(--line);color:var(--muted);
   border-radius:7px;padding:4px 9px;font:inherit;font-size:13px;cursor:pointer}
@@ -446,6 +450,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260929-172258"></script>
+<script src="app.js?v=20260929-200327"></script>
 </body>
 </html>

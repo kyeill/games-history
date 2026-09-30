@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20260929-172258";
+const BUILD = "20260929-200327";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -228,10 +228,21 @@ function stageLabel(g) {
    stages, the records from their results -- except the final ranking, which
    comes from the polls (see harvest's final_rank) and stands in when he
    reached no round of his own. */
+/* THE RECORD IS THE FIRST THING A PHONE GIVES UP (his call 2026-09-30):
+   the line bled over its two lines and pushed the title onto a second one.
+   Each record is wrapped so the stylesheet can drop it under 700px, seeds
+   and rounds and names all staying. */
+function rec(seed, record) {
+  return seed != null
+    ? " (No. " + seed + '<span class="srec">, ' + record + "</span>)"
+    : '<span class="srec"> (' + record + ")</span>";
+}
 // a piece of the season line that celebrates something (2026-09-29)
-function win(colour, text, bold) {
+function win(colour, html, bold) {
+  // the callers build their own markup now -- a record wrapped so a phone can
+  // drop it -- so this paints what it is given rather than escaping it
   return '<span style="color:' + colour + (bold ? ";font-weight:700" : "") +
-    '">' + esc(text) + "</span>";
+    '">' + html + "</span>";
 }
 /* WHO WON THAT SEASON (his call 2026-09-29). TV Windows and Key Games are
    not his team's views, so with one season chosen they name the champions of
@@ -286,15 +297,18 @@ function champLine() {
   const ch = CHAMPS[sport + "-" + FILT.season];
   if (!ch) return null;
   const part = (t, nat) => champPart(t, sport, FILT.season, nat);
+  // ...each under the title it won (his call 2026-09-30), since stacked on a
+  // phone the order alone no longer says which is which
+  const tag = x => '<span class="srole">' + x + ":</span> ";
   const out = [];
-  if (ch.nat) out.push(part(ch.nat, true));
+  if (ch.nat) out.push(tag(sport === "CFB" ? "CFP" : "NCAA") + part(ch.nat, true));
   // a SHARED Big Ten title names everyone who won it, slashed together
   if ((ch.conf || []).length) {
     // (map hands its callback an INDEX too, which read as "this is the
     //  national champion" and capitalised the second name -- 2026-09-29)
-    out.push((ch.conf || []).map(t => part(t)).filter(Boolean).join("/"));
+    out.push(tag("B1G") + (ch.conf || []).map(t => part(t)).filter(Boolean).join("/"));
   }
-  if (sport === "CBB" && ch.cup) out.push(part(ch.cup));
+  if (sport === "CBB" && ch.cup) out.push(tag("BTT") + part(ch.cup));
   if (!out.length) return null;
   return out.map(x => '<span class="spart">' + x + "</span>")
     .join('<span class="ssep"> | </span>');
@@ -322,7 +336,7 @@ function seasonLine() {
   // the OVERALL record, ties and all -- hockey keeps its third number
   let w = 0, l = 0, t = 0;
   games.forEach(g => { if (g.tie) t++; else if (mine(g).win) w++; else l++; });
-  const rec = w + "-" + l + (t ? "-" + t : "");
+  const recd = w + "-" + l + (t ? "-" + t : "");
   // ...and the CONFERENCE record, the regular season only. CORNELL answers
   // to the ECAC rather than the Big Ten (his call 2026-09-29).
   const cornell = fid === CORNELL;
@@ -352,7 +366,7 @@ function seasonLine() {
     const round = tail(nat.game).replace(/^Championship$/, "Final");
     // the SEED belongs to basketball and hockey; football's playoff had none
     // until 2024 and he does not want one there (his call 2026-09-29)
-    const seed = sport !== "CFB" && nat.seed != null ? "No. " + nat.seed + ", " : "";
+    const seedNo = sport !== "CFB" ? nat.seed : null;
     /* HOW DEEP A RUN HAS TO BE TO WEAR ITS COLOUR (his calls 2026-09-29):
        every CFP game is gold, because reaching it at all is the achievement;
        basketball turns blue at the Sweet Sixteen and hockey at the Frozen
@@ -362,9 +376,11 @@ function seasonLine() {
     const DEEP = { CBB: ["Sweet Sixteen", "Elite Eight", "Final Four", "Final"],
                    CHK: ["Frozen Four", "Final"] };
     const deep = (DEEP[sport] || []).indexOf(round) > -1;
+    // ...and CORNELL wears its own red for the NCAA Tournament rather than
+    // Michigan's maize, at any depth (his call 2026-09-30)
     const colour = sport === "CFB" ? "#c28c19"
       : natName !== "NCAA" ? null
-      : deep ? "#4d9ae0" : "#ffcb05";
+      : deep ? "#4d9ae0" : cornell ? "#c0053c" : "#ffcb05";
     /* HOW IT READS (his calls 2026-09-29): the NCAA Tournament goes without
        saying, so only its FINAL names it; the rounds he remembers by name go
        up in capitals. Football keeps the CFP in front of its rounds. */
@@ -372,10 +388,9 @@ function seasonLine() {
     const label = (sport === "CFB" ? "CFP " : natName === "NIT" ? "NIT "
       : round === "Final" ? "NCAA " : "") +
       (CAPS.indexOf(round) > -1 ? round.toUpperCase() : round);
-    const text = nat.won && round === "Final"
-      ? "NATIONAL CHAMPIONS (" + seed + rec + ")"
-      : label + " (" + seed + rec + ")";
-    parts.push(colour ? win(colour, text, nat.won && round === "Final") : esc(text));
+    const text = (nat.won && round === "Final" ? "NATIONAL CHAMPIONS" : label) +
+      rec(seedNo, recd);
+    parts.push(colour ? win(colour, text, nat.won && round === "Final") : text);
   } else {
     // ...or where he finished: the number alone, and NR when he finished
     // outside it (his call 2026-09-29). Which poll it came from is not worth
@@ -387,8 +402,8 @@ function seasonLine() {
     // was no playoff to reach, so the ranking wears maize (his call
     // 2026-09-29): 2011, 2016 and 2018
     const ny6 = sport === "CFB" && games.some(ny6Bowl);
-    const text = (n ? "#" + n : "NR") + " (" + rec + ")";
-    parts.push(ny6 ? win("#ffcb05", text) : esc(text));
+    const text = (n ? "#" + n : "NR") + rec(null, recd);
+    parts.push(ny6 ? win("#ffcb05", text) : text);
   }
   // 2. THE CONFERENCE: where he finished in it, and the DIVISION he finished
   // in where there was one -- "2nd B1G East", "t-5th B1G" (his call
@@ -406,10 +421,16 @@ function seasonLine() {
      the seed is the finish, and it is already on the cards. */
   // the conference tournament of whichever conference he is in
   const cupName = cornell ? "ECAC Tournament" : "Big Ten Tournament";
-  const cupShort = cornell ? "ECAC Tournament" : "BTT";
+  const cupShort = cornell ? "ECACT" : "BTT";
   const bttSeed = sport === "CHK"
     ? (seasonRound(games, cupName) || {}).seed : null;
-  const place = CONF_PLACE[sport + "-" + FILT.season] ||
+  /* WHERE NO TOURNAMENT SEEDED THE SEASON (his call 2026-09-30): 2019-20
+     stopped before the ECAC's, and Cornell had won the league outright. */
+  const FINISH_FIX = { "172-CHK-2019": { place: 1, tied: false, division: null } };
+  const fix = FINISH_FIX[fid + "-" + sport + "-" + FILT.season];
+  const place = (fix && Object.assign({}, fix,
+      { record: cw + "-" + cl + (ct ? "-" + ct : "") })) ||
+    CONF_PLACE[sport + "-" + FILT.season] ||
     (bttSeed != null ? { place: bttSeed, tied: false, division: null,
                          record: cw + "-" + cl + (ct ? "-" + ct : "") } : null);
   if (any || place) {
@@ -432,9 +453,9 @@ function seasonLine() {
     // the ECAC's own red where it is his conference, the Big Ten's blue
     // otherwise -- the same two the cards and the tiles use (2026-09-29)
     const confBlue = cornell ? "#c0053c" : "#0088ce";
-    parts.push(/CHAMPIONS/.test(head) ? win(confBlue, head + " (" + cRec + ")", true)
-      : colour ? win(colour, head + " (" + cRec + ")")
-      : esc(head + " (" + cRec + ")"));
+    const cText = head + rec(null, cRec);
+    parts.push(/CHAMPIONS/.test(head) ? win(confBlue, cText, true)
+      : colour ? win(colour, cText) : cText);
     /* THE IVY LEAGUE SITS BETWEEN THEM (his call 2026-09-29), in its own
        green: the six Ivies play each other inside the ECAC, and harvest marks
        those games, so the record is read straight off them. */
@@ -446,18 +467,23 @@ function seasonLine() {
       });
       if (iw + il + it) {
         parts.push(win("#0f6a37",
-          "Ivy (" + iw + "-" + il + (it ? "-" + it : "") + ")"));
+          "Ivy" + rec(null, iw + "-" + il + (it ? "-" + it : ""))));
       }
     }
   }
   // 3. ...and the CONFERENCE TOURNAMENT, basketball and hockey (his call)
-  if (sport === "CBB" || sport === "CHK") {
+  /* 2019-20 HAD NO CONFERENCE TOURNAMENT TO SPEAK OF (his call 2026-09-30):
+     the Big Ten's and the ECAC's were called off part-played, so neither says
+     anything. Cornell had already won the ECAC outright, which is the finish
+     that season shows -- there was no tournament to seed it. */
+  if ((sport === "CBB" || sport === "CHK") && FILT.season !== 2019) {
     const btt = seasonRound(games, cupName);
     if (btt) {
       const round = tail(btt.game).replace(/^Championship$/, "Final");
       const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
       const bttHead = btt.won && round === "Final" ? cupShort + " CHAMPIONS"
         : cupShort + " " + (round === "Final" ? "FINAL" : round);
+      void 0;
       // ...and reaching the FINAL and losing it is maize (his call 2026-09-29)
       parts.push(/CHAMPIONS/.test(bttHead)
         ? win(cornell ? "#c0053c" : "#0088ce", bttHead + seed, true)
