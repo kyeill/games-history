@@ -3141,6 +3141,15 @@ COVER_AWAY = {("1", "8", "ABC"), ("4", "5", "FOX")}
 # His network waterfall for a game that has to be ADDED: each tier is exhausted
 # before the next gets a turn.
 COVER_TIERS = [["FOX", "CBS", "NBC"], ["ESPN"], ["FS1", "ESPN2"]]
+# FRIDAY NIGHT COMES SECOND IN THE ACC AND THE BIG 12 (his call 2026-10-01).
+# Those two conferences play a real Friday package on ESPN, and a Saturday
+# game that had to be ADDED off ESPN is usually the lesser of the two -- so
+# where the broadcast networks offer nothing, a 7pm-or-later ESPN game between
+# two POWER FOUR teams, hosted by the conference being covered, is taken ahead
+# of anything else. Where more than one qualifies, the earlier kickoff wins.
+# Measured over 2024-26 it swaps seven games, all of them ACC.
+FRIDAY_CONFS = {"1", "4"}                        # ACC, Big 12
+POWER_FOUR = {"1", "4", "5", "8"}                # ...and the Big Ten and SEC
 # One conference-week his rules cannot fill: no ACC team hosted on any of the
 # six networks in week 2 of 2021. His fix (2026-09-15) is to take Pittsburgh at
 # Tennessee -- an ACC visitor, but on ESPN rather than the ABC the away rule
@@ -3240,6 +3249,11 @@ def cover_ids(evs, season, wk0=(), net_over=None):
         span = COVER_CONFS.get(conf)
         if not span or not (span[0] <= season <= span[1]):
             continue
+        mins = d.hour * 60 + d.minute
+        friday = (d.weekday() == 4 and mins >= 19 * 60 and "ESPN" in nets
+                  and conf in FRIDAY_CONFS
+                  and all(str((k.get("team") or {}).get("conferenceId")) in POWER_FOUR
+                          for k in cs))
         ranks = sorted(r for r in (rank_of(k) for k in cs) if r)
         if len(ranks) == 2:
             rest = (0, ranks[0], ranks[1], 0)
@@ -3248,7 +3262,10 @@ def cover_ids(evs, season, wk0=(), net_over=None):
         else:
             order = [n for n in COVER_TIERS[tier] if n in nets]
             rest = (2, _kick_bucket(d), COVER_TIERS[tier].index(order[0]), 0)
-        key = (day, tier) + rest
+        # the broadcast networks first, then that Friday game, then the rest
+        # exactly as before
+        prio = 0 if (day == 0 and tier == 0) else 1 if friday else 2
+        key = (prio, mins) if prio == 1 else (prio,) + (day, tier) + rest
         slot = (conf, week)
         if slot not in pick or key < pick[slot][0]:
             pick[slot] = (key, x["id"])
