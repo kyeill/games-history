@@ -3150,6 +3150,7 @@ COVER_TIERS = [["FOX", "CBS", "NBC"], ["ESPN"], ["FS1", "ESPN2"]]
 # Measured over 2024-26 it swaps seven games, all of them ACC.
 FRIDAY_CONFS = {"1", "4"}                        # ACC, Big 12
 POWER_FOUR = {"1", "4", "5", "8"}                # ...and the Big Ten and SEC
+FRIDAY_FROM = 2024                               # the package's own era (his call)
 # One conference-week his rules cannot fill: no ACC team hosted on any of the
 # six networks in week 2 of 2021. His fix (2026-09-15) is to take Pittsburgh at
 # Tennessee -- an ACC visitor, but on ESPN rather than the ABC the away rule
@@ -3250,7 +3251,8 @@ def cover_ids(evs, season, wk0=(), net_over=None):
         if not span or not (span[0] <= season <= span[1]):
             continue
         mins = d.hour * 60 + d.minute
-        friday = (d.weekday() == 4 and mins >= 19 * 60 and "ESPN" in nets
+        friday = (season >= FRIDAY_FROM
+                  and d.weekday() == 4 and mins >= 19 * 60 and "ESPN" in nets
                   and conf in FRIDAY_CONFS
                   and all(str((k.get("team") or {}).get("conferenceId")) in POWER_FOUR
                           for k in cs))
