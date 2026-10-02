@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261002-094548";
+const BUILD = "20261002-141256";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2498,8 +2498,11 @@ function visible() {
   // "Bowls" and "Postseason" are the named cuts at the end of those two
   // dropdowns (his call 2026-10-02); a numbered week or a named month is the
   // REGULAR season, so the postseason is taken out of March
-  if (FILT.week === "bowls") list = list.filter(g => g.week == null);
-  else if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
+  if (FILT.week === "champ") list = list.filter(g => !!g.title);
+  else if (FILT.week === "bowls")
+    list = list.filter(g => g.sport === "CFB" && g.week == null && !g.title);
+  else if (FILT.week != null)
+    list = list.filter(g => g.week === FILT.week && !g.title);
   if (FILT.month === "postseason") list = list.filter(g => !!g.stage);
   else if (FILT.month != null)
     list = list.filter(g => +g.date.slice(5, 7) === FILT.month && !g.stage);
@@ -2905,18 +2908,21 @@ function filterChips() {
   };
   if (sport === "CFB") {
     const base = seasonBase("week");
-    const weeks = new Set(), numbered = new Set();
-    let bowls = false;
+    const weeks = new Set();
+    let champ = false, bowls = false;
     base.forEach(g => {
+      // A CONFERENCE FINAL LEAVES ITS WEEK NUMBER BEHIND (his call
+      // 2026-10-02): it belongs under Conf Champ whether or not ordinary
+      // games were played that same week -- 2016 is the case that tests it,
+      // where Bedlam was played on championship Saturday.
+      if (g.title) { champ = true; return; }
       if (g.week == null) { bowls = true; return; }
       weeks.add(g.week);
-      // a week with one ordinary game in it keeps its number
-      if (!g.title) numbered.add(g.week);
     });
     if (typeof FILT.week === "number") weeks.add(FILT.week);
     h += group("Week", select("week", "All Weeks",
-      Array.from(weeks).sort((a, b) => a - b)
-        .map(w => [numbered.has(w) ? "Week " + w : "Conf Champ", w])
+      Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w])
+        .concat(champ || FILT.week === "champ" ? [["Conf Champ", "champ"]] : [])
         .concat(bowls || FILT.week === "bowls" ? [["Bowls", "bowls"]] : []),
       FILT.week));
   }
@@ -3253,9 +3259,14 @@ function switchView(view) {
       !upcoming(g) && keyShows(g));
     if (done.length) {
       FILT.season = Math.max.apply(null, done.map(g => g.season));
-      const weeks = done.filter(g => g.season === FILT.season && g.week != null)
-        .map(g => g.week);
-      FILT.week = weeks.length ? Math.max.apply(null, weeks) : null;
+      // ...and the conference finals are their own entry now (2026-10-02),
+      // so "the latest week" is Conf Champ once they have been played
+      const rows = done.filter(g => g.season === FILT.season);
+      const plain = rows.filter(g => g.week != null && !g.title);
+      const champDate = rows.filter(g => g.title).map(g => g.date).sort().pop();
+      const plainDate = plain.map(g => g.date).sort().pop();
+      FILT.week = (champDate && (!plainDate || champDate > plainDate)) ? "champ"
+        : plain.length ? Math.max.apply(null, plain.map(g => g.week)) : null;
     }
     FILT.marquee = false;
     SORT = "asc";

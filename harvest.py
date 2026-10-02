@@ -3881,6 +3881,29 @@ def harvest():
                 # a FOX basketball game.
                 if code == "CFB" and not conf and rules.is_championship(heads):
                     slots = set()
+                stage_txt = rules.stage_label(code, stype, heads, conf=conf,
+                                              month=d.month, season=y)
+                # his seeds ride on conference-tournament games only
+                seeded = bool(stage_txt and stage_txt.startswith("Big Ten Tournament"))
+                # A GAME ESPN LEFT WITH NO RANKING ON EITHER SIDE takes the
+                # poll in force that day (his calls 2026-09-16). A game with
+                # no ranked team really in it simply finds nothing. The CFP
+                # reads the COMMITTEE's rankings, since there the number is
+                # the seed; the NCAA Tournament and the NIT are left alone --
+                # their number is a seed no poll holds, and ESPN has every one.
+                # IT SETTLES THE CATEGORY TOO (his call 2026-10-02: "make sure
+                # there are rankings, even if ESPN misses"). It used to be read
+                # AFTER the game type, so a card could print #5 beating #12 and
+                # still be missing from Key Games -- ESPN drops a ranking on
+                # about 190 games across the archive, most of them basketball.
+                # That is why this block sits above `gtype` and not below the
+                # card, where it was written.
+                poll_day = {}
+                if not any(ranks):
+                    if stage_txt and stage_txt.startswith("CFP"):
+                        poll_day = ap_before(code, y, d.date(), poll=21)
+                    elif not (stage_txt and stage_txt.startswith(("NCAA Tournament", "NIT"))):
+                        poll_day = ap_before(code, y, d.date())
                 gtype = None
                 if len(win) == 1 and len(lose) == 1:
                     # a championship game with no category of its own is filed
@@ -3888,8 +3911,11 @@ def harvest():
                     # a Big Ten Tournament game before the Final
                     b1g_run = (code == "CBB" and conf == "Big Ten"
                                and not title)
-                    gtype = rules.game_type(code, rank_of(win[0]),
-                                            rank_of(lose[0]), bt in confs,
+                    # ESPN's own ranking first, the poll above where it has none
+                    gtype = rules.game_type(code,
+                                            rank_of(win[0]) or poll_day.get(win[0]["team"]["id"]),
+                                            rank_of(lose[0]) or poll_day.get(lose[0]["team"]["id"]),
+                                            bt in confs,
                                             p5_title=title,
                                             b1g_tourney_run=b1g_run,
                                             postseason=postseason)
@@ -4012,24 +4038,6 @@ def harvest():
                 card_slots = set(slots)
                 slots |= set(extras.get(x["id"], ()))
 
-                stage_txt = rules.stage_label(code, stype, heads, conf=conf,
-                                              month=d.month, season=y)
-                # his seeds ride on conference-tournament games only
-                seeded = bool(stage_txt and stage_txt.startswith("Big Ten Tournament"))
-                # A GAME ESPN LEFT WITH NO RANKING ON EITHER SIDE takes the
-                # poll in force that day (his calls 2026-09-16). A game with
-                # no ranked team really in it simply finds nothing. The CFP
-                # reads the COMMITTEE's rankings, since there the number is
-                # the seed; the NCAA Tournament and the NIT are left alone --
-                # their number is a seed no poll holds, and ESPN has every one.
-                # DISPLAY ONLY: this is read after the game type is settled,
-                # so Key Games and Rivals admission are unchanged.
-                poll_day = {}
-                if not any(ranks):
-                    if stage_txt and stage_txt.startswith("CFP"):
-                        poll_day = ap_before(code, y, d.date(), poll=21)
-                    elif not (stage_txt and stage_txt.startswith(("NCAA Tournament", "NIT"))):
-                        poll_day = ap_before(code, y, d.date())
                 side = []
                 for k in cs:
                     t = k["team"]

@@ -177,6 +177,23 @@ SERIES = [
     ("401856766", "Home & Neutral", "CFB 2026    North Carolina at Texas Christian"),
     # Rivals losses before 2021, from a scan of every rival loss since 2014 (2026-09-11)
     ("400548302", "Home & Neutral", "CFB 2014    Notre Dame at Arizona State"),
+    # --- his call 2026-10-02, from the series scan run after the Key Games
+    # backfill. Most of these are the OTHER leg of a series he had already
+    # ruled -- the leg was not in the archive when he ruled it -- and the rest
+    # are new pairs he approved from the scan's list.
+    ("401282066", "Home & Home", "CFB 2021    Pittsburgh at Tennessee"),
+    ("401403882", "Home & Home", "CFB 2022    Penn State at Auburn"),
+    ("401403984", "Home & Home", "CFB 2022    Washington State at Wisconsin"),
+    ("401752825", "Home & Home", "CFB 2025    Illinois at Duke"),
+    ("401856682", "Home & Home", "CFB 2026    Ohio State at Texas"),
+    ("401856685", "Home & Home", "CFB 2026    Florida State at Alabama"),
+    ("401856678", "Home & Home", "CFB 2026    Missouri at Kansas"),
+    ("401856782", "Home & Home", "CFB 2026    Oregon at Oklahoma State"),
+    ("401823566", "Home & Home", "CBB 2025-26 Villanova at Michigan"),
+    ("401921776", "Home & Home", "CBB 2026-27 Michigan at Villanova"),
+    # two seasons apart, the 2023 meeting never scheduled -- still each
+    # school's turn to host (his call 2026-10-02)
+    ("401403969", "Home & Home", "CFB 2022    Boise State at Oregon State"),
 ]
 
 ANNUAL = [
@@ -224,6 +241,13 @@ NOT_SERIES = [
     ("CBB", "150", "127", "Duke / Michigan State", "Duke at Michigan State 2025-26 is not a first leg"),
     ("CBB", "258", "194", "Virginia / Ohio State", "Nashville 2026 is not a first leg"),
     ("CBB", "277", "194", "West Virginia / Ohio State", "Cleveland 2019, 2023, 2025: not a series"),
+    # from the scan run after the Key Games backfill, 2026-10-02: in both of
+    # these MICHIGAN hosts twice and the visitor never does, so neither is a
+    # series however the sites are labelled -- the Eastern Michigan pair is
+    # one Michigan home game moved to Little Caesars Arena, and Oakland played
+    # at Crisler in both seasons
+    ("CBB", "2199", "130", "Eastern Michigan / Michigan", "Michigan hosts both; one leg moved to Detroit"),
+    ("CBB", "2473", "130", "Oakland / Michigan", "the same site both seasons"),
 ]
 
 # Notre Dame plays ACC teams by its scheduling agreement with the ACC (from

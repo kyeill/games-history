@@ -869,6 +869,16 @@ end of those two dropdowns; the change handler coerced every week and month
 value with `+v`, which would have turned "bowls" into NaN and emptied the page
 with no error. Only a run of digits is coerced.
 
+**A conference final leaves its week number behind** (his call 2026-10-02:
+"remove all Conf Champ games from Week 14 and put them under Conf Champ, even
+if other Week 14 games still do exist"). So "Conf Champ" is a value of its
+own, not a renamed week, and a numbered week means the regular season: 2016 is
+the case that tests it, where Bedlam was played on championship Saturday and
+week 14 has to hold that one game and not the five titles. Key Games' opening
+default follows -- it opens on Conf Champ once the finals are the newest games
+of its season, which is the whole year between championship Saturday and the
+next September.
+
 **Those two lists come from `visible()`, with Current and Marquee lifted.**
 They used to be read off GAMES, which offered weeks a view had nothing in and
 could not tell whether "Bowls" existed for this view at all. Reading the
@@ -1152,9 +1162,15 @@ view: `archive_era` is still SEASONS alone, which is what holds TV Windows at
   off a team's schedule, and swapping the source would quietly change ranks,
   networks and venues on cards he has already approved. Only genuinely new
   games come off the scoreboard.
-* **Admission still reads ESPN's own ranking**, not the poll fallback
-  (`ap_before`), which stays display-only. That is the archive era's rule too,
-  so Key Games means the same thing in 2016 as in 2024.
+* **A ranking ESPN forgot now settles the CATEGORY too** (his call
+  2026-10-02: "make sure there are rankings, even if ESPN misses"). `ap_before`
+  was read AFTER `gtype` and fed the card only, so a game could print #5
+  beating #12 and still be missing from Key Games -- about 190 of them across
+  the whole archive, most in basketball, including 37 in 2020-21 and 2021-22,
+  which are archive seasons. The block now sits ABOVE `gtype`, which is why
+  `stage_txt` and `seeded` moved up with it: the poll choice depends on the
+  stage (the CFP reads the committee, the NCAA Tournament and the NIT are left
+  alone, their number being a seed).
 * **The postseason is unchanged.** A bowl, a CFP game or an NCAA Tournament
   game is kept only when Michigan played it, a rival lost it, or his Results
   tab names it -- again exactly as from 2021. There is no season where Key
