@@ -158,6 +158,99 @@ def cbb_range(d, e, keep, tag=""):
     return out
 
 
+# ---------------------------------------------------------------------------
+# HIS RESULTS TAB (his call 2026-10-02). A short list of games that belong on
+# Key Games whatever the rules would say -- a rival beaten by somebody else, a
+# tournament result he remembers -- each with the shade and border he gives
+# it. The games are found by DATE and the two teams' names, since he writes
+# the winner and the loser rather than an id.
+RESULTS_TAB = "Results"
+_RESULTS = None
+
+
+def results_rows():
+    """{(code, season, date): [row]} from his Results tab."""
+    global _RESULTS
+    if _RESULTS is not None:
+        return _RESULTS
+    out = collections.defaultdict(list)
+    url = ("https://docs.google.com/spreadsheets/d/%s/gviz/tq"
+           "?tqx=out:csv&headers=1&sheet=%s" % (SHEET_ID, RESULTS_TAB))
+    try:
+        body = requests.get(url, timeout=40).text
+        rows = list(csv.reader(io.StringIO(body)))
+    except (requests.RequestException, csv.Error):
+        _RESULTS = out
+        return out
+    head = [h.strip().lower() for h in (rows[0] if rows else [])]
+    idx = {h: i for i, h in enumerate(head)}
+    for raw in rows[1:]:
+        def cell(name):
+            i = idx.get(name)
+            return (raw[i] or "").strip() if i is not None and i < len(raw) else ""
+        code = cell("sport").upper()
+        date = sheet_date(cell("date"))
+        if code not in ("CFB", "CBB") or not date:
+            continue
+        season = sheet_season(code, cell("year"))
+        if season is None:
+            y, m = int(date[:4]), int(date[5:7])
+            season = y if (code == "CFB" and m >= 8) else (y if m >= 8 else y - 1)
+        out[(code, season, date)].append(
+            {"winner": cell("winner"), "loser": cell("loser"),
+             "shade": bool(cell("shade")), "border": cell("border")})
+    _RESULTS = out
+    return out
+
+
+# the schools ESPN files under another name than he writes (2026-10-02)
+RESULTS_ALIAS = {"connecticut": "uconn"}
+
+
+def results_match(code, season, date, cs):
+    """The Results row this game answers to, if any -- matched on the two
+    names ESPN gives the competitors, since he writes a winner and a loser."""
+    def names_of(k):
+        t = k.get("team") or {}
+        return {flat(t.get(f) or "") for f in
+                ("shortDisplayName", "location", "displayName", "name")} - {""}
+    sides = [(names_of(k), k) for k in cs]
+    for row in results_rows().get((code, season, date), []):
+        def find(n):
+            n = flat(n)
+            n = RESULTS_ALIAS.get(n, n)
+            if not n:
+                return None
+            for ns, k in sides:
+                if n in ns or any(len(n) > 3 and (q.startswith(n) or n.startswith(q))
+                                  for q in ns):
+                    return k
+            return None
+        qw, ql = find(row["winner"]), find(row["loser"])
+        # BOTH names have to land, or a prefix match takes the wrong game:
+        # "Texas A&M" found Texas against UTEP, "Florida" found Florida State
+        # (2026-10-02). Where ESPN simply spells a school differently, the
+        # alias above is what closes the gap.
+        if qw is not None and ql is not None and qw is not ql:
+            return row
+    return None
+
+
+def results_events(code, y):
+    """The scoreboard events behind his Results rows for one season, for the
+    seasons the archive does not already walk in full."""
+    out = []
+    sport, grp = SPORTS[code]
+    for (c, season, date) in list(results_rows()):
+        if c != code or season != y:
+            continue
+        stamp = date.replace("-", "")
+        got = fetch(sport, {"dates": stamp, "groups": grp, "limit": 400},
+                    "results-%s-%s" % (code.lower(), stamp), True)
+        out += got.get("events") or []
+    return out
+
+
 def rival_events(code, y):
     """Every game Ohio State, Michigan State or Notre Dame (football) played in a
     season BEFORE the archive, for the Rivals view.
@@ -639,6 +732,18 @@ HOCKEY_GAME_FIX = {
     ("130", "2026-10-23"): {"series": "Home & Away"},
     ("130", "2027-01-30"): {"series": "Home & Away", "offsite": "Waldo Stadium"},
     ("130", "2016-11-04"): {"offsite": None},                          # at Arizona State
+    # NEW HAMPSHIRE 2013-14 was the BIG TEN / HOCKEY EAST CHALLENGE, not a
+    # home-and-home (his call 2026-10-02) -- which also takes the 2014-15
+    # weekend out of the family, since the two were each other's only leg
+    ("130", "2013-10-18"): {"labels": ["Big Ten/Hockey East Challenge"],
+                            "no_series": True},
+    ("130", "2013-10-19"): {"labels": ["Big Ten/Hockey East Challenge"],
+                            "no_series": True},
+    # ...and both Penn State games at the Garden say so (his call 2026-10-02)
+    # the 2026-27 Wisconsin weekend ends outdoors at Lambeau (2026-10-02)
+    ("130", "2027-02-20"): {"offsite": "Lambeau Field"},
+    ("130", "2016-01-30"): {"labels": ["MSG", "B1G Super Saturday"], "city": None},
+    ("130", "2019-01-26"): {"labels": ["MSG", "B1G Super Saturday"], "city": None},
 }
 # THE NAMED EVENTS that show their VENUE after the name and their DATE in the
 # header (his call 2026-09-17) -- the venue is USCHO's arena for the game, so
@@ -960,8 +1065,11 @@ def hockey_numbers(keep, teams):
                     nc_n += 1
                 last_nc = day
                 loc = (teams.get(opp["id"]) or {}).get("short")
-                # an MTE game always reads "NC" (his call 2026-09-16)
-                big = bool(g.get("preseason")) or hockey_nc_big(focus, opp["id"], loc, y)
+                # an MTE game always reads "NC" (his call 2026-09-16), and so
+                # does any NAMED event -- the Great Lakes Invitational was
+                # reading lower case on half its games (his catch 2026-10-02)
+                big = (bool(g.get("preseason")) or bool(g.get("event"))
+                       or hockey_nc_big(focus, opp["id"], loc, y))
                 g["mx"]["num"] = ("NC%d" if big else "nc%d") % nc_n
 
 
@@ -3576,7 +3684,8 @@ def harvest():
                 evs, ids = [], set()
                 for x in ((rival_events(code, y) if y in RIVAL_SEASONS else []) +
                           (michigan_events(code, y)
-                           if y in rules.MICHIGAN_SEASONS.get(code, ()) else [])):
+                           if y in rules.MICHIGAN_SEASONS.get(code, ()) else []) +
+                          results_events(code, y)):
                     if x.get("id") not in ids:
                         ids.add(x.get("id"))
                         evs.append(x)
@@ -3643,7 +3752,12 @@ def harvest():
                 # a Michigan-view season keeps every Michigan game, bowls and
                 # tournaments included
                 mich = mich_season and any(k["team"]["id"] == rules.MICHIGAN for k in cs)
-                if stype != 2 and not (postseason and (rival_loss or mich)):
+                # HIS RESULTS TAB reaches the postseason too (2026-10-02): a
+                # tournament game he has named is kept like a rival's loss
+                res_pre = results_match(code, y, (dt.datetime.strptime(
+                    x["date"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=dt.timezone.utc)
+                    .astimezone(ET)).strftime("%Y-%m-%d"), cs)
+                if stype != 2 and not (postseason and (rival_loss or mich or res_pre)):
                     continue
 
                 d = dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") \
@@ -3837,9 +3951,13 @@ def harvest():
                 # the Rivals tab is unchanged -- eleven Michigan State losses
                 # and one Notre Dame one were simply never stored before.
                 key_loss = code == "CFB" and rival_loss and y >= 2021
+                # HIS RESULTS TAB (2026-10-02): a game he has named is kept
+                # whatever the rules would have said, and carries his shade and
+                # border with it
+                res = results_match(code, y, d.strftime("%Y-%m-%d"), cs)
                 # every Michigan game in a Michigan-view season is kept, whatever
                 # else is true of it
-                if not normal and not rivals and not mich and not key_loss:
+                if not normal and not rivals and not mich and not key_loss and not res:
                     continue
                 # kept ONLY for Rivals or the Michigan view (a bowl, an early
                 # tournament round, a Michigan game no rule admits): strip
@@ -3852,7 +3970,11 @@ def harvest():
                     # the window name does not admit the game to TV Windows or
                     # Key Games -- `rivals_only` is what bars it there.
                     slots = slots & {"FOX Big Noon", "ABC Saturday"}
-                    gtype, black_friday, show, opener = None, False, False, False
+                    # ...but it KEEPS its category (his call 2026-10-02): Key
+                    # Games reads those from 2014 in football and 2011-12 in
+                    # basketball, and stripping the type left those seasons
+                    # with nothing to show
+                    black_friday, show, opener = False, False, False
                     showcase = kickoff = False
                     standin = sec_cbs = False
                 # A championship game carries NO TV window chip (his call): it
@@ -3956,6 +4078,11 @@ def harvest():
                               if "event" in game_over.get(x["id"], {}) else event),
                     # admitted to TV Windows without a window of its own
                     "standin": bool(standin),
+                    # one of his Results rows, with the colours he gave it
+                    # (2026-10-02)
+                    "important": bool(res),
+                    "imx": ({"shade": res["shade"], "border": res["border"]}
+                            if res else None),
                     # this week's cover for a power conference, and whether it
                     # had any other reason to be here (see the pass below)
                     "coverpick": x["id"] in cover_pick,
@@ -4412,6 +4539,8 @@ def harvest():
     for g in keep:
         fid = g.get("focus")
         if fid not in OWN_CONF or g.get("stage") or g.get("preseason"):
+            continue
+        if HOCKEY_GAME_FIX.get((fid, g["date"]), {}).get("no_series"):
             continue
         if g.get("event"):
             continue

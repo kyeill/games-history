@@ -717,6 +717,17 @@ function rowHtml(g, browse) {
     ring = keyRing(g);
     flag = !!ring;
   }
+  /* HIS RESULTS CARRY THEIR OWN COLOURS (his call 2026-10-02): the Shade
+     column fills the card and the Border column frames it -- in the winner's
+     colour, or Big Ten blue where he says Big Ten. */
+  const imx = VIEW === "big" ? (g.imx || null) : null;
+  if (imx && imx.border) {
+    const w = g.teams.find(t => t.win);
+    const c = /big ten/i.test(imx.border) ? "#0088ce"
+      : brighten(teamColor(w || g.teams[0]), 130);
+    flag = true;
+    ring = [c, c + "44"];
+  }
   if (VIEW === "rivals") {
     const c = rivalsBorder(g);
     flag = !!c;
@@ -725,7 +736,8 @@ function rowHtml(g, browse) {
   return '<div class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
     (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
-    (VIEW === "rivals" && rivalsFill(g) ? " rwash" : "") +
+    ((VIEW === "rivals" && rivalsFill(g)) || keyFill(g) ||
+      (imx && imx.shade) ? " rwash" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
@@ -1798,8 +1810,12 @@ function hockeyGroups(list) {
       const n = list[i + run.length], last = run[run.length - 1];
       // a NEUTRAL-SITE game never shares a card with one that was not (his
       // call 2026-09-16): Duel in the D keeps a card of its own, same [wX]
+      // ...nor two games played at DIFFERENT RINKS (his call 2026-10-02):
+      // 2026-27 ends its Wisconsin weekend outdoors at Lambeau Field, which
+      // is a card of its own
+      const sameRink = !n || !n.venue || !g.venue || n.venue === g.venue;
       if (!n || !groupable(n) || oppOf(n) !== oppOf(g) || (n.stage || "") !== (g.stage || "") ||
-          !!n.neutral !== !!g.neutral ||
+          !!n.neutral !== !!g.neutral || !sameRink ||
           Math.abs(day(n.date) - day(last.date)) > 3) break;
       run.push(n);
     }
@@ -1955,10 +1971,20 @@ function rankedBefore(g) {
 /* KEY GAMES (his call 2026-09-20) is wider than its categories: a Marquee
    window, any Ohio State / Michigan State / Notre Dame LOSS, and any Michigan
    WIN all belong, on top of the games with a type. */
+/* HOW FAR BACK KEY GAMES READS (his call 2026-10-02): football to 2014 and
+   basketball to 2011-12, the seasons the archive holds his rivals' games for.
+   Before this it stopped at 2021 for both. */
+const KEY_FROM = { CFB: 2014, CBB: 2011 };
 function keyShows(g) {
+  // a game from his RESULTS tab is here whatever else is true of it
+  if (g.important) return true;
   if (!bigViewAllows(g)) return false;
   // FOOTBALL ONLY (his call 2026-09-20): basketball's Key Games stays the
   // categories and nothing else
+  // ...and the floor holds for every reason but his own list
+  if (g.season < (KEY_FROM[g.sport] || 2021)) return false;
+  // basketball's Key Games is its categories, and now the seasons before the
+  // archive as well -- their games kept for Rivals carry a type again
   if (g.sport !== "CFB") return !!g.type;
   // a MARQUEE WINDOW is not a qualification of its own (his call 2026-09-20):
   // such a game is here only if a category, a Michigan win or a rival's loss
@@ -1967,7 +1993,7 @@ function keyShows(g) {
   // ...and those two reach back only to 2021, with no CFP game and no bowl
   // (his calls 2026-09-20); a conference title game still arrives on its own
   // category above
-  if (upcoming(g) || g.season < 2021 || g.bowl || g.stage) return false;
+  if (upcoming(g) || g.bowl || g.stage) return false;
   const m = michTeam(g);
   if (m && m.win) return true;
   return g.teams.some(t => isRival(t) && !t.win);
@@ -1976,6 +2002,11 @@ function keyShows(g) {
    earns one by beating a ranked team or winning its conference title game, a
    RIVAL by losing while ranked or losing its conference title game. Nothing
    else on this tab is framed. */
+// A BORDER ON KEY GAMES FILLS THE CARD TOO (his call 2026-10-02): the ring
+// marked the game and the card stayed dark, which read as half an answer.
+function keyFill(g) {
+  return VIEW === "big" && !!michTeam(g) && !!keyRing(g);
+}
 function keyRing(g) {
   const m = michTeam(g);
   if (m) {
@@ -2316,8 +2347,7 @@ function visible() {
     // KEY GAMES reaches the games kept for the Michigan and Rivals views too
     // (his call 2026-09-20): a Michigan win or a rival's loss belongs here
     // whether or not it had a window or a category of its own
-    : VIEW === "big" ? (g.sport === "CFB" ? keyShows(g)
-                        : !g.rivals_only && g.type && bigViewAllows(g))
+    : VIEW === "big" ? keyShows(g)
     : g.rivals_only ? false
     : VIEW === "tv"
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
@@ -2458,7 +2488,10 @@ function visible() {
   if (FILT.windows && FILT.windows.length)
     list = list.filter(g =>
       (g.slots || []).some(w => FILT.windows.indexOf(w) > -1));
-  if (FILT.type) list = list.filter(g => g.type === FILT.type);
+  // ...and "Important Results" is his Results tab rather than a category
+  // (his call 2026-10-02), so it sits at the end of the same dropdown
+  if (FILT.type === "important") list = list.filter(g => !!g.important);
+  else if (FILT.type) list = list.filter(g => g.type === FILT.type);
   // COMBINED shows PLAYED GAMES ONLY (his call 2026-09-24), and can drop
   // hockey altogether
   if (teamView() && !SPORT_OF[TAB]) {
@@ -2576,7 +2609,11 @@ function filterChips() {
   // other views start with the archive
   const viewSeasons = Array.from(new Set(GAMES.filter(g => (!sport || g.sport === sport) &&
     (VIEW === "rivals" ? rivalsAllows(g)
-      : teamView() ? g.focus === focusId() : !g.rivals_only)).map(g => g.season)));
+      : teamView() ? g.focus === focusId()
+      // KEY GAMES reaches its own seasons (2026-10-02), which run further back
+      // than TV Windows' and include games kept only for the other views
+      : VIEW === "big" ? keyShows(g)
+      : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
   const yearFloor = sport === "CFB" ? 2021 : 2020;
@@ -2851,7 +2888,10 @@ function filterChips() {
   // working and a value set on the other view is cleared on the way in.
   if (VIEW !== "tv")
     h += group("Game type", select("type", "All Game Types",
-      order.types.filter(t => types.has(t)).map(t => [t, t]), FILT.type));
+      order.types.filter(t => types.has(t)).map(t => [t, t])
+        .concat(VIEW === "big" && visibleWithout("type").some(g => g.important)
+          ? [["Important Results", "important"]] : []),
+      FILT.type));
   if (VIEW !== "big") {
     // The dropdown holds ONE window; Marquee Windows sets three at once, and
     // while it is on the dropdown falls back to its "All" label.
@@ -3004,6 +3044,9 @@ function rivalsFill(g) {
   if (g.sport === "CHK") return s === "NCAA Tournament | Frozen Four" ||
     s === "NCAA Tournament | Championship";
   if (s.indexOf("CFP") === 0) return true;
+  // ...and losing a conference FINAL fills too (his call 2026-10-02): the
+  // Big Ten Championship Game, and the Big Ten Tournament's final
+  if (s === "Big Ten Championship" || s === "Big Ten Tournament | Championship") return true;
   if (s === "NCAA Tournament | Final Four" || s === "NCAA Tournament | Championship") return true;
   if (s.indexOf("NCAA Tournament") === 0 && winner) {
     const ls = seedOf(g, loser), ws = seedOf(g, winner);
