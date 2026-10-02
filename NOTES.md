@@ -863,6 +863,29 @@ a #2-over-#1 result; Kyle wants it read as an upset.
 
 ## The app
 
+**A week or month can be a NAME now, so `+v` is no longer safe.** "Conf
+Champ", "Bowls" and basketball's "Postseason" (his call 2026-10-02) sit at the
+end of those two dropdowns; the change handler coerced every week and month
+value with `+v`, which would have turned "bowls" into NaN and emptied the page
+with no error. Only a run of digits is coerced.
+
+**Those two lists come from `visible()`, with Current and Marquee lifted.**
+They used to be read off GAMES, which offered weeks a view had nothing in and
+could not tell whether "Bowls" existed for this view at all. Reading the
+visible set instead needs two cuts turned off first: TV Windows opens on
+CURRENT, which IS one week, so the list would have held a single entry, and it
+opens on Marquee besides. `seasonBase` in `filterChips` does that.
+
+**Key Games reads `keyRing` in every sport, and the postseason names its own
+colour** (his call 2026-10-02). Before this only football called `keyRing`, so
+a basketball card took the winner's colour where the Big Ten, CFP and NCAA
+colours now belong -- `#0088ce`, `#c28c19`, `#0053b8`, the same three the
+Rivals borders and the season line use. `keyStage` gates on Michigan's own
+game or a rival's loss, because the colours mark HIS result, not the round:
+Key Games already bars a Michigan loss and a rival win, so either side of that
+test is the result he wants painted. A conference FINAL only -- the quarters
+and semis are not a title -- and a bowl that is not a CFP game earns nothing.
+
 **GitHub's REST API is CORS-open**, including `PUT` with an `Authorization`
 header from any origin (`Access-Control-Allow-Origin: *`, `access-control-
 allow-methods` lists PUT). Verified 2026-09-09. This is what makes tagging from
@@ -1113,6 +1136,37 @@ ESPN occasionally returns an event with no id at all, which crashed the first
 run. Every game from those seasons is `rivals_only`, and the app keeps
 `rivals_only` games out of TV Windows, Key Games, their Year lists and the
 newest-season default.
+
+**...but Key Games now reads the whole of those seasons** (his call
+2026-10-02: "definitely backfill all historical CFB/CBB needed to fully
+populate the Key Games tabs"). `harvest.KEY_SEASONS` -- football 2014-2020,
+basketball 2011-2020 -- fetches the FULL scoreboard on top of the rival and
+Michigan lists above, and a game with a category of its own is kept by
+`key_type` even though `normal` is false for the whole of a pre-archive
+season. So those seasons keep their Key Games categories and reach no other
+view: `archive_era` is still SEASONS alone, which is what holds TV Windows at
+2021. Three things to know:
+
+* **The scoreboard copy is merged LAST.** A game the rival or Michigan list
+  already holds keeps the payload it has always been built from -- those come
+  off a team's schedule, and swapping the source would quietly change ranks,
+  networks and venues on cards he has already approved. Only genuinely new
+  games come off the scoreboard.
+* **Admission still reads ESPN's own ranking**, not the poll fallback
+  (`ap_before`), which stays display-only. That is the archive era's rule too,
+  so Key Games means the same thing in 2016 as in 2024.
+* **The postseason is unchanged.** A bowl, a CFP game or an NCAA Tournament
+  game is kept only when Michigan played it, a rival lost it, or his Results
+  tab names it -- again exactly as from 2021. There is no season where Key
+  Games holds a playoff game between two teams he does not follow.
+
+**The backfill costs about 400MB of cache and roughly 2,900 ESPN requests
+once.** `scoreboard` walks every date range one DAY at a time (ESPN ignores a
+limit on a range), so a football season is ~184 requests and a basketball one
+~160. The cloud build restores cache/ through actions/cache, so it pays this
+on the first run after the change and nothing afterwards -- which is also why
+these seasons must stay in cache/ rather than the system temp folder
+series_scan.py uses.
 
 **Stage labels read the headline from the END.** A CFP headline can carry a
 suffix ("College Football Playoff Quarterfinal at the Allstate Sugar Bowl -

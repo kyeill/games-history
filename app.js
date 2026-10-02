@@ -713,7 +713,11 @@ function rowHtml(g, browse) {
   // was too loud, so the winner's line keeps its own wash either way.
   let flag = celebrated(g);
   let ring = flag ? celebrateColor(g) : null;
-  if (VIEW === "big" && flag && g.sport === "CFB") {
+  // KEY GAMES READS keyRing IN EVERY SPORT (his call 2026-10-02): before this
+  // only football did, so a basketball card took the winner's colour where the
+  // Big Ten / CFP / NCAA colours now belong. It no longer waits on
+  // `celebrated` either -- a postseason colour is its own reason to frame.
+  if (VIEW === "big") {
     ring = keyRing(g);
     flag = !!ring;
   }
@@ -2004,10 +2008,35 @@ function keyShows(g) {
    else on this tab is framed. */
 // A BORDER ON KEY GAMES FILLS THE CARD TOO (his call 2026-10-02): the ring
 // marked the game and the card stayed dark, which read as half an answer.
+/* THE POSTSEASON NAMES ITS OWN COLOUR HERE (his call 2026-10-02), and it beats
+   the winner's: the Big Ten in Big Ten blue, the CFP in gold, the NCAA
+   Tournament in blue. It reads on Michigan's own win and on a rival's loss
+   alike -- a rival losing the Big Ten Championship Game or the Big Ten
+   Tournament final is Big Ten blue, a CFP or NCAA Tournament loss gold or
+   blue -- and the card fills either way. These are the same colours Rivals
+   uses (see rivalsBorder) and the season line (see champColour).
+   A CONFERENCE FINAL ONLY: the quarters and the semis are not a title, and a
+   bowl that is not a CFP game earns nothing extra. */
+function keyStage(g) {
+  if (upcoming(g)) return null;
+  // Michigan's own game, or a rival's loss. (Key Games already bars a Michigan
+  // loss and a rival win, so either one is the result he wants coloured.)
+  if (!michTeam(g) && !g.teams.some(t => isRival(t) && !t.win)) return null;
+  const s = g.stage || "";
+  if (s.indexOf("CFP") === 0) return "#c28c19";
+  if (s.indexOf("NCAA Tournament") === 0) return "#0053b8";
+  if (s === "Big Ten Championship" || s === "Big Ten Tournament | Championship")
+    return "#0088ce";
+  return null;
+}
 function keyFill(g) {
-  return VIEW === "big" && !!michTeam(g) && !!keyRing(g);
+  if (VIEW !== "big") return false;
+  if (keyStage(g)) return true;
+  return !!michTeam(g) && !!keyRing(g);
 }
 function keyRing(g) {
+  const stage = keyStage(g);
+  if (stage) return [stage, stage + "44"];
   const m = michTeam(g);
   if (m) {
     const beat = g.teams.find(t => t.id !== MICHIGAN);
@@ -2466,9 +2495,14 @@ function visible() {
     if (FILT.winner) list = list.filter(g =>
       g.teams.some(t => t.win && t.id === FILT.winner));
   }
-  if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
-  if (FILT.month != null)
-    list = list.filter(g => +g.date.slice(5, 7) === FILT.month);
+  // "Bowls" and "Postseason" are the named cuts at the end of those two
+  // dropdowns (his call 2026-10-02); a numbered week or a named month is the
+  // REGULAR season, so the postseason is taken out of March
+  if (FILT.week === "bowls") list = list.filter(g => g.week == null);
+  else if (FILT.week != null) list = list.filter(g => g.week === FILT.week);
+  if (FILT.month === "postseason") list = list.filter(g => !!g.stage);
+  else if (FILT.month != null)
+    list = list.filter(g => +g.date.slice(5, 7) === FILT.month && !g.stage);
   // Marquee is a rule of its own now (rules.is_marquee), not a set of
   // windows the button ticks, so it stacks with the window dropdown instead
   // of pretending to be it. Nothing rides along any more.
@@ -2853,32 +2887,58 @@ function filterChips() {
     // every hockey Rivals game is an NCAA Tournament game: no Postseason button
     return h + group("", (sport === "CHK" ? "" : postButton()) + sortButton());
   }
-  // Football is played in numbered weeks; basketball is not. The list follows
-  // the season, since week 16 only exists in some years.
+  /* Football is played in numbered weeks; basketball is not. The list follows
+     the season, since week 16 only exists in some years.
+     THE END OF THE SEASON IS NAMED, NOT NUMBERED (his call 2026-10-02): the
+     week that is nothing but conference finals reads "Conf Champ", and the
+     bowls and the CFP -- which ESPN numbers no week at all -- gather under one
+     "Bowls" option after it. Both lists now come from the games this view can
+     actually show, so a week it has nothing in is not offered. */
+  // the games this VIEW can show in the chosen season, with the two cuts that
+  // would otherwise hide whole weeks lifted: TV WINDOWS opens on Current,
+  // which IS one week, and on Marquee
+  const seasonBase = key => {
+    const cur = FILT.current, mq = FILT.marquee;
+    FILT.current = false; FILT.marquee = false;
+    try { return visibleWithout(key); }
+    finally { FILT.current = cur; FILT.marquee = mq; }
+  };
   if (sport === "CFB") {
-    const weeks = new Set();
-    GAMES.forEach(g => {
-      if (g.sport !== "CFB" || g.week == null) return;
-      if (FILT.season != null && g.season !== FILT.season) return;
+    const base = seasonBase("week");
+    const weeks = new Set(), numbered = new Set();
+    let bowls = false;
+    base.forEach(g => {
+      if (g.week == null) { bowls = true; return; }
       weeks.add(g.week);
+      // a week with one ordinary game in it keeps its number
+      if (!g.title) numbered.add(g.week);
     });
+    if (typeof FILT.week === "number") weeks.add(FILT.week);
     h += group("Week", select("week", "All Weeks",
-      Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]),
+      Array.from(weeks).sort((a, b) => a - b)
+        .map(w => [numbered.has(w) ? "Week " + w : "Conf Champ", w])
+        .concat(bowls || FILT.week === "bowls" ? [["Bowls", "bowls"]] : []),
       FILT.week));
   }
   // Basketball has no week worth showing, so the month is its equivalent
   // coarse cut. Like the week list it follows the SEASON.
+  // THE CONFERENCE TOURNAMENTS AND THE NCAA TOURNAMENT LEAVE MARCH (his call
+  // 2026-10-02): they gather under one "Postseason" option at the end, so
+  // March means the regular-season March games and nothing else. April, whose
+  // every game is a Final Four, disappears into it.
   if (sport === "CBB") {
     const months = new Set();
-    GAMES.forEach(g => {
-      if (g.sport !== "CBB") return;
-      if (FILT.season != null && g.season !== FILT.season) return;
-      const m = +g.date.slice(5, 7);
-      months.add(m);
+    let post = false;
+    seasonBase("month").forEach(g => {
+      if (g.stage) { post = true; return; }
+      months.add(+g.date.slice(5, 7));
     });
+    if (typeof FILT.month === "number") months.add(FILT.month);
     h += group("Month", select("month", "All Months",
       Array.from(months).sort((a, b) => monthOrder(a) - monthOrder(b))
-        .map(m => [MONTHS[m - 1], m]),
+        .map(m => [MONTHS[m - 1], m])
+        .concat(post || FILT.month === "postseason"
+          ? [["Postseason", "postseason"]] : []),
       FILT.month));
   }
   // Each view drops the dropdown it has no use for (his call 2026-09-12):
@@ -3388,8 +3448,11 @@ async function init() {
     const v = e.target.value;
     FILT.current = false; CURRENT_PREV = null;
     if (k === "window") FILT.windows = v === "" ? null : [v];
+    // ...and a week or month can now be a NAME -- "bowls", "postseason" --
+    // so only a run of digits is read as a number (his call 2026-10-02)
     else FILT[k] = v === "" ? null
-      : ((k === "season" || k === "week" || k === "month") ? +v : v);
+      : ((k === "season" || k === "week" || k === "month") && /^\d+$/.test(v)
+         ? +v : v);
     // a week or month chosen under one season may not exist in another
     if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();

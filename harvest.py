@@ -29,6 +29,14 @@ SHEET_FLOOR = 600
 # Rivals reaches further back (his call 2026-09-11), for his rivals only --
 # see rival_events
 RIVAL_SEASONS = list(range(2014, 2021))
+# KEY GAMES READS FURTHER BACK STILL (his call 2026-10-02): football from 2014
+# and basketball from 2011-12 are harvested IN FULL, so the categories fill
+# those seasons instead of showing only the Michigan and rival games the other
+# views needed. They are NOT archive seasons -- TV Windows still begins in
+# 2021 (his call 2026-09-13) -- so `archive_era` stays SEASONS alone and these
+# games are kept with `rivals_only` true, carrying their category and nothing
+# else. The floors match app.js's KEY_FROM.
+KEY_SEASONS = {"CFB": list(range(2014, 2021)), "CBB": list(range(2011, 2021))}
 
 
 def season_over(code, y):
@@ -3673,11 +3681,18 @@ def harvest():
     cover_slot = {}       # game id -> (season, conference, week) it covers
     for code in ("CFB", "CBB"):
         bt = rules.BIG_TEN[code]
-        years = set(RIVAL_SEASONS) | set(SEASONS) | rules.MICHIGAN_SEASONS.get(code, set())
+        years = (set(RIVAL_SEASONS) | set(SEASONS) | set(KEY_SEASONS[code])
+                 | rules.MICHIGAN_SEASONS.get(code, set()))
         for y in sorted(years):
             # before the archive: his rivals' games from 2014, for Rivals, and
             # every Michigan game from 2011, for the Michigan view -- one list
             archive_era = y in SEASONS
+            # ...and from 2026-10-02 the whole season as well, for Key Games
+            # (see KEY_SEASONS). The scoreboard copy goes LAST so a game one
+            # of the lists above already holds keeps the payload it has always
+            # been built from -- only genuinely new games come off the
+            # scoreboard.
+            key_era = y in KEY_SEASONS[code] and not archive_era
             if archive_era:
                 evs = events(code, y)
             else:
@@ -3685,7 +3700,8 @@ def harvest():
                 for x in ((rival_events(code, y) if y in RIVAL_SEASONS else []) +
                           (michigan_events(code, y)
                            if y in rules.MICHIGAN_SEASONS.get(code, ()) else []) +
-                          results_events(code, y)):
+                          results_events(code, y) +
+                          (events(code, y) if key_era else [])):
                     if x.get("id") not in ids:
                         ids.add(x.get("id"))
                         evs.append(x)
@@ -3955,9 +3971,16 @@ def harvest():
                 # whatever the rules would have said, and carries his shade and
                 # border with it
                 res = results_match(code, y, d.strftime("%Y-%m-%d"), cs)
+                # KEY GAMES BEFORE THE ARCHIVE (his call 2026-10-02): a game
+                # with a category of its own is kept, though `normal` is false
+                # for the whole of a pre-archive season and so it reaches no
+                # other view. An early conference-tournament round is still
+                # out, exactly as in the archive era.
+                key_type = key_era and bool(gtype) and not (tourney_round and not title)
                 # every Michigan game in a Michigan-view season is kept, whatever
                 # else is true of it
-                if not normal and not rivals and not mich and not key_loss and not res:
+                if (not normal and not rivals and not mich and not key_loss
+                        and not res and not key_type):
                     continue
                 # kept ONLY for Rivals or the Michigan view (a bowl, an early
                 # tournament round, a Michigan game no rule admits): strip
