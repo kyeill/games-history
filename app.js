@@ -2498,9 +2498,8 @@ function visible() {
   // "Bowls" and "Postseason" are the named cuts at the end of those two
   // dropdowns (his call 2026-10-02); a numbered week or a named month is the
   // REGULAR season, so the postseason is taken out of March
-  if (FILT.week === "champ") list = list.filter(g => !!g.title);
-  else if (FILT.week === "bowls")
-    list = list.filter(g => g.sport === "CFB" && g.week == null && !g.title);
+  if (FILT.week === "postseason")
+    list = list.filter(g => g.sport === "CFB" && (!!g.title || g.week == null));
   else if (FILT.week != null)
     list = list.filter(g => g.week === FILT.week && !g.title);
   if (FILT.month === "postseason") list = list.filter(g => !!g.stage);
@@ -2909,21 +2908,23 @@ function filterChips() {
   if (sport === "CFB") {
     const base = seasonBase("week");
     const weeks = new Set();
-    let champ = false, bowls = false;
+    let post = false;
     base.forEach(g => {
       // A CONFERENCE FINAL LEAVES ITS WEEK NUMBER BEHIND (his call
-      // 2026-10-02): it belongs under Conf Champ whether or not ordinary
-      // games were played that same week -- 2016 is the case that tests it,
-      // where Bedlam was played on championship Saturday.
-      if (g.title) { champ = true; return; }
-      if (g.week == null) { bowls = true; return; }
+      // 2026-10-02): it belongs with the bowls and the CFP under one
+      // POSTSEASON entry, whether or not ordinary games were played that same
+      // week -- 2016 is the case that tests it, where Bedlam was played on
+      // championship Saturday and has to keep Week 14 to itself. The two
+      // began as separate "Conf Champ" and "Bowls" entries and he merged
+      // them, so football's list now ends the way basketball's does.
+      if (g.title || g.week == null) { post = true; return; }
       weeks.add(g.week);
     });
     if (typeof FILT.week === "number") weeks.add(FILT.week);
     h += group("Week", select("week", "All Weeks",
       Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w])
-        .concat(champ || FILT.week === "champ" ? [["Conf Champ", "champ"]] : [])
-        .concat(bowls || FILT.week === "bowls" ? [["Bowls", "bowls"]] : []),
+        .concat(post || FILT.week === "postseason"
+          ? [["Postseason", "postseason"]] : []),
       FILT.week));
   }
   // Basketball has no week worth showing, so the month is its equivalent
@@ -3259,13 +3260,15 @@ function switchView(view) {
       !upcoming(g) && keyShows(g));
     if (done.length) {
       FILT.season = Math.max.apply(null, done.map(g => g.season));
-      // ...and the conference finals are their own entry now (2026-10-02),
-      // so "the latest week" is Conf Champ once they have been played
+      // ...and the end of the season is one Postseason entry now
+      // (2026-10-02), so "the latest week" is Postseason once the conference
+      // finals have been played
       const rows = done.filter(g => g.season === FILT.season);
       const plain = rows.filter(g => g.week != null && !g.title);
-      const champDate = rows.filter(g => g.title).map(g => g.date).sort().pop();
+      const postDate = rows.filter(g => g.title || g.week == null)
+        .map(g => g.date).sort().pop();
       const plainDate = plain.map(g => g.date).sort().pop();
-      FILT.week = (champDate && (!plainDate || champDate > plainDate)) ? "champ"
+      FILT.week = (postDate && (!plainDate || postDate > plainDate)) ? "postseason"
         : plain.length ? Math.max.apply(null, plain.map(g => g.week)) : null;
     }
     FILT.marquee = false;

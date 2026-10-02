@@ -863,21 +863,23 @@ a #2-over-#1 result; Kyle wants it read as an upset.
 
 ## The app
 
-**A week or month can be a NAME now, so `+v` is no longer safe.** "Conf
-Champ", "Bowls" and basketball's "Postseason" (his call 2026-10-02) sit at the
-end of those two dropdowns; the change handler coerced every week and month
-value with `+v`, which would have turned "bowls" into NaN and emptied the page
-with no error. Only a run of digits is coerced.
+**A week or month can be a NAME now, so `+v` is no longer safe.**
+"Postseason" sits at the end of both dropdowns (his call 2026-10-02); the
+change handler coerced every week and month value with `+v`, which would have
+turned "postseason" into NaN and emptied the page with no error. Only a run of
+digits is coerced.
 
 **A conference final leaves its week number behind** (his call 2026-10-02:
 "remove all Conf Champ games from Week 14 and put them under Conf Champ, even
-if other Week 14 games still do exist"). So "Conf Champ" is a value of its
-own, not a renamed week, and a numbered week means the regular season: 2016 is
-the case that tests it, where Bedlam was played on championship Saturday and
-week 14 has to hold that one game and not the five titles. Key Games' opening
-default follows -- it opens on Conf Champ once the finals are the newest games
-of its season, which is the whole year between championship Saturday and the
-next September.
+if other Week 14 games still do exist"). So it is a value of its own, not a
+renamed week, and a numbered week means the regular season: 2016 is the case
+that tests it, where Bedlam was played on championship Saturday and week 14
+has to hold that one game and not the four titles. It began as two entries,
+"Conf Champ" and "Bowls", and he merged them the same day -- football's list
+now ends in one POSTSEASON entry, as basketball's month list does. Key Games'
+opening default follows: it opens on Postseason once the conference finals are
+the newest games of its season, which is the whole year between championship
+Saturday and the next September.
 
 **Those two lists come from `visible()`, with Current and Marquee lifted.**
 They used to be read off GAMES, which offered weeks a view had nothing in and
