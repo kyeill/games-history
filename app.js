@@ -2892,10 +2892,10 @@ function filterChips() {
   /* Football is played in numbered weeks; basketball is not. The list follows
      the season, since week 16 only exists in some years.
      THE END OF THE SEASON IS NAMED, NOT NUMBERED (his call 2026-10-02): the
-     week that is nothing but conference finals reads "Conf Champ", and the
-     bowls and the CFP -- which ESPN numbers no week at all -- gather under one
-     "Bowls" option after it. Both lists now come from the games this view can
-     actually show, so a week it has nothing in is not offered. */
+     conference finals, the bowls and the CFP gather under one "Postseason"
+     option after the numbered weeks, which is how basketball's month list
+     ends too. Both lists now come from the games this view can actually show,
+     so a week it has nothing in is not offered. */
   // the games this VIEW can show in the chosen season, with the two cuts that
   // would otherwise hide whole weeks lifted: TV WINDOWS opens on Current,
   // which IS one week, and on Marquee
@@ -3462,7 +3462,7 @@ async function init() {
     const v = e.target.value;
     FILT.current = false; CURRENT_PREV = null;
     if (k === "window") FILT.windows = v === "" ? null : [v];
-    // ...and a week or month can now be a NAME -- "bowls", "postseason" --
+    // ...and a week or month can now be a NAME -- "postseason" --
     // so only a run of digits is read as a number (his call 2026-10-02)
     else FILT[k] = v === "" ? null
       : ((k === "season" || k === "week" || k === "month") && /^\d+$/.test(v)
