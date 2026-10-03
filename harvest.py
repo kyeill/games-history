@@ -437,10 +437,29 @@ def uscho_polls(y):
     polls = {}
     d, end = dt.date(y, 9, 22), min(dt.date(y + 1, 4, 20), dt.date.today())
     season = "%d%d" % (y, y + 1)
+    days = []
     while d <= end:
+        days.append(d.isoformat())
+        d += dt.timedelta(days=7)
+    # the end of the window itself, which a seven-day step overshoots
+    if end.isoformat() not in days:
+        days.append(end.isoformat())
+    base = "https://www.uscho.com/rankings/d-i-mens-poll/"
+    urls = [base + x + "/" for x in days]
+    # THE UNDATED PAGE IS THE ONE THAT ALWAYS ANSWERS (his catch 2026-10-03:
+    # "shouldn't the Michigan-BGSU game show Michigan's ranking?"). Two things
+    # went wrong at once this season. The 2026-27 preseason poll is dated
+    # Monday 28 September, and the weekly walk asks the 22nd and the 29th, so
+    # it steps straight over it -- the 22nd still answers with LAST season's
+    # final poll, which the season test below rightly throws away. And from the
+    # 29th on, every DATED page answers 500. The bare poll page returns the
+    # poll in force NOW whatever its date, so it closes both gaps: a step that
+    # lands either side of a poll, and a dated page that is simply broken.
+    # For a past season its rows carry the wrong season and are discarded.
+    urls.append(base)
+    for url in urls:
         try:
-            r = requests.get("https://www.uscho.com/rankings/d-i-mens-poll/%s/" % d.isoformat(),
-                             headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
+            r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30)
             body = html_lib.unescape(r.text) if r.status_code == 200 else ""
         except requests.RequestException:
             body = ""
@@ -452,7 +471,6 @@ def uscho_polls(y):
             if j.get("season") != season or j.get("gender") != "m":
                 continue
             polls.setdefault(j["PollDate"], {})[flat(j.get("shortname") or "")] = j["rnk"]
-        d += dt.timedelta(days=7)
     out = sorted(polls.items())
     if season_over("CHK", y) and out:
         os.makedirs(os.path.dirname(path), exist_ok=True)
