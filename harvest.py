@@ -2238,8 +2238,24 @@ def events(code, y):
                 print(f"  WARN: week of {d} hit the 1000 cap", file=sys.stderr)
             ev += got
             d = e + dt.timedelta(days=1)
-        seen = set()
-        ev = [x for x in ev if not (x["id"] in seen or seen.add(x["id"]))]
+        # AN EVENT WITH NO id AT ALL (broke the 6am build 2026-10-03). ESPN
+        # returns one every so often; rival_events has guarded against it since
+        # its first run, and this dedup did not, because until the Key Games
+        # backfill it only ever saw the archive seasons. A bad answer is CACHED,
+        # so one flake failed every run of the day rather than just the one.
+        seen, dropped = set(), 0
+        out = []
+        for x in ev:
+            if not x.get("id"):
+                dropped += 1
+                continue
+            if x["id"] not in seen:
+                seen.add(x["id"])
+                out.append(x)
+        if dropped:
+            print("  WARN: %s %d dropped %d event(s) with no id"
+                  % (code, y, dropped), file=sys.stderr)
+        ev = out
     return ev
 
 
@@ -3712,8 +3728,10 @@ def harvest():
                            if y in rules.MICHIGAN_SEASONS.get(code, ()) else []) +
                           results_events(code, y) +
                           (events(code, y) if key_era else [])):
-                    if x.get("id") not in ids:
-                        ids.add(x.get("id"))
+                    # ...and the same guard here (2026-10-03): an event with
+                    # no id would be kept once and then crash on x["id"] below
+                    if x.get("id") and x["id"] not in ids:
+                        ids.add(x["id"])
                         evs.append(x)
             fox_fri = fox_friday_dates(evs) if code == "CFB" else set()
             wk0 = week_zero_ids(evs) if code == "CFB" else set()
