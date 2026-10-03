@@ -1276,8 +1276,18 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             named = bool(ev and ev.get("event") in VENUE_EVENTS)
             arena = (us or {}).get("arena_name") or ""
             # ...a HOME game names no arena, however the event is billed
-            if named and neutral and arena and arena != "NA" and arena not in labels:
-                labels.append(arena)
+            # USCHO NAMES THE BUILDING, AND IT OVERRULES ESPN (his call
+            # 2026-10-02). ESPN carries the HOST's own rink on a neutral-site
+            # game it has not updated -- the Duel in the D read Munn in 2026
+            # and Yost in 2027, when both are at Little Caesars Arena. The
+            # label was already right; only `venue` was not, and the schedule
+            # export read that. Two games today, and it keeps itself right
+            # whenever ESPN is late.
+            venue_fix = None
+            if named and neutral and arena and arena != "NA":
+                venue_fix = arena
+                if arena not in labels:
+                    labels.append(arena)
             # CORNELL'S IVY GAMES (his call 2026-09-16): the regular season
             # against the other five hockey-playing Ivies
             conference = det.get("conf_game") if us else (hockey_conf(opp["id"], y) == "ECAC")
@@ -1314,7 +1324,7 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
                 # ("Clarkson wins shootout, 3-2") in its shootout notes
                 "so": shootout,
                 "tie": tie, "sho_win": sho_win, "show": False, "week": None,
-                "venue": v.get("fullName"), "mq": False,
+                "venue": venue_fix or v.get("fullName"), "mq": False,
                 "offsite": det.get("offsite") if not stage else None,
                 # a series he has named by hand (2026-09-22); the Michigan pass
                 # that derives them leaves a game that already has one alone
