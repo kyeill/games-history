@@ -2304,21 +2304,25 @@ function struck(g) {
   const m = michTeam(g);
   return !!(m && !m.win);
 }
-// ...and on TV WINDOWS the winner is not even BOLD in two cases (his calls
-// 2026-09-12): a RIVAL won, or ANYONE beat Michigan. A team that beat him
-// reads struck through and unbolded, rival or not. Only this view needs the
-// rule -- Key Games and Rivals never carry either case.
+// ...and the winner is not even BOLD in two cases (his calls 2026-09-12):
+// a RIVAL won, or ANYONE beat Michigan. A team that beat him reads struck
+// through and unbolded, rival or not.
+/* OHIO STATE, MICHIGAN STATE AND NOTRE DAME ARE NEVER BOLD on the CFB and CBB
+   tabs (his call 2026-10-02: "it's rare, but never bold OSU, MSU, or ND names
+   or scores"). It IS rare, which is why the rule used to be TV Windows' alone:
+   Key Games bars a game a rival won and Rivals is a record of their losses.
+   The way through is his RESULTS tab, which `keyShows` admits AHEAD of that
+   bar -- two games in the archive, both of them two rivals meeting (Ohio State
+   over Michigan State in 2012 and in 2021), and both read as Ohio State's
+   triumph on Key Games until now. So the test is on the RESULT, not the view.
+   Michigan's own defeat still unbolds on TV Windows only: the other views have
+   no Michigan loss to show. */
 function flatWin(g) {
   if (upcoming(g)) return false;
-  const rivalWon = g.teams.some(t => isRival(t) && t.win);
-  // RIVALS shows their losses, so a rival WINNING there is the rare case (two
-  // of them meeting, mostly) -- and it should not read as a triumph either
-  // (his call 2026-09-13)
-  if (VIEW === "rivals") return rivalWon;
+  if (g.teams.some(t => isRival(t) && t.win)) return true;
   if (VIEW !== "tv") return false;
   const m = michTeam(g);
-  if (m && !m.win) return true;
-  return rivalWon;
+  return !!(m && !m.win);
 }
 
 function celebrated(g) {
