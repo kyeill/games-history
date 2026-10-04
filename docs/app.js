@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261004-111159";
+const BUILD = "20261004-131613";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1818,8 +1818,20 @@ function hockeyGroups(list) {
       // 2026-27 ends its Wisconsin weekend outdoors at Lambeau Field, which
       // is a card of its own
       const sameRink = !n || !n.venue || !g.venue || n.venue === g.venue;
+      // ...but a weekend SPLIT BETWEEN THE TWO RINKS is one contract, not two
+      // (his call 2026-10-04): Michigan hosts Bowling Green on the Friday and
+      // visits on the Saturday, and that is one card -- which the card itself
+      // has always known how to draw, reading "vs. Bowling Green" with
+      // "Home & Away" underneath (see the homeAway footer). The rink test
+      // above, written for the Lambeau weekend two days earlier, had quietly
+      // split every one of these: six Western Michigan weekends and Cornell's
+      // 2015 Niagara one as well as this. Wisconsin's Lambeau weekend is
+      // still two cards, because both of THOSE are away games.
+      const sideOf = x =>
+        (x.teams.find(t => t.id !== (x.focus || focusId())) || {}).home ? "away" : "home";
+      const split = !!n && !n.neutral && !g.neutral && sideOf(n) !== sideOf(g);
       if (!n || !groupable(n) || oppOf(n) !== oppOf(g) || (n.stage || "") !== (g.stage || "") ||
-          !!n.neutral !== !!g.neutral || !sameRink ||
+          !!n.neutral !== !!g.neutral || (!sameRink && !split) ||
           Math.abs(day(n.date) - day(last.date)) > 3) break;
       run.push(n);
     }

@@ -888,6 +888,20 @@ visible set instead needs two cuts turned off first: TV Windows opens on
 CURRENT, which IS one week, so the list would have held a single entry, and it
 opens on Marquee besides. `seasonBase` in `filterChips` does that.
 
+**Two rinks is two cards, UNLESS the weekend is split between them.** The
+rink test in `hockeyGroups` was written on 2026-10-02 for one game -- the
+2026-27 Wisconsin weekend, whose Saturday leg is outdoors at Lambeau Field --
+and it quietly split every home-and-away weekend as well, because those are at
+two rinks by definition. Seven weekends: six against Western Michigan, back to
+2018, Cornell's 2015 Niagara one, and the Bowling Green opener that he caught
+it on (2026-10-04). The card has always known how to draw these -- "vs.
+Bowling Green", with "Home & Away" or "Away & Home" underneath depending which
+leg came first -- so the fix is in the grouping alone: a pair whose sides
+DIFFER groups anyway. Lambeau still splits, because both of those are away
+games. Note the footer is derived from the order of the two games and owes
+nothing to `g.series`; a weekend home-and-away is deliberately not a series
+tag (see the `FAMILY` list), so do not be tempted to add one in harvest.
+
 **Key Games reads `keyRing` in every sport, and the postseason names its own
 colour** (his call 2026-10-02). Before this only football called `keyRing`, so
 a basketball card took the winner's colour where the Big Ten, CFP and NCAA
