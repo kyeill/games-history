@@ -869,6 +869,45 @@ change handler coerced every week and month value with `+v`, which would have
 turned "postseason" into NaN and emptied the page with no error. Only a run of
 digits is coerced.
 
+**Basketball has weeks on TV Windows now** (his call 2026-10-06), and they
+replace the month list there -- November, December, Week 1 to 9 or 10, then
+Postseason. Football takes its week from ESPN; basketball's means nothing to a
+viewer, so `cbbWeekNo` counts Monday-to-Sunday from the week holding JANUARY'S
+FIRST SATURDAY. That line is not arbitrary: it is where conference play is
+fully under way, and the same line `is_marquee` already draws. The measurements
+that settled it, over 2021-22 to 2025-26:
+
+* a January start gives 9.8 weeks a season, 10.2 games and 2.7 marquee games a
+  week, with 4 of 49 weeks holding no marquee game. Football is 15.4 weeks,
+  6.8 and 1.5, with 26% of weeks empty of marquee.
+* a November start gives 17.8 weeks at 7.2 games -- and **half of them hold no
+  marquee game at all**, because of the gate below. Seven straight November
+  and December weeks read zero.
+* week 1's Monday falls in DECEMBER in four seasons of six (the 27th to the
+  30th), because 1 January lands at a weekend. It costs nothing: no TV Windows
+  game has ever been played on those days. The holiday break covers them, and
+  it is why Christmas week is empty in three seasons of five.
+* conference tournaments begin the week AFTER the last numbered week, every
+  season. No week holds both.
+
+**November and December turn Marquee OFF when picked.** `is_marquee` returns
+false outright for any month but January to March -- his call, and he kept it
+when asked (2026-10-06: "I actually like marquee Jan-onward, once conference
+play is fully underway"). So a December game can hold a window and never be
+Marquee, and since TV Windows OPENS on Marquee those two buckets would open
+empty. Picking either clears the toggle. Worth knowing what the gate costs: 31
+December games across the archive era, 6.2 a season, would be Marquee without
+it -- Michigan State-Duke on FOX, Ohio State-North Carolina on CBS, Indiana-
+Kansas on CBS. He has seen that list and still wants the line at January.
+
+**Counting TV Windows games in a script? Do not filter out `focus` records.**
+A team-view copy is usually `rivals_only` and so excluded anyway, but not
+always: Michigan's two Players Era Festival games in 2025-26 exist ONLY as
+focus records with `rivals_only` false, and the app shows them. An analysis
+that drops every focus record undercounts by about 13% (it read 137 games for
+2025-26 where the app shows 155), which is exactly the mistake the first pass
+at the week numbers above made.
+
 **A conference final leaves its week number behind** (his call 2026-10-02:
 "remove all Conf Champ games from Week 14 and put them under Conf Champ, even
 if other Week 14 games still do exist"). So it is a value of its own, not a

@@ -2074,6 +2074,33 @@ function bigViewAllows(g) {
 // this a game that has not kicked off reads as a Michigan loss, because
 // "did not win" and "lost" are the same test everywhere else.
 function upcoming(g) { return !!g.upcoming; }
+/* BASKETBALL'S WEEK (his call 2026-10-06), for TV Windows only. Football takes
+   its week number from ESPN; basketball's means nothing to a viewer, so a week
+   is Monday to Sunday and the numbering starts with the week that holds
+   JANUARY'S FIRST SATURDAY -- the point conference play is fully under way,
+   and the same line Marquee is drawn on. November and December are buckets in
+   front of it and the conference tournaments are Postseason behind it, so the
+   numbered weeks are the conference season and nothing else.
+   It comes to 9 or 10 weeks a season; only 2022-23, whose New Year's Day fell
+   on a Sunday, is a week short. */
+function cbbWeek1(season) {
+  const jan = new Date(Date.UTC(season + 1, 0, 1));
+  // the first Saturday on or after 1 January, then back to its Monday
+  const sat = jan.getTime() + ((6 - jan.getUTCDay() + 7) % 7) * 864e5;
+  return sat - 5 * 864e5;
+}
+function cbbWeekNo(g) {
+  if (g.sport !== "CBB" || g.stage) return null;
+  const m = +g.date.slice(5, 7);
+  // November and December are named, not numbered -- "December" means
+  // December, even in the years when week 1's Monday falls on the 27th
+  if (m === 11 || m === 12) return null;
+  const d = Date.UTC(+g.date.slice(0, 4), m - 1, +g.date.slice(8, 10));
+  const mon = d - ((new Date(d).getUTCDay() + 6) % 7) * 864e5;
+  // a game before week 1 -- 1 January in a year whose first Saturday is the
+  // 7th -- is week 1 all the same
+  return Math.max(1, Math.round((mon - cbbWeek1(g.season)) / (7 * 864e5)) + 1);
+}
 // this week's Monday, as YYYY-MM-DD
 function weekStart() {
   const d = new Date();
@@ -2514,10 +2541,18 @@ function visible() {
   // "Bowls" and "Postseason" are the named cuts at the end of those two
   // dropdowns (his call 2026-10-02); a numbered week or a named month is the
   // REGULAR season, so the postseason is taken out of March
+  // Postseason is football's conference finals and bowls, basketball's
+  // conference tournaments and the NCAA; November and December are
+  // basketball's two buckets in front of its numbered weeks (2026-10-06)
   if (FILT.week === "postseason")
-    list = list.filter(g => g.sport === "CFB" && (!!g.title || g.week == null));
+    list = list.filter(g => g.sport === "CFB" ? (!!g.title || g.week == null)
+      : !!g.stage);
+  else if (FILT.week === "nov" || FILT.week === "dec")
+    list = list.filter(g => !g.stage &&
+      +g.date.slice(5, 7) === (FILT.week === "nov" ? 11 : 12));
   else if (FILT.week != null)
-    list = list.filter(g => g.week === FILT.week && !g.title);
+    list = list.filter(g => g.sport === "CFB" ? (g.week === FILT.week && !g.title)
+      : cbbWeekNo(g) === FILT.week);
   if (FILT.month === "postseason") list = list.filter(g => !!g.stage);
   else if (FILT.month != null)
     list = list.filter(g => +g.date.slice(5, 7) === FILT.month && !g.stage);
@@ -2943,13 +2978,40 @@ function filterChips() {
           ? [["Postseason", "postseason"]] : []),
       FILT.week));
   }
+  /* BASKETBALL GETS WEEKS TOO, on TV WINDOWS (his call 2026-10-06), and they
+     replace the month list there: November, December, Week 1 to 9 or 10, then
+     Postseason. The weeks are the conference season -- see cbbWeekNo -- which
+     is why the two months in front of them are named rather than numbered.
+     Key Games keeps its months: its seasons run back to 2011-12 and it has no
+     conference-play line to draw. */
+  if (sport === "CBB" && VIEW === "tv") {
+    const base = seasonBase("week");
+    const weeks = new Set();
+    let nov = false, dec = false, post = false;
+    base.forEach(g => {
+      if (g.stage) { post = true; return; }
+      const m = +g.date.slice(5, 7);
+      if (m === 11) { nov = true; return; }
+      if (m === 12) { dec = true; return; }
+      const w = cbbWeekNo(g);
+      if (w != null) weeks.add(w);
+    });
+    if (typeof FILT.week === "number") weeks.add(FILT.week);
+    h += group("Week", select("week", "All Weeks",
+      (nov || FILT.week === "nov" ? [["November", "nov"]] : [])
+        .concat(dec || FILT.week === "dec" ? [["December", "dec"]] : [])
+        .concat(Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]))
+        .concat(post || FILT.week === "postseason"
+          ? [["Postseason", "postseason"]] : []),
+      FILT.week));
+  }
   // Basketball has no week worth showing, so the month is its equivalent
   // coarse cut. Like the week list it follows the SEASON.
   // THE CONFERENCE TOURNAMENTS AND THE NCAA TOURNAMENT LEAVE MARCH (his call
   // 2026-10-02): they gather under one "Postseason" option at the end, so
   // March means the regular-season March games and nothing else. April, whose
   // every game is a Final Four, disappears into it.
-  if (sport === "CBB") {
+  if (sport === "CBB" && VIEW !== "tv") {
     const months = new Set();
     let post = false;
     seasonBase("month").forEach(g => {
@@ -3483,6 +3545,11 @@ async function init() {
     else FILT[k] = v === "" ? null
       : ((k === "season" || k === "week" || k === "month") && /^\d+$/.test(v)
          ? +v : v);
+    // NOVEMBER AND DECEMBER SHOW EVERYTHING (his call 2026-10-06). Marquee is
+    // a January-onward idea -- he keeps it that way deliberately, conference
+    // play being the point of it -- so a December game can never be Marquee
+    // and the bucket would otherwise open empty under the TV Windows default.
+    if (k === "week" && (v === "nov" || v === "dec")) FILT.marquee = false;
     // a week or month chosen under one season may not exist in another
     if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();
