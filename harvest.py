@@ -3256,6 +3256,19 @@ def kickoff_save():
                   separators=(",", ":"), sort_keys=True)
 
 
+# ESPN SPELLS A NETWORK TWO WAYS (his catch 2026-10-06: "why don't you have
+# the Indiana game for CFB Wk 6?"). Nebraska at Indiana was FOX's noon game and
+# reached nothing at all, because the scoreboard called it "Fox" and every rule
+# in rules.py asks for "FOX" -- cfb_slots, is_marquee, NET_TINT, NET_PRIORITY,
+# the Network dropdown's groups. A game spelled the other way falls through all
+# of them silently. Only the names the rules actually test are canonicalised,
+# and only when they differ by CASE: "Peacock", "truTV" and "ESPN+" are already
+# right and must not be touched.
+NET_CANON = {n.lower(): n for n in
+             ("FOX", "FS1", "FS2", "ABC", "CBS", "CBSSN", "NBC", "NBCSN",
+              "ESPN", "ESPN2", "ESPNU", "ESPNEWS", "BTN", "TNT", "TBS")}
+
+
 def networks(comp):
     out = []
     for b in comp.get("broadcasts") or []:
@@ -3266,7 +3279,7 @@ def networks(comp):
         if not names and (b.get("media") or {}).get("shortName"):
             names = [b["media"]["shortName"]]
         out += names
-    return sorted(set(out))
+    return sorted({NET_CANON.get((n or "").strip().lower(), n) for n in out})
 
 
 def fox_friday_dates(evs):

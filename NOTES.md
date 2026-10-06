@@ -691,6 +691,27 @@ rebases before pushing.
 
 ## ESPN data
 
+**ESPN spells a network two ways, and every rule asks for one of them.** His
+catch, 2026-10-06: "why don't you have the Indiana game for CFB Wk 6?" Nebraska
+at Indiana was FOX's noon game, #7 in the country, and reached nothing at all
+-- the scoreboard called it **"Fox"** where `cfb_slots`, `is_marquee`,
+`NET_TINT`, `NET_PRIORITY` and the Network dropdown's groups all ask for
+**"FOX"**. A game spelled the other way falls through every one of them without
+a word. `networks()` now canonicalises the names the rules test, and only where
+they differ by CASE, so "Peacock", "truTV" and "ESPN+" are left alone.
+
+It was costing 30 games: two FOX Big Noon games this season (Nebraska-Indiana
+and Ohio State-Kent State, both Marquee), four more football games, and
+**twenty Tigers games back to 2013**, which had been dropping in and out of the
+archive as ESPN's spelling varied from run to run -- the "two 2014 Tigers games
+that oscillate" was this, not a flaky MLB fetch. Five Big 12 cover picks were
+WITHDRAWN at the same time, correctly: with FOX recognised, better candidates
+existed in those weeks.
+
+The lesson generalises. Any new rule that tests a network by name should go
+through the same canonical list rather than comparing a raw ESPN string.
+
+
 **Sponsor names are inside the championship headline, and the suffix moves
 year to year.** `Subway ACC Championship Game` (2021) → `Subway ACC
 Championship` (2022) → `ACC Championship` (2024); `New York Life ACC
