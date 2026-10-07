@@ -931,6 +931,22 @@ that settled it, over 2021-22 to 2025-26:
 * conference tournaments begin the week AFTER the last numbered week, every
   season. No week holds both.
 
+**NEITHER TV Windows tab admits a game for a reason the result gave** (his
+call 2026-10-07). The game-type route needs both teams ranked before tip-off
+in BOTH sports now; football has required it since 2026-09-20 and basketball
+had not, so 53 games sat on the basketball tab that nothing beforehand could
+have put there -- every one a Top 5 Upset, an unranked team beating a top-five
+one, Michigan over #3 Purdue in February 2022 among them. His framing: "most
+of the Key Games are only going to be known retroactively - that is by design.
+However, we need neither of the TV Windows tabs to act this way." They keep
+their place on Key Games.
+
+The tab goes from 701 games to 648 over 2021-22 to 2025-26, 10.2 to 9.4 a
+numbered week. Marquee is untouched at 2.7 a week -- an upset was never
+Marquee -- and no week empties. Football loses nothing: its four type-only
+games are all ranked-v-ranked, and the 25 it already excluded are the same
+shape as basketball's 53.
+
 **November and December turn Marquee OFF when picked.** `is_marquee` returns
 false outright for any month but January to March -- his call, and he kept it
 when asked (2026-10-06: "I actually like marquee Jan-onward, once conference

@@ -2452,8 +2452,15 @@ function visible() {
          // a KEY GAME is on TV Windows too (his call 2026-09-18) -- never
          // Marquee, or it would have been here already -- but only one that
          // qualified BEFORE the week (2026-09-20)
-         || (g.type && bigViewAllows(g) &&
-             (g.sport !== "CFB" || rankedBefore(g))))
+         // ...IN BOTH SPORTS from 2026-10-07. Football has always needed both
+         // teams ranked; basketball did not, and 53 games were on the tab for
+         // a reason nothing before tip-off could have given -- every one of
+         // them a Top 5 Upset, an unranked team beating a top-five one. His
+         // call: "most of the Key Games are only going to be known
+         // retroactively - that is by design. However, we need neither of the
+         // TV Windows tabs to act this way." They keep their place on Key
+         // Games, where an upset belongs.
+         || (g.type && bigViewAllows(g) && rankedBefore(g)))
       : keyShows(g));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
