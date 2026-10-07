@@ -953,21 +953,26 @@ that settled it, over 2021-22 to 2025-26:
 * conference tournaments begin the week AFTER the last numbered week, every
   season. No week holds both.
 
-**NEITHER TV Windows tab admits a game for a reason the result gave** (his
-call 2026-10-07). The game-type route needs both teams ranked before tip-off
-in BOTH sports now; football has required it since 2026-09-20 and basketball
-had not, so 53 games sat on the basketball tab that nothing beforehand could
-have put there -- every one a Top 5 Upset, an unranked team beating a top-five
-one, Michigan over #3 Purdue in February 2022 among them. His framing: "most
-of the Key Games are only going to be known retroactively - that is by design.
-However, we need neither of the TV Windows tabs to act this way." They keep
-their place on Key Games.
+**A GAME TYPE IS NOT A WAY ONTO TV WINDOWS** (his call 2026-10-07, in two
+steps on the same day). First the route was held to games ranked before
+tip-off in both sports, dropping 53 basketball upsets; then he retired it
+outright: "I do not want those games (including Ranked B1G vs. other ranked)
+included on TV Windows if they miss all of the other rules." A MATCH-UP is not
+a broadcast. Illinois-Oregon on 1/2/25 was #22 at #9, and it was on FS1 at
+10pm, a channel with no basketball window at all -- that game is what prompted
+it.
 
-The tab goes from 701 games to 648 over 2021-22 to 2025-26, 10.2 to 9.4 a
-numbered week. Marquee is untouched at 2.7 a week -- an upset was never
-Marquee -- and no week empties. Football loses nothing: its four type-only
-games are all ranked-v-ranked, and the 25 it already excluded are the same
-shape as basketball's 53.
+The tab is now exactly the eight broadcast reasons: a window, a conference
+final, Black Friday, a show from his Locations tab, Week 0 or a non-Saturday
+opener, a neutral-site kickoff, a stand-in, a conference cover. 98 basketball
+games and 4 football ones left, and every one keeps its place on Key Games,
+which files a game by what it WAS rather than where it was. Basketball goes
+701 -> 550 over 2021-22 to 2025-26, 8.8 games a numbered week; football 622 ->
+618. Marquee does not move at all, at 2.7 a week.
+
+One consequence worth knowing: 2021-22 now runs Week 2 to 10, because the only
+games in its Week 1 were type-only. The numbering is anchored to January's
+first weekend, so an empty week is simply not offered rather than renumbered.
 
 **November and December turn Marquee OFF when picked.** `is_marquee` returns
 false outright for any month but January to March -- his call, and he kept it

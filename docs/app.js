@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261007-093407";
+const BUILD = "20261007-094106";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2447,20 +2447,21 @@ function visible() {
     : VIEW === "big" ? keyShows(g)
     : g.rivals_only ? false
     : VIEW === "tv"
+      /* A GAME TYPE IS NO LONGER A WAY ONTO TV WINDOWS (his call 2026-10-07:
+         "I do not want those games (including Ranked B1G vs. other ranked)
+         included on TV Windows if they miss all of the other rules"). The tab
+         is a record of what was ON -- a window, a conference final, a
+         showcase, a GameDay site, Week 0, a neutral-site kickoff, a stand-in,
+         a conference cover. A MATCH-UP is not a broadcast: Illinois-Oregon on
+         1/2/25 was #22 at #9 and a fine game, and it was on FS1 at 10pm,
+         which belongs to no window at all.
+         It had been admitted since 2026-09-18, narrowed on 2026-09-20 to
+         games ranked before kickoff and on 2026-10-07 to both sports; this
+         retires the route outright. 98 basketball games and 4 football ones
+         leave, and every one of them keeps its place on KEY GAMES, which is
+         the tab that files a game by what it was rather than where it was. */
       ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
-         || g.showcase || g.kickoff || g.standin
-         // a KEY GAME is on TV Windows too (his call 2026-09-18) -- never
-         // Marquee, or it would have been here already -- but only one that
-         // qualified BEFORE the week (2026-09-20)
-         // ...IN BOTH SPORTS from 2026-10-07. Football has always needed both
-         // teams ranked; basketball did not, and 53 games were on the tab for
-         // a reason nothing before tip-off could have given -- every one of
-         // them a Top 5 Upset, an unranked team beating a top-five one. His
-         // call: "most of the Key Games are only going to be known
-         // retroactively - that is by design. However, we need neither of the
-         // TV Windows tabs to act this way." They keep their place on Key
-         // Games, where an upset belongs.
-         || (g.type && bigViewAllows(g) && rankedBefore(g)))
+         || g.showcase || g.kickoff || g.standin)
       : keyShows(g));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
@@ -2469,8 +2470,10 @@ function visible() {
   if (VIEW === "tv" && SPORT_OF[TAB] === "CBB") {
     list = list.filter(g => {
       const m = +g.date.slice(5, 7);
-      return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase ||
-        (g.type && bigViewAllows(g));
+      // (the game-type clause went with the route itself, 2026-10-07 -- a
+      // November game with no window of its own is out, which is what this
+      // was always meant to say)
+      return (m >= 1 && m <= 3) || (g.slots || []).length || g.showcase;
     });
   }
   // CURRENT (his call 2026-09-16): every TV Windows game in the LATEST week
