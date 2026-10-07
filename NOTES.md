@@ -943,20 +943,24 @@ the same minute were ordered by network alone -- FOX, CBS, NBC, ABC, the rest.
   that network closes here. The slot before wins where both could speak,
   because it is already settled.
 
-It is read off the neighbouring slot AS ORDERED, and that detail is the whole
-rule. The first version asked "does exactly one of these networks have the
-next game?", which works for a lone neighbour -- 1/16/24, ESPN 7, Peacock 7,
-ESPN 9, now Peacock 7, ESPN 7, ESPN 9 -- and gives up on a RUN of clashes. His
-catch, 1/27/26: Peacock and ESPN at 7 and again at 9, both networks on both
-sides, so the question answered "both" and the two Peacock games stayed split.
-Asking what the next slot BEGINS with answers Peacock, so the 7 o'clock slot
-closes on Peacock:
+The slot AHEAD only counts when it is a SINGLE game. That asymmetry is the
+rule's whole content, and it took two goes. The slot behind is already
+settled, so it can simply be followed; a clash ahead is not, and chasing its
+baseline order turns a RUN inside out. 1/27/26 -- Peacock and ESPN at 7, and
+again at 9 -- came out ESPN, Peacock, Peacock, ESPN, which pairs the right
+network but leads with the wrong one. His ruling: the preferred network leads
+the run and the pairing happens in the middle.
 
-    ESPN 7 | Peacock 7 | Peacock 9 | ESPN 9
+    Tue   Peacock 7 | ESPN 7 | ESPN 9 | Peacock 9
+    Sat   ESPN 6 | ESPN 8 | FOX 8
 
-15 basketball slots re-order against the old network-only rule: 8 Saturday
-night FOX/ESPN pairs where ESPN had the earlier game, and 7 Tuesday
-Peacock/ESPN ones.
+So a run takes its baseline at the front and each later slot follows what came
+before. Every clash shape in five seasons, 25 in all: 8 Saturdays with a lone
+ESPN game before an 8pm FOX/ESPN clash (the second line above); 4 Tuesdays
+with a lone ESPN after (1/16/24, Peacock 7, ESPN 7, ESPN 9); 3 Tuesdays that
+are two clash slots back to back (the first line); and ten one-off shapes with
+one neighbour or none. Only those 3 Tuesdays are a true run -- the one Saturday
+pair of consecutive clashes holds four DIFFERENT networks, so nothing can pair.
 
 **The sandwich is deliberately NOT applied to football.** It would still fire
 39 times with Marquee pinned first, but the results are wrong: thirty-odd of

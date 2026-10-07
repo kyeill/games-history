@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261007-103456";
+const BUILD = "20261007-104419";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2486,9 +2486,17 @@ function tieOrder(list) {
       if (s.games.length < 2) return;
       const nets = new Set(s.games.map(netOf));
       if (nets.size < 2) return;
-      // the slot BEFORE is already settled; the one after is still baseline
+      // The slot BEFORE is already settled, so it can be followed. The one
+      // after is only an anchor when it is a SINGLE game (his call
+      // 2026-10-07): a clash ahead is not settled yet, and chasing its
+      // baseline head turned the Tuesday runs inside out -- 1/27/26 came out
+      // ESPN, Peacock, Peacock, ESPN when he wants the preferred network to
+      // LEAD the run and the pairing to happen in the middle:
+      //     Peacock 7 | ESPN 7 | ESPN 9 | Peacock 9
+      // Left alone, the slot takes its baseline and the next slot follows it.
       const prev = i ? slots[i - 1].games : null;
-      const next = i + 1 < slots.length ? slots[i + 1].games : null;
+      const next = (i + 1 < slots.length && slots[i + 1].games.length === 1)
+        ? slots[i + 1].games : null;
       const tail = prev && netOf(prev[prev.length - 1]);
       const head = next && netOf(next[0]);
       if (tail && nets.has(tail))
