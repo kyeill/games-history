@@ -713,8 +713,27 @@ function rowHtml(g, browse) {
   // the whole header. It does not wait on a Big Ten team either.
   if (teamView() && !browse) {
     const one = winCol || netCol;
-    return michCard(g, { tags: tags, when: when, headCol: one,
-                         netCol: one, timeCol: one });
+    /* THE DATE SITS BETWEEN THEM on a team card (his call 2026-10-07), so the
+       header goes down in two pieces rather than one: `lead` is what the game
+       IS -- a week number, or nothing -- and `tail` is how to watch it: a
+       window label, or the weekday that stands in for one. "WEEK 6 | DATE |
+       FOX BIG NOON", and in basketball and hockey, which have no week, the
+       date simply leads: "DATE | TUESDAY | ESPN 9:15PM". */
+    let lead = "", tail = "";
+    if (!g.stage) {
+      if (g.sport === "CFB" || g.sport === "NFL") {
+        const hasWeek = g.week != null;
+        lead = (hasWeek ? '<span class="wk">Week ' + g.week + "</span>" : "") +
+          (hasWeek && !label && g.dow !== (g.sport === "NFL" ? "Sun" : "Sat")
+            ? " (" + esc(g.dow) + ")" : "");
+        if (!lead) lead = esc(DAYS[g.dow] || g.dow);
+        tail = label ? esc(label) : "";
+      } else {
+        tail = esc(label || DAYS[g.dow] || g.dow);
+      }
+    }
+    return michCard(g, { tags: tags, when: when, lead: lead, tail: tail,
+                         headCol: one, netCol: one, timeCol: one });
   }
   // A coloured BORDER flags a Michigan win or a rival loss. A full maize box
   // was too loud, so the winner's line keeps its own wash either way.
@@ -975,9 +994,11 @@ function michCard(g, p) {
   // em dash standing in for a network (his call 2026-09-14).
   // a card with ONE game runs the day into its time -- "FRIDAY 7:05PM" --
   // with no pipe between them (his call 2026-09-23)
-  const tvBits = (g.sport === "CHK" && !g._series ? ' ' : ' | ') +
-    (netTxt ? '<span' + col(p.netCol) + ">" + esc(netTxt) + "</span> " : "") +
+  const tvInner = (netTxt ? '<span' + col(p.netCol) + ">" + esc(netTxt) + "</span> " : "") +
     '<span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
+  // a card with ONE hockey game runs the day into its time -- "FRIDAY 7:05PM"
+  const tvGlue = (g.sport === "CHK" && !g._series ? ' ' : ' | ');
+  const tvBits = tvGlue + tvInner;
   // SEPTEMBER 21 is his date: a Michigan WIN that day spells itself out --
   // "Sep 21, 2024" -- in the header and in the third row alike. Every other
   // date stays in slashes (his call 2026-09-13).
@@ -989,6 +1010,17 @@ function michCard(g, p) {
   // "DECEMBER SATURDAY" reads "SATURDAY" on this view (his call 2026-09-16);
   // the date beside it already says December
   let when = p.when.replace(/^December /, ""), right = shownDate;
+  /* THE DATE COMES BEFORE THE TIME (his call 2026-10-07), everywhere it can.
+     The header reads `lead | DATE | tail`: what the game IS, when it was, then
+     how to watch it. A week number, a bowl, a tournament or an event name is a
+     lead and keeps its place in front; a weekday is not, so in basketball and
+     hockey the date simply leads. Where the date is forced down to the footer
+     -- which is most hockey cards, because their footers are otherwise bare --
+     it reads time then date, and he has accepted that. The postseason card
+     already read date then time in its footer and is untouched. */
+  let hLead = (p.lead || "").replace(/^December /, "");
+  let hTail = (p.tail || "").replace(/^December /, "");
+  let noDate = false;          // bigStage and MTE carry theirs in the footer
   // the year leads every tournament header (his call 2026-09-14) -- ESPN does
   // not count the Big Ten Tournament as postseason, so `post` alone missed it
   // The tournament writes itself out in full on this view (his call
@@ -1018,12 +1050,14 @@ function michCard(g, p) {
       : esc(full));
   };
   if (bigStage) {
+    noDate = true;
     // the round, then WHERE it was played; the date and the TV details have
     // gone down to the third row
     when = stageHead() + (place ? " | " + esc(place) : "") +
       // GAME 2 (1-1) on a split tournament series (his call 2026-09-22)
       (g._gm ? " | Game " + g._gm.n + (g._gm.rec ? " (" + esc(g._gm.rec) + ")" : "") : "");
   } else if (mteCard) {
+    noDate = true;
     // the event, then the round within it -- his Round column, blank until he
     // fills it in, and then the header is simply the event
     // the bracket works the round out on its own (see harvest); the Round
@@ -1051,28 +1085,37 @@ function michCard(g, p) {
       : esc(ev)) + (wantPlace && place ? " | " + esc(place) : "") +
       (rnd ? " | " + esc(rnd) : "");
   } else if (g.stage) {
-    when = stageHead() + tvBits;
+    // a BOWL or conference final: the name leads, the date follows it, the TV
+    // closes (his call 2026-10-07 -- it used to read TIME then DATE)
+    hLead = stageHead();
+    hTail = tvInner;
     right = '<span class="hdow">' + esc(g.dow) + "</span> " + right;
   } else if (!g.header || /^December /.test(g.header)) {
     // a window label already names its network ("FOX PRIMETIME"), so the TV
     // details are left off -- but "DECEMBER SATURDAY" names nothing, and
     // dropping them there lost the network and the time (his catch
     // 2026-09-13)
-    when += tvBits;
+    hTail += (hTail ? tvGlue : "") + tvInner;
   } else if (g.sport === "CBB") {
     // ...and where the label DOES name the network, BASKETBALL still shows the
     // time (his call 2026-09-14), appended to the back of the label -- TV
     // Windows leaves it out because the window implies it. Football keeps it
-    // off: that header already carries a week, a window and a date.
-    when += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
+    // off: its header already carries a week and a window.
+    hTail += ' <span' + col(p.timeCol) + ">" + fmtTime(g.time) + "</span>";
   }
   // no emoji in the header any more (his call 2026-09-13)
-  const head = (mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "") +
-    (series && !tSeries ? series.map(x => esc(x.dow) + " " + fmtTime(x.time)).join(" | ") : when);
-  // The DATE goes at the end of the header -- unless the third row would be
-  // empty, in which case it drops down there instead and the header ends
-  // without it (his call 2026-09-13). Decided below, once the footer is known.
-  const headDate = ' | <span class="hdate">' + right + "</span>";
+  const headNum = mx.num ? '<span class="mnum">[' + esc(mx.num) + "]</span> " : "";
+  // a bigStage or MTE header is one piece; everything else is lead | date | tail
+  if (bigStage || mteCard) { hLead = when; hTail = ""; }
+  const seriesTimes = (series && !tSeries)
+    ? series.map(x => esc(x.dow) + " " + fmtTime(x.time)).join(" | ") : "";
+  if (seriesTimes) { hLead = ""; hTail = seriesTimes; }
+  // The DATE sits between the two -- unless the third row would be empty, in
+  // which case it drops down there instead and the header closes without it
+  // (his call 2026-09-13, kept 2026-10-07: "if one of the elements HAS to
+  // drop, make it the date not the time"). Decided below, once the footer is
+  // known.
+  const headDate = '<span class="hdate">' + right + "</span>";
   const dateText = (g.stage ? g.dow.toUpperCase() + " " : "") + shownDate;
   // UNIFORM (his calls 2026-09-11): the score box is the jersey, the rank box
   // the pants, and the accessories colour is the text on both. He wants maize
@@ -1354,10 +1397,12 @@ function michCard(g, p) {
     if (g.sport === "CHK" && place &&
         !["Ice Breaker"].some(e =>
           (g.event || "").toLowerCase().indexOf(e.toLowerCase()) > -1)) bit(place);
+    // the DATE now leads the TV details here too (his call 2026-10-07), as it
+    // already did on a postseason card
+    bit(dateText);
     // ...and Cornell's shows no time (his call 2026-09-17), only a network
     if (fid === CORNELL && g.sport === "CHK") bit(netTxt);
     else bit(tvTxt, netTxt, false, 4);
-    bit(dateText);
   }
   // the EVENT first and its city after for these (his call 2026-09-18):
   // "Jumpman Invitational | Charlotte"
@@ -1423,19 +1468,25 @@ function michCard(g, p) {
   // whenever the bottom row has details of its own -- Home & Home, Duel in the
   // D, Red Hot Hockey -- and fills the bottom row only when it would otherwise
   // be empty (his call 2026-09-16)
+  // A SERIES CARD'S MONTH LEADS IT NOW (his call 2026-10-07), where it used to
+  // close the header: "OCTOBER 2026 | FRI 7:00PM | SAT 6:07PM". It still falls
+  // to the bottom row when that row would otherwise be empty.
   let monthHead = "";
   if (series && !tSeries) {
     const month = MONTHS[+g.date.slice(5, 7) - 1] + " " + g.date.slice(0, 4);
     // a GLI, Duel in the D, Red Hot Hockey or Frozen Apple card carries its
     // DATE instead (his call 2026-09-17)
-    if (series.some(x => x.dated)) monthHead = " | " + esc(fmtDate(g.date));
-    else if (parts.length) monthHead = " | " + esc(month);
+    if (series.some(x => x.dated)) monthHead = esc(fmtDate(g.date));
+    else if (parts.length) monthHead = esc(month);
     else parts.unshift({ t: month, short: "", his: false });
   }
-  const dateDown = tSeries || (!series && (bigStage || mteCard || !parts.length));
+  const dateDown = !series && (bigStage || mteCard || !parts.length);
   if (dateDown && !bigStage && !mteCard) {
     parts.unshift({ t: dateText, short: "", his: false });
   }
+  const head = headNum + [hLead,
+      series ? monthHead : (dateDown || noDate ? "" : headDate),
+      hTail].filter(Boolean).join(" | ");
   const wrap = (p, colour) => '<span class="mdet' + (p.att ? " matt" : "") + '"' +
     (p.short ? ' data-short="' + esc(p.short) + '" data-trim="' + (p.pri || 5) + '"' : "") +
     (colour || p.it ? ' style="' + (colour ? "color:" + colour + ";" : "") +
@@ -1693,7 +1744,7 @@ function michCard(g, p) {
   return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
     shade(MICH_WASH[opp.id] || teamColor(opp)) + ring + '">' +
     '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head +
-      monthHead + (dateDown || series ? "" : headDate) + "</span></div>" +
+      "</span></div>" +
     '<div class="teams">' + oppLine + "</div>" +
     '<div class="tags mdets">' +
       (mx.attended && g.sport !== "CHK" ? '<span class="mstar">*</span>' : "") +

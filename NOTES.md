@@ -926,6 +926,40 @@ a #2-over-#1 result; Kyle wants it read as an upset.
 
 ## The app
 
+**The date comes before the time on a team card** (his calls 2026-10-07). The
+header reads `lead | DATE | tail`: what the game IS, when it was, then how to
+watch it. A week number, a bowl, a tournament or an MTE event is a LEAD and
+keeps its place in front; a weekday is not, so in basketball and hockey the
+date simply leads.
+
+    CFB   WEEK 6 | 10/10/2026 | FOX BIG NOON
+    CFB   OUTBACK BOWL | MON 1/1/2018 | ESPN 1:00PM
+    CBB   11/14/2025 | FRIDAY | ESPN2 9:00PM
+    CBB   1/4/2025 | FOX PRIMETIME 8:00PM
+    HKY   11/7/2025 | FRIDAY 7:00PM
+    HKY   OCTOBER 2019 | FRI 7:30PM | SAT 7:30PM
+    MTE   PUERTO RICO TIP-OFF | FINAL  ->  footer: DATE then NET TIME
+    post  2023 CFP SEMIFINALS | ROSE BOWL  ->  footer: MON DATE then ESPN 5:00PM
+
+The postseason card already read that way and is untouched; the window label
+counts as the time ("Big Noon essentially is the time"), which is why it moves
+behind the date. rowHtml now hands michCard the label in TWO pieces, `lead`
+and `tail`, rather than one string -- splitting "WEEK 6 | FOX BIG NOON" back
+apart downstream would have meant parsing HTML.
+
+**WHERE ONE OF THEM HAS TO DROP, IT IS THE DATE** (his call, keeping the
+2026-09-13 behaviour). The bottom row must not be blank, so a card with
+nothing else to say down there takes the date -- and then reads time, then
+date. He has accepted that. It is most hockey cards: 84% of Michigan's
+non-postseason ones have a bare footer and 52% of Cornell's, against 16% and
+48% carrying a venue, an event, Ivy League, a series tag or an Attended note.
+
+**`tSeries` is dead code.** It tests `_series && stage`, and `_series` is only
+ever set on the NON-stage weekend path -- a best-of-three tournament series
+became one card per game on 2026-09-22. So the combined-tournament-series
+branches never run. Left in place for now; removing them touches six sites for
+no visible gain.
+
 **Who leads a shared kickoff** (his calls 2026-10-07; `tieOrder`). Two games at
 the same minute were ordered by network alone -- FOX, CBS, NBC, ABC, the rest.
 
