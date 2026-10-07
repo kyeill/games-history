@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261006-165726";
+const BUILD = "20261006-205320";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -154,6 +154,13 @@ function teamName(t, sport, season) {
   if (VIEW === "rivals") return (t.id === MICHIGAN || t.id === CORNELL) ? nm.toUpperCase() : nm;
   const caps = VIEW === "cornell" ? (TEAM_CONF[CORNELL] || {})[sport] : BIG_TEN[sport];
   return (sport && t.conf === caps) ? nm.toUpperCase() : nm;
+}
+/* ESPN'S CAPITALS (his call 2026-10-06). It wrote event and bowl names in
+   capitals before about 2021 and in title case after -- "GAVITT TIPOFF GAMES"
+   then "Gavitt Tipoff Games" -- so every test against one of its names
+   compares without case. The same class of bug as "Fox" against "FOX". */
+function sameName(a, b) {
+  return String(a || "").toLowerCase() === String(b || "").toLowerCase();
 }
 function esc(s) {
   return String(s).replace(/[&<>"]/g,
@@ -576,7 +583,7 @@ function teamLine(t, sport, season, seed, g0) {
    CFP gold. The NIT and the other bowls stay plain. */
 function ny6Bowl(g) {
   return ["Rose Bowl", "Sugar Bowl", "Orange Bowl", "Cotton Bowl",
-          "Fiesta Bowl", "Peach Bowl"].indexOf(g.stage || "") > -1;
+          "Fiesta Bowl", "Peach Bowl"].some(b => sameName(b, g.stage));
 }
 function stageColor(g) {
   const st = g.stage || "";
@@ -628,7 +635,7 @@ function rowHtml(g, browse) {
   }
   // Champions Classic and CBS Sports Classic move every year, so their cards
   // name the place as a second chip (his call 2026-09-11)
-  if (g.event && !g.stage && PLACE_TOO.indexOf(g.event) > -1 &&
+  if (g.event && !g.stage && PLACE_TOO.some(e => sameName(e, g.event)) &&
       (g.offsite || (g.neutral && g.city)))
     tags.push(chip("champ", g.offsite || g.city));
   showsOf(g).forEach(t => tags.push(chip("mine " + tagClass(t), t)));
@@ -740,7 +747,7 @@ function rowHtml(g, browse) {
   return '<div class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
     (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
-    ((VIEW === "rivals" && rivalsFill(g)) || keyFill(g) ||
+    ((VIEW === "rivals" && rivalsFill(g)) || keyFill(g) || marqueeFill(g) ||
       (imx && imx.shade) ? " rwash" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
@@ -1345,7 +1352,8 @@ function michCard(g, p) {
     // ...except a HOCKEY MTE whose header carries no place: Cornell's Florida
     // College Classic and the rest name it here, first (his call 2026-09-16)
     if (g.sport === "CHK" && place &&
-        !["Ice Breaker"].some(e => (g.event || "").indexOf(e) > -1)) bit(place);
+        !["Ice Breaker"].some(e =>
+          (g.event || "").toLowerCase().indexOf(e.toLowerCase()) > -1)) bit(place);
     // ...and Cornell's shows no time (his call 2026-09-17), only a network
     if (fid === CORNELL && g.sport === "CHK") bit(netTxt);
     else bit(tvTxt, netTxt, false, 4);
@@ -2041,6 +2049,19 @@ function keyStage(g) {
     return "#0088ce";
   return null;
 }
+/* A MICHIGAN WIN OVER A RANKED TEAM IN A MARQUEE WINDOW FILLS MAIZE (his call
+   2026-10-06). Marquee is TV Windows' own idea -- the games he plans a weekend
+   around -- and that is the one view where a Michigan win like this was marked
+   by a border alone. Elsewhere it is a no-op: Key Games already fills a
+   bordered Michigan card, and on Rivals a Michigan win fills whatever else is
+   true. The wash is the winner's colour, which for Michigan is maize. */
+function marqueeFill(g) {
+  if (upcoming(g) || !g.mq) return false;
+  if (g.sport !== "CFB" && g.sport !== "CBB") return false;
+  const m = michTeam(g);
+  if (!m || !m.win) return false;
+  return g.teams.some(t => t.id !== MICHIGAN && !!t.rank);
+}
 function keyFill(g) {
   if (VIEW !== "big") return false;
   if (keyStage(g)) return true;
@@ -2276,7 +2297,11 @@ function highlightOf(g, kind) {
     // ...and in basketball, a College GameDay game (his call 2026-09-18)
     const gameDay = g.sport === "CBB" && showsOf(g).indexOf("College GameDay") > -1;
     return ((g.neutral || !!g.offsite) && !st && !g.post) || series || gameDay ||
-      /ACC Challenge|Gavitt/.test(g.event || "");
+      // CASE-INSENSITIVE, like every other test on an ESPN EVENT name (his
+      // call 2026-10-06, after the "Fox" business): ESPN wrote these in
+      // capitals before about 2021 -- "GAVITT TIPOFF GAMES", "BIG TEN/ACC
+      // CHALLENGE" -- and nine games were missing this highlight.
+      /ACC Challenge|Gavitt/i.test(g.event || "");
   }
   // HIS SHEET DECIDES THIS (his call 2026-09-25): he never shades or borders
   // a defeat, so the only work left here is keeping defeats out -- and a TIE

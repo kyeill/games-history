@@ -711,6 +711,26 @@ existed in those weeks.
 The lesson generalises. Any new rule that tests a network by name should go
 through the same canonical list rather than comparing a raw ESPN string.
 
+**...and the audit that followed found the same bug in its other form.** ESPN
+wrote event names in CAPITALS before about 2021 and in title case after, so the
+archive holds both "GAVITT TIPOFF GAMES" and "Gavitt Tipoff Games", both
+"BIG TEN/ACC CHALLENGE" and "Big Ten/ACC Challenge". `highlightOf`'s Details
+test was `/ACC Challenge|Gavitt/` with no `i`, and missed them. Three more
+tests on the same raw ESPN strings were clean only by luck and are now
+case-blind too: `PLACE_TOO`, the Ice Breaker chip and `ny6Bowl` -- that last
+one matters, because `stage` keeps ESPN's own casing and the archive already
+holds "OUTBACK BOWL" and "REDBOX BOWL" in capitals.
+
+What is SAFE, and why: `stage`, `champ` and `round` are strings WE generate,
+and a sweep found no case variants among them, so the many `g.stage.indexOf(...)`
+tests are sound. `cbb_showcase` lowercases both sides. `ev_overrides` is keyed
+lower. Hockey's event names come from USCHO, which is consistent. The rule of
+thumb: compare OUR strings literally, ESPN's never.
+
+**And a numeric field has the mirror of this problem**: `conf` is the STRING
+"7", not the number 7. An analysis that wrote `t.conf == 7` silently matched
+nothing and under-reported the December marquee count until it was caught.
+
 
 **Sponsor names are inside the championship headline, and the suffix moves
 year to year.** `Subway ACC Championship Game` (2021) → `Subway ACC
