@@ -936,18 +936,27 @@ the same minute were ordered by network alone -- FOX, CBS, NBC, ABC, the rest.
   Tuesdays included -- the one piece of ordering that reaches before January,
   everything else about Nov/Dec being left alone -- and FOX over ESPN on a
   Saturday night (which the old list already did).
-* The SANDWICH: where one of the clashing networks also has the game
-  immediately before or after, its game sits beside that neighbour -- leading
-  the group when the neighbour came first, closing it when the neighbour comes
-  next. 1/16/24 is the case he caught: ESPN 7, Peacock 7, ESPN 9, with Peacock
-  splitting the two ESPN games. It now reads Peacock 7, ESPN 7, ESPN 9.
+* The SANDWICH: two games on the same network either side of a shared tip sit
+  TOGETHER rather than being split by the other channel. Each slot is ordered
+  by the baseline, then: if the slot BEFORE ends on a network this slot also
+  has, that network leads here; failing that, if the slot AFTER begins on one,
+  that network closes here. The slot before wins where both could speak,
+  because it is already settled.
 
-18 basketball slots re-order: 10 from the baseline, 8 from the sandwich alone
-(all Saturday-night FOX/ESPN pairs where ESPN had the earlier game). The rule
-only speaks when EXACTLY ONE of the clashing networks has the neighbour; where
-both do, or neither, the baseline decides. Across five seasons the before- and
-after-neighbours never once pulled different ways, so there is no tie to break
-inside the tiebreak.
+It is read off the neighbouring slot AS ORDERED, and that detail is the whole
+rule. The first version asked "does exactly one of these networks have the
+next game?", which works for a lone neighbour -- 1/16/24, ESPN 7, Peacock 7,
+ESPN 9, now Peacock 7, ESPN 7, ESPN 9 -- and gives up on a RUN of clashes. His
+catch, 1/27/26: Peacock and ESPN at 7 and again at 9, both networks on both
+sides, so the question answered "both" and the two Peacock games stayed split.
+Asking what the next slot BEGINS with answers Peacock, so the 7 o'clock slot
+closes on Peacock:
+
+    ESPN 7 | Peacock 7 | Peacock 9 | ESPN 9
+
+15 basketball slots re-order against the old network-only rule: 8 Saturday
+night FOX/ESPN pairs where ESPN had the earlier game, and 7 Tuesday
+Peacock/ESPN ones.
 
 **The sandwich is deliberately NOT applied to football.** It would still fire
 39 times with Marquee pinned first, but the results are wrong: thirty-odd of

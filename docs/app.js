@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261007-100606";
+const BUILD = "20261007-103456";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2431,23 +2431,25 @@ function celebrateColor(g) {
    ABC/ESPN". Marquee was never consulted, so a plain FOX game led a marquee
    CBS or NBC one in twenty slots. It leads now.
 
-   BASKETBALL takes his own order instead: PEACOCK leads ESPN on a Tuesday
-   (December Tuesdays included -- the one piece of ordering that reaches before
-   January), and FOX leads ESPN on a Saturday night.
+   BASKETBALL takes his own order: PEACOCK leads ESPN on a Tuesday (December
+   Tuesdays included -- the one piece of ordering that reaches before January),
+   and FOX leads ESPN on a Saturday night.
 
-   ...and then the SANDWICH. Where one of the clashing networks ALSO has the
-   game immediately before or after, the two on that network sit together: its
-   game leads the group when the neighbour came first, and closes the group
-   when the neighbour comes next. 1/16/24 is the case he caught it on --
-   ESPN 7, Peacock 7, ESPN 9, with the Peacock game splitting the two ESPN
-   ones. The rule only speaks when EXACTLY ONE of the clashing networks has
-   that neighbour; where both do, or neither, the order above decides. (In
-   five seasons the before- and after-neighbours never pulled different ways.)
+   ...and then the SANDWICH: two games on the same network either side of a
+   shared tip should sit TOGETHER, not be split by the other channel. It is
+   read off the NEIGHBOURING SLOT AS ALREADY ORDERED, which is what makes a run
+   of clashes work. 1/27/26 is the case he caught: Peacock and ESPN at 7, and
+   again at 9. Asking "does exactly one of these networks have the next game?"
+   answered "both", gave up, and left Peacock 7, ESPN 7, Peacock 9, ESPN 9 --
+   the two Peacock games split. Asking instead "what does the next slot BEGIN
+   with?" gives Peacock, so the 7 o'clock slot ends with Peacock:
 
-   Basketball only. Football's clashes are one-off collisions between
-   networks rather than runs on one channel, and applying it there demoted a
-   window-labelled game below an unlabelled one in thirty-odd slots -- the
-   opposite of the hierarchy he asked for. */
+       ESPN 7 | Peacock 7 | Peacock 9 | ESPN 9
+
+   So each slot is ordered by the baseline above, then: if the slot before it
+   ENDS on a network this slot also has, that network leads here; failing that,
+   if the slot after it BEGINS on one, that network closes here. The slot
+   before wins where both could speak, because it is already settled. */
 function tieOrder(list) {
   const out = new Map();
   const netOf = g => primaryNet(g.nets);
@@ -2466,43 +2468,35 @@ function tieOrder(list) {
     return pri(g);
   };
   list.forEach(g => out.set(g, 10000 + base(g)));
-  // the sandwich, one day at a time
   const byDay = new Map();
   list.forEach(g => {
     if (g.sport !== "CBB" || !g.time || g.time === "TBD") return;
-    const k = g.date;
-    if (!byDay.has(k)) byDay.set(k, []);
-    byDay.get(k).push(g);
+    if (!byDay.has(g.date)) byDay.set(g.date, []);
+    byDay.get(g.date).push(g);
   });
   byDay.forEach(gs => {
-    gs = gs.slice().sort((a, b) => a.time.localeCompare(b.time));
-    const times = [];
-    gs.forEach(g => {
-      if (!times.length || times[times.length - 1].t !== g.time)
-        times.push({ t: g.time, games: [] });
-      times[times.length - 1].games.push(g);
+    const slots = [];
+    gs.slice().sort((a, b) => a.time.localeCompare(b.time)).forEach(g => {
+      if (!slots.length || slots[slots.length - 1].t !== g.time)
+        slots.push({ t: g.time, games: [] });
+      slots[slots.length - 1].games.push(g);
     });
-    times.forEach((slot, i) => {
-      const grp = slot.games;
-      if (grp.length < 2) return;
-      const nets = Array.from(new Set(grp.map(netOf)));
-      if (nets.length < 2) return;
-      const at = j => (j >= 0 && j < times.length)
-        ? new Set(times[j].games.map(netOf)) : new Set();
-      const sole = near => {
-        const hit = nets.filter(n => near.has(n));
-        return hit.length === 1 ? hit[0] : null;
-      };
-      const lead = sole(at(i - 1));
-      const close = lead ? null : sole(at(i + 1));
-      if (!lead && !close) return;
-      grp.forEach(g => {
-        const n = netOf(g);
-        const shift = lead ? (n === lead ? -10000 : 0)
-                           : (n === close ? 10000 : 0);
-        out.set(g, out.get(g) + shift);
-      });
+    slots.forEach(s => s.games.sort((a, b) => base(a) - base(b)));
+    slots.forEach((s, i) => {
+      if (s.games.length < 2) return;
+      const nets = new Set(s.games.map(netOf));
+      if (nets.size < 2) return;
+      // the slot BEFORE is already settled; the one after is still baseline
+      const prev = i ? slots[i - 1].games : null;
+      const next = i + 1 < slots.length ? slots[i + 1].games : null;
+      const tail = prev && netOf(prev[prev.length - 1]);
+      const head = next && netOf(next[0]);
+      if (tail && nets.has(tail))
+        s.games.sort((a, b) => (netOf(a) === tail ? 0 : 1) - (netOf(b) === tail ? 0 : 1));
+      else if (head && nets.has(head))
+        s.games.sort((a, b) => (netOf(a) === head ? 1 : 0) - (netOf(b) === head ? 1 : 0));
     });
+    slots.forEach(s => s.games.forEach((g, j) => out.set(g, 10000 + j)));
   });
   return out;
 }
