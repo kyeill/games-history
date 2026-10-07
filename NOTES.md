@@ -691,6 +691,28 @@ rebases before pushing.
 
 ## ESPN data
 
+**conf_map was asking ESPN for the wrong basketball year** (found 2026-10-07
+while answering "what rule brings in Illinois-Oregon on 1/2/25?"). ESPN dates a
+basketball season by the year it ENDS -- the trap that has now caught FOUR
+callers: the standings, the final polls, and this. `seasons/%d` was given our
+season number, so CBB 2024 fetched 2023-24 and every realignment landed a year
+late. Oregon, Washington, USC and UCLA read Pac-12 through the whole of
+2024-25, the season they joined the Big Ten; Maryland and Rutgers read ACC and
+American through 2014-15; Nebraska read Big XII in 2011-12. Kentucky, Florida
+and Vanderbilt carried conference id 37, which is not in the CBB label map at
+all, so they had no conference in the filter.
+
+Fixed with `season + 1` for basketball, and the stale CBB rows were dropped
+from data/conf-map.json so they refetch. It corrected 70-odd team-seasons and
+changed NO game type -- `has_big_ten` happened to be carried by the other side
+every time -- but it decides the Conference filter and which names go up in
+CAPITALS, so the 1/2/25 card now reads ILLINOIS and OREGON rather than only
+Illinois.
+
+Any new per-season ESPN lookup should be checked against this. Football is
+dated by the year it starts; basketball, hockey polls and everything else
+ESPN files under a single year are dated by the year they end.
+
 **ESPN spells a network two ways, and every rule asks for one of them.** His
 catch, 2026-10-06: "why don't you have the Indiana game for CFB Wk 6?" Nebraska
 at Indiana was FOX's noon game, #7 in the country, and reached nothing at all

@@ -3177,7 +3177,13 @@ def conf_map(code, season):
     if key in _CONF_MAP:
         return _CONF_MAP[key]
     out = {}
-    base = "%s/%s/seasons/%d/types/2/groups" % (CORE, CORE_LEAGUE[code], season)
+    # ESPN DATES A BASKETBALL SEASON BY THE YEAR IT ENDS (the trap that has now
+    # caught four different callers -- standings, the final polls, and this).
+    # Asking for CBB season 2024 returns 2023-24, so Oregon, Washington, USC
+    # and UCLA read Pac-12 through the whole of 2024-25, the season they joined
+    # the Big Ten. Football is dated by the year it starts and needs no shift.
+    yr = season if code == "CFB" else season + 1
+    base = "%s/%s/seasons/%d/types/2/groups" % (CORE, CORE_LEAGUE[code], yr)
     try:
         top = get_json(base, params={"limit": 100}).get("items", [])
         for ref in top:
