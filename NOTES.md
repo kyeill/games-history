@@ -926,6 +926,36 @@ a #2-over-#1 result; Kyle wants it read as an upset.
 
 ## The app
 
+**Who leads a shared kickoff** (his calls 2026-10-07; `tieOrder`). Two games at
+the same minute were ordered by network alone -- FOX, CBS, NBC, ABC, the rest.
+
+* FOOTBALL is a hierarchy: "Marquee Spot > FOX/CBS/NBC > ABC/ESPN". Marquee
+  was never consulted, so a plain FOX game led a marquee CBS or NBC one in
+  twenty slots. It leads now.
+* BASKETBALL takes his own order: PEACOCK over ESPN on a Tuesday, December
+  Tuesdays included -- the one piece of ordering that reaches before January,
+  everything else about Nov/Dec being left alone -- and FOX over ESPN on a
+  Saturday night (which the old list already did).
+* The SANDWICH: where one of the clashing networks also has the game
+  immediately before or after, its game sits beside that neighbour -- leading
+  the group when the neighbour came first, closing it when the neighbour comes
+  next. 1/16/24 is the case he caught: ESPN 7, Peacock 7, ESPN 9, with Peacock
+  splitting the two ESPN games. It now reads Peacock 7, ESPN 7, ESPN 9.
+
+18 basketball slots re-order: 10 from the baseline, 8 from the sandwich alone
+(all Saturday-night FOX/ESPN pairs where ESPN had the earlier game). The rule
+only speaks when EXACTLY ONE of the clashing networks has the neighbour; where
+both do, or neither, the baseline decides. Across five seasons the before- and
+after-neighbours never once pulled different ways, so there is no tie to break
+inside the tiebreak.
+
+**The sandwich is deliberately NOT applied to football.** It would still fire
+39 times with Marquee pinned first, but the results are wrong: thirty-odd of
+them demote a window-labelled game ("SEC on CBS", "CBS B1G Time") below an
+unlabelled ABC or ESPN one, purely because that network had a neighbouring
+game. Football's clashes are one-off collisions between networks, not runs on
+one channel, which is what the rule is for.
+
 **A week or month can be a NAME now, so `+v` is no longer safe.**
 "Postseason" sits at the end of both dropdowns (his call 2026-10-02); the
 change handler coerced every week and month value with `+v`, which would have

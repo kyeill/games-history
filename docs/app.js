@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261007-094106";
+const BUILD = "20261007-100606";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2423,6 +2423,90 @@ function celebrateColor(g) {
   return [solid, solid + "44"];
 }
 
+/* WHO LEADS A SHARED KICKOFF (his calls 2026-10-07). Two games at the same
+   minute used to be ordered by network alone -- FOX, CBS, NBC, ABC, then the
+   rest -- and he wanted two things changed.
+
+   FOOTBALL is a hierarchy of importance: "Marquee Spot > FOX/CBS/NBC >
+   ABC/ESPN". Marquee was never consulted, so a plain FOX game led a marquee
+   CBS or NBC one in twenty slots. It leads now.
+
+   BASKETBALL takes his own order instead: PEACOCK leads ESPN on a Tuesday
+   (December Tuesdays included -- the one piece of ordering that reaches before
+   January), and FOX leads ESPN on a Saturday night.
+
+   ...and then the SANDWICH. Where one of the clashing networks ALSO has the
+   game immediately before or after, the two on that network sit together: its
+   game leads the group when the neighbour came first, and closes the group
+   when the neighbour comes next. 1/16/24 is the case he caught it on --
+   ESPN 7, Peacock 7, ESPN 9, with the Peacock game splitting the two ESPN
+   ones. The rule only speaks when EXACTLY ONE of the clashing networks has
+   that neighbour; where both do, or neither, the order above decides. (In
+   five seasons the before- and after-neighbours never pulled different ways.)
+
+   Basketball only. Football's clashes are one-off collisions between
+   networks rather than runs on one channel, and applying it there demoted a
+   window-labelled game below an unlabelled one in thirty-odd slots -- the
+   opposite of the hierarchy he asked for. */
+function tieOrder(list) {
+  const out = new Map();
+  const netOf = g => primaryNet(g.nets);
+  const pri = g => {
+    const p = NET_PRIORITY[g.sport] || [];
+    const i = p.indexOf(netOf(g));
+    return i < 0 ? 99 : i;
+  };
+  const base = g => {
+    if (g.sport === "CFB") return (g.mq ? 0 : 1) * 100 + pri(g);
+    const n = netOf(g);
+    if (g.dow === "Tue" && (n === "Peacock" || n === "ESPN"))
+      return n === "Peacock" ? 0 : 1;
+    if (g.dow === "Sat" && g.time >= "18:00" && (n === "FOX" || n === "ESPN"))
+      return n === "FOX" ? 0 : 1;
+    return pri(g);
+  };
+  list.forEach(g => out.set(g, 10000 + base(g)));
+  // the sandwich, one day at a time
+  const byDay = new Map();
+  list.forEach(g => {
+    if (g.sport !== "CBB" || !g.time || g.time === "TBD") return;
+    const k = g.date;
+    if (!byDay.has(k)) byDay.set(k, []);
+    byDay.get(k).push(g);
+  });
+  byDay.forEach(gs => {
+    gs = gs.slice().sort((a, b) => a.time.localeCompare(b.time));
+    const times = [];
+    gs.forEach(g => {
+      if (!times.length || times[times.length - 1].t !== g.time)
+        times.push({ t: g.time, games: [] });
+      times[times.length - 1].games.push(g);
+    });
+    times.forEach((slot, i) => {
+      const grp = slot.games;
+      if (grp.length < 2) return;
+      const nets = Array.from(new Set(grp.map(netOf)));
+      if (nets.length < 2) return;
+      const at = j => (j >= 0 && j < times.length)
+        ? new Set(times[j].games.map(netOf)) : new Set();
+      const sole = near => {
+        const hit = nets.filter(n => near.has(n));
+        return hit.length === 1 ? hit[0] : null;
+      };
+      const lead = sole(at(i - 1));
+      const close = lead ? null : sole(at(i + 1));
+      if (!lead && !close) return;
+      grp.forEach(g => {
+        const n = netOf(g);
+        const shift = lead ? (n === lead ? -10000 : 0)
+                           : (n === close ? 10000 : 0);
+        out.set(g, out.get(g) + shift);
+      });
+    });
+  });
+  return out;
+}
+
 function visible() {
   let list = GAMES.filter(g => !isHidden(g.id));
   // games added by hand live only in tags.json, so fold them back in
@@ -2625,12 +2709,9 @@ function visible() {
     list = list.filter(g => confsIn(g).indexOf(want) > -1);
   } else if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
-  // Same kickoff minute: the bigger network leads (his order).
-  const rank = g => {
-    const pri = NET_PRIORITY[g.sport] || [];
-    const i = pri.indexOf(primaryNet(g.nets));
-    return i < 0 ? 99 : i;
-  };
+  // Same kickoff minute: his tiebreak -- see tieOrder.
+  const tieScore = tieOrder(list);
+  const rank = g => tieScore.get(g) || 0;
   // Newest First walks the BLOCKS backwards but reads each one forwards --
   // week 14, then 13, then 12, and inside a week the Thursday game first.
   // A football block is its week; basketball has none, so its block is the
