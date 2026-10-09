@@ -98,6 +98,12 @@ OVERRIDES = {
     # ESPN offers Georgia Tech only old gold and WHITE, neither usable, so this
     # is the school's real navy rather than an ESPN value.
     "59": ("003057", "Georgia Tech: Tech navy; ESPN's only alternative is white"),
+    # The last two hockey schools ESPN has nothing for, taken off their own
+    # athletics sites rather than guessed (2026-10-09). sports-daily lightens
+    # the Augustana navy for its stripe, where this one would be the page's own
+    # background; a wash wants the dark original.
+    "1": ("00583d", "Alaska Anchorage: Seawolf green"),
+    "2043": ("081e3f", "Augustana (SD): Viking navy"),
     # PRO TEAMS in their other colour (his calls 2026-09-21) -- each is ESPN's
     # own alternateColor for the team
     "mlb-5": ("e31937", "Guardians: red, not the navy"),
