@@ -57,10 +57,13 @@ h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
 /* THE SEASON LINE STACKS ON A PHONE (his calls 2026-09-29, 2026-09-30): one
    part a line, the bars that separated them gone with the single line, and
    the RECORDS dropped -- they were what pushed the line over its width and
-   the title onto a second row. The title never wraps now either. */
+   the title onto a second row. The title never wraps now either.
+   The SEEDS go with the records (his call 2026-10-12): .sseed wraps the whole
+   parenthetical with .srec inside it, so this one rule drops both and the
+   rounds and names stay. */
 @media (max-width:700px){
   .count .spart{display:block}
-  .count .ssep,.count .srec{display:none}
+  .count .ssep,.count .srec,.count .sseed{display:none}
 }
 h1{white-space:nowrap}
 .count .srole{opacity:.72}

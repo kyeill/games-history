@@ -633,6 +633,18 @@ reaching to the end of the season put 74 of them on the tab at once. The fix
 calls `rules.cbb_header_suffix` with the same arguments the archive uses,
 including `espn_saturday_ids` computed over the upcoming events.
 
+**THE SEASON LINE DROPS ITS SEEDS ON A PHONE** (his call 2026-10-12), after
+the records (2026-09-30). With the record already gone a seed is a lone
+parenthetical that buys the width nothing: "NCAA Sweet Sixteen (No. 4)" says
+no more than "NCAA Sweet Sixteen". `.sseed` wraps the WHOLE parenthetical with
+`.srec` INSIDE it, so one rule under 700px drops both and the rounds, names
+and conference finishes all stay. Two places write a seed into that line --
+`rec()` for the finish and the conference-tournament block for "BTT CHAMPIONS
+(No. 3)" / "ECACT CHAMPIONS (No. 2)" -- and the second escaped its head and
+seed together, so that call had to become `esc(bttHead) + seed` before the
+markup would survive. The seed CHIP on a card is untouched; this is the
+header line only.
+
 **BLACK FRIDAY NAMES ITS WEEK AND NOTHING ELSE** (his call 2026-10-12: "for
 CFB FOX games on Black Friday, don't put FOX FRIDAY in the header but just
 WEEK # (FRI)"). The Friday after Thanksgiving is its own occasion, not the FOX

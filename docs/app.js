@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261012-162939";
+const BUILD = "20261012-190145";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -238,10 +238,16 @@ function stageLabel(g) {
 /* THE RECORD IS THE FIRST THING A PHONE GIVES UP (his call 2026-09-30):
    the line bled over its two lines and pushed the title onto a second one.
    Each record is wrapped so the stylesheet can drop it under 700px, seeds
-   and rounds and names all staying. */
+   and rounds and names all staying.
+   ...AND THE SEED GOES WITH IT (his call 2026-10-12). With the record gone a
+   seed is a lone parenthetical that buys a phone nothing -- "NCAA Sweet
+   Sixteen (No. 4)" says no more than "NCAA Sweet Sixteen". The whole
+   parenthetical is wrapped, record inside seed, so one rule drops both and
+   the rounds and names still stay. */
 function rec(seed, record) {
   return seed != null
-    ? " (No. " + seed + '<span class="srec">, ' + record + "</span>)"
+    ? '<span class="sseed"> (No. ' + seed + '<span class="srec">, ' + record +
+      "</span>)</span>"
     : '<span class="srec"> (' + record + ")</span>";
 }
 // a piece of the season line that celebrates something (2026-09-29)
@@ -487,7 +493,9 @@ function seasonLine() {
     const btt = seasonRound(games, cupName);
     if (btt) {
       const round = tail(btt.game).replace(/^Championship$/, "Final");
-      const seed = btt.seed != null ? " (No. " + btt.seed + ")" : "";
+      // the tournament seed drops on a phone like the one above it
+      const seed = btt.seed != null
+        ? '<span class="sseed"> (No. ' + btt.seed + ")</span>" : "";
       const bttHead = btt.won && round === "Final" ? cupShort + " CHAMPIONS"
         : cupShort + " " + (round === "Final" ? "FINAL" : round);
       void 0;
@@ -495,7 +503,7 @@ function seasonLine() {
       parts.push(/CHAMPIONS/.test(bttHead)
         ? win(cornell ? "#c0053c" : "#0088ce", bttHead + seed, true)
         : round === "Final" ? win("#ffcb05", bttHead + seed)
-        : esc(bttHead + seed));
+        : esc(bttHead) + seed);
     }
   }
   // EACH PART ON ITS OWN LINE ON A PHONE (his call 2026-09-29): the bars
