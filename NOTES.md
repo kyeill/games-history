@@ -624,6 +624,22 @@ unknowable before kickoff, but CHECK against the archive branch before assuming
 so -- the two `keep.append` calls should be read side by side whenever a field
 is added.
 
+`header` was the FOURTH (his catch 2026-10-12: "shouldn't a lot of the CBB
+games you just add have different headers? FOX PRIMETIME, etc"). The upcoming
+branch read `head_txt if code == "CFB" else None`, so basketball got no label
+at all and every upcoming game read as a bare weekday. It had never shown,
+because the window was one week and the basketball season had not started;
+reaching to the end of the season put 74 of them on the tab at once. The fix
+calls `rules.cbb_header_suffix` with the same arguments the archive uses,
+including `espn_saturday_ids` computed over the upcoming events.
+
+**30 of those 74 are still bare, and that is his rule, not a miss.**
+`cbb_header_suffix` labels January to March only, plus a December game with
+Big Ten teams on BOTH sides ("December Saturday"). So a November FOX Saturday
+night game -- Michigan at Villanova, 21 November 2026, 7pm -- carries a window
+and no label. Worth revisiting now that November and December are weeks in the
+dropdown rather than games nobody saw.
+
 **AND EVERY VIEW FILTER HAS TO STEP AROUND AN UNPLAYED GAME TOO.**
 `bigViewAllows` drops any game Michigan did not win, which silently excluded
 every upcoming Michigan game from Key Games until it learned about `upcoming`

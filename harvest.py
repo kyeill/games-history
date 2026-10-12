@@ -4259,6 +4259,15 @@ def harvest():
         # has a network, so running it over a week two months out would stand
         # a game up on the strength of a half-announced slate and swap it for
         # another tomorrow. A real window out there speaks for itself.
+        # ...AND BASKETBALL'S CARD LABEL IS WORKED OUT HERE TOO (his catch
+        # 2026-10-12: "shouldn't a lot of the CBB games you just add have
+        # different headers? FOX PRIMETIME, etc"). `header` was hardcoded None
+        # for basketball on this path, so every upcoming game read as a bare
+        # weekday. It never showed before because the window was one week and
+        # the season had not started; reaching ahead put 74 of them on the tab
+        # at once. This is the fourth field the two paths had to be read side
+        # by side to catch -- see the warning above.
+        up_espn_sat = espn_saturday_ids(up_evs) if code == "CBB" else set()
         up_cover = set()
         if code == "CFB":
             week_evs = [x for x in up_evs if in_window(x, start, end)]
@@ -4404,7 +4413,13 @@ def harvest():
                 "header": ((rules.cfb_header(sorted(slots), d, season=y, week=wk,
                                             nets=nets)
                             or (rules.SEC_ON_CBS["label"] if sec_cbs else None))
-                           if code == "CFB" else None),
+                           if code == "CFB" else
+                           rules.cbb_header_suffix(
+                               nets, d, tourney=tourney,
+                               big_ten=(bt_code in confs),
+                               espn_sat=x["id"] in up_espn_sat,
+                               both_big_ten=all(q == bt_code for q in confs),
+                               ranked=ranked)),
                 "venue": v.get("fullName"),
                 "city": rules.display_city((v.get("address") or {}).get("city"),
                                            v.get("fullName")),
