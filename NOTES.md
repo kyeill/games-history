@@ -708,6 +708,16 @@ Reaching to the end of the season walks about 6,000 basketball games to find
 apiece for teams that never appear. The rows are collected locally and merged
 only once the game survives every test.
 
+**THE EXCLUSION HE REMEMBERED WAS IN app.js, NOT THE HARVEST.** `visible()`
+dropped any upcoming game past the coming Sunday from BOTH TV Windows and Key
+Games (his call 2026-09-18), which is why widening the harvest alone changed
+nothing on the page -- 81 football games in the file, 67 on the tab, weeks 9
+to 14 missing. The clamp came off TV Windows on 2026-10-12, because Current is
+the default now and holds the tab to this week by itself; the season ahead is
+behind the button rather than in front of it. **Key Games keeps the clamp**:
+what it shows of an unplayed game is Michigan's own schedule, and a list of
+fixtures out to December is not what that tab is for.
+
 **And CURRENT'S FALLBACK HAD TO LEARN TO LOOK BACKWARDS.** When this calendar
 week holds nothing -- basketball in September -- Current falls back to "the
 latest week there is". With the season now loaded ahead, that meant the

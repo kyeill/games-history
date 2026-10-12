@@ -2666,10 +2666,15 @@ function visible() {
   else if (FILT.net) {
     list = list.filter(g => !g.stage && primaryNet(g.nets) === FILT.net);
   }
-  // TV WINDOWS AND KEY GAMES look only as far as the coming Sunday (his call
-  // 2026-09-18) -- the Michigan views load the whole season ahead, but these
-  // two lists stop at the end of this week
-  if (VIEW === "tv" || VIEW === "big") {
+  // KEY GAMES looks only as far as the coming Sunday (his call 2026-09-18).
+  // TV WINDOWS used to stop here too, and that is the rule he remembered
+  // having asked for; it came off on 2026-10-12, now that CURRENT is the
+  // default and holds the tab to this week by itself. The season ahead is
+  // behind the button rather than in front of it.
+  // Key Games keeps the clamp: what it shows of an unplayed game is Michigan's
+  // own schedule, and a list of fixtures out to December is not what that tab
+  // is for.
+  if (VIEW === "big") {
     const end = weekEnd();
     list = list.filter(g => !upcoming(g) || g.date <= end);
   }
