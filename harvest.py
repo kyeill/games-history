@@ -4321,6 +4321,14 @@ def harvest():
                              "seed": None})
             if len(side) != 2:
                 continue
+            # A MATCH-UP THAT DOES NOT EXIST YET IS NOT A GAME (2026-10-12).
+            # ESPN parks the conference championships on the calendar with two
+            # placeholder teams, id -1 and -2, both called TBD, so reaching to
+            # the end of the regular season brought back four "TBD at TBD"
+            # cards in Week 14. Inside the coming week this cannot arise --
+            # by December the teams are known -- so the test is `far` only.
+            if far and any(str(q["id"]).startswith("-") for q in side):
+                continue
             mich = any(s["id"] == rules.MICHIGAN for s in side)
             heads = [n.get("headline") or "" for n in (c.get("notes") or [])]
             wk = (x.get("week") or {}).get("number")
