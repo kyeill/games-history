@@ -2959,6 +2959,31 @@ def upcoming_window(today=None):
     return today, today + dt.timedelta(days=(6 - today.weekday()) % 7)
 
 
+def in_window(ev, start, end):
+    """Is a scoreboard event inside the coming-week window, in Eastern time?"""
+    try:
+        d = (dt.datetime.strptime(ev["date"], "%Y-%m-%dT%H:%MZ")
+             .replace(tzinfo=dt.timezone.utc).astimezone(ET)).date()
+    except (KeyError, TypeError, ValueError):
+        return False
+    return start <= d <= end
+
+
+def season_reach(code, today):
+    """HOW FAR AHEAD TV WINDOWS LOOKS for a game that already has a window
+    (his call 2026-10-12). The coming-Sunday window above is what loads a week
+    WHOLE -- Michigan included, window or not. This reaches past it to the end
+    of the REGULAR season, and only a game that already meets the TV Windows
+    criteria comes back, so the tab fills in as the networks announce.
+
+    The postseason is deliberately out of reach: the upcoming path cannot set
+    `stage`, and a bowl or an NCAA Tournament game without one would be filed
+    as an ordinary broadcast. Those arrive through the coming-week window,
+    which is near enough to kickoff for the archive to have them right."""
+    y = upcoming_season(code, today)
+    return dt.date(y, 12, 15) if code == "CFB" else dt.date(y + 1, 3, 15)
+
+
 def upcoming_season(code, d):
     """Which SEASON a date belongs to. Football is one calendar year from
     August; basketball straddles two, so January to June belongs to the year
@@ -4218,15 +4243,26 @@ def harvest():
         y = upcoming_season(code, start)
         if y not in rules.MICHIGAN_SEASONS.get(code, ()) and y not in SEASONS:
             continue
-        up_evs = upcoming_events(code, start, end)
+        reach = max(end, season_reach(code, start))
+        up_evs = upcoming_events(code, start, reach)
+        # MICHIGAN'S OWN REMAINING GAMES KEEP THEIR FREE PASS whether they came
+        # back from the scoreboard or the team schedule, so `later_ids` is the
+        # whole set and the dedup only decides what to APPEND. Reading the
+        # scoreboard first and subtracting it would have quietly demoted every
+        # Michigan game past this week to "needs a TV window".
+        later_full = michigan_rest_of_season(code, y, end)
+        later_ids = {x["id"] for x in later_full if x.get("id")}
         seen_up = {x.get("id") for x in up_evs}
-        later = [x for x in michigan_rest_of_season(code, y, end) if x.get("id") not in seen_up]
-        later_ids = {x["id"] for x in later}
-        up_evs = up_evs + later
-        # the coming week is covered like any other (his call 2026-09-14)
+        up_evs = up_evs + [x for x in later_full if x.get("id") not in seen_up]
+        # the coming week is covered like any other (his call 2026-09-14) --
+        # and ONLY the coming week. A conference cover is picked from whatever
+        # has a network, so running it over a week two months out would stand
+        # a game up on the strength of a half-announced slate and swap it for
+        # another tomorrow. A real window out there speaks for itself.
         up_cover = set()
         if code == "CFB":
-            picks = cover_ids(up_evs, y, set(), net_overrides)
+            week_evs = [x for x in up_evs if in_window(x, start, end)]
+            picks = cover_ids(week_evs, y, set(), net_overrides)
             up_cover = set(picks)
             cover_slot.update({g: (y,) + q for g, q in picks.items()})
         for x in up_evs:
@@ -4247,21 +4283,34 @@ def harvest():
                      .replace(tzinfo=dt.timezone.utc).astimezone(ET))
             except (KeyError, ValueError):
                 continue
-            if not (start <= d.date() <= end) and x["id"] not in later_ids:
+            # THREE KINDS OF GAME REACH THIS LOOP and they are admitted on
+            # different terms: one inside the coming week, one of Michigan's
+            # own further out, and -- since 2026-10-12 -- one further out that
+            # already has a TV window of its own.
+            far = not (start <= d.date() <= end) and x["id"] not in later_ids
+            if far and not (end < d.date() <= reach):
                 continue
+            if far and (x.get("season") or {}).get("type") != 2:
+                continue          # see season_reach: no stage, so no postseason
             nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
-            side = []
+            side, side_teams = [], {}
             for k in cs:
                 t = k.get("team") or {}
                 if not t.get("id"):
                     break
                 r = (k.get("curatedRank") or {}).get("current")
-                teams.setdefault(t["id"], {
+                # HELD BACK UNTIL THE GAME IS ACTUALLY KEPT (2026-10-12).
+                # Registering here used to be free, because the window was one
+                # week and nearly everything in it was admitted. Reaching to
+                # the end of the season walks ~6,000 basketball games to find
+                # ~90, and writing a team on sight took `teams` from 378 to
+                # 889 -- a crest apiece, for teams that never appear.
+                side_teams[t["id"]] = {
                     "name": t.get("displayName"),
                     "short": rules.display_name(
                         t.get("location") or t.get("displayName") or t["id"]),
                     "abbr": t.get("abbreviation"),
-                    "color": t.get("color"), "alt": t.get("alternateColor")})
+                    "color": t.get("color"), "alt": t.get("alternateColor")}
                 side.append({"id": t["id"], "score": None,
                              "rank": r if r and r != 99 else None,
                              "win": False, "home": k.get("homeAway") == "home",
@@ -4300,7 +4349,13 @@ def harvest():
                        for dd in (d.date().isoformat(),
                                   (d.date() - dt.timedelta(days=1)).isoformat(),
                                   (d.date() + dt.timedelta(days=1)).isoformat()))
-            if (not slots and not mich and not show and not standin
+            if far:
+                # out past the coming week a game has to earn its own place:
+                # no Michigan free pass (his schedule is loaded whole either
+                # way) and no conference cover
+                if not (slots or show or standin):
+                    continue
+            elif (not slots and not mich and not show and not standin
                     and x["id"] not in up_cover):
                 continue          # nothing to show it under on TV Windows
             # MARQUEE, worked out the same way the archive does it -- this was
@@ -4318,10 +4373,15 @@ def harvest():
             # return an upset label -- "anyone beats #1" needs the loser to be
             # #1 -- so an upcoming game is never announced as an upset, and the
             # daily rebuild re-files it properly once it has been played.
+            # ...and NOT out past the coming week (2026-10-12). Today's poll
+            # is a poor guess at December's, so a game reached for its TV
+            # window does not get to announce itself on Key Games as well.
             ranks = sorted(s["rank"] for s in side if s["rank"])
             gtype = (rules.game_type(code, ranks[0], ranks[1],
                                      has_big_ten=(bt_code in confs))
-                     if len(ranks) == 2 else None)
+                     if len(ranks) == 2 and not far else None)
+            for tid, row in side_teams.items():
+                teams.setdefault(tid, row)
             v = c.get("venue") or {}
             keep.append({
                 "id": x["id"], "sport": code, "season": y,
@@ -4355,7 +4415,8 @@ def harvest():
                 keep[-1].pop("mx", None)
                 keep[-1].pop("michigan", None)
             added += 1
-    print("  %d upcoming games (%s to %s)" % (added, start, end))
+    print("  %d upcoming games (%s to %s, windows to end of regular season)"
+          % (added, start, end))
 
     # COLLEGE HOCKEY, team by team (2026-09-16)
     hk, hk_miss = hockey_games(rules.MICHIGAN, sorted(rules.MICHIGAN_SEASONS["CHK"]),

@@ -2180,6 +2180,12 @@ function weekStart() {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
     String(d.getDate()).padStart(2, "0");
 }
+// today, as YYYY-MM-DD
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
 // today through the coming Sunday (today itself on a Sunday), as YYYY-MM-DD
 function weekEnd() {
   const d = new Date();
@@ -2625,12 +2631,20 @@ function visible() {
   if (thisWeek.length) {
     list = thisWeek;
   } else if (VIEW === "tv" && FILT.current && list.length) {
+    // ...and THE FALLBACK LOOKS BACKWARDS, NEVER FORWARDS (2026-10-12). Since
+    // TV Windows started carrying games out to the end of the regular season,
+    // "the latest week there is" would otherwise mean the furthest FUTURE one
+    // -- basketball in September would open on March. Only once there is
+    // nothing behind us at all does the whole list stand in.
+    const today = todayISO();
+    const back = list.filter(g => g.date <= today);
+    const pool = back.length ? back : list;
     if (SPORT_OF[TAB] === "CFB") {
       const key = g => g.week == null ? -1 : g.season * 100 + g.week;
-      const top = Math.max.apply(null, list.map(key));
+      const top = Math.max.apply(null, pool.map(key));
       list = list.filter(g => key(g) === top);
     } else {
-      const last = list.map(g => g.date).sort().pop();
+      const last = pool.map(g => g.date).sort().pop();
       const d = new Date(last + "T12:00:00Z");
       const mon = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5)
         .toISOString().slice(0, 10);

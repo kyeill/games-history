@@ -672,6 +672,49 @@ is playing: TV Windows has nothing to file it under. On a Saturday in
 September that is most of the slate -- 34 of 36 unfinished games were ESPN+,
 MW+ or similar.
 
+**TV WINDOWS NOW REACHES PAST THE COMING WEEK, to the end of the REGULAR
+season** (his call 2026-10-12). The coming-Sunday window is still what loads a
+week WHOLE -- every Michigan game, window or not, plus the conference covers.
+Past it, `season_reach` fetches to 15 December (football) or 15 March
+(basketball) and a game is admitted only if it already meets the TV Windows
+criteria on its own: a slot, a show, or a stand-in. Three things are
+deliberately NOT extended with it:
+
+* **The Michigan free pass**, because `michigan_rest_of_season` already loads
+  his whole remaining schedule. The trap here is that the scoreboard now
+  returns those same games, so subtracting them from the team-schedule list --
+  which is what the old dedup did -- would have demoted every Michigan game
+  past this week to "needs a TV window". `later_ids` is therefore built from
+  the team schedule in full, and the dedup only decides what to APPEND.
+* **The conference cover**, because a cover is picked from whatever has a
+  network. Two months out that is 15 games in 70, so the pick would stand a
+  game up on a half-announced slate and swap it for another the next morning.
+  A real window out there speaks for itself.
+* **The Key Games type**, because today's poll is a poor guess at December's.
+  A game reached for its TV window does not get to announce itself as a Top 10
+  matchup as well.
+
+**The postseason is out of reach too**: the upcoming path cannot set `stage`,
+so a bowl or an NCAA Tournament game fetched this far ahead would be filed as
+an ordinary broadcast. Those still arrive through the coming-week window,
+which is near enough to kickoff for the archive to have them right. The gate
+is `season.type == 2`.
+
+**A CANDIDATE IS NOT A GAME, and `teams` must not be written until one is
+kept.** Registering a team the moment its competitor row was read used to be
+free: the window was a single week and nearly everything in it was admitted.
+Reaching to the end of the season walks about 6,000 basketball games to find
+90, so writing on sight took `teams` from 378 to 889 and shipped a crest
+apiece for teams that never appear. The rows are collected locally and merged
+only once the game survives every test.
+
+**And CURRENT'S FALLBACK HAD TO LEARN TO LOOK BACKWARDS.** When this calendar
+week holds nothing -- basketball in September -- Current falls back to "the
+latest week there is". With the season now loaded ahead, that meant the
+furthest FUTURE week, so the tab would have opened on March. The fallback
+picks from games on or before today, and only uses the whole list when there
+is nothing behind us at all.
+
 **The cloud build lives or dies on cache/.** Finished seasons are written there
 and never re-fetched (`season_over`), so with the Actions cache restored a
 daily run pulls only the current season and the upcoming week. Without it every
