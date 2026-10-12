@@ -447,6 +447,17 @@ def cfb_header(slots, d, forced=False, season=None, week=None, nets=()):
     window-overrides.json -- the Clemson-LSU weather delay is recorded at its
     9:40pm restart but was scheduled in primetime.
     """
+    # BLACK FRIDAY NAMES ITS WEEK AND NOTHING ELSE (his call 2026-10-12:
+    # "for CFB FOX games on Black Friday, don't put FOX FRIDAY in the header
+    # but just WEEK # (FRI)"). The Friday after Thanksgiving is its own
+    # occasion, not the FOX Friday package -- the same reasoning that keeps
+    # Week 1's Friday game out of it, see cfb_opener. The WINDOW stands, so
+    # the game still files and filters under FOX Friday; it is the label that
+    # goes, exactly as an ABC Saturday game outside primetime carries none.
+    # FOX Friday is the only window that can fire on a Friday, so in practice
+    # this is the FOX games he named.
+    if is_black_friday(d):
+        return None
     named = [w for w in CFB_WINDOWS if w in slots and w != "ABC Saturday"]
     if named:
         s = SEC_ON_CBS

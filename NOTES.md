@@ -633,6 +633,21 @@ reaching to the end of the season put 74 of them on the tab at once. The fix
 calls `rules.cbb_header_suffix` with the same arguments the archive uses,
 including `espn_saturday_ids` computed over the upcoming events.
 
+**BLACK FRIDAY NAMES ITS WEEK AND NOTHING ELSE** (his call 2026-10-12: "for
+CFB FOX games on Black Friday, don't put FOX FRIDAY in the header but just
+WEEK # (FRI)"). The Friday after Thanksgiving is its own occasion, not the FOX
+Friday package -- the same reasoning that keeps Week 1's Friday game out of it.
+`cfb_header` returns None on that date, so the card falls through to its week
+and weekday. **The WINDOW stands**: the game still files and filters under FOX
+Friday, exactly as an ABC Saturday game outside primetime keeps its window and
+carries no label. THREE games change, not the one he was looking at: Central
+Florida at Utah (2024) and Arizona at Arizona State (2025) were already reading
+"FOX FRIDAY" in the archive, and Utah at West Virginia (27 November 2026) is
+the one the season-ahead reach put in front of him. None of the three is
+`bfri` -- that flag needs a Big Ten team on a FOX game -- so looking only at
+Black Friday games the flag had caught would have missed all three. The date
+is the test, not the flag.
+
 **30 of those 74 are still bare, and that is his rule, not a miss.**
 `cbb_header_suffix` labels January to March only, plus a December game with
 Big Ten teams on BOTH sides ("December Saturday"). So a November FOX Saturday
@@ -1008,6 +1023,15 @@ date simply leads.
     HKY   11/7/2025 | FRIDAY 7:00PM
     HKY   OCTOBER 2019 | FRI 7:30PM | SAT 7:30PM
     MTE   PUERTO RICO TIP-OFF | FINAL  ->  footer: DATE then NET TIME
+
+A HOCKEY MTE names its place in that footer too, and since 2026-10-12 the date
+leads it: `12/29/2009 | Estero`, not `Estero | 12/29/2009`. It was the last
+footer reading place-first, and his instruction was "make Cornell hockey match
+Michigan hockey" -- Michigan's own hockey MTE, the Ice Breaker, is excluded
+from the place line by name and so already led with the date. Two Cornell
+hockey differences were left alone because neither is about this ordering: the
+Ice Breaker's suppressed place, and Cornell showing a network without a time
+(his call 2026-09-17).
     post  2023 CFP SEMIFINALS | ROSE BOWL  ->  footer: MON DATE then ESPN 5:00PM
 
 The postseason card already read that way and is untouched; the window label

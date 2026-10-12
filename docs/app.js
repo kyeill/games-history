@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261012-160109";
+const BUILD = "20261012-162939";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1392,14 +1392,18 @@ function michCard(g, p) {
   } else if (mteCard) {
     // the location has gone up into the header (2026-09-14), so this row holds
     // the network, the time and the date, and has room to spell them out
-    // ...except a HOCKEY MTE whose header carries no place: Cornell's Florida
-    // College Classic and the rest name it here, first (his call 2026-09-16)
+    // the DATE now leads the TV details here too (his call 2026-10-07), as it
+    // already did on a postseason card
+    // ...AND IT LEADS THE PLACE AS WELL (his call 2026-10-12, "make Cornell
+    // hockey match Michigan hockey"). A hockey MTE whose header carries no
+    // place names it here instead -- Cornell's Florida College Classic and
+    // the rest (his call 2026-09-16) -- and that used to put the venue in
+    // front of the date, the one footer left reading place-first. Michigan's
+    // own hockey MTE leads with the date, so Cornell's does now too.
+    bit(dateText);
     if (g.sport === "CHK" && place &&
         !["Ice Breaker"].some(e =>
           (g.event || "").toLowerCase().indexOf(e.toLowerCase()) > -1)) bit(place);
-    // the DATE now leads the TV details here too (his call 2026-10-07), as it
-    // already did on a postseason card
-    bit(dateText);
     // ...and Cornell's shows no time (his call 2026-09-17), only a network
     if (fid === CORNELL && g.sport === "CHK") bit(netTxt);
     else bit(tvTxt, netTxt, false, 4);
