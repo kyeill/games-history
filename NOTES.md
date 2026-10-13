@@ -686,6 +686,21 @@ renamed ("NFC Wild Card" to "Wild Card Round") and basketball's two
 tab being Eastern; a Western one would have to read it off the game. Baseball
 and hockey already read the way he says them.
 
+**ONE HELPER FOR BOTH, because the first build had them disagree.** "Conference"
+becomes "Eastern" and "Semifinals" becomes "Semis" on the basketball tabs (his
+calls 2026-10-12) -- and the first attempt changed only the SEASON LINE, so a
+Pistons 2005-06 headed "Eastern Finals" sat above six cards reading "2006
+CONFERENCE FINALS". Both now read through `nbaRound`. Note that `stageLabel`
+expands "Semis" to "Semifinals" for everyone else (his call 2026-09-14, with a
+`data-short` back to "Semis" when the header is cramped); the NBA replace runs
+AFTER it, and is a no-op on a stage ESPN already spells out.
+
+**ESPN NAMES NO DIVISIONS FOR THE OLDER HOCKEY SEASONS**, only the
+conferences, so the Red Wings come back "Western Conference" before 2013-14.
+That reads as plain "Western" (his call 2026-10-12) -- " Conference" is
+stripped alongside " Division". The 16 rows already cached were migrated in
+place rather than refetched.
+
 **A PHONE DROPS THE SEED AND THE RECORD OUT OF THE MIDDLE of that
 parenthetical**, and comma surgery on what is left reads badly -- "(, AL
 Central, )". So it is written out TWICE, `.sfull` and `.sshort`, and the

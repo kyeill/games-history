@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261012-205829";
+const BUILD = "20261012-212432";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -211,6 +211,15 @@ function fmtDate(d) {
 function stageYear(g) {
   return (g.sport === "CFB" ? g.season : g.season + 1) + " ";
 }
+/* BASKETBALL'S PLAYOFF ROUNDS, HIS WAY (his calls 2026-10-12): the two
+   "Conference" rounds name the conference, which for the Pistons and the
+   Cavaliers is the Eastern, and Semifinals shortens to Semis. BOTH the cards
+   and the season line read through here -- the first build changed only the
+   line, so a Pistons season headed "Eastern Finals" sat above six cards
+   reading "2006 CONFERENCE FINALS". */
+function nbaRound(s) {
+  return s.replace(/^Conference /, "Eastern ").replace("Semifinals", "Semis");
+}
 function stageLabel(g) {
   let s = g.stage || "";
   if (!s) return "";
@@ -223,7 +232,9 @@ function stageLabel(g) {
   if (/(Tournament|Ivy Madness) Championship$/.test(s) && !/^(NCAA|NIT)/.test(s)) {
     s = s.replace(/Championship$/, "Final");
   }
-  return s;
+  // ...and the NBA's own names last, after the generic Semis-to-Semifinals
+  // above has had its say (it is a no-op on a stage already spelled out)
+  return g.sport === "NBA" ? nbaRound(s) : s;
 }
 /* THE SEASON LINE (his call 2026-09-29). With ONE season chosen on a
    Michigan view, the count at the top of the page gives way to how the season
@@ -390,7 +401,7 @@ const PRO_TINT = {
   "nba-5": { deep: "#bc945c" }                    // Cavaliers gold
 };
 function proRound(raw, sport) {
-  if (sport === "NBA") return raw.replace(/^Conference /, "Eastern ");
+  if (sport === "NBA") return nbaRound(raw);
   return PRO_ROUND[raw] || raw;
 }
 /* THE PARENTHETICAL, in his order: seed, division title, record (2026-10-12).

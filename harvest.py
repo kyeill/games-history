@@ -2616,8 +2616,12 @@ def pro_division(code, season, team_id):
         return None
     better = sum(1 for k in keys if k is not None and k > me)
     tied = sum(1 for i, k in enumerate(keys) if i != idx and k == me)
+    # ESPN returns no DIVISIONS at all for the older hockey seasons, only the
+    # conferences, so the Red Wings read "Western Conference" before 2013-14.
+    # He wants that as plain "Western" (2026-10-12).
     out = {"place": better + 1,
-           "group": PRO_DIV_FIX.get(name, name).replace(" Division", ""),
+           "group": (PRO_DIV_FIX.get(name, name)
+                     .replace(" Division", "").replace(" Conference", "")),
            "tied": bool(tied),
            "record": _pro_record(entries[idx])}
     if pro_season_over(code, season):
