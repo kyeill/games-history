@@ -690,7 +690,10 @@ and hockey already read the way he says them.
 becomes "Eastern" and "Semifinals" becomes "Semis" on the basketball tabs (his
 calls 2026-10-12) -- and the first attempt changed only the SEASON LINE, so a
 Pistons 2005-06 headed "Eastern Finals" sat above six cards reading "2006
-CONFERENCE FINALS". Both now read through `nbaRound`. Note that `stageLabel`
+CONFERENCE FINALS". Both now read through `nbaRound` -- and so does a THIRD place found only by
+looking at the cards afterwards: the pro playoff card builds its own header
+off the raw `g.stage`, because `stageHead` runs only for the tournaments in
+`bigStage` and a conference round is not one of them. Note that `stageLabel`
 expands "Semis" to "Semifinals" for everyone else (his call 2026-09-14, with a
 `data-short` back to "Semis" when the header is cramped); the NBA replace runs
 AFTER it, and is a no-op on a stage ESPN already spells out.

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261012-212432";
+const BUILD = "20261012-212648";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1861,13 +1861,18 @@ function michCard(g, p) {
     let head;
     // a baseball season is named for its own year; the others end a year on
     const yr = g.sport === "MLB" ? g.season : g.season + 1;
+    // THE PRO PLAYOFF CARD WRITES ITS OWN HEADER off the raw stage, which is
+    // the third place the NBA's round names had to be taught (2026-10-12):
+    // `stageHead` runs only for the tournaments in `bigStage`, and a
+    // conference round is not one of them.
+    const stg = g.sport === "NBA" ? nbaRound(g.stage || "") : (g.stage || "");
     if (g.stage === "Play-In") {
       head = esc(yr + " Play-In Tournament");
     } else if (g.post) {
-      head = esc(yr + " " + g.stage) + " | Game " + mx.game +
+      head = esc(yr + " " + stg) + " | Game " + mx.game +
         " (" + esc(mx.series || "") + ")";
     } else {
-      head = esc(g.date.slice(0, 4) + " " + g.stage);
+      head = esc(g.date.slice(0, 4) + " " + stg);
     }
     const mySeed = m.seed ? '<span class="mrk2" style="color:' +
       ((PRO_BOX[fid] || {}).seed || "var(--rank)") + '">' + m.seed + "</span>" : "";
