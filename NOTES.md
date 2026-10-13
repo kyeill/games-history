@@ -633,6 +633,64 @@ reaching to the end of the season put 74 of them on the tab at once. The fix
 calls `rules.cbb_header_suffix` with the same arguments the archive uses,
 including `espn_saturday_ids` computed over the upcoming events.
 
+## The Detroit tab's season line
+
+**TWO LINES (his call 2026-10-12): what his team did, then who won the
+league.** The first is the furthest playoff round it reached, or -- where it
+missed the playoffs -- its place in its DIVISION, with the record either way.
+The second names the champion of that season in their own colours.
+
+    Wild Card Round (No. 3, 12-5)        4th NFC North (9-8)
+    Super Bowl: Kansas City              Super Bowl: Philadelphia
+
+**NONE of the first line can be counted from the games**, which is why this
+needed a harvest and not just a template. The app holds 29 Tigers games a
+season, not 162, so the record comes from the standings; a division table is
+not a thing a schedule knows; and the champion is almost never a Detroit game
+at all. `pro_division` and `pro_champ` write `data/pro-place.json` and
+`data/pro-champs.json`, and nothing is cached until `pro_season_over`, so a
+running season is asked again every day.
+
+**ESPN DOES NOT ORDER A STANDINGS TABLE, whatever one season suggests.** The
+2023 NFC North came back in order and the first build read the place straight
+off the row. The 2024 one comes back Minnesota, Green Bay, Chicago, Detroit --
+and the Lions went 15-2 and won it, so the tab said "4th NFC North (15-2)".
+The place is COUNTED now, as the college table always did it: hockey orders on
+POINTS (ESPN gives it no `winPercent` at all), everything else on win
+percentage.
+
+**Two name collisions, both caught before they shipped.**
+* `pro_place` was already taken -- it reads a pro team's CITY off its ESPN
+  record -- and defining the division one over it broke the team table before
+  the first fetch. The new one is `pro_division`.
+* A pro team must be keyed BY LEAGUE in `teams`. ESPN's bare "12" is the
+  Kansas City Chiefs here and the Arizona Wildcats in the college tables, so
+  registering a champion under the raw id would have painted a Super Bowl
+  winner in Arizona's red. The key is `nfl-12`, as the game rows already use.
+
+**Three more traps worth naming.** `level=3` is what returns DIVISIONS; the
+default standings call gives conferences, so the NFL comes back as two tables
+of sixteen. ESPN dates a winter season by the year it ENDS, so the NBA and NHL
+ask for `season + 1` -- the fifth caller to meet this, after the college
+standings, the final polls twice and `conf_map`. And the NBA CUP is played in
+November and carries a stage like any knockout, so "the furthest round" would
+have been a group game in every year the Pistons entered one; it is excluded
+by name.
+
+**The record is spelled per league.** ESPN gives basketball no `overall` at
+all, so it is built from wins and losses, and hockey appends the points to it
+("41-32-9, 91 PTS"), so everything from the comma on is cut.
+
+**CORNELL'S IVY LINE** (his calls 2026-10-12). The six Ivies play each other
+inside the ECAC and only Cornell's own games are in this app, so an Ivy title
+cannot be read off a record the way the ECAC place can -- `rules.IVY_TITLES`
+holds the seasons he won it, as "SPORT-season" with the season being the year
+the campaign STARTED. It ships EMPTY, awaiting his list. A listed season reads
+"IVY CHAMPIONS" in the Ivy's green; any other reads "Ivy" and its record.
+On a phone the plain one DROPS (`.sdrop`), because a bare "Ivy" said nothing
+once its record had gone -- but IVY CHAMPIONS stays, a title not being a
+record.
+
 **THE SEASON LINE DROPS ITS SEEDS ON A PHONE** (his call 2026-10-12), after
 the records (2026-09-30). With the record already gone a seed is a lone
 parenthetical that buys the width nothing: "NCAA Sweet Sixteen (No. 4)" says

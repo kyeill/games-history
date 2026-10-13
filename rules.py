@@ -759,6 +759,14 @@ def cfb_black_friday(nets, d, season, big_ten=False):
     return season >= 2023 and bool(nets & {"CBS", "NBC"})
 
 
+# THE IVY LEAGUE TITLES CORNELL WON (his call 2026-10-12). The six Ivies play
+# each other inside the ECAC and only Cornell's own games are in this app, so
+# a title cannot be read off a record the way the ECAC's place can -- the
+# seasons are his to give. Each entry is "SPORT-season", the season being the
+# year the campaign STARTED: "CHK-2009" is 2009-10.
+IVY_TITLES = []
+
+
 def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):
     """Basketball's windows -- **November through March** (his call
     2026-09-11, widening January-March). Big Monday and Super Tuesday stay

@@ -2479,6 +2479,205 @@ def conf_place(code, season):
     return got
 
 
+# ---------------------------------------------------------------------------
+# THE DETROIT TAB'S SEASON LINE (his call 2026-10-12). Two lines: what his
+# team did -- the furthest playoff round it reached, or where it finished in
+# its DIVISION -- and under it, who won the league that year, in their colours.
+#
+# Neither answer is in the games. The record cannot be counted from them (the
+# app holds 29 Tigers games a year, not 162), a division table is not a thing
+# a schedule knows, and the champion is almost never a Detroit game at all.
+PRO_STANDINGS = {"NFL": "football/nfl", "NBA": "basketball/nba",
+                 "MLB": "baseball/mlb", "NHL": "hockey/nhl"}
+# ESPN DATES A WINTER SEASON BY THE YEAR IT ENDS -- the fifth caller to meet
+# this, after the college standings, the final polls twice and conf_map.
+# Basketball and hockey straddle two years; football and baseball do not.
+PRO_END_YEAR = {"NBA": 1, "NHL": 1, "NFL": 0, "MLB": 0}
+# the deciding game's month, as (years after the season, month). A ranged
+# scoreboard call 400s, but a bare YYYYMM is answered, so each is one request.
+PRO_FINAL_MONTHS = {"NFL": [(1, 2)], "MLB": [(0, 10), (0, 11)],
+                    "NBA": [(1, 6), (1, 7)], "NHL": [(1, 6), (1, 7)]}
+PRO_TROPHY = {"NFL": "Super Bowl", "MLB": "World Series",
+              "NBA": "NBA Finals", "NHL": "Stanley Cup"}
+# his short forms for the divisions ESPN spells out
+PRO_DIV_FIX = {"American League Central": "AL Central",
+               "American League East": "AL East",
+               "American League West": "AL West",
+               "National League Central": "NL Central",
+               "National League East": "NL East",
+               "National League West": "NL West"}
+PRO_PLACE_FILE = os.path.join(HERE, "data", "pro-place.json")
+_PRO_PLACE = (json.load(open(PRO_PLACE_FILE, encoding="utf-8"))
+              if os.path.exists(PRO_PLACE_FILE) else {})
+PRO_CHAMP_FILE = os.path.join(HERE, "data", "pro-champs.json")
+_PRO_CHAMP = (json.load(open(PRO_CHAMP_FILE, encoding="utf-8"))
+              if os.path.exists(PRO_CHAMP_FILE) else {})
+
+
+def _pro_div(node, tid):
+    """The DIVISION table holding a team, as (name, ordered entries). ESPN
+    returns the divisions only at level 3; the default is the conference."""
+    if "standings" in node:
+        for e in node["standings"]["entries"]:
+            if str((e.get("team") or {}).get("id") or "") == tid:
+                return node.get("name") or "", node["standings"]["entries"]
+    for c in node.get("children") or []:
+        got = _pro_div(c, tid)
+        if got:
+            return got
+    return None
+
+
+def _pro_key(entry, code):
+    """What ORDERS a division: points in hockey, win percentage everywhere
+    else. ESPN gives hockey no `winPercent` at all."""
+    st = {x.get("name"): x for x in entry.get("stats") or []}
+    want = "points" if code == "NHL" else "winPercent"
+    v = (st.get(want) or {}).get("value")
+    if v is not None:
+        return float(v)
+    w = (st.get("wins") or {}).get("value")
+    l = (st.get("losses") or {}).get("value")
+    if w is None or l is None:
+        return None
+    n = w + l
+    return (w / n) if n else 0.0
+
+
+def _pro_record(entry):
+    """A team's record as his tab spells it. ESPN gives basketball no
+    `overall` at all, and hockey appends the points to it."""
+    st = {x.get("name"): x.get("displayValue") for x in entry.get("stats") or []}
+    rec = st.get("overall")
+    if rec:
+        return rec.split(",")[0].strip()
+    w, l, t = st.get("wins"), st.get("losses"), st.get("ties")
+    if w is None or l is None:
+        return None
+    return w + "-" + l + ("-" + t if t and t != "0" else "")
+
+
+def pro_season_over(code, season):
+    """Is that season finished? Nothing is written to the cache until it is,
+    so a table read in October is asked again tomorrow."""
+    today = dt.datetime.now(ET).date()
+    end = {"NFL": dt.date(season + 1, 3, 1), "MLB": dt.date(season, 12, 1),
+           "NBA": dt.date(season + 1, 8, 1), "NHL": dt.date(season + 1, 8, 1)}
+    return today >= end[code]
+
+
+def pro_division(code, season, team_id):
+    """Where a Detroit team finished in its DIVISION, and its record.
+
+    NOT `pro_place` -- that name was taken, by the helper that reads a pro
+    team's CITY off its ESPN record, and defining this one over it broke the
+    team table before the first fetch (2026-10-12).
+
+    {"place": 4, "tied": false, "group": "NFC North", "record": "9-8"}
+    """
+    key = "%s-%s-%d" % (code, team_id, season)
+    if key in _PRO_PLACE:
+        return _PRO_PLACE[key]
+    yr = season + PRO_END_YEAR[code]
+    try:
+        r = requests.get("https://site.api.espn.com/apis/v2/sports/%s/standings"
+                         % PRO_STANDINGS[code],
+                         params={"season": yr, "level": 3}, timeout=30)
+        j = r.json() if r.status_code == 200 else {}
+    except (requests.RequestException, ValueError):
+        j = {}
+    got_div = _pro_div(j, team_id) if j else None
+    if not got_div:
+        return None
+    name, entries = got_div
+    idx = next(i for i, e in enumerate(entries)
+               if str((e.get("team") or {}).get("id") or "") == team_id)
+    # ESPN DOES NOT ORDER THE TABLE, whatever 2023 suggested: the 2024 NFC
+    # North comes back Minnesota, Green Bay, Chicago, Detroit, and the Lions
+    # went 15-2 and won it. Reading the place off the row would have filed
+    # them 4th. The place is COUNTED, the way the college table is.
+    keys = [_pro_key(e, code) for e in entries]
+    me = keys[idx]
+    if me is None:
+        return None
+    better = sum(1 for k in keys if k is not None and k > me)
+    tied = sum(1 for i, k in enumerate(keys) if i != idx and k == me)
+    out = {"place": better + 1,
+           "group": PRO_DIV_FIX.get(name, name).replace(" Division", ""),
+           "tied": bool(tied),
+           "record": _pro_record(entries[idx])}
+    if pro_season_over(code, season):
+        _PRO_PLACE[key] = out
+    return out
+
+
+def pro_champ(code, season, teams):
+    """Who won the league that season -- the LAST completed postseason game of
+    the year, and whoever won it. Registers the winner in `teams` so the page
+    can paint it in their own colours."""
+    key = "%s-%d" % (code, season)
+    if key in _PRO_CHAMP:
+        got = _PRO_CHAMP[key]
+        if got and got.get("id"):
+            teams.setdefault(got["id"], got["team"])
+            return got["id"]
+        return None
+    best = None
+    for off, m in PRO_FINAL_MONTHS[code]:
+        try:
+            r = requests.get("https://site.api.espn.com/apis/site/v2/sports/%s/scoreboard"
+                             % PRO_STANDINGS[code],
+                             params={"dates": "%d%02d" % (season + off, m)}, timeout=30)
+            evs = r.json().get("events", []) if r.status_code == 200 else []
+        except (requests.RequestException, ValueError):
+            evs = []
+        for x in evs:
+            comps = x.get("competitions") or []
+            if not comps:
+                continue
+            c = comps[0]
+            if not ((c.get("status") or {}).get("type") or {}).get("completed"):
+                continue
+            if (x.get("season") or {}).get("type") not in (3, 4):
+                continue
+            nm = x.get("name") or ""
+            # the PRO BOWL shares the Super Bowl's month and its season type.
+            # It is played the week before, so "the last game" survives it --
+            # but only while that stays true, and it has not always.
+            if code == "NFL" and ("Pro Bowl" in nm or nm.startswith("NFC ")
+                                  or " at AFC" in nm):
+                continue
+            if best is None or x["date"] > best[0]["date"]:
+                best = (x, c)
+    if not best:
+        return None
+    w = next((k for k in best[1]["competitors"] if k.get("winner")), None)
+    t = (w or {}).get("team") or {}
+    if not t.get("id"):
+        return None
+    # THE PRO TEAMS ARE KEYED BY LEAGUE, and must be: ESPN's bare "12" is the
+    # Kansas City Chiefs here and the Arizona Wildcats in the college tables,
+    # so writing the champion under the raw id would have painted a Super Bowl
+    # winner in Arizona's red.
+    tid = "%s-%s" % (code.lower(), t["id"])
+    row = {"name": t.get("displayName"),
+           "short": rules.display_name(t.get("location") or t.get("displayName")),
+           "abbr": t.get("abbreviation"),
+           "color": t.get("color"), "alt": t.get("alternateColor")}
+    teams.setdefault(tid, row)
+    if pro_season_over(code, season):
+        _PRO_CHAMP[key] = {"id": tid, "team": row}
+    return tid
+
+
+def pro_extras_save():
+    for path, blob in ((PRO_PLACE_FILE, _PRO_PLACE), (PRO_CHAMP_FILE, _PRO_CHAMP)):
+        if blob:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            json.dump(blob, open(path, "w", encoding="utf-8"),
+                      separators=(",", ":"), sort_keys=True)
+
+
 def conf_place_save():
     if _CONF_PLACE:
         os.makedirs(os.path.dirname(CONF_PLACE_FILE), exist_ok=True)
@@ -4886,8 +5085,26 @@ def harvest():
         for code in ("CFB", "CBB"):
             if any(g["sport"] == code and g["season"] == y for g in keep):
                 ch["%s-%d" % (code, y)] = season_champs(code, y)
+    # THE DETROIT TAB'S OWN TWO (his call 2026-10-12): the division finish for
+    # each team-season on the tab, and the league champion of that season.
+    # Keyed by TEAM as well as sport, because the NBA tab carries two.
+    pp, pc = {}, {}
+    pro_seen = {(g["sport"], g["focus"], g["season"]) for g in keep
+                if g["sport"] in PRO_STANDINGS and g.get("focus")}
+    for code, fid, y in sorted(pro_seen):
+        tid = fid.split("-")[1] if "-" in fid else fid
+        got = pro_division(code, y, tid)
+        if got:
+            pp["%s-%s-%d" % (code, fid, y)] = got
+        ckey = "%s-%d" % (code, y)
+        if ckey not in pc:
+            won = pro_champ(code, y, teams)
+            if won:
+                pc[ckey] = {"id": won, "trophy": PRO_TROPHY[code]}
+    print("  Detroit: %d division finishes, %d league champions" % (len(pp), len(pc)))
     final_rank_save()
     conf_place_save()
+    pro_extras_save()
     champs_save()
     print("  champions for %d seasons" % len(ch))
     print("  final rankings for %d Michigan seasons, %d conference finishes"
@@ -4896,6 +5113,8 @@ def harvest():
     os.makedirs(OUT, exist_ok=True)
     json.dump({"games": keep, "teams": teams, "order": rules.ORDER,
                "final_rank": fr, "conf_place": cp, "champs": ch,
+               "pro_place": pp, "pro_champ": pc,
+               "ivy_titles": rules.IVY_TITLES,
                "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,

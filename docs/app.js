@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261012-190145";
+const BUILD = "20261012-202035";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -29,6 +29,7 @@ function monthOrder(m) { return m >= 8 ? m - 12 : m; }
 let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
 let FINAL_RANK = {}, CONF_PLACE = {}, CHAMPS = {};
+let PRO_PLACE = {}, PRO_CHAMP = {}, IVY_TITLES = [];
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -245,6 +246,11 @@ function stageLabel(g) {
    parenthetical is wrapped, record inside seed, so one rule drops both and
    the rounds and names still stay. */
 function rec(seed, record) {
+  // a seed with no record behind it still parenthesises cleanly -- the pro
+  // tabs reach here before their standings have loaded (2026-10-12)
+  if (!record) {
+    return seed != null ? '<span class="sseed"> (No. ' + seed + ")</span>" : "";
+  }
   return seed != null
     ? '<span class="sseed"> (No. ' + seed + '<span class="srec">, ' + record +
       "</span>)</span>"
@@ -340,11 +346,70 @@ function seasonRound(games, prefix) {
   const me = last.teams.find(t => t.id === focusId());
   return { game: last, won: !!(me && me.win), seed: seedOf(last, me) };
 }
+/* THE DETROIT TAB READS ITS OWN WAY (his call 2026-10-12), in two lines:
+   what his team did -- the furthest playoff round it reached, or where it
+   finished in its division -- and under it, who won the league that year, in
+   their own colours.
+
+     Wild Card Round (No. 3, 12-5)        4th NFC North (9-8)
+     Super Bowl: Kansas City              Super Bowl: Philadelphia
+
+   NONE of the first line can be counted from the games. The app holds 29
+   Tigers games a season, not 162, so the record comes from the standings; a
+   division table is not a thing a schedule knows; and the champion is almost
+   never a Detroit game at all. See harvest's pro_place and pro_champ. */
+const PRO_ROUND = {
+  "NFC Wild Card": "Wild Card Round", "AFC Wild Card": "Wild Card Round",
+  "AL Wild Card": "Wild Card Round", "NL Wild Card": "Wild Card Round",
+  "NFC Divisional Round": "Divisional Round",
+  "AFC Divisional Round": "Divisional Round",
+  "Conference Final": "Conference Finals"
+};
+const PRO_FINAL_ROUND = { NFL: "Super Bowl", MLB: "World Series",
+                          NBA: "NBA Finals", NHL: "Stanley Cup Final" };
+const PRO_WON = { NFL: "SUPER BOWL", MLB: "WORLD SERIES",
+                  NBA: "NBA", NHL: "STANLEY CUP" };
+function proSeasonLine(games, fid, sport) {
+  const pl = PRO_PLACE[sport + "-" + fid + "-" + FILT.season];
+  const ch = PRO_CHAMP[sport + "-" + FILT.season];
+  const recd = pl && pl.record ? pl.record : null;
+  /* THE NBA CUP IS NOT THE PLAYOFFS. It is played in November and carries a
+     stage like any knockout, so the furthest round would otherwise be a group
+     game every year the Pistons entered one. */
+  const post = games.filter(g => g.stage && g.stage.indexOf("NBA Cup") !== 0)
+    .slice().sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  let first = null;
+  if (post.length) {
+    const last = post[post.length - 1];
+    const me = last.teams.find(t => t.id === fid) || {};
+    const raw = last.stage;
+    const won = !!me.win && raw === PRO_FINAL_ROUND[sport];
+    const head = won ? PRO_WON[sport] + " CHAMPIONS" : (PRO_ROUND[raw] || raw);
+    const text = esc(head) + rec(me.seed != null ? me.seed : null, recd);
+    first = won ? '<span style="font-weight:700">' + text + "</span>" : text;
+  } else if (pl) {
+    first = esc(ordinal(pl.place, pl.tied) + " " + pl.group) + rec(null, recd);
+  }
+  if (!first) return null;
+  let second = "";
+  const t = ch && TEAMS[ch.id];
+  if (t) {
+    const own = ch.id === fid;
+    const nm = t.short || t.name || "";
+    second = '<span class="srole">' + esc(ch.trophy) + ":</span> " +
+      '<span style="color:' + champColour(ch.id) +
+      (own ? ";font-weight:700" : "") + '">' +
+      esc(own ? nm.toUpperCase() : nm) + "</span>";
+  }
+  return '<span class="sline">' + first + "</span>" +
+    (second ? '<span class="sline">' + second + "</span>" : "");
+}
 function seasonLine() {
   const fid = focusId(), sport = SPORT_OF[TAB];
   const games = GAMES.filter(g => g.sport === sport && g.focus === fid &&
     g.season === FILT.season && !upcoming(g));
   if (!games.length) return null;
+  if (proView()) return proSeasonLine(games, fid, sport);
   const mine = g => g.teams.find(t => t.id === fid) || {};
   // the OVERALL record, ties and all -- hockey keeps its third number
   let w = 0, l = 0, t = 0;
@@ -479,8 +544,18 @@ function seasonLine() {
         if (g.tie) it++; else if (mine(g).win) iw++; else il++;
       });
       if (iw + il + it) {
-        parts.push(win("#0f6a37",
-          "Ivy" + rec(null, iw + "-" + il + (it ? "-" + it : ""))));
+        /* IVY CHAMPIONS where he won it (his call 2026-10-12). The six Ivies
+           play each other inside the ECAC and only Cornell's games are here,
+           so the title cannot be read off a record -- the seasons come from
+           him, in rules.IVY_TITLES.
+           ...and the plain record DROPS ON A PHONE with the seeds, where a
+           bare "Ivy" said nothing once its record had gone. A title is not a
+           record, so IVY CHAMPIONS stays. */
+        const ivyWon = IVY_TITLES.indexOf(sport + "-" + FILT.season) > -1;
+        const ivyRec = rec(null, iw + "-" + il + (it ? "-" + it : ""));
+        parts.push(ivyWon
+          ? { html: win("#0f6a37", "IVY CHAMPIONS" + ivyRec, true) }
+          : { html: win("#0f6a37", "Ivy" + ivyRec), drop: true });
       }
     }
   }
@@ -508,7 +583,11 @@ function seasonLine() {
   }
   // EACH PART ON ITS OWN LINE ON A PHONE (his call 2026-09-29): the bars
   // between them go with the single line they were holding together.
-  return parts.map(x => '<span class="spart">' + x + "</span>")
+  // a part may ask to be DROPPED ON A PHONE (2026-10-12) -- the Ivy record
+  // does. The bar in front of it is already hidden at that width, so hiding
+  // the part alone leaves nothing behind.
+  return parts.map(x => '<span class="spart' + (x && x.drop ? " sdrop" : "") +
+      '">' + (x && x.html !== undefined ? x.html : x) + "</span>")
     .join('<span class="ssep"> | </span>');
 }
 function fmtTime(t) {
@@ -3603,6 +3682,9 @@ async function init() {
   FINAL_RANK = r[0].final_rank || {};
   CONF_PLACE = r[0].conf_place || {};
   CHAMPS = r[0].champs || {};
+  PRO_PLACE = r[0].pro_place || {};
+  PRO_CHAMP = r[0].pro_champ || {};
+  IVY_TITLES = r[0].ivy_titles || [];
   TEAM_CONF = r[0].team_conf || {};
   SEASON_NAMES = r[0].season_names || {};
   HIDDEN_WINDOWS = r[0].hidden_windows || {};

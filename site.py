@@ -63,8 +63,11 @@ h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
    rounds and names stay. */
 @media (max-width:700px){
   .count .spart{display:block}
-  .count .ssep,.count .srec,.count .sseed{display:none}
+  .count .ssep,.count .srec,.count .sseed,.count .sdrop{display:none}
 }
+/* THE DETROIT TAB IS TWO LINES AT EVERY WIDTH (his call 2026-10-12): what his
+   team did, then who won the league. */
+.count .sline{display:block}
 h1{white-space:nowrap}
 .count .srole{opacity:.72}
 .spacer{flex:1}
