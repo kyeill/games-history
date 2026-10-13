@@ -764,7 +764,10 @@ def cfb_black_friday(nets, d, season, big_ten=False):
 # a title cannot be read off a record the way the ECAC's place can -- the
 # seasons are his to give. Each entry is "SPORT-season", the season being the
 # year the campaign STARTED: "CHK-2009" is 2009-10.
-IVY_TITLES = []
+# His list, 2026-10-12: 2011-12, 2013-14, 2017-18, 2018-19, 2019-20, 2023-24,
+# 2025-26.
+IVY_TITLES = ["CHK-2011", "CHK-2013", "CHK-2017", "CHK-2018", "CHK-2019",
+              "CHK-2023", "CHK-2025"]
 
 
 def cbb_slots(nets, d, both_big_ten, any_ranked, any_big_ten=False):

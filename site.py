@@ -66,8 +66,15 @@ h1{font-size:22px;margin:0;letter-spacing:-.2px;font-weight:700;line-height:1.2}
   .count .ssep,.count .srec,.count .sseed,.count .sdrop{display:none}
 }
 /* THE DETROIT TAB IS TWO LINES AT EVERY WIDTH (his call 2026-10-12): what his
-   team did, then who won the league. */
+   team did, then who won the league. Its parenthetical is written out twice,
+   long and short, because a phone drops the seed and the record out of the
+   middle of it and the commas left behind read badly. */
 .count .sline{display:block}
+.count .sshort{display:none}
+@media (max-width:700px){
+  .count .sfull{display:none}
+  .count .sshort{display:inline}
+}
 h1{white-space:nowrap}
 .count .srole{opacity:.72}
 .spacer{flex:1}

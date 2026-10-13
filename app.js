@@ -358,21 +358,57 @@ function seasonRound(games, prefix) {
    Tigers games a season, not 162, so the record comes from the standings; a
    division table is not a thing a schedule knows; and the champion is almost
    never a Detroit game at all. See harvest's pro_place and pro_champ. */
+/* ONLY FOOTBALL'S ROUNDS ARE RENAMED. Baseball and hockey already read the
+   way he says them -- ALDS, ALCS, Conference Final -- and basketball's two
+   "Conference" rounds name the conference instead, which for the Pistons and
+   the Cavaliers is the Eastern (his call 2026-10-12). Both teams on that tab
+   are Eastern; a Western one would have to read this off the game. */
 const PRO_ROUND = {
   "NFC Wild Card": "Wild Card Round", "AFC Wild Card": "Wild Card Round",
-  "AL Wild Card": "Wild Card Round", "NL Wild Card": "Wild Card Round",
   "NFC Divisional Round": "Divisional Round",
-  "AFC Divisional Round": "Divisional Round",
-  "Conference Final": "Conference Finals"
+  "AFC Divisional Round": "Divisional Round"
 };
 const PRO_FINAL_ROUND = { NFL: "Super Bowl", MLB: "World Series",
                           NBA: "NBA Finals", NHL: "Stanley Cup Final" };
 const PRO_WON = { NFL: "SUPER BOWL", MLB: "WORLD SERIES",
                   NBA: "NBA", NHL: "STANLEY CUP" };
+/* THE RECORD IS NOT ON EVERY TAB (his call 2026-10-12): the Tigers go without
+   it, the rest keep it at the end of the parenthetical. */
+const PRO_NO_REC = { "mlb-6": true };
+/* WHAT COLOUR A PLAYOFF SEASON WEARS (his call 2026-10-12), each team in its
+   own. The Tigers and the Lions have two: one for going out in the first
+   round they played having NOT won the division, the other for everything
+   deeper than that -- a division title counts as deeper. The rest wear one
+   colour for any playoffs at all. A season that missed them is plain.
+   Every hex but the Pistons' is the team's own from ESPN; theirs is the
+   1996-2001 teal, which ESPN does not carry. */
+const PRO_TINT = {
+  "mlb-6": { out: "#0a2240", deep: "#ff4713" },   // Tigers navy, Tigers orange
+  "nfl-8": { out: "#bbbbbb", deep: "#0076b6" },   // Lions silver, Lions blue
+  "nhl-5": { deep: "#e30526" },                   // Red Wings red
+  "nba-8": { deep: "#00a3b0" },                   // Pistons teal
+  "nba-5": { deep: "#bc945c" }                    // Cavaliers gold
+};
+function proRound(raw, sport) {
+  if (sport === "NBA") return raw.replace(/^Conference /, "Eastern ");
+  return PRO_ROUND[raw] || raw;
+}
+/* THE PARENTHETICAL, in his order: seed, division title, record (2026-10-12).
+   On a phone the seed and the record both go, and a comma-surgery of what is
+   left reads badly -- so the short form is written out separately and the
+   stylesheet swaps them. Where nothing survives, nothing is drawn. */
+function proParen(seed, title, record) {
+  const full = [seed != null ? "No. " + seed : null, title, record].filter(Boolean);
+  if (!full.length) return "";
+  const out = '<span class="sfull"> (' + esc(full.join(", ")) + ")</span>";
+  return out + (title ? '<span class="sshort"> (' + esc(title) + ")</span>" : "");
+}
 function proSeasonLine(games, fid, sport) {
   const pl = PRO_PLACE[sport + "-" + fid + "-" + FILT.season];
   const ch = PRO_CHAMP[sport + "-" + FILT.season];
-  const recd = pl && pl.record ? pl.record : null;
+  const recd = pl && pl.record && !PRO_NO_REC[fid] ? pl.record : null;
+  // winning the division outright is worth naming beside the round he reached
+  const divTitle = pl && pl.place === 1 && !pl.tied ? pl.group : null;
   /* THE NBA CUP IS NOT THE PLAYOFFS. It is played in November and carries a
      stage like any knockout, so the furthest round would otherwise be a group
      game every year the Pistons entered one. */
@@ -384,11 +420,21 @@ function proSeasonLine(games, fid, sport) {
     const me = last.teams.find(t => t.id === fid) || {};
     const raw = last.stage;
     const won = !!me.win && raw === PRO_FINAL_ROUND[sport];
-    const head = won ? PRO_WON[sport] + " CHAMPIONS" : (PRO_ROUND[raw] || raw);
-    const text = esc(head) + rec(me.seed != null ? me.seed : null, recd);
-    first = won ? '<span style="font-weight:700">' + text + "</span>" : text;
+    const head = won ? PRO_WON[sport] + " CHAMPIONS" : proRound(raw, sport);
+    const text = esc(head) +
+      proParen(me.seed != null ? me.seed : null, divTitle, recd);
+    // ONE ROUND AND OUT: the whole postseason was a single stage he lost.
+    // Winning the division lifts a season out of it whatever happened next.
+    const rounds = new Set(post.map(g => g.stage)).size;
+    const tint = PRO_TINT[fid] || {};
+    const col = (rounds === 1 && !won && !divTitle && tint.out) || tint.deep;
+    first = col
+      ? '<span style="color:' + brighten(col, 150) +
+        (won ? ";font-weight:700" : "") + '">' + text + "</span>"
+      : won ? '<span style="font-weight:700">' + text + "</span>" : text;
   } else if (pl) {
-    first = esc(ordinal(pl.place, pl.tied) + " " + pl.group) + rec(null, recd);
+    first = esc(ordinal(pl.place, pl.tied) + " " + pl.group) +
+      proParen(null, null, recd);
   }
   if (!first) return null;
   let second = "";

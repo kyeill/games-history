@@ -1228,7 +1228,17 @@ def hockey_games(team_id, seasons, teams, latest_conf, start, end):
             if not stage:
                 if us:
                     if det.get("event") or det.get("city") or det.get("offsite"):
-                        ev = {"event": det.get("event"), "city": det.get("city"),
+                        # WHERE USCHO'S NOTE NAMES NO CITY, HOCKEY_EVENTS DOES
+                        # (his call 2026-10-12). The Ice Breaker is listed here
+                        # with Duluth and is in the app's MTE_PLACE, meaning it
+                        # wants its location in the header -- but USCHO had the
+                        # game, so this branch ran, the note carried no city,
+                        # and "ICE BREAKER | DULUTH | SEMIFINALS" lost its
+                        # middle. Only the CITY falls back; the event and the
+                        # round stay USCHO's.
+                        named = hockey_event(team_id, y, day) or {}
+                        ev = {"event": det.get("event"),
+                              "city": det.get("city") or named.get("city"),
                               "mte": det.get("mte"), "mte_round": det.get("mte_round"),
                               "frame": det.get("frame")}
                 else:
@@ -2500,7 +2510,11 @@ PRO_FINAL_MONTHS = {"NFL": [(1, 2)], "MLB": [(0, 10), (0, 11)],
 PRO_TROPHY = {"NFL": "Super Bowl", "MLB": "World Series",
               "NBA": "NBA Finals", "NHL": "Stanley Cup"}
 # his short forms for the divisions ESPN spells out
-PRO_DIV_FIX = {"American League Central": "AL Central",
+# ...and 2020-21 had no divisions ESPN will name: the NHL realigned for that
+# season alone, and level 3 answers with the whole league, so Detroit comes
+# back 28th of 31. He is happy for that to read "NHL" (2026-10-12).
+PRO_DIV_FIX = {"National Hockey League": "NHL",
+               "American League Central": "AL Central",
                "American League East": "AL East",
                "American League West": "AL West",
                "National League Central": "NL Central",

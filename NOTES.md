@@ -677,6 +677,33 @@ November and carries a stage like any knockout, so "the furthest round" would
 have been a group game in every year the Pistons entered one; it is excluded
 by name.
 
+**EACH TAB READS ITS OWN WAY (his calls 2026-10-12).** The parenthetical is
+seed, then the DIVISION TITLE where he won it outright, then the record:
+"ALCS (No. 3, AL Central)", "Wild Card Round (No. 6, 9-8)". The Tigers go
+without a record entirely; every other tab keeps it. Football's rounds are
+renamed ("NFC Wild Card" to "Wild Card Round") and basketball's two
+"Conference" rounds name the conference instead -- EASTERN, both teams on that
+tab being Eastern; a Western one would have to read it off the game. Baseball
+and hockey already read the way he says them.
+
+**A PHONE DROPS THE SEED AND THE RECORD OUT OF THE MIDDLE of that
+parenthetical**, and comma surgery on what is left reads badly -- "(, AL
+Central, )". So it is written out TWICE, `.sfull` and `.sshort`, and the
+stylesheet swaps them. Where nothing survives the short form, nothing is
+drawn.
+
+**COLOUR SAYS HOW THE SEASON WENT, in each team's own (his call 2026-10-12).**
+The Tigers and the Lions have two: one for going out in the first round they
+played having NOT won the division (Tigers navy, Lions silver), the other for
+anything deeper (Tigers orange, Lions blue) -- and a division title counts as
+deeper whatever happened next. The Red Wings wear red, the Pistons teal, the
+Cavaliers gold for any playoffs at all. A season that missed them is plain.
+"One round and out" is measured as the whole postseason being a single stage
+he lost, which is why it is counted from DISTINCT stages rather than games.
+Every hex is the team's own from ESPN except the Pistons', whose teal is the
+1996-2001 identity ESPN does not carry; `brighten(…, 150)` lifts them all to
+the same strength on the dark ground, the way the champion line is lifted.
+
 **The record is spelled per league.** ESPN gives basketball no `overall` at
 all, so it is built from wins and losses, and hockey appends the points to it
 ("41-32-9, 91 PTS"), so everything from the comma on is cut.
@@ -685,7 +712,8 @@ all, so it is built from wins and losses, and hockey appends the points to it
 inside the ECAC and only Cornell's own games are in this app, so an Ivy title
 cannot be read off a record the way the ECAC place can -- `rules.IVY_TITLES`
 holds the seasons he won it, as "SPORT-season" with the season being the year
-the campaign STARTED. It ships EMPTY, awaiting his list. A listed season reads
+the campaign STARTED. His list, 2026-10-12: 2011-12, 2013-14, 2017-18, 2018-19, 2019-20, 2023-24 and
+2025-26. A listed season reads
 "IVY CHAMPIONS" in the Ivy's green; any other reads "Ivy" and its record.
 On a phone the plain one DROPS (`.sdrop`), because a bare "Ivy" said nothing
 once its record had gone -- but IVY CHAMPIONS stays, a title not being a
@@ -1098,10 +1126,17 @@ A HOCKEY MTE names its place in that footer too, and since 2026-10-12 the date
 leads it: `12/29/2009 | Estero`, not `Estero | 12/29/2009`. It was the last
 footer reading place-first, and his instruction was "make Cornell hockey match
 Michigan hockey" -- Michigan's own hockey MTE, the Ice Breaker, is excluded
-from the place line by name and so already led with the date. Two Cornell
-hockey differences were left alone because neither is about this ordering: the
-Ice Breaker's suppressed place, and Cornell showing a network without a time
-(his call 2026-09-17).
+from the place line by name and so already led with the date.
+
+**The Ice Breaker is excluded there because its place belongs in the HEADER**
+-- it is in `MTE_PLACE`, the events whose location reads beside the event
+name. It was not getting there: `HOCKEY_EVENTS` lists it with Duluth, but
+that only applied where USCHO had no record of the game, USCHO had one, its
+note carried no city, and so "ICE BREAKER | DULUTH | SEMIFINALS" lost its
+middle and Duluth appeared nowhere on the card. Since 2026-10-12 the CITY
+falls back to `HOCKEY_EVENTS` when the note names none; the event and the
+round stay USCHO's. One Cornell hockey difference is still deliberate: its
+cards show a network without a time (his call 2026-09-17).
     post  2023 CFP SEMIFINALS | ROSE BOWL  ->  footer: MON DATE then ESPN 5:00PM
 
 The postseason card already read that way and is untouched; the window label
