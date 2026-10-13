@@ -597,6 +597,25 @@ header row matches what that tab should have before trusting a fetch.
 
 ## Upcoming games and the daily build
 
+**THE BUILD RUNS TWICE A DAY, 6am AND 6pm Eastern (his call 2026-10-12).** The
+evening one is for the NETWORKS: ESPN announces a football kickoff and its
+channel about twelve days out, usually on a Sunday night or a Monday, which is
+exactly when the morning build has just run. Indiana at Michigan and USC at
+Wisconsin sat on the tab all of 13 October with no window, having had none at
+08:43 -- nothing was broken, the site was simply a build behind. Before the
+season-ahead reach this was invisible, because nothing past the coming Sunday
+was on the tab to be missing.
+
+**THE SLOT IS READ BACK OUT OF THE COMMIT MESSAGES**, which already carry each
+build's New York time, so nothing new is recorded and an older commit still
+parses. At or after 6pm is the evening's build, 6am to 6pm the morning's --
+which also means a badly delayed morning run counts as the MORNING build
+rather than stealing the evening's turn. Both halves keep the same shape as
+before: asked for hours early against GitHub's delay, with catch-up runs that
+cost nothing on a normal day. Twelve cases were run against the gate before it
+shipped, including yesterday's builds not counting for today and a morning
+that failed entirely.
+
 **AN UPCOMING GAME IS BUILT BY A SECOND, SEPARATE CODE PATH, and every flag it
 does not set is a bug waiting to happen** (his catch 2026-09-14). `mq` was
 hardcoded `False` there while the archive computed it through
