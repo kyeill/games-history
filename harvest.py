@@ -2528,15 +2528,25 @@ _PRO_CHAMP = (json.load(open(PRO_CHAMP_FILE, encoding="utf-8"))
               if os.path.exists(PRO_CHAMP_FILE) else {})
 
 
-def _pro_div(node, tid):
-    """The DIVISION table holding a team, as (name, ordered entries). ESPN
-    returns the divisions only at level 3; the default is the conference."""
+def _pro_div(node, tid, conf=None):
+    """The DIVISION table holding a team, as (name, conference, ordered
+    entries). ESPN returns the divisions only at level 3; the default is the
+    conference.
+
+    The CONFERENCE is carried down because the rounds are named for it (his
+    call 2026-10-12) and a franchise can change it: the Red Wings played in
+    the Western until 2012-13 and the Eastern since, so "Conference Final"
+    means Western on one card and Eastern on another. For the older hockey
+    seasons ESPN returns no division at all and the table found IS the
+    conference, which is why the node's own name is tested too."""
+    here = node.get("name") or ""
+    mine = here if here.endswith(" Conference") else conf
     if "standings" in node:
         for e in node["standings"]["entries"]:
             if str((e.get("team") or {}).get("id") or "") == tid:
-                return node.get("name") or "", node["standings"]["entries"]
+                return here, mine, node["standings"]["entries"]
     for c in node.get("children") or []:
-        got = _pro_div(c, tid)
+        got = _pro_div(c, tid, mine)
         if got:
             return got
     return None
@@ -2603,7 +2613,7 @@ def pro_division(code, season, team_id):
     got_div = _pro_div(j, team_id) if j else None
     if not got_div:
         return None
-    name, entries = got_div
+    name, conf, entries = got_div
     idx = next(i for i, e in enumerate(entries)
                if str((e.get("team") or {}).get("id") or "") == team_id)
     # ESPN DOES NOT ORDER THE TABLE, whatever 2023 suggested: the 2024 NFC
@@ -2622,6 +2632,7 @@ def pro_division(code, season, team_id):
     out = {"place": better + 1,
            "group": (PRO_DIV_FIX.get(name, name)
                      .replace(" Division", "").replace(" Conference", "")),
+           "conf": (conf or "").replace(" Conference", "") or None,
            "tied": bool(tied),
            "record": _pro_record(entries[idx])}
     if pro_season_over(code, season):

@@ -686,17 +686,36 @@ renamed ("NFC Wild Card" to "Wild Card Round") and basketball's two
 tab being Eastern; a Western one would have to read it off the game. Baseball
 and hockey already read the way he says them.
 
-**ONE HELPER FOR BOTH, because the first build had them disagree.** "Conference"
-becomes "Eastern" and "Semifinals" becomes "Semis" on the basketball tabs (his
-calls 2026-10-12) -- and the first attempt changed only the SEASON LINE, so a
-Pistons 2005-06 headed "Eastern Finals" sat above six cards reading "2006
-CONFERENCE FINALS". Both now read through `nbaRound` -- and so does a THIRD place found only by
-looking at the cards afterwards: the pro playoff card builds its own header
-off the raw `g.stage`, because `stageHead` runs only for the tournaments in
-`bigStage` and a conference round is not one of them. Note that `stageLabel`
-expands "Semis" to "Semifinals" for everyone else (his call 2026-09-14, with a
-`data-short` back to "Semis" when the header is cramped); the NBA replace runs
-AFTER it, and is a no-op on a stage ESPN already spells out.
+**A "CONFERENCE" ROUND NAMES ITS CONFERENCE (his calls 2026-10-12), and
+Semifinals shortens to Semis in basketball.** The abbreviation is for these
+tabs ONLY -- he was asked and said so -- and Michigan's Big Ten Tournament
+goes on spelling itself out (2026-09-14, with a `data-short` back to "Semis"
+when the header is cramped). The Detroit replace runs AFTER that expansion and
+is a no-op on a stage ESPN already spells out.
+
+**THE CONFERENCE IS READ, NOT ASSUMED.** The first build hardcoded "Eastern",
+both basketball teams on the tab being Eastern, and that would have been wrong
+the moment hockey wanted the same treatment: the Red Wings played in the
+WESTERN until 2012-13 and the Eastern since, so "Conference Final" is Western
+on a 2008 card and would be Eastern on a 2026 one. `_pro_div` carries the
+conference down the standings tree -- testing the node's OWN name too, since
+for the older hockey seasons ESPN returns no division and the table found IS
+the conference -- and `pro_division` stores it as `conf`.
+
+**THREE PLACES NAME A ROUND, and the first build taught one.** The season
+line, the shared `stageLabel`, and the pro playoff card, which builds its own
+header off the raw `g.stage` because `stageHead` runs only for the tournaments
+in `bigStage` and a conference round is not one of them. A Pistons 2005-06
+headed "Eastern Finals" sat above six cards reading "2006 CONFERENCE FINALS"
+until all three went through `proStage`. It takes the game's own `focus`, so
+it works wherever the card is drawn rather than only on the open tab.
+
+**A TITLE READS JUST "CHAMPIONS" (his call 2026-10-12)**, not "STANLEY CUP
+CHAMPIONS": the line below already names the trophy and who lifted it --
+"Stanley Cup: DETROIT" -- so spelling it out up here said it twice. He named
+the Red Wings and the Pistons and "any other future Detroit"; it is applied to
+the whole tab, the Cavaliers included, because the second line names the
+trophy for them in exactly the same way.
 
 **ESPN NAMES NO DIVISIONS FOR THE OLDER HOCKEY SEASONS**, only the
 conferences, so the Red Wings come back "Western Conference" before 2013-14.

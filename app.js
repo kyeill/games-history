@@ -211,14 +211,37 @@ function fmtDate(d) {
 function stageYear(g) {
   return (g.sport === "CFB" ? g.season : g.season + 1) + " ";
 }
-/* BASKETBALL'S PLAYOFF ROUNDS, HIS WAY (his calls 2026-10-12): the two
-   "Conference" rounds name the conference, which for the Pistons and the
-   Cavaliers is the Eastern, and Semifinals shortens to Semis. BOTH the cards
-   and the season line read through here -- the first build changed only the
-   line, so a Pistons season headed "Eastern Finals" sat above six cards
-   reading "2006 CONFERENCE FINALS". */
-function nbaRound(s) {
-  return s.replace(/^Conference /, "Eastern ").replace("Semifinals", "Semis");
+/* THE DETROIT TABS' PLAYOFF ROUNDS, HIS WAY (his calls 2026-10-12): a
+   "Conference" round names the conference instead, and in basketball
+   Semifinals shortens to Semis -- that abbreviation is his for these tabs
+   only, Michigan's Big Ten Tournament still spelling itself out.
+
+   THE CONFERENCE IS READ, NOT ASSUMED. The first build wrote "Eastern" for
+   basketball because both teams on that tab are Eastern, and that would have
+   been wrong the moment hockey joined it: the Red Wings played in the WESTERN
+   until 2012-13 and the Eastern since, so "Conference Final" is Western on a
+   2008 card and would be Eastern on a 2026 one. `pro_division` carries the
+   conference down from the standings tree for exactly this.
+
+   EVERY PLACE A ROUND IS NAMED READS THROUGH HERE -- the season line, the
+   shared stage label, and the pro playoff card, which builds its own header
+   off the raw stage because `stageHead` only runs for the tournaments in
+   `bigStage`. The first build taught one of the three, and a Pistons season
+   headed "Eastern Finals" sat above six cards reading "2006 CONFERENCE
+   FINALS". */
+function proConf(fid, sport, season) {
+  const pl = PRO_PLACE[sport + "-" + fid + "-" + season];
+  const c = pl && pl.conf;
+  return c === "Eastern" || c === "Western" ? c : null;
+}
+function proStage(stage, sport, fid, season) {
+  let s = stage || "";
+  if (sport === "NBA") s = s.replace("Semifinals", "Semis");
+  if (sport === "NBA" || sport === "NHL") {
+    const c = proConf(fid, sport, season);
+    if (c) s = s.replace(/^Conference /, c + " ");
+  }
+  return s;
 }
 function stageLabel(g) {
   let s = g.stage || "";
@@ -232,9 +255,12 @@ function stageLabel(g) {
   if (/(Tournament|Ivy Madness) Championship$/.test(s) && !/^(NCAA|NIT)/.test(s)) {
     s = s.replace(/Championship$/, "Final");
   }
-  // ...and the NBA's own names last, after the generic Semis-to-Semifinals
-  // above has had its say (it is a no-op on a stage already spelled out)
-  return g.sport === "NBA" ? nbaRound(s) : s;
+  // ...and the Detroit tabs' own names last, after the generic
+  // Semis-to-Semifinals above has had its say (it is a no-op on a stage ESPN
+  // already spells out). The game carries its own focus, so this works
+  // wherever the card is drawn.
+  return g.sport === "NBA" || g.sport === "NHL"
+    ? proStage(s, g.sport, g.focus, g.season) : s;
 }
 /* THE SEASON LINE (his call 2026-09-29). With ONE season chosen on a
    Michigan view, the count at the top of the page gives way to how the season
@@ -381,8 +407,6 @@ const PRO_ROUND = {
 };
 const PRO_FINAL_ROUND = { NFL: "Super Bowl", MLB: "World Series",
                           NBA: "NBA Finals", NHL: "Stanley Cup Final" };
-const PRO_WON = { NFL: "SUPER BOWL", MLB: "WORLD SERIES",
-                  NBA: "NBA", NHL: "STANLEY CUP" };
 /* THE RECORD IS NOT ON EVERY TAB (his call 2026-10-12): the Tigers go without
    it, the rest keep it at the end of the parenthetical. */
 const PRO_NO_REC = { "mlb-6": true };
@@ -400,8 +424,10 @@ const PRO_TINT = {
   "nba-8": { deep: "#00a3b0" },                   // Pistons teal
   "nba-5": { deep: "#bc945c" }                    // Cavaliers gold
 };
-function proRound(raw, sport) {
-  if (sport === "NBA") return nbaRound(raw);
+function proRound(raw, sport, fid, season) {
+  if (sport === "NBA" || sport === "NHL") {
+    return proStage(raw, sport, fid, season);
+  }
   return PRO_ROUND[raw] || raw;
 }
 /* THE PARENTHETICAL, in his order: seed, division title, record (2026-10-12).
@@ -431,7 +457,10 @@ function proSeasonLine(games, fid, sport) {
     const me = last.teams.find(t => t.id === fid) || {};
     const raw = last.stage;
     const won = !!me.win && raw === PRO_FINAL_ROUND[sport];
-    const head = won ? PRO_WON[sport] + " CHAMPIONS" : proRound(raw, sport);
+    // JUST "CHAMPIONS" (his call 2026-10-12): the line below already names the
+    // trophy and who lifted it -- "Stanley Cup: DETROIT" -- so spelling it out
+    // up here said it twice.
+    const head = won ? "CHAMPIONS" : proRound(raw, sport, fid, FILT.season);
     const text = esc(head) +
       proParen(me.seed != null ? me.seed : null, divTitle, recd);
     // ONE ROUND AND OUT: the whole postseason was a single stage he lost.
@@ -1865,7 +1894,7 @@ function michCard(g, p) {
     // the third place the NBA's round names had to be taught (2026-10-12):
     // `stageHead` runs only for the tournaments in `bigStage`, and a
     // conference round is not one of them.
-    const stg = g.sport === "NBA" ? nbaRound(g.stage || "") : (g.stage || "");
+    const stg = proStage(g.stage || "", g.sport, g.focus, g.season);
     if (g.stage === "Play-In") {
       head = esc(yr + " Play-In Tournament");
     } else if (g.post) {
