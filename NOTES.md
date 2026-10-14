@@ -652,6 +652,32 @@ reaching to the end of the season put 74 of them on the tab at once. The fix
 calls `rules.cbb_header_suffix` with the same arguments the archive uses,
 including `espn_saturday_ids` computed over the upcoming events.
 
+**CURRENT NAMES ITS WEEK (his call 2026-10-14):** "the Week filter should
+also default to whatever week is current, not say All Weeks (which isn't even
+true, since clearly it is filtered)". The dropdown now shows the week Current
+settled on, READ OFF THE GAMES IT KEPT rather than worked out a second time --
+the fallback to "the latest week there is" would otherwise have to be
+duplicated to be got right, and the two would drift.
+
+Three things follow from that:
+* `visible()` records the week in `CUR_WEEK`, so **the list is drawn BEFORE
+  the filters** in `draw()`; the dropdown cannot name a week nobody has
+  worked out yet.
+* `visibleWithout` puts `CUR_WEEK` back as it found it. The dropdowns run the
+  pipeline many times over, and only the one pass that draws the list gets to
+  say what the week is.
+* **Choosing a week LEAVES Current**, because Current pins the list to this
+  one and the two would otherwise fight: asking for Week 3 under it came back
+  empty, and asking for "All Weeks" went on showing one. Picking the week
+  Current is already on changes nothing, so the button stays down for that.
+
+**A window that straddles two weeks names neither** -- a Sunday or Monday game
+can carry the week either side of it, and a label true of most of the list is
+the same complaint again. Measured across every Monday-to-Sunday window of
+every season on the tab: ONE case in football (Labor Day 2021, a Monday game
+in Week 1 beside Week 2) and none at all in basketball. Current only ever
+lands on the live week, so in practice it never meets one.
+
 ## The Detroit tab's season line
 
 **TWO LINES (his call 2026-10-12): what his team did, then who won the

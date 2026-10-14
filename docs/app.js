@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-101530";
+const BUILD = "20261014-085520";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -30,6 +30,8 @@ let ORDER = {}, SEASONS = [], WINDOW_NET = {};
 let HEADER_TINT = {}, NET_TINT = {}, NET_PRIORITY = {}, BIG_TEN = {}, CONF_LABEL = {};
 let FINAL_RANK = {}, CONF_PLACE = {}, CHAMPS = {};
 let PRO_PLACE = {}, PRO_CHAMP = {}, IVY_TITLES = [];
+// the week CURRENT settled on, for the Week dropdown to name -- see visible()
+let CUR_WEEK = null;
 // the conference a non-Michigan team view capitalises, per team and sport
 let TEAM_CONF = {};
 let SEASON_NAMES = {}, HIDDEN_WINDOWS = {};
@@ -2748,6 +2750,19 @@ function tieOrder(list) {
   return out;
 }
 
+/* WHICH ENTRY OF THE WEEK DROPDOWN A GAME BELONGS TO. The two lists that
+   build that dropdown each work this out for themselves, further down; this
+   is here so CURRENT can name its week in the same vocabulary. */
+function weekKeyOf(g) {
+  if (SPORT_OF[TAB] === "CFB") {
+    return g.title || g.week == null ? "postseason" : g.week;
+  }
+  if (g.stage) return "postseason";
+  const m = +g.date.slice(5, 7);
+  if (m === 11) return "nov";
+  if (m === 12) return "dec";
+  return cbbWeekNo(g);
+}
 function visible() {
   let list = GAMES.filter(g => !isHidden(g.id));
   // games added by hand live only in tags.json, so fold them back in
@@ -2831,6 +2846,22 @@ function visible() {
       const mon = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5)
         .toISOString().slice(0, 10);
       list = list.filter(g => g.date >= mon);
+    }
+  }
+  /* ...AND CURRENT NAMES ITS WEEK (his call 2026-10-14): "the Week filter
+     should also default to whatever week is current, not say All Weeks (which
+     isn't even true, since clearly it is filtered)". The dropdown shows the
+     week Current settled on, READ OFF THE GAMES IT KEPT rather than worked
+     out a second time -- the fallback to the latest week there is would
+     otherwise have to be duplicated to be got right.
+     A window that straddles two of them names neither: a Monday or Sunday
+     game can carry the week either side of it, and a label that is true of
+     most of the list is the same complaint again. */
+  CUR_WEEK = null;
+  if (VIEW === "tv" && FILT.current && list.length) {
+    const keys = list.map(weekKeyOf);
+    if (keys.every(k => k != null && String(k) === String(keys[0]))) {
+      CUR_WEEK = keys[0];
     }
   }
   // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
@@ -3346,7 +3377,7 @@ function filterChips() {
       Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w])
         .concat(post || FILT.week === "postseason"
           ? [["Postseason", "postseason"]] : []),
-      FILT.week));
+      weekShown()));
   }
   /* BASKETBALL GETS WEEKS TOO, on TV WINDOWS (his call 2026-10-06), and they
      replace the month list there: November, December, Week 1 to 9 or 10, then
@@ -3373,7 +3404,7 @@ function filterChips() {
         .concat(Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]))
         .concat(post || FILT.week === "postseason"
           ? [["Postseason", "postseason"]] : []),
-      FILT.week));
+      weekShown()));
   }
   // Basketball has no week worth showing, so the month is its equivalent
   // coarse cut. Like the week list it follows the SEASON.
@@ -3478,10 +3509,17 @@ function teamOrder(sport, allowed, pinsOverride, leadConf, confSport) {
 /* A dropdown lists only choices that would return games (his call
    2026-09-11): the list this view would show with THAT filter cleared. The
    current choice always stays listed, so a selection never vanishes. */
+// WHAT THE WEEK DROPDOWN READS: his own choice where he has made one, and
+// otherwise the week Current is showing him (2026-10-14).
+function weekShown() {
+  return FILT.week != null ? FILT.week : (FILT.current ? CUR_WEEK : null);
+}
 function visibleWithout(key) {
-  const saved = FILT[key];
+  // the dropdowns run this many times over, so CUR_WEEK is put back as it was
+  // -- only the one pass that draws the list gets to say what the week is
+  const saved = FILT[key], savedWeek = CUR_WEEK;
   FILT[key] = null;
-  try { return visible(); } finally { FILT[key] = saved; }
+  try { return visible(); } finally { FILT[key] = saved; CUR_WEEK = savedWeek; }
 }
 function teamsIn(list, idsOf, current) {
   const ids = new Set();
@@ -3638,8 +3676,10 @@ function draw() {
   document.getElementById("viewbar").innerHTML = NAV[TOP].map(v =>
     '<button data-tab="' + v[1] + '" data-view="' + v[2] + '" aria-selected="' +
     (v[1] === TAB && v[2] === VIEW) + '">' + v[0] + "</button>").join("");
-  document.getElementById("filters").innerHTML = filterChips();
+  // THE LIST FIRST, then the filters: the Week dropdown reads the week
+  // CURRENT settled on, and only drawing the list works that out (2026-10-14)
   const list = visible();
+  document.getElementById("filters").innerHTML = filterChips();
   // the count gives way to the season line where there is one (2026-09-29)
   const line = FILT.season == null ? null
     : teamView() && SPORT_OF[TAB] ? seasonLine()
@@ -3923,6 +3963,14 @@ async function init() {
     // play being the point of it -- so a December game can never be Marquee
     // and the bucket would otherwise open empty under the TV Windows default.
     if (k === "week" && (v === "nov" || v === "dec")) FILT.marquee = false;
+    // CHOOSING A WEEK LEAVES CURRENT (2026-10-14), because Current pins the
+    // list to this one and the two would otherwise fight -- asking for Week 3
+    // under it would have come back empty, and asking for "All Weeks" would
+    // have gone on showing one. Picking the week Current is already on changes
+    // nothing, so the button stays down for that.
+    if (k === "week" && FILT.current && String(v) !== String(CUR_WEEK)) {
+      FILT.current = false; CURRENT_PREV = null;
+    }
     // a week or month chosen under one season may not exist in another
     if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();
