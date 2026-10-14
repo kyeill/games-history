@@ -689,6 +689,45 @@ every season on the tab: ONE case in football (Labor Day 2021, a Monday game
 in Week 1 beside Week 2) and none at all in basketball. Current only ever
 lands on the live week, so in practice it never meets one.
 
+## Combined: TV Windows and Key Games at once
+
+**A FOURTH CFB VIEW (his call 2026-10-14):** "add a view to the CFB tab that
+combines the two. Keep all filter abilities when you smash together (so I
+could highlight marquee games, or filter by upset type, etc)." A third of
+football's Key Games are not on TV Windows -- 65 of 195 across 2021-25, which
+is what prompted it -- so neither tab alone is the whole picture.
+
+**IT ASKS `keyShows` FIRST, then `tvShows`.** Order matters: a game kept only
+for the Michigan and Rivals views (`rivals_only`) belongs here through the Key
+Games door and would be turned away at the other one, the TV test excluding
+those outright. The TV test was lifted out of `visible` into `tvShows` so the
+two views ask the same question rather than a copy of it.
+
+**EVERY CONTROL BOTH SIDES HAVE.** The Game Type and TV Window dropdowns
+already appear together, each being hidden only on the view it would cross
+("VIEW !== tv", "VIEW !== big"), so Combined got them free. Current, Marquee
+Windows and Upsets each had to be told about it, as did "Important Results" in
+the Game Type list.
+
+**IT OPENS PLAIN** -- the newest season, oldest first, no Current and no
+Marquee. Neither parent's opening suits it: Current pins the list to one week
+and hides everything Key Games brings, and Marquee hides most of it the other
+way. It is a view for looking across a season, so it starts by showing one.
+
+**IT REACHES BACK AS FAR AS KEY GAMES DOES**, 2014 for football, and he knows
+the pre-2021 seasons have no TV Windows side to them ("just knowing there will
+be no TV Windows impact for now"). 2018 shows 29 games, all of them Key.
+
+**The CARD COLOURS are Key Games'** -- `keyRing`, `keyFill` and his Results
+`imx` all read the new view as well, so a postseason frame or a Shade column
+paints here too. A TV-only game is untouched by them, having neither a stage
+nor Michigan in it.
+
+**The clamp on unplayed games stays Key Games' alone.** Combined shows the
+season ahead the way TV Windows does; what Key Games keeps out is Michigan's
+fixture list, and Combined reaches those only through a game TYPE, which
+needs both teams ranked.
+
 ## The Detroit tab's season line
 
 **TWO LINES (his call 2026-10-12): what his team did, then who won the

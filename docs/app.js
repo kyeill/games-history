@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-090032";
+const BUILD = "20261014-091032";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -775,7 +775,7 @@ function stageColor(g) {
 // Games until it is played (his call 2026-09-21); after that the ordinary
 // rules take over
 function michAhead(g) {
-  return upcoming(g) && (VIEW === "tv" || VIEW === "big") &&
+  return upcoming(g) && (VIEW === "tv" || VIEW === "big" || VIEW === "both") &&
     g.teams.some(t => t.id === MICHIGAN);
 }
 function rowHtml(g, browse) {
@@ -918,14 +918,14 @@ function rowHtml(g, browse) {
   // only football did, so a basketball card took the winner's colour where the
   // Big Ten / CFP / NCAA colours now belong. It no longer waits on
   // `celebrated` either -- a postseason colour is its own reason to frame.
-  if (VIEW === "big") {
+  if (VIEW === "big" || VIEW === "both") {
     ring = keyRing(g);
     flag = !!ring;
   }
   /* HIS RESULTS CARRY THEIR OWN COLOURS (his call 2026-10-02): the Shade
      column fills the card and the Border column frames it -- in the winner's
      colour, or Big Ten blue where he says Big Ten. */
-  const imx = VIEW === "big" ? (g.imx || null) : null;
+  const imx = (VIEW === "big" || VIEW === "both") ? (g.imx || null) : null;
   if (imx && imx.border) {
     const w = g.teams.find(t => t.win);
     const c = /big ten/i.test(imx.border) ? "#0088ce"
@@ -2298,7 +2298,7 @@ function marqueeFill(g) {
   return g.teams.some(t => t.id !== MICHIGAN && !!t.rank);
 }
 function keyFill(g) {
-  if (VIEW !== "big") return false;
+  if (VIEW !== "big" && VIEW !== "both") return false;
   if (keyStage(g)) return true;
   return !!michTeam(g) && !!keyRing(g);
 }
@@ -2586,7 +2586,8 @@ function isUpset(g) {
   // no upset -- Ole Miss over LSU reads blue. REGULAR SEASON ONLY, and only on
   // TV Windows and Key Games; the Michigan and Rivals views read the rankings
   // as they stand
-  const soft = (VIEW === "tv" || VIEW === "big") && regularSeason(g);
+  const soft = (VIEW === "tv" || VIEW === "big" || VIEW === "both") &&
+    regularSeason(g);
   return !(soft && w.rank && levelRanks(w.rank, l.rank));
 }
 
@@ -2763,6 +2764,28 @@ function weekKeyOf(g) {
   if (m === 12) return "dec";
   return cbbWeekNo(g);
 }
+/* WHAT TV WINDOWS ADMITS. A GAME TYPE IS NO LONGER A WAY ONTO IT (his call
+   2026-10-07: "I do not want those games (including Ranked B1G vs. other
+   ranked) included on TV Windows if they miss all of the other rules"). The
+   tab is a record of what was ON -- a window, a conference final, a showcase,
+   a GameDay site, Week 0, a neutral-site kickoff, a stand-in, a conference
+   cover. A MATCH-UP is not a broadcast: Illinois-Oregon on 1/2/25 was #22 at
+   #9 and a fine game, and it was on FS1 at 10pm, which belongs to no window
+   at all.
+   It had been admitted since 2026-09-18, narrowed on 2026-09-20 to games
+   ranked before kickoff and on 2026-10-07 to both sports; this retires the
+   route outright. 98 basketball games and 4 football ones leave, and every
+   one of them keeps its place on KEY GAMES, which is the tab that files a
+   game by what it was rather than where it was.
+   Pulled out of `visible` on 2026-10-14 so COMBINED can ask the same
+   question rather than a copy of it. The rivals-only test comes WITH it: a
+   game kept for the Michigan and Rivals views was never part of the
+   broadcast record. */
+function tvShows(g) {
+  if (g.rivals_only) return false;
+  return !!((g.slots || []).length || g.title || g.bfri || g.show || g.opener
+            || g.showcase || g.kickoff || g.standin);
+}
 function visible() {
   let list = GAMES.filter(g => !isHidden(g.id));
   // games added by hand live only in tags.json, so fold them back in
@@ -2785,24 +2808,14 @@ function visible() {
     // (his call 2026-09-20): a Michigan win or a rival's loss belongs here
     // whether or not it had a window or a category of its own
     : VIEW === "big" ? keyShows(g)
+    // COMBINED is the two of them at once (his call 2026-10-14), so it asks
+    // both questions -- and asks keyShows FIRST, because a game kept only for
+    // the Michigan and Rivals views belongs here through that door and would
+    // be turned away at the other one.
+    : VIEW === "both" ? (keyShows(g) || tvShows(g))
     : g.rivals_only ? false
-    : VIEW === "tv"
-      /* A GAME TYPE IS NO LONGER A WAY ONTO TV WINDOWS (his call 2026-10-07:
-         "I do not want those games (including Ranked B1G vs. other ranked)
-         included on TV Windows if they miss all of the other rules"). The tab
-         is a record of what was ON -- a window, a conference final, a
-         showcase, a GameDay site, Week 0, a neutral-site kickoff, a stand-in,
-         a conference cover. A MATCH-UP is not a broadcast: Illinois-Oregon on
-         1/2/25 was #22 at #9 and a fine game, and it was on FS1 at 10pm,
-         which belongs to no window at all.
-         It had been admitted since 2026-09-18, narrowed on 2026-09-20 to
-         games ranked before kickoff and on 2026-10-07 to both sports; this
-         retires the route outright. 98 basketball games and 4 football ones
-         leave, and every one of them keeps its place on KEY GAMES, which is
-         the tab that files a game by what it was rather than where it was. */
-      ? ((g.slots || []).length || g.title || g.bfri || g.show || g.opener
-         || g.showcase || g.kickoff || g.standin)
-      : keyShows(g));
+    : VIEW === "tv" ? tvShows(g)
+    : keyShows(g));
   // Basketball TV Windows run November to March now (his call 2026-09-11),
   // because the windows themselves reach into November and December. A game
   // with NO window of its own -- a College GameDay ride-along -- still has to
@@ -2823,11 +2836,12 @@ function visible() {
   // ...CURRENT IS NOW THIS WEEK, Monday to Sunday by the calendar (his call
   // 2026-09-18), not the latest week in the data. Only a week with nothing in
   // it -- basketball in September -- falls back to the latest one there is.
-  const thisWeek = VIEW === "tv" && FILT.current
+  const curView = VIEW === "tv" || VIEW === "both";
+  const thisWeek = curView && FILT.current
     ? list.filter(g => g.date >= weekStart() && g.date <= weekEnd()) : [];
   if (thisWeek.length) {
     list = thisWeek;
-  } else if (VIEW === "tv" && FILT.current && list.length) {
+  } else if (curView && FILT.current && list.length) {
     // ...and THE FALLBACK LOOKS BACKWARDS, NEVER FORWARDS (2026-10-12). Since
     // TV Windows started carrying games out to the end of the regular season,
     // "the latest week there is" would otherwise mean the furthest FUTURE one
@@ -3030,7 +3044,7 @@ function visible() {
      can carry the week either side of it, and a label true of most of the
      list is the same complaint again. */
   CUR_WEEK = null;
-  if (VIEW === "tv" && FILT.current && list.length) {
+  if ((VIEW === "tv" || VIEW === "both") && FILT.current && list.length) {
     const keys = list.map(weekKeyOf);
     if (keys.every(k => k != null && String(k) === String(keys[0]))) {
       CUR_WEEK = keys[0];
@@ -3109,6 +3123,9 @@ function filterChips() {
       // KEY GAMES reaches its own seasons (2026-10-02), which run further back
       // than TV Windows' and include games kept only for the other views
       : VIEW === "big" ? keyShows(g)
+      // COMBINED reaches back as far as Key Games does. Before 2021 there is
+      // no TV Windows side to it, which he knows and accepts (2026-10-14).
+      : VIEW === "both" ? (keyShows(g) || tvShows(g))
       : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
@@ -3443,7 +3460,8 @@ function filterChips() {
   if (VIEW !== "tv")
     h += group("Game type", select("type", "All Game Types",
       order.types.filter(t => types.has(t)).map(t => [t, t])
-        .concat(VIEW === "big" && visibleWithout("type").some(g => g.important)
+        .concat((VIEW === "big" || VIEW === "both")
+          && visibleWithout("type").some(g => g.important)
           ? [["Important Results", "important"]] : []),
       FILT.type));
   if (VIEW !== "big") {
@@ -3650,15 +3668,20 @@ function sortButton() {
 
 function marqueeOn() { return !!FILT.marquee; }
 function quickButtons() {
-  return (VIEW === "tv" ? '<button class="f" data-act="current" aria-pressed="' +
-      !!FILT.current + '">Current</button>' : "") +
+  // COMBINED KEEPS EVERY CONTROL BOTH SIDES HAVE (his call 2026-10-14) --
+  // Current and Marquee Windows from TV Windows, Upsets from Key Games, and
+  // the Game Type and TV Window dropdowns together further up.
+  const both = VIEW === "both";
+  return (VIEW === "tv" || both
+      ? '<button class="f" data-act="current" aria-pressed="' +
+        !!FILT.current + '">Current</button>' : "") +
     // Marquee games are simply IN Key Games now, so the button goes (his
     // call 2026-09-20)
     (VIEW === "big" && SPORT_OF[TAB] === "CFB" ? ""
       : '<button class="f" data-act="marquee" aria-pressed="' +
         marqueeOn() + '">Marquee Windows</button>') +
     // UPSETS (his call 2026-09-20): the two upset categories, nothing else
-    (VIEW === "big" && SPORT_OF[TAB] === "CFB"
+    ((VIEW === "big" || both) && SPORT_OF[TAB] === "CFB"
       ? '<button class="f" data-act="upset" aria-pressed="' + !!FILT.upset +
         '">Upsets</button>' : "") +
     sortButton();
@@ -3668,8 +3691,10 @@ function quickButtons() {
 const NAV = {
   michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"],
              ["Hockey", "chk", "michigan"], ["Combined", "all", "michigan"]],
+  // COMBINED is TV Windows and Key Games at once, with the filters of both
+  // (his call 2026-10-14)
   cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
-        ["Rivals", "cfb", "rivals"]],
+        ["Combined", "cfb", "both"], ["Rivals", "cfb", "rivals"]],
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
         ["Rivals", "cbb", "rivals"], ["Cornell", "cbb", "cornell"]],
   hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]],
@@ -3691,7 +3716,8 @@ function draw() {
   // the count gives way to the season line where there is one (2026-09-29)
   const line = FILT.season == null ? null
     : teamView() && SPORT_OF[TAB] ? seasonLine()
-    : (VIEW === "tv" || VIEW === "big") && (SPORT_OF[TAB] === "CFB" || SPORT_OF[TAB] === "CBB")
+    : (VIEW === "tv" || VIEW === "big" || VIEW === "both") &&
+      (SPORT_OF[TAB] === "CFB" || SPORT_OF[TAB] === "CBB")
       ? champLine() : null;
   document.getElementById("count").innerHTML =
     line || esc(list.length.toLocaleString() + " games");
@@ -3749,6 +3775,15 @@ function switchView(view) {
   // TV WINDOWS OPENS ON CURRENT, oldest first (his call 2026-09-18); turning
   // Current off gives back the old opening -- the newest season, Marquee on
   if (VIEW === "tv") enterCurrent();
+  /* COMBINED OPENS PLAIN (2026-10-14): the newest season, oldest first, no
+     Current and no Marquee. Neither parent's opening suits it -- Current pins
+     the list to one week and hides everything Key Games brings, and Marquee
+     hides most of it the other way. It is a view for looking across a season,
+     so it starts by showing one. */
+  if (VIEW === "both") {
+    FILT.marquee = false; FILT.current = false; CURRENT_PREV = null;
+    SORT = "asc";
+  }
   // KEY GAMES OPENS ON THE LATEST COMPLETED WEEK, oldest first (his call
   // 2026-09-20) -- football by week number, basketball by nothing, it has none
   if (VIEW === "big" && SPORT_OF[TAB] === "CFB") {
