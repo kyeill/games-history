@@ -718,6 +718,31 @@ way. It is a view for looking across a season, so it starts by showing one.
 the pre-2021 seasons have no TV Windows side to them ("just knowing there will
 be no TV Windows impact for now"). 2018 shows 29 games, all of them Key.
 
+**BASKETBALL HAS THE SAME VIEW (his call 2026-10-14, "duplicate all this for
+CBB").** Almost nothing needed changing: `tvShows`, `keyShows`,
+`rivalWonShows`, `combPaint` and `weekKeyOf` were already written per sport,
+and `KEY_FROM` carries the 2011-12 floor. Two things differed.
+
+* **The WEEK dropdown, not the months.** Basketball's two parents disagree:
+  TV Windows buckets by week, Key Games by month, because its seasons run back
+  to 2011-12 and it has "no conference-play line to draw". But `cbbWeekNo` is
+  computed from January's first Saturday and works as well in 2011 as in 2026,
+  and November, December and Postseason are buckets in that same list -- so
+  Combined takes the finer of the two.
+* **TV Windows' November-to-March gate is left to TV Windows.** It makes NO
+  difference here, measured: every basketball game the TV door admits already
+  passes it, a window or a showcase implying the months. 1,340 games either
+  way.
+
+1,340 cards, 54 to 166 a season, 0 to 18 of them dashed. **The 61 orphaned
+basketball games are visible at last**, the same ones that prompted all this.
+
+**NOTRE DAME IS A RIVAL IN THE APP IN BOTH SPORTS**, where harvest treats them
+as a football rival only (`RIVALS_BY_SPORT`). `isRival` reads one flat list.
+21 basketball games involving Notre Dame are in the file, all `rivals_only`,
+so this has always been true of Key Games and now carries into Combined. Not
+introduced here, not changed here.
+
 **COMBINED HAS ITS OWN SHADING (his calls 2026-10-14)**, `combPaint`. The
 shape is the same on both sides -- a BORDER says it was a marquee window, a
 FILL says the result mattered -- and the fill takes the WINNER's colour for

@@ -3507,7 +3507,13 @@ function filterChips() {
      is why the two months in front of them are named rather than numbered.
      Key Games keeps its months: its seasons run back to 2011-12 and it has no
      conference-play line to draw. */
-  if (sport === "CBB" && VIEW === "tv") {
+  /* COMBINED TAKES THE WEEK BUCKETS, NOT THE MONTHS (2026-10-14). Key Games
+     reads months because its seasons run back to 2011-12 and it has "no
+     conference-play line to draw" -- but `cbbWeekNo` is computed from
+     January's first Saturday and works just as well in 2011 as in 2026, and
+     November, December and Postseason are buckets in the same list. Combined
+     is the two views at once, so it takes the finer of the two. */
+  if (sport === "CBB" && (VIEW === "tv" || VIEW === "both")) {
     const base = seasonBase("week");
     const weeks = new Set();
     let nov = false, dec = false, post = false;
@@ -3534,7 +3540,7 @@ function filterChips() {
   // 2026-10-02): they gather under one "Postseason" option at the end, so
   // March means the regular-season March games and nothing else. April, whose
   // every game is a Final Four, disappears into it.
-  if (sport === "CBB" && VIEW !== "tv") {
+  if (sport === "CBB" && VIEW !== "tv" && VIEW !== "both") {
     const months = new Set();
     let post = false;
     seasonBase("month").forEach(g => {
@@ -3792,8 +3798,10 @@ const NAV = {
   // (his call 2026-10-14)
   cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
         ["Combined", "cfb", "both"], ["Rivals", "cfb", "rivals"]],
+  // ...and basketball gets the same fourth view (his call 2026-10-14)
   cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
-        ["Rivals", "cbb", "rivals"], ["Cornell", "cbb", "cornell"]],
+        ["Combined", "cbb", "both"], ["Rivals", "cbb", "rivals"],
+        ["Cornell", "cbb", "cornell"]],
   hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]],
   detroit: [["Tigers", "mlb", "tigers"], ["Lions", "nfl", "lions"],
             ["Red Wings", "nhl", "redwings"],
