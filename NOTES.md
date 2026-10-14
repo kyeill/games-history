@@ -737,6 +737,25 @@ and `KEY_FROM` carries the 2011-12 floor. Two things differed.
 1,340 cards, 54 to 166 a season, 0 to 18 of them dashed. **The 61 orphaned
 basketball games are visible at last**, the same ones that prompted all this.
 
+**EVERY MICHIGAN WIN AND EVERY RIVAL LOSS, on basketball's Combined (his call
+2026-10-14).** Football's Key Games has admitted these since 2026-09-20 --
+"any Ohio State / Michigan State / Notre Dame LOSS, and any Michigan WIN" --
+and football's Combined inherits them through `keyShows`. Basketball's Key
+Games is its CATEGORIES AND NOTHING ELSE (same date), so a Michigan win over
+an unranked team reached neither view. `michRivalShows` is that football rule
+written for basketball, on COMBINED ONLY; CBB Key Games is deliberately
+unchanged, and the function returns false for football so that view does not
+move either.
+
+"Except to each other" needed no code: `bigViewAllows` already bars a game a
+rival WON, so Michigan State losing to Ohio State is refused for Ohio State
+having won it.
+
+**The POSTSEASON is in**, unlike football's version of the rule, which stops
+at `g.bowl || g.stage`. He asked for every Michigan win and a Big Ten
+Tournament quarter-final is one; that choice is worth 34 of the games. The
+view goes from 1,341 to 1,696 -- 267 Michigan wins and 88 rival losses added.
+
 **NOTRE DAME IS A RIVAL IN THE APP IN BOTH SPORTS**, where harvest treats them
 as a football rival only (`RIVALS_BY_SPORT`). `isRival` reads one flat list.
 21 basketball games involving Notre Dame are in the file, all `rivals_only`,

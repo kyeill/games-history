@@ -2409,6 +2409,28 @@ function rivalWonShows(g) {
   if (g.season < (KEY_FROM[g.sport] || 2021)) return false;
   return !!(g.type || g.title);
 }
+/* EVERY MICHIGAN WIN AND EVERY RIVAL LOSS, on BASKETBALL's Combined (his
+   call 2026-10-14). Football's Key Games has admitted these since 2026-09-20
+   -- "any Ohio State / Michigan State / Notre Dame LOSS, and any Michigan
+   WIN" -- and its Combined view inherits them through `keyShows`. Basketball's
+   Key Games is its CATEGORIES AND NOTHING ELSE (his call 2026-09-20), so a
+   Michigan win over an unranked team reached neither view. This is that
+   football rule written for basketball, on COMBINED ONLY: CBB Key Games is
+   deliberately left as it was.
+
+   "Except to each other" needs no code: `bigViewAllows` already bars any game
+   a rival WON, so Michigan State losing to Ohio State is refused for Ohio
+   State having won it. The postseason is IN, unlike football's version of the
+   rule -- he asked for every Michigan win, and a Big Ten Tournament
+   quarter-final is one. */
+function michRivalShows(g) {
+  if (g.sport !== "CBB" || upcoming(g)) return false;
+  if (g.season < (KEY_FROM[g.sport] || 2021)) return false;
+  if (!bigViewAllows(g)) return false;
+  const m = michTeam(g);
+  if (m && m.win) return true;
+  return g.teams.some(t => isRival(t) && !t.win);
+}
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
   // rival wins. Both still appear under TV Windows, which is a record of what
@@ -2908,8 +2930,10 @@ function visible() {
     // both questions -- and asks keyShows FIRST, because a game kept only for
     // the Michigan and Rivals views belongs here through that door and would
     // be turned away at the other one, and a game a rival WON through a third
-    // door of its own (2026-10-14) that no other view opens.
-    : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g))
+    // door of its own (2026-10-14) that no other view opens -- and, in
+    // BASKETBALL, every Michigan win and every rival loss besides.
+    : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g)
+                         || michRivalShows(g))
     : g.rivals_only ? false
     : VIEW === "tv" ? tvShows(g)
     : keyShows(g));
@@ -3222,7 +3246,8 @@ function filterChips() {
       : VIEW === "big" ? keyShows(g)
       // COMBINED reaches back as far as Key Games does. Before 2021 there is
       // no TV Windows side to it, which he knows and accepts (2026-10-14).
-      : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g))
+      : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g)
+                           || michRivalShows(g))
       : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
