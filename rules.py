@@ -827,6 +827,14 @@ def cbb_header_suffix(nets, d, tourney=False, big_ten=False, espn_sat=False,
     # plays a handful before the new year and they read as ordinary
     # non-conference filler otherwise -- "DECEMBER SATURDAY", not "SATURDAY".
     if d.month == 12:
+        # ...BUT NOT AFTER CHRISTMAS (his call 2026-10-14). The label exists to
+        # mark the handful of Big Ten games played before the new year as
+        # conference games, which they do not otherwise look like. By the 25th
+        # that has stopped being a surprise and the words say nothing. 17 of
+        # the 53 December Big Ten games lose it, nine of them from 2020-21's
+        # compressed season.
+        if d.day >= 25:
+            return None
         return ("December " + DAY_FULL[d.weekday()]) if both_big_ten else None
     if d.month not in (1, 2, 3):
         return None

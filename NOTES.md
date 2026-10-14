@@ -839,6 +839,40 @@ season ahead the way TV Windows does; what Key Games keeps out is Michigan's
 fixture list, and Combined reaches those only through a game TYPE, which
 needs both teams ranked.
 
+## Basketball's four buckets
+
+**NOVEMBER, FEAST WEEK, EARLY DECEMBER, LATE DECEMBER (his call 2026-10-14)**,
+replacing the two that were simply November and December. Measured across
+sixteen seasons the breaks are real, and they are THANKSGIVING-relative:
+
+| bucket | games | conference | what defines it |
+| --- | --- | --- | --- |
+| November | 88 | 0 | Champions Classic (23), Gavitt |
+| Feast Week | 144 | 2 | Maui (20), Battle 4 Atlantis (19) |
+| Early December | 118 | 27 | Jimmy V, Big 12-Big East Battle |
+| Late December | 120 | 29 | CBS Sports Classic (13), Jumpman |
+
+The seams are where the numbers turn: the named-event share goes 50% to 69%
+into Feast Week, conference games go 2 to 27 out of it, and the holiday
+showcases mark the last. **A FIXED CALENDAR LINE CANNOT HOLD THEM.**
+Thanksgiving moves between the 22nd and the 28th, so the Feast block starts
+anywhere from 12 to 18 November, and in 2013, 2019 and 2024 it runs into
+December -- Battle 4 Atlantis games played on 1 December would land in "early
+December" under a mid-month cut. `cbbBucket` counts whole weeks from
+Thanksgiving week, so -1 and 0 are the fortnight. He named the first bucket
+NOVEMBER rather than Opening.
+
+Marquee still clears when any of the four is chosen, as it did for the two:
+Marquee is a January-onward idea and the bucket would open empty under it.
+
+**A DECEMBER CONFERENCE GAME STOPS SAYING SO AFTER CHRISTMAS (his call
+2026-10-14).** "December Saturday" exists to mark the handful of Big Ten games
+played before the new year, which do not otherwise look like conference games.
+By the 25th that has stopped being a surprise. 17 of the 53 December Big Ten
+games lose the label -- nine of them from 2020-21's compressed season, the
+rest from 2011, 2012, 2014 and 2015. Since 2017, outside that one season,
+every December Big Ten game has been played before the 25th anyway.
+
 ## The Detroit tab's season line
 
 **TWO LINES (his call 2026-10-12): what his team did, then who won the

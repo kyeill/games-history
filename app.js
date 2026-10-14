@@ -2898,14 +2898,53 @@ function tieOrder(list) {
 /* WHICH ENTRY OF THE WEEK DROPDOWN A GAME BELONGS TO. The two lists that
    build that dropdown each work this out for themselves, further down; this
    is here so CURRENT can name its week in the same vocabulary. */
+/* THE FOUR BUCKETS IN FRONT OF THE NUMBERED WEEKS (his call 2026-10-14),
+   replacing the two that were simply November and December. Measured across
+   sixteen seasons the breaks are real, and they are THANKSGIVING-relative,
+   not calendar-relative:
+
+     November        opening to the week before Feast   88 games,  0 conference
+     Feast Week      the MTE fortnight                 144 games,  2 conference
+     Early December  the challenges                    118 games, 27 conference
+     Late December   the holiday showcases             120 games, 29 conference
+
+   A fixed mid-November line cannot hold them. Thanksgiving moves between the
+   22nd and the 28th, so the Feast block starts anywhere from 12 to 18
+   November and in 2013, 2019 and 2024 runs into December -- Battle 4 Atlantis
+   games played on 1 December would land in "early December" under a calendar
+   cut. He named the first bucket November rather than Opening. */
+function thanksgiving(season) {
+  // the fourth Thursday of November
+  const nov = new Date(Date.UTC(season, 10, 1));
+  const first = (4 - nov.getUTCDay() + 7) % 7;
+  return new Date(Date.UTC(season, 10, 1 + first + 21));
+}
+const CBB_BUCKETS = [["nov", "November"], ["feast", "Feast Week"],
+                     ["dec1", "Early December"], ["dec2", "Late December"]];
+// the Monday of a date's week, as a timestamp
+function mondayOf(d) {
+  const m = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5);
+  m.setUTCHours(0, 0, 0, 0);
+  return m.getTime();
+}
+function cbbBucket(g) {
+  const m = +g.date.slice(5, 7);
+  if (m !== 11 && m !== 12) return null;
+  // whole weeks from THANKSGIVING WEEK: -1 and 0 are the Feast fortnight
+  const rel = Math.round((mondayOf(new Date(g.date + "T12:00:00Z"))
+    - mondayOf(thanksgiving(g.season))) / (7 * 864e5));
+  if (rel <= -2) return "nov";
+  if (rel <= 0) return "feast";
+  if (rel <= 2) return "dec1";
+  return "dec2";
+}
 function weekKeyOf(g) {
   if (SPORT_OF[TAB] === "CFB") {
     return g.title || g.week == null ? "postseason" : g.week;
   }
   if (g.stage) return "postseason";
-  const m = +g.date.slice(5, 7);
-  if (m === 11) return "nov";
-  if (m === 12) return "dec";
+  const b = cbbBucket(g);
+  if (b) return b;
   return cbbWeekNo(g);
 }
 /* WHAT TV WINDOWS ADMITS. A GAME TYPE IS NO LONGER A WAY ONTO IT (his call
@@ -3096,9 +3135,8 @@ function visible() {
   if (FILT.week === "postseason")
     list = list.filter(g => g.sport === "CFB" ? (!!g.title || g.week == null)
       : !!g.stage);
-  else if (FILT.week === "nov" || FILT.week === "dec")
-    list = list.filter(g => !g.stage &&
-      +g.date.slice(5, 7) === (FILT.week === "nov" ? 11 : 12));
+  else if (CBB_BUCKETS.some(b => b[0] === FILT.week))
+    list = list.filter(g => !g.stage && cbbBucket(g) === FILT.week);
   else if (FILT.week != null)
     list = list.filter(g => g.sport === "CFB" ? (g.week === FILT.week && !g.title)
       : cbbWeekNo(g) === FILT.week);
@@ -3566,19 +3604,19 @@ function filterChips() {
   if (sport === "CBB" && (VIEW === "tv" || VIEW === "both")) {
     const base = seasonBase("week");
     const weeks = new Set();
-    let nov = false, dec = false, post = false;
+    const buckets = new Set();
+    let post = false;
     base.forEach(g => {
       if (g.stage) { post = true; return; }
-      const m = +g.date.slice(5, 7);
-      if (m === 11) { nov = true; return; }
-      if (m === 12) { dec = true; return; }
+      const b = cbbBucket(g);
+      if (b) { buckets.add(b); return; }
       const w = cbbWeekNo(g);
       if (w != null) weeks.add(w);
     });
     if (typeof FILT.week === "number") weeks.add(FILT.week);
     h += group("Week", select("week", "All Weeks",
-      (nov || FILT.week === "nov" ? [["November", "nov"]] : [])
-        .concat(dec || FILT.week === "dec" ? [["December", "dec"]] : [])
+      CBB_BUCKETS.filter(b => buckets.has(b[0]) || FILT.week === b[0])
+        .map(b => [b[1], b[0]])
         .concat(Array.from(weeks).sort((a, b) => a - b).map(w => ["Week " + w, w]))
         .concat(post || FILT.week === "postseason"
           ? [["Postseason", "postseason"]] : []),
@@ -4162,7 +4200,7 @@ async function init() {
     // a January-onward idea -- he keeps it that way deliberately, conference
     // play being the point of it -- so a December game can never be Marquee
     // and the bucket would otherwise open empty under the TV Windows default.
-    if (k === "week" && (v === "nov" || v === "dec")) FILT.marquee = false;
+    if (k === "week" && CBB_BUCKETS.some(b => b[0] === v)) FILT.marquee = false;
     // (CHOOSING A WEEK LEAVES CURRENT, which matters here -- Current pins the
     // list to one week and the two would otherwise fight, asking for Week 3
     // under it coming back empty and asking for "All Weeks" going on showing
