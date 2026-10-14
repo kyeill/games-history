@@ -881,6 +881,20 @@ shows the event chip only when there is none, so not one of them renders.
 The other footer chips were checked too: city, offsite and the series tags
 have no capitals problem.
 
+**FIVE OF THE NAMES I CHOSE WERE NOT WANTED AT ALL (his call 2026-10-14):**
+"give the city for all of those (except Germany) instead of the event name".
+The Gotham Classic, the Armed Forces Classic, the Big Four Classic, the
+Hoophall Invitational and the Jerry Colangelo Classic are each one or two
+games nobody calls by name, so their overrides are `null`, which forces the
+CITY. They now read Madison Square Garden, Germany and Honolulu, Des Moines,
+Miami and Phoenix.
+
+**RAMSTEIN NAMES A COUNTRY MORE USEFULLY THAN A TOWN.** The 2012 Armed Forces
+Classic was played at Ramstein Air Force Base; `CITY_OVERRIDES` maps it to
+Germany. And the Gotham Classic resolves to MADISON SQUARE GARDEN rather than
+New York, which is his own venue-for-metro rule (2026-09-11) working as
+intended, not a miss.
+
 **INDIANA CLASSIC IS THE INDY CLASSIC** (his call 2026-10-14, answering
 whether the 2016 Purdue Fort Wayne game at Indiana was the same event as the
 2022-onward neutral-site one: "same"). I had guessed they were different and

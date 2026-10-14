@@ -182,7 +182,11 @@ CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
                   "Saint Paul": "St. Paul",
                   # the 2024 hockey regional: he calls it St. Louis
                   "Maryland Heights": "St. Louis",
-                  "Cincinatti": "Cincinnati"}             # USCHO's spelling
+                  "Cincinatti": "Cincinnati",            # USCHO's spelling
+                  # the 2012 Armed Forces Classic was played at Ramstein Air
+                  # Force Base, which names a country more usefully than a town
+                  # (his call 2026-10-14)
+                  "Ramstein": "Germany"}
 
 
 # MICHIGAN view (his call 2026-09-11): every Michigan game from 2011 on (the
