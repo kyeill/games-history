@@ -2303,6 +2303,18 @@ function keyFill(g) {
   return !!michTeam(g) && !!keyRing(g);
 }
 function keyRing(g) {
+  /* NOBODY HAS WON AN UNPLAYED GAME, and this asks who did (2026-10-14). The
+     rival branch below finds a rival "that did not win" -- true of BOTH sides
+     before kickoff -- and hands the game to celebrateColor, which looks up
+     `g.teams.find(t => t.win)` and reads `.id` off undefined. It THREW, and a
+     throw inside the row map aborts the whole of `draw`, so the list rendered
+     as far as the first bad game and every later filter change died the same
+     way. That is why Combined's filters looked dead.
+     `keyStage` has always guarded this; `keyRing` never did, and Key Games
+     hid it -- an unplayed game reaches that view only through a game TYPE,
+     which needs both teams ranked, and the clamp holds it to this week.
+     Combined carries the whole season ahead, so it meets one at once. */
+  if (upcoming(g)) return null;
   const stage = keyStage(g);
   if (stage) return [stage, stage + "44"];
   const m = michTeam(g);
