@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-164757";
+const BUILD = "20261014-165056";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2382,9 +2382,19 @@ function combPaint(g) {
   // covers a conference title they took and an ordinary win alike -- and a
   // Michigan LOSS to one of them, which is the same news said twice.
   if (rivalWon) return { ring: COMB_GREY, fill: false, dash: true };
-  // the CFP outranks everything below it
-  if ((g.stage || "").indexOf("CFP") === 0 && (m || g.teams.some(t => isRival(t) && !t.win))) {
-    return { ring: ["#c28c19", "#c28c1944"], fill: true, dash: false };
+  /* THE NATIONAL TOURNAMENT OUTRANKS EVERYTHING BELOW IT -- football's CFP in
+     gold, basketball's NCAA Tournament in blue (his call 2026-10-14, mirroring
+     the football rules onto CBB Combined). The two are the same idea and the
+     same two colours `keyStage` has used on Key Games since 2026-10-02; the
+     branch simply only knew about the CFP, so basketball's 58 postseason
+     games with Michigan or a losing rival in them were falling through to the
+     ordinary rules. The NIT is deliberately NOT here, matching football, where
+     "a bowl that is not a CFP game earns nothing extra". */
+  const natl = (g.stage || "").indexOf("CFP") === 0 ? ["#c28c19", "#c28c1944"]
+    : (g.stage || "").indexOf("NCAA Tournament") === 0 ? ["#0053b8", "#0053b844"]
+    : null;
+  if (natl && (m || g.teams.some(t => isRival(t) && !t.win))) {
+    return { ring: natl, fill: true, dash: false };
   }
   if (g.title && winner) {
     return { ring: m && m.win ? COMB_MAIZE : ofWinner(), fill: false, dash: false };

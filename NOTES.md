@@ -1057,6 +1057,21 @@ On a phone the plain one DROPS (`.sdrop`), because a bare "Ivy" said nothing
 once its record had gone -- but IVY CHAMPIONS stays, a title not being a
 record.
 
+**THE SHADING MIRRORS ONTO BASKETBALL ALMOST FOR FREE (his call
+2026-10-14).** `combPaint` is keyed on the VIEW, not the sport, so the rival
+pair, the dashed rival win, the conference title, the Michigan rules and the
+rival-loss rules all crossed over the moment CBB Combined existed. ONE branch
+did not: it knew only the CFP, so basketball's 58 postseason games with
+Michigan or a losing rival in them fell through to the ordinary rules. The
+national tournament is now read per sport -- football's CFP in gold, the NCAA
+Tournament in blue -- which are the same two colours `keyStage` has used on
+Key Games since 2026-10-02.
+
+The NIT is deliberately NOT in it (4 games), matching football, where "a bowl
+that is not a CFP game earns nothing extra". And the Big Ten Tournament's
+quarters and semis stay plain: only the CHAMPIONSHIP carries `title`, which
+mirrors football's "a conference final only".
+
 **THE SEASON LINE DROPS ITS SEEDS ON A PHONE** (his call 2026-10-12), after
 the records (2026-09-30). With the record already gone a seed is a lone
 parenthetical that buys the width nothing: "NCAA Sweet Sixteen (No. 4)" says
