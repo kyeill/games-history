@@ -659,7 +659,16 @@ settled on, READ OFF THE GAMES IT KEPT rather than worked out a second time --
 the fallback to "the latest week there is" would otherwise have to be
 duplicated to be got right, and the two would drift.
 
-Three things follow from that:
+**IT IS READ AT THE VERY END of `visible()`, off what is actually shown.**
+Asking in the middle of the pipeline, just after Current narrows, was wrong
+for basketball: Current's fallback is a DATE -- "this Monday onward" -- and
+the season filter has not run yet, so next season's games were still in the
+list and the keys came back mixed. Three championship games in March and a
+league's worth of November fixtures agree about nothing, so the dropdown went
+on saying "All Weeks". Football hid it, its Current being a date RANGE that
+only one season falls inside.
+
+Three more things follow:
 * `visible()` records the week in `CUR_WEEK`, so **the list is drawn BEFORE
   the filters** in `draw()`; the dropdown cannot name a week nobody has
   worked out yet.

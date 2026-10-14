@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-085813";
+const BUILD = "20261014-090032";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2848,22 +2848,6 @@ function visible() {
       list = list.filter(g => g.date >= mon);
     }
   }
-  /* ...AND CURRENT NAMES ITS WEEK (his call 2026-10-14): "the Week filter
-     should also default to whatever week is current, not say All Weeks (which
-     isn't even true, since clearly it is filtered)". The dropdown shows the
-     week Current settled on, READ OFF THE GAMES IT KEPT rather than worked
-     out a second time -- the fallback to the latest week there is would
-     otherwise have to be duplicated to be got right.
-     A window that straddles two of them names neither: a Monday or Sunday
-     game can carry the week either side of it, and a label that is true of
-     most of the list is the same complaint again. */
-  CUR_WEEK = null;
-  if (VIEW === "tv" && FILT.current && list.length) {
-    const keys = list.map(weekKeyOf);
-    if (keys.every(k => k != null && String(k) === String(keys[0]))) {
-      CUR_WEEK = keys[0];
-    }
-  }
   // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
   // so the filter and the header can never disagree (his call 2026-09-14).
   // It is a REGULAR-SEASON question: asking for CBS is asking what he watched
@@ -3028,6 +3012,30 @@ function visible() {
     const ba = block(a), bb = block(b);
     return ba === bb ? chron(a, b) : bb.localeCompare(ba);
   });
+  /* ...AND CURRENT NAMES ITS WEEK (his call 2026-10-14): "the Week filter
+     should also default to whatever week is current, not say All Weeks (which
+     isn't even true, since clearly it is filtered)". The dropdown shows the
+     week Current settled on, READ OFF THE GAMES IT KEPT rather than worked
+     out a second time -- the fallback to "the latest week there is" would
+     otherwise have to be duplicated to be got right, and the two would drift.
+
+     IT IS READ AT THE VERY END, off what is actually being shown. Asking in
+     the middle of the pipeline -- just after Current narrows -- was wrong for
+     basketball: Current's fallback is a DATE, "this Monday onward", and the
+     season filter has not run yet, so next season's games were still in the
+     list and the keys came back mixed. Three games in March and a league's
+     worth of November fixtures agree about nothing.
+
+     A window that straddles two weeks names neither: a Sunday or Monday game
+     can carry the week either side of it, and a label true of most of the
+     list is the same complaint again. */
+  CUR_WEEK = null;
+  if (VIEW === "tv" && FILT.current && list.length) {
+    const keys = list.map(weekKeyOf);
+    if (keys.every(k => k != null && String(k) === String(keys[0]))) {
+      CUR_WEEK = keys[0];
+    }
+  }
   return list;
 }
 
