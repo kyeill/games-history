@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-093428";
+const BUILD = "20261014-094650";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -918,8 +918,14 @@ function rowHtml(g, browse) {
   // only football did, so a basketball card took the winner's colour where the
   // Big Ten / CFP / NCAA colours now belong. It no longer waits on
   // `celebrated` either -- a postseason colour is its own reason to frame.
-  if (VIEW === "big" || VIEW === "both") {
+  if (VIEW === "big") {
     ring = keyRing(g);
+    flag = !!ring;
+  }
+  // ...and COMBINED reads its own rules (his calls 2026-10-14) -- see combPaint
+  const paint = VIEW === "both" ? combPaint(g) : null;
+  if (paint) {
+    ring = paint.ring;
     flag = !!ring;
   }
   /* HIS RESULTS CARRY THEIR OWN COLOURS (his call 2026-10-02): the Shade
@@ -941,8 +947,12 @@ function rowHtml(g, browse) {
   return '<div class="row' + (flag ? " celebrate" : "") +
     (dimmed(g) ? " dimmed" : "") + (struck(g) ? " struck" : "") +
     (flatWin(g) ? " flatwin" : "") + (g.ot ? " ot" : "") +
-    ((VIEW === "rivals" && rivalsFill(g)) || keyFill(g) || marqueeFill(g) ||
-      (imx && imx.shade) ? " rwash" : "") +
+    ((paint ? paint.fill
+      : (VIEW === "rivals" && rivalsFill(g)) || keyFill(g) || marqueeFill(g))
+      || (imx && imx.shade) ? " rwash" : "") +
+    // a rival winning a conference title reads dashed, the way a Michigan loss
+    // does -- `mloss` cannot say it, Michigan not being in the game
+    (paint && paint.dash ? " dsh" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
     ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
@@ -2324,6 +2334,61 @@ function keyRing(g) {
   }
   const rival = g.teams.find(t => isRival(t) && !t.win);
   return (g.title || (rival && rival.rank)) ? celebrateColor(g) : null;
+}
+/* COMBINED HAS ITS OWN SHADING (his calls 2026-10-14). Neither parent's
+   scheme fitted: TV Windows frames every Michigan game, Key Games frames only
+   the ones that mattered, and this list is long enough to need the stricter
+   idea while carrying results that neither tab shows on its own.
+
+   The shape is the same on both sides -- a BORDER says it was a marquee
+   window, a FILL says the result mattered -- and the fill takes the WINNER's
+   colour for free, `--winwash` already being set from whoever won.
+
+     MICHIGAN  loses                        dashed grey, always
+               beats a ranked team or a rival        fill
+               wins in a marquee window              border
+     A RIVAL   loses while ranked, in a marquee      border + fill
+               is upset                              fill
+               loses in a marquee window             border
+
+   Two rivals playing each other still cancel out: one of them had to win.
+   A CONFERENCE TITLE GAME is coloured by its winner instead, and reads dashed
+   grey when a rival won it -- the same "bad news" look a Michigan loss gets.
+   The CFP keeps its gold (his call 2026-10-02); he did not ask for it to go,
+   and it is the one colour that outranks a conference title. */
+const COMB_MAIZE = ["#ffcb05", "#ffcb0544"];
+const COMB_GREY = ["#7a7a82", "#7a7a8244"];
+function combPaint(g) {
+  const none = { ring: null, fill: false, dash: false };
+  if (upcoming(g)) return none;          // nobody has won it yet
+  const winner = g.teams.find(t => t.win);
+  const mq = !!g.mq;
+  const m = michTeam(g);
+  const rivalWon = g.teams.some(t => isRival(t) && t.win);
+  const ofWinner = () => {
+    const c = brighten(teamColor(winner), 130);
+    return [c, c + "44"];
+  };
+  // the CFP outranks everything below it
+  if ((g.stage || "").indexOf("CFP") === 0 && (m || g.teams.some(t => isRival(t) && !t.win))) {
+    return { ring: ["#c28c19", "#c28c1944"], fill: true, dash: false };
+  }
+  if (g.title && winner) {
+    if (rivalWon) return { ring: COMB_GREY, fill: false, dash: true };
+    return { ring: m && m.win ? COMB_MAIZE : ofWinner(), fill: false, dash: false };
+  }
+  if (m) {
+    if (!m.win) return { ring: COMB_GREY, fill: false, dash: true };
+    const other = g.teams.find(t => t.id !== MICHIGAN);
+    const quality = !!(other && (other.rank || isRival(other)));
+    return { ring: mq ? COMB_MAIZE : null, fill: quality, dash: false };
+  }
+  const lost = g.teams.find(t => isRival(t) && !t.win);
+  if (lost && !rivalWon && winner) {
+    return { ring: mq ? ofWinner() : null,
+             fill: (!!lost.rank && mq) || isUpset(g), dash: false };
+  }
+  return none;
 }
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no

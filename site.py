@@ -175,6 +175,9 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 /* a Michigan loss on the other views: dashed, never mistaken for a grey
    winner. The Michigan view keeps a plain frame (his calls 2026-09-11) */
 .row.celebrate.mloss{border-style:dashed;box-shadow:none}
+/* ...and on COMBINED a rival winning a conference title reads the same way
+   (his call 2026-10-14). `mloss` cannot say it: Michigan is not in the game */
+.row.celebrate.dsh{border-style:dashed;box-shadow:none}
 /* a rival won, or Michigan lost: both team lines go italic */
 /* a rival won, or Michigan lost: the WINNER's name is struck through -- no
    italics anywhere any more (his call 2026-09-11) */
