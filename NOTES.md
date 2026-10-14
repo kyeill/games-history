@@ -718,10 +718,37 @@ way. It is a view for looking across a season, so it starts by showing one.
 the pre-2021 seasons have no TV Windows side to them ("just knowing there will
 be no TV Windows impact for now"). 2018 shows 29 games, all of them Key.
 
-**The CARD COLOURS are Key Games'** -- `keyRing`, `keyFill` and his Results
-`imx` all read the new view as well, so a postseason frame or a Shade column
-paints here too. A TV-only game is untouched by them, having neither a stage
-nor Michigan in it.
+**COMBINED HAS ITS OWN SHADING (his calls 2026-10-14)**, `combPaint`. The
+shape is the same on both sides -- a BORDER says it was a marquee window, a
+FILL says the result mattered -- and the fill takes the WINNER's colour for
+free, `--winwash` already being set from whoever won.
+
+| | border | fill |
+| --- | --- | --- |
+| Michigan loses | dashed grey, always | no |
+| Michigan beats a ranked team or a rival | only if marquee | yes |
+| Michigan wins in a marquee window | yes | only if ranked/rival |
+| a rival loses while ranked, in a marquee | yes | yes |
+| a rival is upset | only if marquee | yes |
+| a rival loses in a marquee window | yes | only if ranked or upset |
+
+Two rivals playing each other still cancel out: one of them had to win. A
+CONFERENCE TITLE GAME is coloured by its winner instead, dashed grey when a
+rival won it -- `.dsh`, because `mloss` cannot say it with Michigan not in the
+game. The CFP keeps its gold (2026-10-02): he did not ask for it to go, and it
+is the one colour that outranks a conference title. His Results columns
+(`imx`) still override everything, which is why the 2023 Texas-Washington
+semifinal wears Washington purple.
+
+**THE "RIVAL WINS A CONFERENCE TITLE" RULE HAS NOTHING TO COLOUR.** Every such
+game -- Ohio State in 2014, 2017, 2018, 2019 and 2020, Michigan State in 2015,
+Clemson over Notre Dame in 2020 -- is `rivals_only`, so `tvShows` rejects it
+and `keyShows` rejects it for a rival having won. They reach the Rivals tab
+and nothing else. The rule is written and correct; it is the ADMISSION that
+keeps those games off this tab, and he may want that changed.
+
+(The first build borrowed Key Games' `keyRing` wholesale; `combPaint`
+replaced it on 2026-10-14. His Results `imx` still reads this view.)
 
 **The clamp on unplayed games stays Key Games' alone.** Combined shows the
 season ahead the way TV Windows does; what Key Games keeps out is Michigan's
