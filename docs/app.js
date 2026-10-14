@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-102019";
+const BUILD = "20261014-111016";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -932,6 +932,10 @@ function rowHtml(g, browse) {
      column fills the card and the Border column frames it -- in the winner's
      colour, or Big Ten blue where he says Big Ten. */
   const imx = (VIEW === "big" || VIEW === "both") ? (g.imx || null) : null;
+  // HIS SHEET OVERRIDES THE DASH TOO (his call 2026-10-14): "rival wins should
+  // probably always be dashed, unless specified on sheets". A Border column
+  // names a solid colour, so the dashed edge goes with the grey it replaced.
+  const sheetBorder = !!(imx && imx.border);
   if (imx && imx.border) {
     const w = g.teams.find(t => t.win);
     const c = /big ten/i.test(imx.border) ? "#0088ce"
@@ -952,10 +956,11 @@ function rowHtml(g, browse) {
       || (imx && imx.shade) ? " rwash" : "") +
     // a rival winning a conference title reads dashed, the way a Michigan loss
     // does -- `mloss` cannot say it, Michigan not being in the game
-    (paint && paint.dash ? " dsh" : "") +
+    (paint && paint.dash && !sheetBorder ? " dsh" : "") +
     // a Michigan loss is DASHED on these views (his call 2026-09-11); the
     // Michigan view keeps a plain frame
-    ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win) ? " mloss" : "") +
+    ((VIEW !== "rivals" && michTeam(g) && !michTeam(g).win
+      && !(paint && sheetBorder)) ? " mloss" : "") +
     // ranking colour (his calls 2026-09-11), every view: a Michigan loss or a
     // win by Ohio State, Michigan State or Notre Dame greys the rankings;
     // otherwise an upset paints them Sports Daily's orange
@@ -2369,6 +2374,10 @@ function combPaint(g) {
     const c = brighten(teamColor(winner), 130);
     return [c, c + "44"];
   };
+  // A SURVIVING RIVAL PAIR WEARS NO BORDER OF ITS OWN (2026-10-14): it is
+  // here for the marquee window, and whoever won it is still a rival. One on
+  // his Results sheet is painted by the sheet, below.
+  if (rivalPair(g)) return none;
   // A RIVAL WON: dashed grey, whatever else the game was (2026-10-14). This
   // covers a conference title they took and an ordinary win alike -- and a
   // Michigan LOSS to one of them, which is the same news said twice.
@@ -2430,6 +2439,23 @@ function michRivalShows(g) {
   const m = michTeam(g);
   if (m && m.win) return true;
   return g.teams.some(t => isRival(t) && !t.win);
+}
+/* TWO RIVALS PLAYING EACH OTHER LEAVE COMBINED (his call 2026-10-14):
+   "drop all Rival vs Rival unless marquee (no border) or included on Results
+   (shade/border as listed)". One of them had to win, so the result says
+   nothing he wants said -- but a marquee window is a reason to have watched
+   it, and a game on his Results sheet is there because he put it there.
+   27 games, of which 9 stay: 7 marquee and 2 from the sheet.
+   Michigan is never a rival, so a Michigan game is never a pair. */
+function rivalPair(g) {
+  return g.teams.length === 2 && g.teams.every(isRival);
+}
+function onResults(g) {
+  return !!(g.imx && (g.imx.shade || g.imx.border));
+}
+function combShows(g) {
+  if (rivalPair(g) && !(g.mq || onResults(g))) return false;
+  return keyShows(g) || tvShows(g) || rivalWonShows(g) || michRivalShows(g);
 }
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
@@ -2931,9 +2957,9 @@ function visible() {
     // the Michigan and Rivals views belongs here through that door and would
     // be turned away at the other one, and a game a rival WON through a third
     // door of its own (2026-10-14) that no other view opens -- and, in
-    // BASKETBALL, every Michigan win and every rival loss besides.
-    : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g)
-                         || michRivalShows(g))
+    // BASKETBALL, every Michigan win and every rival loss besides. See
+    // combShows, which also turns two rivals playing each other away.
+    : VIEW === "both" ? combShows(g)
     : g.rivals_only ? false
     : VIEW === "tv" ? tvShows(g)
     : keyShows(g));
@@ -3246,8 +3272,7 @@ function filterChips() {
       : VIEW === "big" ? keyShows(g)
       // COMBINED reaches back as far as Key Games does. Before 2021 there is
       // no TV Windows side to it, which he knows and accepts (2026-10-14).
-      : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g)
-                           || michRivalShows(g))
+      : VIEW === "both" ? combShows(g)
       : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing
@@ -3809,7 +3834,9 @@ function quickButtons() {
       : '<button class="f" data-act="marquee" aria-pressed="' +
         marqueeOn() + '">Marquee Windows</button>') +
     // UPSETS (his call 2026-09-20): the two upset categories, nothing else
-    ((VIEW === "big" || both) && SPORT_OF[TAB] === "CFB"
+    // ...and COMBINED carries it in BOTH sports (his call 2026-10-14).
+    // Basketball's Key Games still does not: that view is unchanged.
+    ((VIEW === "big" && SPORT_OF[TAB] === "CFB") || both
       ? '<button class="f" data-act="upset" aria-pressed="' + !!FILT.upset +
         '">Upsets</button>' : "") +
     sortButton();

@@ -737,6 +737,29 @@ and `KEY_FROM` carries the 2011-12 floor. Two things differed.
 1,340 cards, 54 to 166 a season, 0 to 18 of them dashed. **The 61 orphaned
 basketball games are visible at last**, the same ones that prompted all this.
 
+**TWO RIVALS PLAYING EACH OTHER LEAVE COMBINED (his call 2026-10-14):** "drop
+all Rival vs Rival unless marquee (no border) or included on Results
+(shade/border as listed)". One of them had to win, so the result says nothing
+he wants said -- but a marquee window is a reason to have watched it, and a
+game on his Results sheet is there because he put it there. 27 such games
+across both sports; 9 stay, 7 for the marquee and 2 from the sheet; 18 go.
+A surviving pair wears NO border of its own, the sheet painting the two that
+have one. Michigan is never a rival, so a Michigan game is never a pair.
+
+The drop is a filter on the VIEW, not on one door: a rival pair can arrive
+through `tvShows` as easily as through `rivalWonShows`, so `combShows` turns
+it away before either is asked.
+
+**HIS SHEET OVERRIDES THE DASH, not just the colour (his call 2026-10-14):**
+"rival wins should probably always be dashed (unless specified on sheets)". A
+Border column names a solid colour, so the dashed edge goes with the grey it
+replaced -- 2012-03-04 Ohio State over Michigan State had been reading dashed
+in Ohio State's red, which was the two rules each winning half the argument.
+`mloss` is suppressed the same way, on COMBINED only; the other views keep it.
+
+**UPSETS IS ON BOTH COMBINED VIEWS (his call 2026-10-14)**, football and
+basketball. CBB Key Games still has no such button: that view is unchanged.
+
 **EVERY MICHIGAN WIN AND EVERY RIVAL LOSS, on basketball's Combined (his call
 2026-10-14).** Football's Key Games has admitted these since 2026-09-20 --
 "any Ohio State / Michigan State / Notre Dame LOSS, and any Michigan WIN" --
