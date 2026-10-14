@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261014-094650";
+const BUILD = "20261014-100012";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2369,12 +2369,15 @@ function combPaint(g) {
     const c = brighten(teamColor(winner), 130);
     return [c, c + "44"];
   };
+  // A RIVAL WON: dashed grey, whatever else the game was (2026-10-14). This
+  // covers a conference title they took and an ordinary win alike -- and a
+  // Michigan LOSS to one of them, which is the same news said twice.
+  if (rivalWon) return { ring: COMB_GREY, fill: false, dash: true };
   // the CFP outranks everything below it
   if ((g.stage || "").indexOf("CFP") === 0 && (m || g.teams.some(t => isRival(t) && !t.win))) {
     return { ring: ["#c28c19", "#c28c1944"], fill: true, dash: false };
   }
   if (g.title && winner) {
-    if (rivalWon) return { ring: COMB_GREY, fill: false, dash: true };
     return { ring: m && m.win ? COMB_MAIZE : ofWinner(), fill: false, dash: false };
   }
   if (m) {
@@ -2389,6 +2392,22 @@ function combPaint(g) {
              fill: (!!lost.rank && mq) || isUpset(g), dash: false };
   }
   return none;
+}
+/* A GAME A RIVAL WON REACHES COMBINED, and nothing else (his call
+   2026-10-14: "I think they should show up with dashed borders, because we
+   have the rest of the CCGs"). It had been reaching NOTHING. 92 games sat in
+   the file on no tab at all -- every one a rival win, every one carrying a
+   category -- because the harvest keeps them to fill Key Games' older seasons
+   while all three doors refuse them: Rivals wants a rival LOSS, Key Games
+   bars a rival win by design, and TV Windows bars `rivals_only`. Six were
+   conference titles, which is what he noticed: the tab showed every other
+   conference final and silently dropped the ones Ohio State won.
+   The floor is Key Games' own, so this reaches no further back than the rest
+   of the view already does. */
+function rivalWonShows(g) {
+  if (!g.teams.some(t => isRival(t) && t.win)) return false;
+  if (g.season < (KEY_FROM[g.sport] || 2021)) return false;
+  return !!(g.type || g.title);
 }
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
@@ -2888,8 +2907,9 @@ function visible() {
     // COMBINED is the two of them at once (his call 2026-10-14), so it asks
     // both questions -- and asks keyShows FIRST, because a game kept only for
     // the Michigan and Rivals views belongs here through that door and would
-    // be turned away at the other one.
-    : VIEW === "both" ? (keyShows(g) || tvShows(g))
+    // be turned away at the other one, and a game a rival WON through a third
+    // door of its own (2026-10-14) that no other view opens.
+    : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g))
     : g.rivals_only ? false
     : VIEW === "tv" ? tvShows(g)
     : keyShows(g));
@@ -3202,7 +3222,7 @@ function filterChips() {
       : VIEW === "big" ? keyShows(g)
       // COMBINED reaches back as far as Key Games does. Before 2021 there is
       // no TV Windows side to it, which he knows and accepts (2026-10-14).
-      : VIEW === "both" ? (keyShows(g) || tvShows(g))
+      : VIEW === "both" ? (keyShows(g) || tvShows(g) || rivalWonShows(g))
       : !g.rivals_only)).map(g => g.season)));
   // ...and while "2021-Onward" is on, the years it hides are not offered
   // either (his call 2026-09-14) -- picking one could only return nothing

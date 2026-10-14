@@ -740,12 +740,29 @@ is the one colour that outranks a conference title. His Results columns
 (`imx`) still override everything, which is why the 2023 Texas-Washington
 semifinal wears Washington purple.
 
-**THE "RIVAL WINS A CONFERENCE TITLE" RULE HAS NOTHING TO COLOUR.** Every such
-game -- Ohio State in 2014, 2017, 2018, 2019 and 2020, Michigan State in 2015,
-Clemson over Notre Dame in 2020 -- is `rivals_only`, so `tvShows` rejects it
-and `keyShows` rejects it for a rival having won. They reach the Rivals tab
-and nothing else. The rule is written and correct; it is the ADMISSION that
-keeps those games off this tab, and he may want that changed.
+**92 GAMES WERE ON NO TAB AT ALL**, and Combined now has a third door for
+them (his call 2026-10-14). Every one is a game a rival WON, every one carries
+a category, and all three doors refused them: Rivals wants a rival LOSS, Key
+Games bars a rival win by design, TV Windows bars `rivals_only`. The harvest
+keeps them to fill Key Games' older seasons -- "carrying their category and
+nothing else" -- so the app simply had nowhere to put them. 61 basketball, 31
+football; 85 of them before 2021.
+
+I had told him these games "reach the Rivals tab and nothing else". That was
+WRONG and worth remembering: `rivalsAllows` needs `g.rivals` or
+`g.rival_loss`, and a rival WIN has neither. He spotted it at once -- "why are
+any sort of rivals wins living on Rival?" -- and the honest answer was that
+they were living nowhere.
+
+What he noticed first was the conference finals: the tab showed every other
+one and silently dropped the six Ohio State and Michigan State won.
+`rivalWonShows` admits a rival win that carries a type or a title, from Key
+Games' own season floor, on COMBINED ONLY. It adds 38 football cards.
+
+**A RIVAL WIN READS DASHED GREY, whatever else the game was** -- a conference
+title they took, an ordinary ranked win, or a Michigan loss to one of them,
+which is the same news said twice. That is 124 dashed cards across the
+thirteen football seasons, 10 to 20 a year.
 
 (The first build borrowed Key Games' `keyRing` wholesale; `combPaint`
 replaced it on 2026-10-14. His Results `imx` still reads this view.)
