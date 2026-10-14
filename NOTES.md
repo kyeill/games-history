@@ -881,6 +881,11 @@ shows the event chip only when there is none, so not one of them renders.
 The other footer chips were checked too: city, offsite and the series tags
 have no capitals problem.
 
+**INDIANA CLASSIC IS THE INDY CLASSIC** (his call 2026-10-14, answering
+whether the 2016 Purdue Fort Wayne game at Indiana was the same event as the
+2022-onward neutral-site one: "same"). I had guessed they were different and
+named it Indiana Classic; they are not. Nine games now, 2016 and 2022-25.
+
 ## Basketball's four buckets
 
 **NOVEMBER, FEAST WEEK, EARLY DECEMBER, LATE DECEMBER (his call 2026-10-14)**,
