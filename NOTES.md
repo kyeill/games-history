@@ -854,6 +854,33 @@ the unfiltered view still shows what is coming, which is the point of loading
 it. Note the Combined tab on the Michigan view already dropped every unplayed
 game (2026-09-24) -- this is the per-sport tabs.
 
+**ESPN WROTE EVENT NAMES IN CAPITALS BEFORE ABOUT 2021, and carried the
+sponsor** -- so loading the older basketball seasons brought a mess of footer
+chips with them (his catch 2026-10-14: "some of the Big Ten/ACC Challenge
+footers are way too wordy, the Crossroads Classic is inconsistent"). The event
+name comes straight from ESPN's headline, so `event-overrides.json` is where
+it is fixed; 24 entries were added and the rendered names went from 56
+distinct to 41, with no ALL-CAPS and no sponsor left in either.
+
+Three kinds of mess, and one decision each:
+* **Capitals with a cased twin already in the file** -- CROSSROADS CLASSIC,
+  BIG TEN/ACC CHALLENGE, JIMMY V CLASSIC, GAVITT TIPOFF GAMES. Folded on.
+* **Sponsors**, which ESPN changes yearly, so one event wore five names:
+  the Challenge was ACC/BIG TEN ... DICK'S SPORTING GOODS (2012, 2014),
+  ... LG V20 (2016), ... Continental Tire (2018, 2020, 2022) and plain
+  Big Ten/ACC Challenge (eleven seasons). All now Big Ten/ACC Challenge, 35
+  games. Note TWO of those sponsor forms were in the 2021-26 era he was happy
+  with, so this was not purely a pre-2021 problem.
+* **Two names for one event** -- Gavitt Games and Gavitt Tipoff Games, both
+  used in 2023. Unified on the shorter.
+
+**The NCAA Tournament's three name variants were left alone** -- MEN'S
+BASKETBALL CHAMPIONSHIP, Men's Basketball Championship and NCAA Men's
+Basketball Championship, 68 games. Every one carries a STAGE, and `rowHtml`
+shows the event chip only when there is none, so not one of them renders.
+The other footer chips were checked too: city, offsite and the series tags
+have no capitals problem.
+
 ## Basketball's four buckets
 
 **NOVEMBER, FEAST WEEK, EARLY DECEMBER, LATE DECEMBER (his call 2026-10-14)**,
