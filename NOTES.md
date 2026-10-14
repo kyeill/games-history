@@ -839,6 +839,21 @@ season ahead the way TV Windows does; what Key Games keeps out is Michigan's
 fixture list, and Combined reaches those only through a game TYPE, which
 needs both teams ranked.
 
+**2021-ONWARD IS ON BOTH COMBINED VIEWS (his call 2026-10-14).** The filter
+is old -- it is the Michigan views' button -- and the floor is the sport's
+own: football from 2021, basketball from the 2020-21 season, which is season
+2020 in the file. Combined is the one list that spans both eras, Key Games
+reaching back to 2014 and 2011-12 while TV Windows begins in 2021, so it is
+the one that needed a way to cut.
+
+**ASKING FOR AN OPPONENT IS ASKING WHAT HAPPENED (his call 2026-10-14).** On a
+TEAM view, choosing a team drops the games not yet played. Those tabs load the
+season ahead whole, so "Michigan vs Ohio State" ended on a fixture with no
+score sitting under a list of results. It applies only where he PICKED a team;
+the unfiltered view still shows what is coming, which is the point of loading
+it. Note the Combined tab on the Michigan view already dropped every unplayed
+game (2026-09-24) -- this is the per-sport tabs.
+
 ## Basketball's four buckets
 
 **NOVEMBER, FEAST WEEK, EARLY DECEMBER, LATE DECEMBER (his call 2026-10-14)**,

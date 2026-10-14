@@ -3177,6 +3177,13 @@ function visible() {
     list = list.filter(g => confsIn(g).indexOf(want) > -1);
   } else if (FILT.team) list = list.filter(g =>
     g.teams.some(t => t.id === FILT.team));
+  /* ASKING FOR AN OPPONENT IS ASKING WHAT HAPPENED (his call 2026-10-14): on
+     a team view, choosing one drops the games not yet played. The season
+     ahead is loaded whole on those tabs, so "Michigan vs Ohio State" would
+     otherwise end on a fixture with no score under a list of results. The
+     filter is only applied where he PICKED a team -- the unfiltered view
+     still shows what is coming. */
+  if (teamView() && FILT.team) list = list.filter(g => !upcoming(g));
   // Same kickoff minute: his tiebreak -- see tieOrder.
   const tieScore = tieOrder(list);
   const rank = g => tieScore.get(g) || 0;
@@ -3877,6 +3884,14 @@ function quickButtons() {
     ((VIEW === "big" && SPORT_OF[TAB] === "CFB") || both
       ? '<button class="f" data-act="upset" aria-pressed="' + !!FILT.upset +
         '">Upsets</button>' : "") +
+    /* 2021-ONWARD, ON BOTH COMBINED VIEWS (his call 2026-10-14). The filter
+       itself is old -- it is the Michigan views' button -- and the floor is
+       the sport's own: football from 2021, basketball from the 2020-21
+       season, which is season 2020 in the file. Combined is the one list that
+       spans both eras, Key Games reaching back to 2014 and 2011-12 while TV
+       Windows begins in 2021, so it is the one that needed a way to cut. */
+    (both ? '<button class="f" data-act="recent" aria-pressed="' +
+        !!FILT.recent + '">2021-Onward</button>' : "") +
     sortButton();
 }
 
