@@ -3963,14 +3963,11 @@ async function init() {
     // play being the point of it -- so a December game can never be Marquee
     // and the bucket would otherwise open empty under the TV Windows default.
     if (k === "week" && (v === "nov" || v === "dec")) FILT.marquee = false;
-    // CHOOSING A WEEK LEAVES CURRENT (2026-10-14), because Current pins the
-    // list to this one and the two would otherwise fight -- asking for Week 3
-    // under it would have come back empty, and asking for "All Weeks" would
-    // have gone on showing one. Picking the week Current is already on changes
-    // nothing, so the button stays down for that.
-    if (k === "week" && FILT.current && String(v) !== String(CUR_WEEK)) {
-      FILT.current = false; CURRENT_PREV = null;
-    }
+    // (CHOOSING A WEEK LEAVES CURRENT, which matters here -- Current pins the
+    // list to one week and the two would otherwise fight, asking for Week 3
+    // under it coming back empty and asking for "All Weeks" going on showing
+    // one. No code is needed for it: every dropdown already releases Current,
+    // at the top of this handler.)
     // a week or month chosen under one season may not exist in another
     if (k === "season") { FILT.week = null; FILT.month = null; }
     draw();

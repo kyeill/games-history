@@ -666,10 +666,12 @@ Three things follow from that:
 * `visibleWithout` puts `CUR_WEEK` back as it found it. The dropdowns run the
   pipeline many times over, and only the one pass that draws the list gets to
   say what the week is.
-* **Choosing a week LEAVES Current**, because Current pins the list to this
-  one and the two would otherwise fight: asking for Week 3 under it came back
-  empty, and asking for "All Weeks" went on showing one. Picking the week
-  Current is already on changes nothing, so the button stays down for that.
+* **Choosing a week LEAVES Current**, which matters here -- Current pins the
+  list to one week and the two would otherwise fight, asking for Week 3 under
+  it coming back empty and asking for "All Weeks" going on showing one. This
+  needed no code: EVERY dropdown already releases Current, at the top of the
+  change handler. A conditional was written for it first, sat below that line,
+  and could never have run -- worth remembering before adding another.
 
 **A window that straddles two weeks names neither** -- a Sunday or Monday game
 can carry the week either side of it, and a label true of most of the list is
