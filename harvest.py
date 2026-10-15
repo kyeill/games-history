@@ -2851,7 +2851,13 @@ def _b1g_regular(season):
             if not got:
                 continue
             _rec, w, l = got
-            pct = w / (w + l) if w + l else 0
+            # AN UNPLAYED TABLE HAS NO LEADER (2026-10-15). Before the first
+            # conference game every team is 0-0, every percentage is 0, and
+            # all eighteen tied for the title -- so the 2026-27 header read
+            # "B1G: Illinois/Indiana/Iowa/Maryland/..." all the way across.
+            if w + l == 0:
+                continue
+            pct = w / (w + l)
             if best is None or pct > best + 1e-9:
                 best, out = pct, []
             if abs(pct - best) < 1e-9:

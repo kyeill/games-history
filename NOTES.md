@@ -689,6 +689,29 @@ every season on the tab: ONE case in football (Labor Day 2021, a Monday game
 in Week 1 beside Week 2) and none at all in basketball. Current only ever
 lands on the live week, so in practice it never meets one.
 
+**AN UNPLAYED TABLE HAS NO LEADER (2026-10-15).** `_b1g_regular` reads the
+Big Ten standings and keeps everyone tied for the best percentage. Before the
+first conference game every team is 0-0, every percentage is 0, and all
+EIGHTEEN tied -- so the 2026-27 basketball header read "B1G: Illinois/Indiana/
+Iowa/Maryland/Michigan/..." all the way across. A 0-0 row is skipped now.
+
+**AND A SEASON STILL BEING PLAYED SHOWS NO CHAMPIONS AT ALL (his call
+2026-10-15)**, just the count of games on the page. `champLine` asks the GAMES
+rather than the calendar -- a season with anything unplayed left in it is not
+over -- which is belt and braces over the harvest fix above and covers any
+other half-filled champion row.
+
+**EVERY VIEW OPENS ON ITS OWN DEFAULTS (his call 2026-10-15):** "the filters
+should all reset when switching from view to view". `switchView` used to clear
+them one at a time -- type, windows, Marquee, Current, Highlights -- which
+left the season, the team, the network, the week and the rest to follow him
+across, so a team chosen on Rivals silently narrowed Combined. It calls
+`clearFilters` now, which REPLACES the object so a key nobody names goes too,
+then the per-view openings set what that view wants. SORT is reset with them,
+or basketball's Key Games would keep whatever order the view before it was
+read in. The branch that used to put the season back when LEAVING Rivals or a
+team view is gone: it is every view's business now, not those three.
+
 ## The College tab
 
 **SECOND AFTER MICHIGAN (his call 2026-10-15):** the two COMBINED views, which

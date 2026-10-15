@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261015-101657";
+const BUILD = "20261015-105251";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -352,6 +352,15 @@ function champPart(t, sport, season, national) {
 }
 function champLine() {
   const sport = SPORT_OF[TAB];
+  /* A SEASON STILL BEING PLAYED HAS NO WINNER (his call 2026-10-15), so it
+     says how many games are on the page instead. Asked of the GAMES rather
+     than the calendar: a season with anything unplayed left in it is not
+     over. This is belt and braces over the harvest fix -- `_b1g_regular` was
+     handing back all eighteen Big Ten teams before a conference game had been
+     played, every one of them 0-0 and so tied for the lead. */
+  if (GAMES.some(g => g.sport === sport && g.season === FILT.season && upcoming(g))) {
+    return null;
+  }
   const ch = CHAMPS[sport + "-" + FILT.season];
   if (!ch) return null;
   const part = (t, nat) => champPart(t, sport, FILT.season, nat);
@@ -3984,13 +3993,20 @@ function toast(msg, bad) {
 }
 /* ---------- wiring ------------------------------------------------------ */
 function switchView(view) {
-  const leaving = VIEW;
   VIEW = view;
-  FILT.type = null;
-  FILT.windows = null;
-  FILT.marquee = VIEW === "tv";
-  FILT.current = false; CURRENT_PREV = null;
-  FILT.hl = null;
+  /* EVERY VIEW OPENS ON ITS OWN DEFAULTS (his call 2026-10-15): "the filters
+     should all reset when switching from view to view". They used to be
+     cleared one at a time -- type, windows, Marquee, Current, Highlights --
+     which left the season, the team, the network, the week and the rest to
+     follow him across, so a team chosen on Rivals silently narrowed Combined.
+     `clearFilters` replaces the whole object, so a key nobody names here goes
+     too. The per-view openings below then set what that view wants, exactly
+     as they did when a tab CHANGE did this (go() has always called it). */
+  clearFilters();
+  CURRENT_PREV = null;
+  // ...and the SORT with them, or basketball's Key Games would keep whatever
+  // order the view before it was read in
+  SORT = defaultSort();
   if (VIEW === "rivals") {
     // his Rivals default (2026-09-11): every season, newest first, opened
     // on Ohio State in football and Michigan State in basketball
@@ -4010,13 +4026,9 @@ function switchView(view) {
     FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
     FILT.net = null;
     SORT = defaultSort();
-  } else if (leaving === "rivals" || leaving === "michigan" || leaving === "cornell") {
-    // leaving Rivals or Michigan puts back the season a normal view opens on
-    FILT.season = latestSeason(); FILT.week = null; FILT.month = null;
-    FILT.team = null; FILT.rival = null; FILT.post = false; FILT.winner = null;
-    FILT.net = null;
-    if (leaving === "michigan" || leaving === "cornell") SORT = defaultSort();
   }
+  // (the branch that used to put the season back when LEAVING Rivals or a team
+  // view is gone: clearFilters above does it for every view, not just those.)
   // TV WINDOWS OPENS ON CURRENT, oldest first (his call 2026-09-18); turning
   // Current off gives back the old opening -- the newest season, Marquee on
   if (VIEW === "tv") enterCurrent();
