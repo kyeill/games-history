@@ -3186,6 +3186,18 @@ function visible() {
   // (his call 2026-10-02), so it sits at the end of the same dropdown
   if (FILT.type === "important") list = list.filter(g => !!g.important);
   else if (FILT.type) list = list.filter(g => g.type === FILT.type);
+  /* ASKING FOR A CATEGORY ON COMBINED IS ASKING FOR THE GOOD ONES (his call
+     2026-10-15): "never include a Michigan loss or MSU/OSU/ND win, even if it
+     would qualify". Combined carries those games because it is the two views
+     at once -- Key Games bars them, TV Windows does not -- and they are
+     welcome on the unfiltered list. But a cut by Upsets or Ranked Games is a
+     cut by what he wants to watch again, and `bigViewAllows` is already the
+     test for that. IMPORTANT RESULTS is the exception he named, both as the
+     dropdown entry (which never reaches here) and as a game of his that
+     happens to carry a category. */
+  if (VIEW === "both" && (FILT.upset || (FILT.type && FILT.type !== "important"))) {
+    list = list.filter(g => g.important || bigViewAllows(g));
+  }
   // COMBINED shows PLAYED GAMES ONLY (his call 2026-09-24), and can drop
   // hockey altogether
   if (teamView() && !SPORT_OF[TAB]) {
