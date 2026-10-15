@@ -737,6 +737,21 @@ and `KEY_FROM` carries the 2011-12 floor. Two things differed.
 1,340 cards, 54 to 166 a season, 0 to 18 of them dashed. **The 61 orphaned
 basketball games are visible at last**, the same ones that prompted all this.
 
+**A CONFERENCE COVER IS NOT A REASON TO BE ON COMBINED (his call
+2026-10-15):** "remove the Big XII/ACC extra games that we add". Those are the
+games added so every TV Windows week shows each power conference -- 73 of
+them, 28 ACC, 23 Big 12, 20 Pac-12 and 2 SEC, and none at all for the Big Ten,
+whose own windows and host stand-in always cover it. They STAY on TV Windows,
+where filling the week is the point; Combined is what was ON and what
+mattered, and a game put in to fill a gap is neither. 68 leave, the other 5
+carrying a game TYPE and so coming back through the Key Games door -- which is
+right, because there they earned it.
+
+A surviving cover used to be indistinguishable from the NAMED stand-ins (SEC
+on CBS, a Big Ten host on a broadcast network), both reading only `standin`.
+Harvest now writes `cover` on the covers alone, so the view can keep the
+packages and drop the gap-fillers.
+
 **TWO RIVALS PLAYING EACH OTHER LEAVE COMBINED (his call 2026-10-14):** "drop
 all Rival vs Rival unless marquee (no border) or included on Results
 (shade/border as listed)". One of them had to win, so the result says nothing

@@ -4889,6 +4889,14 @@ def harvest():
             continue
         covered |= {(g["season"], q, g["week"]) for q in _covered_by(g)} | {slot}
         g["standin"] = True
+        # ...AND IT SAYS SO (his call 2026-10-15). A surviving cover reads as
+        # an ordinary stand-in on TV Windows, which is right there -- the
+        # whole point is that the week shows its conference. COMBINED does not
+        # want them: that view is what was ON and what mattered, and a game
+        # added to fill a gap is neither. The flag is what lets it tell them
+        # apart from the NAMED stand-ins, SEC on CBS and a Big Ten host on a
+        # broadcast network, which it keeps.
+        g["cover"] = True
         kept_cover.append(g)
     trimmed = []
     for g in keep:

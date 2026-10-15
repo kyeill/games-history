@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261015-112822";
+const BUILD = "20261015-090027";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -2465,7 +2465,17 @@ function onResults(g) {
 }
 function combShows(g) {
   if (rivalPair(g) && !(g.mq || onResults(g))) return false;
-  return keyShows(g) || tvShows(g) || rivalWonShows(g) || michRivalShows(g);
+  /* A CONFERENCE COVER IS NOT A REASON TO BE HERE (his call 2026-10-15:
+     "remove the Big XII/ACC extra games that we add"). Those games are added
+     so every TV Windows week shows each power conference -- 73 of them, 28
+     ACC, 23 Big 12, 20 Pac-12 and 2 SEC -- and they stay on that tab, where
+     filling the week is the point. Combined is what was ON and what mattered,
+     and a game put in to fill a gap is neither. Five of the 73 carry a game
+     TYPE and so come back through the Key Games door, which is right: there
+     they earned it. The NAMED stand-ins stay either way -- SEC on CBS and a
+     Big Ten host on a broadcast network are real packages, not gap-filling. */
+  return keyShows(g) || (tvShows(g) && !g.cover)
+    || rivalWonShows(g) || michRivalShows(g);
 }
 function bigViewAllows(g) {
   // Key Games is the view he browses for pleasure: no Michigan losses and no
