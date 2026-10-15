@@ -474,9 +474,9 @@ BODY = """
 
 <nav>
   <button data-top="michigan" aria-selected="true">Michigan</button>
+  <button data-top="college" aria-selected="false">College</button>
   <button data-top="cfb" aria-selected="false">CFB</button>
   <button data-top="cbb" aria-selected="false">CBB</button>
-  <button data-top="hockey" aria-selected="false">HKY</button>
   <button data-top="detroit" aria-selected="false">Detroit</button>
 </nav>
 

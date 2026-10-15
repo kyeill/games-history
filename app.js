@@ -3931,15 +3931,18 @@ function quickButtons() {
 const NAV = {
   michigan: [["Football", "cfb", "michigan"], ["Basketball", "cbb", "michigan"],
              ["Hockey", "chk", "michigan"], ["Combined", "all", "michigan"]],
-  // COMBINED is TV Windows and Key Games at once, with the filters of both
-  // (his call 2026-10-14)
-  cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"],
-        ["Combined", "cfb", "both"], ["Rivals", "cfb", "rivals"]],
-  // ...and basketball gets the same fourth view (his call 2026-10-14)
-  cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"],
-        ["Combined", "cbb", "both"], ["Rivals", "cbb", "rivals"],
-        ["Cornell", "cbb", "cornell"]],
-  hockey: [["Cornell", "chk", "cornell"], ["Rivals", "chk", "rivals"]],
+  /* COLLEGE (his call 2026-10-15), second after Michigan: the two COMBINED
+     views -- which are TV Windows and Key Games at once, and are what he
+     actually browses now -- then the three Rivals lists and Cornell's two.
+     The old CFB and CBB tabs keep TV Windows and Key Games and nothing else;
+     he expects to retire them. HOCKEY had only the two views that moved here,
+     so its tab goes with them -- there was nothing left to put on it. */
+  college: [["CFB", "cfb", "both"], ["CBB", "cbb", "both"],
+            ["CFB Rivals", "cfb", "rivals"], ["CBB Rivals", "cbb", "rivals"],
+            ["HKY Rivals", "chk", "rivals"],
+            ["Cornell HKY", "chk", "cornell"], ["Cornell CBB", "cbb", "cornell"]],
+  cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"]],
+  cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"]],
   detroit: [["Tigers", "mlb", "tigers"], ["Lions", "nfl", "lions"],
             ["Red Wings", "nhl", "redwings"],
             ["Pistons", "nba", "pistons"], ["Cavaliers", "nba", "cavaliers"]]

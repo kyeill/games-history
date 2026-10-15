@@ -689,6 +689,23 @@ every season on the tab: ONE case in football (Labor Day 2021, a Monday game
 in Week 1 beside Week 2) and none at all in basketball. Current only ever
 lands on the live week, so in practice it never meets one.
 
+## The College tab
+
+**SECOND AFTER MICHIGAN (his call 2026-10-15):** the two COMBINED views, which
+are TV Windows and Key Games at once and are what he browses now, then the
+three Rivals lists and Cornell's two.
+
+    CFB | CBB | CFB Rivals | CBB Rivals | HKY Rivals | Cornell HKY | Cornell CBB
+
+The views MOVED rather than being copied. The old CFB and CBB tabs keep TV
+Windows and Key Games and nothing else; he expects to retire them. HOCKEY had
+only the two views that came here, so its tab went with them -- there was
+nothing left to put on it, and he had not spotted that when he asked.
+
+`TOPS` is `Object.keys(NAV)`, so the swipe order follows the nav order with no
+second list to keep in step; the only other place the tabs are written out is
+the `<nav>` in site.py.
+
 ## Combined: TV Windows and Key Games at once
 
 **A FOURTH CFB VIEW (his call 2026-10-14):** "add a view to the CFB tab that
