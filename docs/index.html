@@ -79,6 +79,15 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    the buttons tighten up so the row fits */
 .viewbar button{white-space:nowrap}
 @media (max-width:480px){.viewbar button{padding:6px 10px;font-size:13px}}
+/* ...and SEVEN on College (2026-10-15) do not fit on a phone however tight
+   they are: 491px of buttons in a 410px window pushed the whole PAGE sideways,
+   the bar being inline-flex with its overflow hidden. It wraps instead, which
+   keeps every name readable -- "Cornell HKY" has nowhere to go if it cannot.
+   Desktop is untouched: one row, as before. */
+@media (max-width:620px){
+  .viewbar{display:flex;flex-wrap:wrap}
+  .viewbar button{flex:1 1 auto}
+}
 .viewbar button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 .filters{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
@@ -465,6 +474,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20261015-101447"></script>
+<script src="app.js?v=20261015-101657"></script>
 </body>
 </html>
