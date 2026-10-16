@@ -2522,6 +2522,30 @@ games were still wearing what ESPN recorded afterwards. They have hand-written
 | USC at Purdue, 2025-09-13 | 6:45pm | CBS 3:30 |
 | LSU at Clemson, 2026-09-05 | 9:40pm | ABC 7:30 |
 
+**THE ARCHIVE WAS SWEPT FOR THE REST (his question 2026-10-16, "how far back
+did you look?" -- the honest answer being not at all).** All 2,784 played
+games, football 2011-2026 and basketball 2009-2025, against two signatures:
+
+* **A degraded NETWORK record.** 7 football and 98 basketball games carry only
+  a streaming feed; of those, 4 and 4 are power-vs-power, and every one is a
+  GENUINE exclusive -- Peacock's Big Ten package, the Big 12 on ESPN+. Texas
+  A&M at Florida was the only corrupted one.
+* **A late TIME.** 15 football games kick on something other than :00, :15,
+  :30 or :45. Most are not weather at all: three identical 3:41pm entries are
+  ESPN recording the actual kick eleven minutes into a 3:30 window. **Not one
+  of the fifteen loses its window either way**, checked against the rules at
+  both times, so nothing was falling off a tab -- the cards simply read a few
+  minutes late.
+
+He confirmed the scheduled times and 14 now have `kickoff.json` entries. The
+EXCEPTION is Illinois-Nebraska, 28 August 2021 at 1:20pm -- **Week 0 keeps its
+odd time**, being a standalone game that answers to no window and so has no
+standard slot to be rounded to.
+
+BASKETBALL cannot be screened this way: an odd tip is routinely SCHEDULED
+there (9:07pm second games of a doubleheader), so the minute proves nothing.
+Those need naming by him.
+
 **`window-overrides.json` IS NOW EMPTY, and that is the better answer.** All
 three had lived there, and forcing a window also forces the HEADER: with the
 time restored, Texas A&M at Florida read "ABC PRIMETIME" over a 3:30 kickoff.
