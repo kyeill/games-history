@@ -1,6 +1,3 @@
 {
-  "_comment": "Manual window assignments, by ESPN game id. A WEATHER-DELAYED game is recorded by ESPN at its delayed start, and sometimes with only a streaming feed, so no rule keyed on kickoff time or network can place it. Add the game id and the window it belongs in, then run `python harvest.py && python site.py`.",
-  "401752832": ["CBS B1G Time"],
-  "401628353": ["ABC Saturday"],
-  "401856660": ["ABC Saturday"]
+  "_comment": "Manual window assignments, by ESPN game id. Empty since 2026-10-15: the three weather-delayed games that lived here are handled at the source instead, by a hand-written entry in data/kickoff.json giving the time and network the game was SCHEDULED for. That restores the kickoff he planned around, and the ordinary rules then place the game themselves -- which is better, because forcing a window also forces the header, and Texas A&M at Florida was reading 'ABC Primetime' at 3:30pm. Reach for kickoff.json first; this file is for a window no restored kickoff can explain. Run `python harvest.py && python site.py` afterwards."
 }

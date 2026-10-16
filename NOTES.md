@@ -2503,9 +2503,31 @@ window list, read by harvest.
 Saturday CBS game (or CBS + Big Ten/SEC) to explain a missing game, and he
 rejected both -- they dragged in Washington-Washington State, UCLA-Hawai'i and
 a dozen 2023 fixtures. **Both games he reported missing were WEATHER DELAYED**:
-USC at Purdue reads 6:45pm because of the delay, and Texas A&M at Florida lost
-its network entirely. Those are `window-overrides.json` entries, not rule
-changes. Read a missing game as a data problem before widening a rule.
+USC at Purdue read 6:45pm because of the delay, and Texas A&M at Florida lost
+its network entirely. Read a missing game as a data problem before widening a
+rule.
+
+**...AND THE DELAY IS FIXED AT THE SOURCE NOW, not with a window (2026-10-15,
+after his reminder "take broadcast time/network PRIOR to game start").**
+`kickoff_remember` already writes every upcoming game's date, time, dow and
+nets to `data/kickoff.json` and gives them back once it is played (his call
+2026-09-25) -- 156 games, every one of the 27 played so far restored. But the
+snapshot only reaches back to 19 September 2026, so the three older delayed
+games were still wearing what ESPN recorded afterwards. They have hand-written
+`kickoff.json` entries now:
+
+| game | was | scheduled |
+| --- | --- | --- |
+| Texas A&M at Florida, 2024-09-14 | ESPN+, ESPN3 | ABC 3:30 |
+| USC at Purdue, 2025-09-13 | 6:45pm | CBS 3:30 |
+| LSU at Clemson, 2026-09-05 | 9:40pm | ABC 7:30 |
+
+**`window-overrides.json` IS NOW EMPTY, and that is the better answer.** All
+three had lived there, and forcing a window also forces the HEADER: with the
+time restored, Texas A&M at Florida read "ABC PRIMETIME" over a 3:30 kickoff.
+Restore the kickoff and the ordinary rules place the game themselves -- all
+three now derive their own window and header with nothing forced. Reach for
+`kickoff.json` first.
 
 **Seven tabbed games have NO network at all, and ESPN has none to give.**
 Checked 2026-09-11: the scoreboard's `broadcasts`, `geoBroadcasts` and
