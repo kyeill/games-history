@@ -2522,6 +2522,25 @@ games were still wearing what ESPN recorded afterwards. They have hand-written
 | USC at Purdue, 2025-09-13 | 6:45pm | CBS 3:30 |
 | LSU at Clemson, 2026-09-05 | 9:40pm | ABC 7:30 |
 
+**A KICKOFF NOBODY HAS SET YET IS NOT A KICKOFF (2026-10-18).** ESPN parks an
+unannounced game at "TBD", `kickoff_remember` wrote that down as the time he
+planned around, and when the game was played the restore fed
+`"2026-10-17 TBD"` to `strptime` and the harvest died. **Every build of 18
+October failed** -- four runs, the retry inside the Harvest step included,
+because a cached bad answer is not the problem here: the file was.
+
+**The season-ahead reach (2026-10-12) is what exposed it.** Before that the
+upcoming window was ONE WEEK, by which point ESPN has nearly always set a
+time; reaching to the end of the season loads games months out with no time at
+all. 38 of the 173 entries were TBD, and the first of them was played on the
+17th.
+
+Three parts to the fix: nothing is RECORDED while the time is TBD (the entry
+stays open, so the first build that sees a real time takes it); a TBD entry
+already in the file is IGNORED on read, in both places that read one; and the
+38 were deleted. Worth remembering that `kickoff.json` is COMMITTED, so a bad
+entry outlives the build that wrote it.
+
 **THE ARCHIVE WAS SWEPT FOR THE REST (his question 2026-10-16, "how far back
 did you look?" -- the honest answer being not at all).** All 2,784 played
 games, football 2011-2026 and basketball 2009-2025, against two signatures:

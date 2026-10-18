@@ -3496,12 +3496,23 @@ def kickoff_remember(games):
             continue
         gid = g["id"]
         if g.get("upcoming"):
-            if gid not in _KICKOFF:
+            # A KICKOFF NOBODY HAS SET YET IS NOT A KICKOFF (2026-10-18). ESPN
+            # parks an unannounced game at "TBD", and recording that as the
+            # time he planned around broke every build of 18 October: the game
+            # was played, the restore fed "2026-10-17 TBD" to strptime and the
+            # harvest died. Nothing is written until a real time appears, and
+            # the entry is still open until then, so the first build that sees
+            # one records it.
+            # The season-ahead reach (2026-10-12) is what exposed this: before
+            # it the window was ONE WEEK, by which point ESPN has nearly always
+            # set a time. 38 of the 173 entries were TBD.
+            if gid not in _KICKOFF and g["time"] != "TBD":
                 _KICKOFF[gid] = {"date": g["date"], "time": g["time"],
                                  "dow": g["dow"], "nets": list(g.get("nets") or [])}
             continue
         was = _KICKOFF.get(gid)
-        if not was:
+        # ...and an old TBD entry in the file is ignored rather than trusted
+        if not was or was.get("time") == "TBD":
             continue
         if (g["date"], g["time"], sorted(g.get("nets") or [])) != \
                 (was["date"], was["time"], sorted(was.get("nets") or [])):
@@ -4106,7 +4117,8 @@ def harvest():
                 # moved afterwards keeps the slot he planned around, so the
                 # window rules below judge that one
                 was = _KICKOFF.get(x["id"])
-                if was:
+                # a TBD snapshot is no kickoff at all -- see kickoff_remember
+                if was and was.get("time") != "TBD":
                     d = dt.datetime.strptime(was["date"] + " " + was["time"],
                                              "%Y-%m-%d %H:%M").replace(tzinfo=ET)
                 # Regulation is 4 quarters of football, 2 halves of
