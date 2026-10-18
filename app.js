@@ -1157,7 +1157,18 @@ function michCard(g, p) {
   // ...and a BOWL shows no final ranking for the opponent (his call 2026-09-18)
   const bowlFin = g.sport === "CFB" && !!g.stage && !playoffGame(g) &&
     g.stage.indexOf("Big Ten Championship") !== 0;
-  const fin = mx.finish ? mx.finish : mx.final ? (bowlFin ? "" : "#" + mx.final)
+  /* NO END-OF-SEASON SUFFIX WHILE THE SEASON IS BEING PLAYED (his call
+     2026-10-18, "and all sports"). All three of these describe how an
+     opponent's year TURNED OUT -- where they finished the poll, how far they
+     went, what they rated -- and none of them can be known yet. Hockey is
+     where it showed, "Denver #1" off the latest weekly USCHO poll, and
+     harvest no longer emits that; this is the guard for every sport, so
+     football and basketball cannot grow the same bug when their ratings
+     arrive mid-season. */
+  const live = GAMES.some(x => x.sport === g.sport && x.season === g.season
+    && upcoming(x));
+  const fin = live ? ""
+    : mx.finish ? mx.finish : mx.final ? (bowlFin ? "" : "#" + mx.final)
     : mx.rating ? (mx.rating === "DII" ? "DII" : mx.rating + "+") : "";
   const col = c => (c ? ' style="color:' + c + '"' : "");
   // HEADER (his calls 2026-09-11). The TV details follow a bar -- "[nc1] WEEK 1
@@ -4032,15 +4043,12 @@ function switchView(view) {
   // TV WINDOWS OPENS ON CURRENT, oldest first (his call 2026-09-18); turning
   // Current off gives back the old opening -- the newest season, Marquee on
   if (VIEW === "tv") enterCurrent();
-  /* COMBINED OPENS PLAIN (2026-10-14): the newest season, oldest first, no
-     Current and no Marquee. Neither parent's opening suits it -- Current pins
-     the list to one week and hides everything Key Games brings, and Marquee
-     hides most of it the other way. It is a view for looking across a season,
-     so it starts by showing one. */
-  if (VIEW === "both") {
-    FILT.marquee = false; FILT.current = false; CURRENT_PREV = null;
-    SORT = "asc";
-  }
+  /* ...AND SO DOES COMBINED (his call 2026-10-18). It opened plain for four
+     days -- the newest season, oldest first -- on my reading that Current
+     pinned the list to one week and hid everything Key Games brought. He
+     wants the week. `enterCurrent` also puts the current week in the dropdown
+     by itself, CUR_WEEK being read off the games Current keeps. */
+  if (VIEW === "both") enterCurrent();
   // KEY GAMES OPENS ON THE LATEST COMPLETED WEEK, oldest first (his call
   // 2026-09-20) -- football by week number, basketball by nothing, it has none
   if (VIEW === "big" && SPORT_OF[TAB] === "CFB") {

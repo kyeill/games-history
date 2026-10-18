@@ -1023,6 +1023,16 @@ def hockey_ncaa(y):
 
 
 def uscho_final_rank(y, location):
+    """Where a team FINISHED a season in the USCHO poll.
+
+    A SEASON STILL BEING PLAYED HAS NO FINAL RANKING (his call 2026-10-18:
+    "they can't have a final ranking yet by definition"). This reads the LAST
+    poll of the season, which while one is under way is simply the most recent
+    weekly one -- so a 2026-27 card read "Denver #1" in the slot kept for a
+    finishing position. 23 of the season's games carried one.
+    """
+    if not season_over("CHK", y):
+        return None
     polls = uscho_polls(y)
     if not polls:
         return None

@@ -2522,6 +2522,26 @@ games were still wearing what ESPN recorded afterwards. They have hand-written
 | USC at Purdue, 2025-09-13 | 6:45pm | CBS 3:30 |
 | LSU at Clemson, 2026-09-05 | 9:40pm | ABC 7:30 |
 
+**A SEASON STILL BEING PLAYED HAS NO FINAL RANKING (his call 2026-10-18:
+"they can't have a final ranking yet by definition").** `uscho_final_rank`
+reads the LAST poll of a season, which while one is under way is simply the
+most recent weekly one -- so a 2026-27 hockey card read "Denver #1" in the
+slot kept for a finishing position. 23 of the season's games carried one; it
+is 0 now, and the finished 2025-26 season keeps all 27 of its own.
+
+Fixed in BOTH places, as the champion line was. Harvest no longer emits it,
+and `rowHtml` suppresses the whole suffix -- `finish`, `final` and `rating`
+alike, all three being how an opponent's year TURNED OUT -- for any sport
+whose season still has an unplayed game in it. Hockey is merely where it
+showed; football and basketball carry no mid-season rating today and would
+have grown the same bug when they do.
+
+**COMBINED OPENS ON CURRENT (his call 2026-10-18)**, not plain. It opened
+plain for four days on my reading that Current pinned the list to one week and
+hid everything Key Games brought. He wants the week. `enterCurrent` also puts
+the current week in the dropdown by itself, CUR_WEEK being read off the games
+Current keeps.
+
 **THE HARVEST RETRY NOW ASKS WHAT KILLED IT (his call 2026-10-18).** It exists
 for a flaky ESPN response and cannot fix a bug, so it reads the LAST exception
 line and retries only a network one -- `requests.exceptions.*`, a timeout, an
