@@ -138,7 +138,39 @@ jobs:
       # again a minute later before giving the day up to the next catch-up run
       - name: Harvest
         if: steps.clock.outputs.go == 'yes'
-        run: python harvest.py || (echo "harvest failed -- trying once more" && sleep 60 && python harvest.py)
+        run: |
+          set -o pipefail
+          if python harvest.py 2>&1 | tee harvest.log; then
+            exit 0
+          fi
+          # WHICH FAILURES ARE WORTH A SECOND GO (his call 2026-10-18). A
+          # flaky ESPN response is; a bug is not. On 18 October the harvest
+          # died on `ValueError: time data '2026-10-17 TBD'` and all four runs
+          # of the day spent 90 seconds each proving a retry cannot fix a file.
+          # Only the LAST exception line is read. Grepping the whole log would
+          # misread the internal "retry 1/3 after HTTPSConnectionPool..."
+          # notices, which harvest prints when it recovers a request ITSELF --
+          # a run that stumbled on the network and then died on a bug would
+          # have looked transient.
+          # the suffixes matter: ReadTimeout and socket.timeout end in
+          # neither Error nor Exception, and a pattern wanting one of
+          # those read a genuine timeout as "no exception found"
+          err=$(grep -E '^[A-Za-z_][A-Za-z0-9_.]*(Error|Exception|Timeout|timeout|Interrupt):' harvest.log | tail -1)
+          echo "last exception: ${err:-(none)}"
+          case "$err" in
+            *requests.exceptions*|*ConnectionError*|*Timeout*|*timeout*|*SSLError*|\
+            *ChunkedEncodingError*|*ProtocolError*|*RemoteDisconnected*|\
+            *IncompleteRead*|*JSONDecodeError*)
+              echo "network trouble -- trying once more"
+              sleep 60
+              python harvest.py
+              ;;
+            *)
+              echo "not a network failure -- a retry cannot fix this, giving up"
+              tail -25 harvest.log
+              exit 1
+              ;;
+          esac
 
       # new teams get a wash colour without being asked for (his standing
       # question, settled 2026-09-12)

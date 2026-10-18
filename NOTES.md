@@ -2522,6 +2522,24 @@ games were still wearing what ESPN recorded afterwards. They have hand-written
 | USC at Purdue, 2025-09-13 | 6:45pm | CBS 3:30 |
 | LSU at Clemson, 2026-09-05 | 9:40pm | ABC 7:30 |
 
+**THE HARVEST RETRY NOW ASKS WHAT KILLED IT (his call 2026-10-18).** It exists
+for a flaky ESPN response and cannot fix a bug, so it reads the LAST exception
+line and retries only a network one -- `requests.exceptions.*`, a timeout, an
+SSL or protocol error, a truncated JSON body. Anything else prints the tail of
+the log and gives up, which is both faster and louder: the four failed runs of
+18 October each spent 90 seconds proving a retry could not mend a file.
+
+**It reads the LAST exception line, not the log.** Harvest prints
+"retry 1/3 after HTTPSConnectionPool..." when it recovers a request ITSELF, so
+a run that stumbled on the network and then died on a bug would have looked
+transient to a grep over the whole thing -- which is exactly the shape of the
+18 October log.
+
+**And the suffixes matter.** The first pattern wanted a name ending in `Error`
+or `Exception`; `requests.exceptions.ReadTimeout` and `socket.timeout` end in
+neither, so a genuine timeout read as "no exception found" and was given up on.
+Nine log shapes were run through the classifier before it shipped.
+
 **A KICKOFF NOBODY HAS SET YET IS NOT A KICKOFF (2026-10-18).** ESPN parks an
 unannounced game at "TBD", `kickoff_remember` wrote that down as the time he
 planned around, and when the game was played the restore fed
