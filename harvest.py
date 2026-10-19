@@ -26,6 +26,72 @@ SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
 # editing never trips them, but a collapse does.
 LOCATIONS_FLOOR = 150
 SHEET_FLOOR = 600
+
+# THE SHEET CACHE (his call 2026-10-19). The floors above turn a collapse into
+# a loud failure; they do not let him WORK with rows collapsed, which is what
+# he actually wants -- the historical seasons folded away, the current one
+# open, the daily build still picking up what he fills in. So every tab is now
+# remembered ROW BY ROW in data/sheet-cache, and each build merges:
+#
+#     a key the live read returns  ->  LIVE wins, always
+#     a key only the cache has     ->  the cache stands in
+#
+# which is exactly the behaviour he asked to confirm. A collapsed row keeps
+# whatever it last said; an expanded row is authoritative, so an edit needs
+# the row open THROUGH a build, not merely while he types; and a new row in an
+# open group is live from the first build that sees it.
+#
+# THE ONE THING THIS CANNOT DO IS FORGET. A deleted row and a collapsed row
+# look identical from here -- both are simply absent -- so the cache holds a
+# deleted row for ever. To retire a row, BLANK ITS CELLS (an edit, which wins)
+# rather than removing it; to drop one for real, run `python harvest.py
+# --resnap` with everything expanded, which ignores the cache and writes it
+# fresh. The floors stay as the backstop for that run and for a lost cache.
+SHEET_CACHE = os.path.join(HERE, "data", "sheet-cache")
+RESNAP = "--resnap" in sys.argv
+
+
+def sheet_cache(name, live, extra=None):
+    """Merge a live sheet read with the remembered one, and write it back.
+
+    `live` is keyed by TUPLES, which JSON cannot hold as object keys, so the
+    file stores [[key parts], value] pairs -- a list keeps the ints ints.
+    `extra` carries the per-tab sets that are not rows (the teams a ratings
+    tab knows); those are UNIONED, never replaced, since a collapsed team
+    missing from the live read would otherwise read as Division II.
+    """
+    path = os.path.join(SHEET_CACHE, name + ".json")
+    old, old_extra = {}, {}
+    if os.path.exists(path) and not RESNAP:
+        try:
+            blob = json.load(open(path, encoding="utf-8"))
+            old = {tuple(k): v for k, v in blob.get("rows") or []}
+            old_extra = blob.get("extra") or {}
+        except (ValueError, TypeError, KeyError):
+            print("  WARN: the %s cache is unreadable -- rebuilding it from "
+                  "this read" % name, file=sys.stderr)
+    merged = dict(old)
+    merged.update(live)
+    out_extra = {}
+    for k in set(old_extra) | set(extra or {}):
+        out_extra[k] = sorted(set(old_extra.get(k) or [])
+                              | set((extra or {}).get(k) or []))
+    stood_in = len(merged) - len(live)
+    if stood_in:
+        print("  %s: %d rows stood in from the cache" % (name, stood_in))
+    if RESNAP:
+        print("  %s: cache rewritten from scratch (%d rows)" % (name, len(merged)))
+    os.makedirs(SHEET_CACHE, exist_ok=True)
+    json.dump({"_note": "Last good read of his sheet, row by row. A row the "
+                        "live read does not return -- collapsed in the "
+                        "browser, or a tab that failed -- stands in from here. "
+                        "Rewrite with: python harvest.py --resnap",
+               "rows": sorted(([list(k), v] for k, v in merged.items()),
+                              key=lambda kv: [str(x) for x in kv[0]]),
+               "extra": out_extra},
+              open(path, "w", encoding="utf-8"), separators=(",", ":"),
+              ensure_ascii=False, indent=0)
+    return merged, out_extra
 # Rivals reaches further back (his call 2026-09-11), for his rivals only --
 # see rival_events
 RIVAL_SEASONS = list(range(2014, 2021))
@@ -188,8 +254,10 @@ def results_rows():
         body = requests.get(url, timeout=40).text
         rows = list(csv.reader(io.StringIO(body)))
     except (requests.RequestException, csv.Error):
-        _RESULTS = out
-        return out
+        # NOTHING READ IS NOT THE SAME AS NOTHING THERE: fall through to the
+        # cache rather than publishing a Results tab with no rows in it
+        _RESULTS = collections.defaultdict(list, sheet_cache("results", {})[0])
+        return _RESULTS
     head = [h.strip().lower() for h in (rows[0] if rows else [])]
     idx = {h: i for i, h in enumerate(head)}
     for raw in rows[1:]:
@@ -207,8 +275,9 @@ def results_rows():
         out[(code, season, date)].append(
             {"winner": cell("winner"), "loser": cell("loser"),
              "shade": bool(cell("shade")), "border": cell("border")})
-    _RESULTS = out
-    return out
+    # a collapsed row stands in from the cache -- see sheet_cache
+    _RESULTS = collections.defaultdict(list, sheet_cache("results", dict(out))[0])
+    return _RESULTS
 
 
 # the schools ESPN files under another name than he writes (2026-10-02)
@@ -3147,7 +3216,7 @@ def load_sheet():
                 continue
             box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
                    "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
-            out[(focus, code, season, date)] = {
+            row = {
                 # HIS OWN WORD from the Attended column (2026-09-23): "Gm1" or
                 # "Gm2" names the game of a weekend he was at, anything else
                 # (an x) just marks the card
@@ -3162,7 +3231,11 @@ def load_sheet():
                 "jersey": "/".join(cell(k).title() for k in ("jersey", "pants", "acc."))
                           if all(cell(k) for k in ("jersey", "pants", "acc.")) else "",
             }
-            flags = used.setdefault((focus, code, season), set())
+            # WHICH COLUMNS THIS ROW USED travels WITH the row, so a row that
+            # stands in from the cache brings its season's flags back with it.
+            # Read off the cells rather than the stored row: a Jersey with no
+            # Pants stores nothing but still means he has used the column.
+            flags = set()
             for label, flag in (("case", "case"), ("attended", "attended"), ("shade", "shade"),
                                 ("border", "border"), ("notes", "note"),
                                 ("note", "note"), ("footer", "footer"),
@@ -3171,13 +3244,22 @@ def load_sheet():
                     flags.add(flag)
             if any(box.values()):
                 flags.add("box")
-    print("  sheet: %d rows across %d season-sports" % (len(out), len(used)))
-    if len(out) < SHEET_FLOOR:
+            out[(focus, code, season, date)] = {"row": row, "flags": sorted(flags)}
+    merged = sheet_cache("michigan", out)[0]
+    rows = {}
+    for key, pack in merged.items():
+        rows[key] = pack["row"]
+        # the season key exists for every row, flags or not: absence only
+        # means "off" once he has marked that season at all
+        used.setdefault(tuple(key[:3]), set()).update(pack["flags"])
+    print("  sheet: %d rows across %d season-sports" % (len(rows), len(used)))
+    if len(rows) < SHEET_FLOOR:
         raise SystemExit(
             "ABORT: his Michigan tabs returned only %d rows, below the floor "
-            "of %d. Rows COLLAPSED in the browser are omitted from the gviz "
-            "export -- expand them and run again." % (len(out), SHEET_FLOOR))
-    return out, used
+            "of %d, with the cache merged in. Rows COLLAPSED in the browser "
+            "are omitted from the gviz export -- expand them and run again."
+            % (len(rows), SHEET_FLOOR))
+    return rows, used
 
 
 def load_game_overrides():
@@ -3313,15 +3395,15 @@ def load_seeds():
         rows = list(csv.reader(io.StringIO(r.content.decode("utf-8-sig"))))
     except (requests.RequestException, ValueError) as e:
         print("  WARN: could not read the BTT tab (%s)" % e, file=sys.stderr)
-        return {}
+        return sheet_cache("seeds", {})[0]
     if not rows:
-        return {}
+        return sheet_cache("seeds", {})[0]
     head = [(h or "").strip().lower() for h in rows[0]]
     try:
         yi, ti, si = head.index("year"), head.index("team"), head.index("seed")
     except ValueError:
         print("  WARN: the BTT tab needs Year, Team and Seed", file=sys.stderr)
-        return {}
+        return sheet_cache("seeds", {})[0]
     out = {}
     for raw in rows[1:]:
         cell = lambda i: (raw[i] or "").strip() if i < len(raw) else ""
@@ -3332,6 +3414,7 @@ def load_seeds():
             out[(int(year.split("-")[0]), flat(team))] = int(seed)
         except ValueError:
             continue
+    out = sheet_cache("seeds", out)[0]
     print("  BTT: %d seeds" % len(out))
     return out
 
@@ -3417,6 +3500,13 @@ def load_ratings():
         known[code] = seen
         print("  %s: %d teams, %d ratings" % (tab.replace("%2B", "+"), len(seen),
                                               sum(1 for k in out if k[0] == code)))
+    # A TEAM MISSING FROM THE LIVE READ MUST NOT READ "DII": `known` is unioned
+    # with the cache, not replaced, or a collapsed KenPom row would relabel a
+    # ranked opponent as Division II
+    out, extra = sheet_cache("ratings", out,
+                             {"known-" + c: sorted(v) for c, v in known.items()})
+    known = {c: set(extra.get("known-" + c) or []) for c in RATING_TABS
+             if extra.get("known-" + c)}
     return out, known
 
 
@@ -3846,9 +3936,9 @@ def load_locations():
         rows = list(csv.reader(io.StringIO(r.content.decode("utf-8-sig"))))
     except (requests.RequestException, ValueError) as e:
         print("  WARN: could not read the Locations tab (%s)" % e, file=sys.stderr)
-        return {}
+        return sheet_cache("locations", {})[0]
     if not rows:
-        return {}
+        return sheet_cache("locations", {})[0]
     head = [(h or "").strip().lower() for h in rows[0]]
     # the blank column splits football from basketball
     split = next((i for i, h in enumerate(head) if not h), len(head))
@@ -3869,6 +3959,7 @@ def load_locations():
                 who = get(label)
                 if who:
                     out.setdefault((code, day), {})[tag] = who
+    out = sheet_cache("locations", out)[0]
     print("  locations: %d show-days" % len(out))
     # A COLLAPSED ROW GROUP IS INVISIBLE TO gviz (caught 2026-09-14): with his
     # historical rows collapsed in the browser this returned 14 rows instead of
@@ -3877,8 +3968,9 @@ def load_locations():
     if len(out) < LOCATIONS_FLOOR:
         raise SystemExit(
             "ABORT: the Locations tab returned only %d show-days, below the "
-            "floor of %d. Rows COLLAPSED in the browser are omitted from the "
-            "gviz export -- expand them and run again." % (len(out), LOCATIONS_FLOOR))
+            "floor of %d, with the cache merged in. Rows COLLAPSED in the "
+            "browser are omitted from the gviz export -- expand them and run "
+            "again." % (len(out), LOCATIONS_FLOOR))
     return out
 
 

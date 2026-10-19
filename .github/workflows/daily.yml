@@ -165,6 +165,23 @@ jobs:
               sleep 60
               python harvest.py
               ;;
+            "")
+              # NO EXCEPTION LINE AT ALL is not a bug in the harvest (settled
+              # 2026-10-19): Python that raises prints one, so a run that
+              # fails without one was killed from outside -- the runner ran
+              # out of memory, or the job was cut off. That IS worth a second
+              # go. A deliberate abort is the exception: the sheet floors
+              # raise SystemExit, which prints "ABORT:" and no traceback, and
+              # no retry can expand a collapsed row.
+              if grep -q '^ABORT:' harvest.log; then
+                echo "the harvest aborted on purpose -- giving up"
+                tail -25 harvest.log
+                exit 1
+              fi
+              echo "killed with no exception -- trying once more"
+              sleep 60
+              python harvest.py
+              ;;
             *)
               echo "not a network failure -- a retry cannot fix this, giving up"
               tail -25 harvest.log
@@ -192,7 +209,7 @@ jobs:
           git config user.email "actions@github.com"
           git add docs/app.js docs/games.json docs/colors.json docs/crests.json \
                   docs/index.html docs/sw.js docs/manifest.webmanifest \
-                  output/colors.json output/crests.json data/uscho data/nfl-key.json data/nfl-seeds.json data/pro-seeds.json data/mlb-walkoff.json data/mlb-lines.json data/conf-map.json data/kickoff.json data/final-rank.json data/conf-place.json data/champs.json || true
+                  output/colors.json output/crests.json data/uscho data/nfl-key.json data/nfl-seeds.json data/pro-seeds.json data/mlb-walkoff.json data/mlb-lines.json data/conf-map.json data/kickoff.json data/final-rank.json data/conf-place.json data/champs.json data/sheet-cache || true
           if git diff --cached --quiet; then
             echo "nothing changed"
             exit 0

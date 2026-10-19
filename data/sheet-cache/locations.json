@@ -1,0 +1,2846 @@
+{
+"_note":"Last good read of his sheet, row by row. A row the live read does not return -- collapsed in the browser, or a tab that failed -- stands in from here. Rewrite with: python harvest.py --resnap",
+"rows":[
+[
+[
+"CBB",
+"2012-01-14"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CBB",
+"2012-01-21"
+],
+{
+"College GameDay":"Pittsburgh"
+}
+],
+[
+[
+"CBB",
+"2012-01-28"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CBB",
+"2012-02-04"
+],
+{
+"College GameDay":"Missouri"
+}
+],
+[
+[
+"CBB",
+"2012-02-11"
+],
+{
+"College GameDay":"Vanderbilt"
+}
+],
+[
+[
+"CBB",
+"2012-02-18"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CBB",
+"2012-02-25"
+],
+{
+"College GameDay":"Connecticut"
+}
+],
+[
+[
+"CBB",
+"2012-03-03"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2013-01-19"
+],
+{
+"College GameDay":"Butler"
+}
+],
+[
+[
+"CBB",
+"2013-01-26"
+],
+{
+"College GameDay":"NC State"
+}
+],
+[
+[
+"CBB",
+"2013-02-02"
+],
+{
+"College GameDay":"Indiana"
+}
+],
+[
+[
+"CBB",
+"2013-02-09"
+],
+{
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CBB",
+"2013-02-16"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2013-02-23"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2013-03-02"
+],
+{
+"College GameDay":"UCLA"
+}
+],
+[
+[
+"CBB",
+"2013-03-09"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2014-01-18"
+],
+{
+"College GameDay":"Connecticut"
+}
+],
+[
+[
+"CBB",
+"2014-01-25"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CBB",
+"2014-02-01"
+],
+{
+"College GameDay":"Syracuse"
+}
+],
+[
+[
+"CBB",
+"2014-02-08"
+],
+{
+"College GameDay":"Memphis"
+}
+],
+[
+[
+"CBB",
+"2014-02-15"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2014-02-22"
+],
+{
+"College GameDay":"Colorado"
+}
+],
+[
+[
+"CBB",
+"2014-03-01"
+],
+{
+"College GameDay":"Oklahoma State"
+}
+],
+[
+[
+"CBB",
+"2014-03-08"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2015-01-17"
+],
+{
+"College GameDay":"Iowa State"
+}
+],
+[
+[
+"CBB",
+"2015-01-24"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CBB",
+"2015-01-31"
+],
+{
+"College GameDay":"Virginia"
+}
+],
+[
+[
+"CBB",
+"2015-02-07"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CBB",
+"2015-02-14"
+],
+{
+"College GameDay":"Southern Methodist"
+}
+],
+[
+[
+"CBB",
+"2015-02-21"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CBB",
+"2015-02-28"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2015-03-07"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2016-01-23"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CBB",
+"2016-01-30"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2016-02-06"
+],
+{
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CBB",
+"2016-02-13"
+],
+{
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CBB",
+"2016-02-20"
+],
+{
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CBB",
+"2016-02-27"
+],
+{
+"College GameDay":"Virginia"
+}
+],
+[
+[
+"CBB",
+"2016-03-05"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2017-01-21"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2017-01-28"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2017-02-04"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CBB",
+"2017-02-11"
+],
+{
+"College GameDay":"Saint Mary's"
+}
+],
+[
+[
+"CBB",
+"2017-02-18"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2017-02-25"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CBB",
+"2017-03-04"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2018-01-20"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2018-01-27"
+],
+{
+"College GameDay":"West Virginia"
+}
+],
+[
+[
+"CBB",
+"2018-02-03"
+],
+{
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CBB",
+"2018-02-10"
+],
+{
+"College GameDay":"Virginia"
+}
+],
+[
+[
+"CBB",
+"2018-02-17"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2018-02-24"
+],
+{
+"College GameDay":"Texas Tech"
+}
+],
+[
+[
+"CBB",
+"2018-03-03"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2019-01-19"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2019-01-26"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2019-02-02"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CBB",
+"2019-02-09"
+],
+{
+"College GameDay":"Virginia"
+}
+],
+[
+[
+"CBB",
+"2019-02-16"
+],
+{
+"College GameDay":"Kentucky"
+}
+],
+[
+[
+"CBB",
+"2019-03-02"
+],
+{
+"College GameDay":"Houston"
+}
+],
+[
+[
+"CBB",
+"2019-03-09"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2020-01-18"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2020-01-25"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2020-02-01"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CBB",
+"2020-02-08"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2020-02-15"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CBB",
+"2020-02-22"
+],
+{
+"College GameDay":"Baylor"
+}
+],
+[
+[
+"CBB",
+"2020-02-29"
+],
+{
+"College GameDay":"Maryland"
+}
+],
+[
+[
+"CBB",
+"2020-03-07"
+],
+{
+"College GameDay":"Dayton"
+}
+],
+[
+[
+"CBB",
+"2022-01-29"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2022-02-05"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2022-02-12"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CBB",
+"2022-02-19"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CBB",
+"2022-02-26"
+],
+{
+"College GameDay":"Baylor"
+}
+],
+[
+[
+"CBB",
+"2022-03-05"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2023-01-28"
+],
+{
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CBB",
+"2023-02-04"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2023-02-11"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CBB",
+"2023-02-18"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2023-02-25"
+],
+{
+"College GameDay":"Gonzaga"
+}
+],
+[
+[
+"CBB",
+"2023-03-04"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2024-01-27"
+],
+{
+"College GameDay":"Arkansas"
+}
+],
+[
+[
+"CBB",
+"2024-02-03"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2024-02-10"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2024-02-17"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CBB",
+"2024-02-24"
+],
+{
+"College GameDay":"Connecticut"
+}
+],
+[
+[
+"CBB",
+"2024-03-02"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CBB",
+"2024-03-09"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2025-01-25"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CBB",
+"2025-02-01"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2025-02-08"
+],
+{
+"College GameDay":"Iowa State"
+}
+],
+[
+[
+"CBB",
+"2025-02-15"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CBB",
+"2025-02-22"
+],
+{
+"College GameDay":"Houston"
+}
+],
+[
+[
+"CBB",
+"2025-03-01"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CBB",
+"2025-03-08"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2026-01-24"
+],
+{
+"College GameDay":"Texas Tech"
+}
+],
+[
+[
+"CBB",
+"2026-01-31"
+],
+{
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CBB",
+"2026-02-07"
+],
+{
+"College GameDay":"North Carolina"
+}
+],
+[
+[
+"CBB",
+"2026-02-14"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CBB",
+"2026-02-21"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CBB",
+"2026-02-28"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CBB",
+"2026-03-07"
+],
+{
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CFB",
+"2011-09-03"
+],
+{
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2011-09-10"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2011-09-17"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CFB",
+"2011-09-24"
+],
+{
+"College GameDay":"West Virginia"
+}
+],
+[
+[
+"CFB",
+"2011-10-01"
+],
+{
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2011-10-08"
+],
+{
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2011-10-15"
+],
+{
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2011-10-22"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CFB",
+"2011-10-29"
+],
+{
+"College GameDay":"Southern California"
+}
+],
+[
+[
+"CFB",
+"2011-11-05"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2011-11-12"
+],
+{
+"College GameDay":"Stanford"
+}
+],
+[
+[
+"CFB",
+"2011-11-19"
+],
+{
+"College GameDay":"Houston"
+}
+],
+[
+[
+"CFB",
+"2011-11-26"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CFB",
+"2012-09-01"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2012-09-08"
+],
+{
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2012-09-15"
+],
+{
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2012-09-22"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CFB",
+"2012-09-29"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CFB",
+"2012-10-06"
+],
+{
+"College GameDay":"South Carolina"
+}
+],
+[
+[
+"CFB",
+"2012-10-13"
+],
+{
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CFB",
+"2012-10-20"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CFB",
+"2012-10-27"
+],
+{
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CFB",
+"2012-11-03"
+],
+{
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2012-11-10"
+],
+{
+"College GameDay":"Troy"
+}
+],
+[
+[
+"CFB",
+"2012-11-17"
+],
+{
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2012-11-24"
+],
+{
+"College GameDay":"Southern California"
+}
+],
+[
+[
+"CFB",
+"2013-08-31"
+],
+{
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2013-09-07"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2013-09-14"
+],
+{
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2013-09-21"
+],
+{
+"College GameDay":"North Dakota State"
+}
+],
+[
+[
+"CFB",
+"2013-09-28"
+],
+{
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2013-10-05"
+],
+{
+"College GameDay":"Northwestern"
+}
+],
+[
+[
+"CFB",
+"2013-10-12"
+],
+{
+"College GameDay":"Washington"
+}
+],
+[
+[
+"CFB",
+"2013-10-19"
+],
+{
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2013-10-26"
+],
+{
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2013-11-02"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CFB",
+"2013-11-09"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2013-11-16"
+],
+{
+"College GameDay":"Southern California"
+}
+],
+[
+[
+"CFB",
+"2013-11-23"
+],
+{
+"College GameDay":"Oklahoma State"
+}
+],
+[
+[
+"CFB",
+"2013-11-30"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CFB",
+"2014-08-30"
+],
+{
+"College GameDay":"Oklahoma State"
+}
+],
+[
+[
+"CFB",
+"2014-09-06"
+],
+{
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2014-09-13"
+],
+{
+"College GameDay":"North Dakota State"
+}
+],
+[
+[
+"CFB",
+"2014-09-20"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CFB",
+"2014-09-27"
+],
+{
+"College GameDay":"South Carolina"
+}
+],
+[
+[
+"CFB",
+"2014-10-04"
+],
+{
+"College GameDay":"Ole Miss"
+}
+],
+[
+[
+"CFB",
+"2014-10-11"
+],
+{
+"College GameDay":"Mississippi State"
+}
+],
+[
+[
+"CFB",
+"2014-10-18"
+],
+{
+"College GameDay":"Florida State"
+}
+],
+[
+[
+"CFB",
+"2014-10-25"
+],
+{
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2014-11-01"
+],
+{
+"College GameDay":"West Virginia"
+}
+],
+[
+[
+"CFB",
+"2014-11-08"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CFB",
+"2014-11-15"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2014-11-22"
+],
+{
+"College GameDay":"Harvard"
+}
+],
+[
+[
+"CFB",
+"2014-11-29"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2015-09-05"
+],
+{
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2015-09-12"
+],
+{
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CFB",
+"2015-09-19"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2015-09-26"
+],
+{
+"College GameDay":"Arizona"
+}
+],
+[
+[
+"CFB",
+"2015-10-03"
+],
+{
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2015-10-10"
+],
+{
+"College GameDay":"Utah"
+}
+],
+[
+[
+"CFB",
+"2015-10-17"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2015-10-24"
+],
+{
+"College GameDay":"James Madison"
+}
+],
+[
+[
+"CFB",
+"2015-10-31"
+],
+{
+"College GameDay":"Temple"
+}
+],
+[
+[
+"CFB",
+"2015-11-07"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2015-11-14"
+],
+{
+"College GameDay":"Baylor"
+}
+],
+[
+[
+"CFB",
+"2015-11-21"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2015-11-28"
+],
+{
+"College GameDay":"Oklahoma State"
+}
+],
+[
+[
+"CFB",
+"2016-09-03"
+],
+{
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2016-09-10"
+],
+{
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2016-09-17"
+],
+{
+"College GameDay":"Louisville"
+}
+],
+[
+[
+"CFB",
+"2016-09-24"
+],
+{
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2016-10-01"
+],
+{
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2016-10-08"
+],
+{
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2016-10-15"
+],
+{
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2016-10-22"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2016-10-29"
+],
+{
+"College GameDay":"Utah"
+}
+],
+[
+[
+"CFB",
+"2016-11-05"
+],
+{
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2016-11-12"
+],
+{
+"College GameDay":"Washington"
+}
+],
+[
+[
+"CFB",
+"2016-11-19"
+],
+{
+"College GameDay":"Western Michigan"
+}
+],
+[
+[
+"CFB",
+"2016-11-26"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2017-09-02"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2017-09-09"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2017-09-16"
+],
+{
+"College GameDay":"Louisville"
+}
+],
+[
+[
+"CFB",
+"2017-09-30"
+],
+{
+"College GameDay":"Virginia Tech"
+}
+],
+[
+[
+"CFB",
+"2017-10-07"
+],
+{
+"College GameDay":"Texas Christian"
+}
+],
+[
+[
+"CFB",
+"2017-10-14"
+],
+{
+"College GameDay":"James Madison"
+}
+],
+[
+[
+"CFB",
+"2017-10-21"
+],
+{
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2017-10-28"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2017-11-04"
+],
+{
+"College GameDay":"Oklahoma State"
+}
+],
+[
+[
+"CFB",
+"2017-11-11"
+],
+{
+"College GameDay":"Miami"
+}
+],
+[
+[
+"CFB",
+"2017-11-18"
+],
+{
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2017-11-25"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CFB",
+"2018-09-01"
+],
+{
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CFB",
+"2018-09-08"
+],
+{
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2018-09-15"
+],
+{
+"College GameDay":"Texas Christian"
+}
+],
+[
+[
+"CFB",
+"2018-09-22"
+],
+{
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2018-09-29"
+],
+{
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2018-10-06"
+],
+{
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CFB",
+"2018-10-13"
+],
+{
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2018-10-20"
+],
+{
+"College GameDay":"Washington State"
+}
+],
+[
+[
+"CFB",
+"2018-10-27"
+],
+{
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2018-11-03"
+],
+{
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2018-11-10"
+],
+{
+"College GameDay":"Boston College"
+}
+],
+[
+[
+"CFB",
+"2018-11-17"
+],
+{
+"College GameDay":"Central Florida"
+}
+],
+[
+[
+"CFB",
+"2018-11-24"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2019-08-31"
+],
+{
+"College GameDay":"Auburn"
+}
+],
+[
+[
+"CFB",
+"2019-09-07"
+],
+{
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2019-09-14"
+],
+{
+"College GameDay":"Iowa State"
+}
+],
+[
+[
+"CFB",
+"2019-09-21"
+],
+{
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2019-09-28"
+],
+{
+"College GameDay":"Nebraska"
+}
+],
+[
+[
+"CFB",
+"2019-10-05"
+],
+{
+"College GameDay":"Florida"
+}
+],
+[
+[
+"CFB",
+"2019-10-12"
+],
+{
+"Big Noon Kickoff":"Texas",
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2019-10-19"
+],
+{
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2019-10-26"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"South Dakota State"
+}
+],
+[
+[
+"CFB",
+"2019-11-02"
+],
+{
+"College GameDay":"Memphis"
+}
+],
+[
+[
+"CFB",
+"2019-11-09"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2019-11-16"
+],
+{
+"College GameDay":"Baylor"
+}
+],
+[
+[
+"CFB",
+"2019-11-23"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2019-11-30"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Minnesota"
+}
+],
+[
+[
+"CFB",
+"2020-09-12"
+],
+{
+"College GameDay":"Wake Forest"
+}
+],
+[
+[
+"CFB",
+"2020-09-19"
+],
+{
+"College GameDay":"Louisville"
+}
+],
+[
+[
+"CFB",
+"2020-09-26"
+],
+{
+"College GameDay":"Miami"
+}
+],
+[
+[
+"CFB",
+"2020-10-03"
+],
+{
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2020-10-10"
+],
+{
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2020-10-17"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2020-10-24"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Minnesota"
+}
+],
+[
+[
+"CFB",
+"2020-10-31"
+],
+{
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2020-11-07"
+],
+{
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CFB",
+"2020-11-21"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CFB",
+"2020-11-28"
+],
+{
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2021-09-04"
+],
+{
+"Big Noon Kickoff":"Wisconsin",
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2021-09-11"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Iowa State"
+}
+],
+[
+[
+"CFB",
+"2021-09-18"
+],
+{
+"Big Noon Kickoff":"Oklahoma",
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2021-09-25"
+],
+{
+"Big Noon Kickoff":"Notre Dame",
+"College GameDay":"Wisconsin"
+}
+],
+[
+[
+"CFB",
+"2021-10-02"
+],
+{
+"Big Noon Kickoff":"Wisconsin",
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2021-10-09"
+],
+{
+"Big Noon Kickoff":"Iowa",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2021-10-16"
+],
+{
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2021-10-23"
+],
+{
+"College GameDay":"UCLA"
+}
+],
+[
+[
+"CFB",
+"2021-10-30"
+],
+{
+"Big Noon Kickoff":"Michigan State",
+"College GameDay":"Michigan State"
+}
+],
+[
+[
+"CFB",
+"2021-11-06"
+],
+{
+"College GameDay":"Cincinnati"
+}
+],
+[
+[
+"CFB",
+"2021-11-13"
+],
+{
+"Big Noon Kickoff":"Baylor",
+"College GameDay":"Ole Miss"
+}
+],
+[
+[
+"CFB",
+"2021-11-20"
+],
+{
+"Big Noon Kickoff":"Oklahoma",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2021-11-27"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2022-09-03"
+],
+{
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2022-09-10"
+],
+{
+"Big Noon Kickoff":"Texas",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2022-09-17"
+],
+{
+"Big Noon Kickoff":"Nebraska",
+"College GameDay":"Appalachian State"
+}
+],
+[
+[
+"CFB",
+"2022-09-24"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2022-10-01"
+],
+{
+"Big Noon Kickoff":"Iowa",
+"College GameDay":"Clemson"
+}
+],
+[
+[
+"CFB",
+"2022-10-08"
+],
+{
+"Big Noon Kickoff":"Indiana",
+"College GameDay":"Kansas"
+}
+],
+[
+[
+"CFB",
+"2022-10-15"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2022-10-22"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2022-10-29"
+],
+{
+"Big Noon Kickoff":"Penn State",
+"College GameDay":"Jackson State"
+}
+],
+[
+[
+"CFB",
+"2022-11-05"
+],
+{
+"Big Noon Kickoff":"Texas Christian",
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2022-11-12"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2022-11-19"
+],
+{
+"Big Noon Kickoff":"Baylor",
+"College GameDay":"Montana State"
+}
+],
+[
+[
+"CFB",
+"2022-11-26"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2023-09-02"
+],
+{
+"Big Noon Kickoff":"Texas Christian",
+"College GameDay":"South Carolina"
+}
+],
+[
+[
+"CFB",
+"2023-09-09"
+],
+{
+"Big Noon Kickoff":"Colorado",
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2023-09-16"
+],
+{
+"Big Noon Kickoff":"Colorado",
+"College GameDay":"Colorado"
+}
+],
+[
+[
+"CFB",
+"2023-09-23"
+],
+{
+"Big Noon Kickoff":"Cincinnati",
+"College GameDay":"Notre Dame"
+}
+],
+[
+[
+"CFB",
+"2023-09-30"
+],
+{
+"Big Noon Kickoff":"Colorado",
+"College GameDay":"Duke"
+}
+],
+[
+[
+"CFB",
+"2023-10-07"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2023-10-14"
+],
+{
+"Big Noon Kickoff":"Notre Dame",
+"College GameDay":"Washington"
+}
+],
+[
+[
+"CFB",
+"2023-10-21"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2023-10-28"
+],
+{
+"Big Noon Kickoff":"Kansas",
+"College GameDay":"Utah"
+}
+],
+[
+[
+"CFB",
+"2023-11-04"
+],
+{
+"Big Noon Kickoff":"Texas",
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2023-11-11"
+],
+{
+"Big Noon Kickoff":"Penn State",
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2023-11-18"
+],
+{
+"Big Noon Kickoff":"Maryland",
+"College GameDay":"James Madison"
+}
+],
+[
+[
+"CFB",
+"2023-11-25"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2024-08-24"
+],
+{
+"College GameDay":"Georgia Tech"
+}
+],
+[
+[
+"CFB",
+"2024-08-31"
+],
+{
+"Big Noon Kickoff":"West Virginia",
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2024-09-07"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2024-09-14"
+],
+{
+"Big Noon Kickoff":"Wisconsin",
+"College GameDay":"South Carolina"
+}
+],
+[
+[
+"CFB",
+"2024-09-21"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CFB",
+"2024-09-28"
+],
+{
+"Big Noon Kickoff":"Central Florida",
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2024-10-05"
+],
+{
+"Big Noon Kickoff":"Penn State",
+"College GameDay":"California"
+}
+],
+[
+[
+"CFB",
+"2024-10-12"
+],
+{
+"Big Noon Kickoff":"Brigham Young",
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2024-10-19"
+],
+{
+"Big Noon Kickoff":"Indiana",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2024-10-26"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Indiana"
+}
+],
+[
+[
+"CFB",
+"2024-11-02"
+],
+{
+"Big Noon Kickoff":"Penn State",
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2024-11-09"
+],
+{
+"Big Noon Kickoff":"Texas Tech",
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2024-11-16"
+],
+{
+"Big Noon Kickoff":"Colorado",
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2024-11-23"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2024-11-30"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Texas A&M"
+}
+],
+[
+[
+"CFB",
+"2025-08-30"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Ohio State"
+}
+],
+[
+[
+"CFB",
+"2025-09-06"
+],
+{
+"Big Noon Kickoff":"Iowa State",
+"College GameDay":"Oklahoma"
+}
+],
+[
+[
+"CFB",
+"2025-09-13"
+],
+{
+"Big Noon Kickoff":"Northwestern",
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2025-09-20"
+],
+{
+"Big Noon Kickoff":"Utah",
+"College GameDay":"Miami"
+}
+],
+[
+[
+"CFB",
+"2025-09-27"
+],
+{
+"Big Noon Kickoff":"Illinois",
+"College GameDay":"Penn State"
+}
+],
+[
+[
+"CFB",
+"2025-10-04"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2025-10-11"
+],
+{
+"Big Noon Kickoff":"Illinois",
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2025-10-18"
+],
+{
+"Big Noon Kickoff":"Brigham Young",
+"College GameDay":"Georgia"
+}
+],
+[
+[
+"CFB",
+"2025-10-25"
+],
+{
+"Big Noon Kickoff":"Indiana",
+"College GameDay":"Vanderbilt"
+}
+],
+[
+[
+"CFB",
+"2025-11-01"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Utah"
+}
+],
+[
+[
+"CFB",
+"2025-11-08"
+],
+{
+"Big Noon Kickoff":"Iowa",
+"College GameDay":"Texas Tech"
+}
+],
+[
+[
+"CFB",
+"2025-11-15"
+],
+{
+"Big Noon Kickoff":"Northwestern",
+"College GameDay":"Pittsburgh"
+}
+],
+[
+[
+"CFB",
+"2025-11-22"
+],
+{
+"Big Noon Kickoff":"Cincinnati",
+"College GameDay":"Oregon"
+}
+],
+[
+[
+"CFB",
+"2025-11-29"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Michigan"
+}
+],
+[
+[
+"CFB",
+"2026-09-05"
+],
+{
+"Big Noon Kickoff":"Indiana",
+"College GameDay":"Louisiana State"
+}
+],
+[
+[
+"CFB",
+"2026-09-12"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Texas"
+}
+],
+[
+[
+"CFB",
+"2026-09-19"
+],
+{
+"Big Noon Kickoff":"Kansas",
+"College GameDay":"Ole Miss"
+}
+],
+[
+[
+"CFB",
+"2026-09-26"
+],
+{
+"Big Noon Kickoff":"Ohio State",
+"College GameDay":"Tennessee"
+}
+],
+[
+[
+"CFB",
+"2026-10-03"
+],
+{
+"Big Noon Kickoff":"Minnesota",
+"College GameDay":"Iowa"
+}
+],
+[
+[
+"CFB",
+"2026-10-10"
+],
+{
+"Big Noon Kickoff":"Nebraska",
+"College GameDay":"Alabama"
+}
+],
+[
+[
+"CFB",
+"2026-10-17"
+],
+{
+"Big Noon Kickoff":"Indiana",
+"College GameDay":"Brigham Young"
+}
+],
+[
+[
+"CFB",
+"2026-10-24"
+],
+{
+"Big Noon Kickoff":"Michigan",
+"College GameDay":"Utah"
+}
+]
+],
+"extra":{}
+}

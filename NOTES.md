@@ -577,11 +577,38 @@ chips out of the archive. The sheet was never edited -- the rows were merely
 folded shut. I diagnosed it as deleted data and was about to offer to restore
 it from git.
 
-`LOCATIONS_FLOOR` and `SHEET_FLOOR` in harvest.py now ABORT the build when a
-tab comes back far short (150 show-days, 600 Michigan rows -- well under the
-real 302 and 733, so ordinary editing never trips them). A failed build leaves
-the last good site up, which a quiet one does not. WATCH THE `locations:` AND
-`sheet:` LINES after every harvest; the game count alone will not tell you.
+`LOCATIONS_FLOOR` and `SHEET_FLOOR` in harvest.py ABORT the build when a tab
+comes back far short (150 show-days, 600 Michigan rows). A failed build leaves
+the last good site up, which a quiet one does not.
+
+**THE SHEET CACHE IS WHAT ACTUALLY FIXES IT (his call 2026-10-19).** The
+floors only made the trap loud; he wanted to WORK with the historical seasons
+folded away. So every tab is now remembered ROW BY ROW under
+`data/sheet-cache/` -- michigan, results, seeds, ratings, locations -- and each
+build merges the live read over the remembered one:
+
+| the key | what wins |
+| --- | --- |
+| the live read returns it | **LIVE**, always -- an edit takes effect |
+| only the cache has it | **the cache stands in** -- a collapsed row holds |
+
+So: a collapsed row keeps whatever it last said; a row he wants to CHANGE has
+to be open **through a build**, not merely while he types; and a new row in an
+open group is live from the first build that sees it. Verified 2026-10-19 by
+faking a collapse of 453 of the 560 Michigan CBB rows -- all 453 came back
+byte-identical, an edit to an expanded row won, and a new expanded row landed.
+
+**THE CACHE CANNOT FORGET.** A deleted row and a collapsed row are both simply
+absent, so a deletion never takes. To retire a row, BLANK ITS CELLS (an edit,
+which wins). To drop one for real, run `python harvest.py --resnap` with
+everything expanded: that ignores the cache and writes it fresh. The floors
+are the backstop for exactly that run, and for a cache that goes missing.
+
+A failed tab fetch now falls to the cache too, instead of returning nothing.
+The `N rows stood in from the cache` line says how many a build filled in --
+expect it to be nonzero whenever he has rows folded shut, and WATCH IT, along
+with the `locations:` and `sheet:` lines; the game count alone will not tell
+you.
 
 **gviz GUESSES the header row, and gets it wrong on year columns.** The KP tab
 headers are "2025-26", "2024-25" and so on; gviz typed those columns as DATES
