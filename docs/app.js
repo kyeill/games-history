@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261020-145759";
+const BUILD = "20261020-150108";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -4029,14 +4029,21 @@ const NAV = {
              ["Hockey", "chk", "michigan"], ["Combined", "all", "michigan"]],
   /* COLLEGE (his call 2026-10-15), second after Michigan: the two COMBINED
      views -- which are TV Windows and Key Games at once, and are what he
-     actually browses now -- then the three Rivals lists and Cornell's two.
-     The old CFB and CBB tabs keep TV Windows and Key Games and nothing else;
-     he expects to retire them. HOCKEY had only the two views that moved here,
-     so its tab goes with them -- there was nothing left to put on it. */
+     actually browses now -- and Cornell's two. HOCKEY had only the two views
+     that moved here, so its tab went with them: there was nothing left to put
+     on it. */
   college: [["CFB", "cfb", "both"], ["CBB", "cbb", "both"],
-            ["CFB Rivals", "cfb", "rivals"], ["CBB Rivals", "cbb", "rivals"],
-            ["HKY Rivals", "chk", "rivals"],
             ["Cornell HKY", "chk", "cornell"], ["Cornell CBB", "cbb", "cornell"]],
+  /* RIVALS, A TAB OF ITS OWN (his call 2026-10-20), third and ahead of
+     Detroit. The three lists came to College on 2026-10-15 and sat behind the
+     two Combined views; on their own they need no sport in the label, so
+     "CFB Rivals" is simply CFB. Nothing about the VIEW changes -- it is the
+     same `rivals` view, read by `rivalsAllows`, `rivalPair` and the rest --
+     only where it is reached from, which is why this is a NAV edit and
+     nothing else. The TOP key is "rivals" like the view's name; the two never
+     meet, TOP only ever being looked up as NAV[TOP]. */
+  rivals: [["CFB", "cfb", "rivals"], ["CBB", "cbb", "rivals"],
+           ["HKY", "chk", "rivals"]],
   /* THE OLD CFB AND CBB TABS ARE GONE (his call 2026-10-20), as he said
      they would be when College took their place on 2026-10-15: "that will
      leave the existing CFB and CBB tabs with only a couple views; that's
@@ -4242,7 +4249,7 @@ async function init() {
 
   /* SWIPING BETWEEN TABS ON A PHONE (his call 2026-09-27, narrowing the one
      he made on 2026-09-24). A horizontal drag across the cards walks the TOP
-     row -- Michigan, College, Detroit -- and wraps at either end,
+     row -- Michigan, College, Rivals, Detroit -- and wraps at either end,
      landing on each tab's first view exactly as tapping the tab does. It used
      to walk every view of every tab instead, which made crossing Detroit five
      swipes wide; the second row is left to his fingers. A swipe must be

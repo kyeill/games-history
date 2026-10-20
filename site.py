@@ -484,6 +484,7 @@ BODY = """
 <nav>
   <button data-top="michigan" aria-selected="true">Michigan</button>
   <button data-top="college" aria-selected="false">College</button>
+  <button data-top="rivals" aria-selected="false">Rivals</button>
   <button data-top="detroit" aria-selected="false">Detroit</button>
 </nav>
 

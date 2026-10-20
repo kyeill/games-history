@@ -745,7 +745,20 @@ team view is gone: it is every view's business now, not those three.
 are TV Windows and Key Games at once and are what he browses now, then the
 three Rivals lists and Cornell's two.
 
-    CFB | CBB | CFB Rivals | CBB Rivals | HKY Rivals | Cornell HKY | Cornell CBB
+    CFB | CBB | Cornell HKY | Cornell CBB
+
+**THE THREE RIVALS LISTS LEFT AGAIN ON 2026-10-20**, for a tab of their own,
+third and ahead of Detroit:
+
+    RIVALS:  CFB | CBB | HKY
+
+On their own they need no sport in the label, so "CFB Rivals" is simply CFB.
+Nothing about the VIEW changed -- same `rivals` view, same `rivalsAllows`,
+same filters (Rival, Year, Winner, Postseason) -- only where it is reached
+from, so the whole change is NAV plus the `<nav>` row. The TOP key is
+"rivals", which is also the view's name; the two never meet, TOP only ever
+being looked up as `NAV[TOP]`. College is down to four views, so its viewbar
+fits one row at 410px again -- seven used to overflow to 491px.
 
 The views MOVED rather than being copied. HOCKEY had only the two views that
 came here, so its tab went with them -- there was nothing left to put on it,
