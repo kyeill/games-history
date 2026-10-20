@@ -747,10 +747,24 @@ three Rivals lists and Cornell's two.
 
     CFB | CBB | CFB Rivals | CBB Rivals | HKY Rivals | Cornell HKY | Cornell CBB
 
-The views MOVED rather than being copied. The old CFB and CBB tabs keep TV
-Windows and Key Games and nothing else; he expects to retire them. HOCKEY had
-only the two views that came here, so its tab went with them -- there was
-nothing left to put on it, and he had not spotted that when he asked.
+The views MOVED rather than being copied. HOCKEY had only the two views that
+came here, so its tab went with them -- there was nothing left to put on it,
+and he had not spotted that when he asked.
+
+**AND THE OLD CFB AND CBB TABS ARE NOW GONE TOO (his call 2026-10-20)**, as he
+said they would be when he asked for College: "that will leave the existing
+CFB and CBB tabs with only a couple views; that's fine for now, will likely
+delete soon". Each held TV Windows and Key Games, and Combined is both at
+once. The nav is three tabs wide: **Michigan | College | Detroit**.
+
+THE TWO VIEWS ARE LEFT IN THE CODE, unreachable rather than ripped out.
+`VIEW === "tv"` and `VIEW === "big"` appear in 24 places, nearly all as one
+arm of an `||` that Combined shares -- the upcoming-game rules, the Current
+button, the CBB week dropdown, the Important Results chip -- so unpicking them
+would be two dozen edits to live Combined behaviour for no gain. `tvShows`,
+`keyShows`, `bigViewAllows` and `keyRing` are needed either way: `combShows`
+is built from the first two, and the Game Type cut on Combined is
+`bigViewAllows`. A separate sweep if the dead branches ever get in the way.
 
 `TOPS` is `Object.keys(NAV)`, so the swipe order follows the nav order with no
 second list to keep in step; the only other place the tabs are written out is

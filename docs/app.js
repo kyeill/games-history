@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261020-143017";
+const BUILD = "20261020-145759";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -4037,8 +4037,22 @@ const NAV = {
             ["CFB Rivals", "cfb", "rivals"], ["CBB Rivals", "cbb", "rivals"],
             ["HKY Rivals", "chk", "rivals"],
             ["Cornell HKY", "chk", "cornell"], ["Cornell CBB", "cbb", "cornell"]],
-  cfb: [["TV Windows", "cfb", "tv"], ["Key Games", "cfb", "big"]],
-  cbb: [["TV Windows", "cbb", "tv"], ["Key Games", "cbb", "big"]],
+  /* THE OLD CFB AND CBB TABS ARE GONE (his call 2026-10-20), as he said
+     they would be when College took their place on 2026-10-15: "that will
+     leave the existing CFB and CBB tabs with only a couple views; that's
+     fine for now, will likely delete soon". Each held TV Windows and Key
+     Games, and Combined is both of those at once.
+
+     THE VIEWS THEMSELVES ARE LEFT IN THE CODE, unreachable rather than
+     ripped out. `VIEW === "tv"` and `VIEW === "big"` appear in 24 places,
+     nearly all of them as one arm of an `||` that Combined shares -- the
+     upcoming-game rules, the Current button, the CBB week dropdown, the
+     Important Results chip. Unpicking them would be two dozen edits to
+     live Combined behaviour for no gain, and `tvShows`, `keyShows`,
+     `bigViewAllows` and `keyRing` are needed either way: `combShows` is
+     built from the first two, and the Game Type cut on Combined is
+     `bigViewAllows`. Ask for the sweep separately if the dead branches
+     start getting in the way. */
   detroit: [["Tigers", "mlb", "tigers"], ["Lions", "nfl", "lions"],
             ["Red Wings", "nhl", "redwings"],
             ["Pistons", "nba", "pistons"], ["Cavaliers", "nba", "cavaliers"]]
@@ -4228,7 +4242,7 @@ async function init() {
 
   /* SWIPING BETWEEN TABS ON A PHONE (his call 2026-09-27, narrowing the one
      he made on 2026-09-24). A horizontal drag across the cards walks the TOP
-     row -- Michigan, CFB, CBB, HKY, Detroit -- and wraps at either end,
+     row -- Michigan, College, Detroit -- and wraps at either end,
      landing on each tab's first view exactly as tapping the tab does. It used
      to walk every view of every tab instead, which made crossing Detroit five
      swipes wide; the second row is left to his fingers. A swipe must be
