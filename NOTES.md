@@ -1043,6 +1043,35 @@ games lose the label -- nine of them from 2020-21's compressed season, the
 rest from 2011, 2012, 2014 and 2015. Since 2017, outside that one season,
 every December Big Ten game has been played before the 25th anyway.
 
+## What CURRENT opens on
+
+**THE SEASON THAT IS UNDERWAY, OR THE NEXT ONE TO START (his call 2026-10-20:
+"Open on Nov 2026-27").** `enterCurrent` used to take the newest season with a
+game PLAYED, which is right for ten months of the year and wrong for the other
+two: in October the newest played basketball season is LAST season, so College
+CBB opened on April's national championship -- one card, the end of a season he
+had finished with. `currentSeason` asks instead whether today falls between a
+season's first game and its last, and when none is underway takes the one
+starting soonest. Football is unaffected: today sits inside its season.
+
+**AND WITH NOTHING BEHIND US, CURRENT TAKES THE FIRST WEEK RATHER THAN THE
+LAST.** Once an unstarted season is open, every game is ahead, and "the latest
+week in the pool" would land on March 2027. The opening block is asked for by
+its WEEK KEY rather than by seven days, so basketball answers with the whole
+November bucket and the Week dropdown reads "November" through `CUR_WEEK`.
+
+**THE TRAP THAT MADE THE FIRST ATTEMPT LOOK FIXED WHEN IT WAS NOT:** this
+block runs BEFORE the season filter, so `list` still holds every season. With
+the Year dropdown correctly reading 2026-27, "the latest week behind us" was
+still last April's final, and what survived was everything from that Monday on
+-- all 94 games of the new season, looking plausibly like a working Current.
+`curPool` scopes the question to `FILT.season` first. The `CUR_WEEK` comment
+further down was written about the same trap.
+
+Opens today on **2026-27, November, 2 games** -- Notre Dame against Villanova
+in Rome and UConn at Michigan in Boston, the only two November windows
+announced so far. It fills in as the networks name more.
+
 ## Thanksgiving and Black Friday in a CBB header
 
 **The two days of the year that have their own name (his call 2026-10-20),

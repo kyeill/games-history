@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261020-150108";
+const BUILD = "20261020-150752";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -3085,29 +3085,50 @@ function visible() {
   // 2026-09-18), not the latest week in the data. Only a week with nothing in
   // it -- basketball in September -- falls back to the latest one there is.
   const curView = VIEW === "tv" || VIEW === "both";
+  /* CURRENT ASKS ITS QUESTION OF THE CHOSEN SEASON ALONE (2026-10-20). This
+     block runs BEFORE the season filter below, so `list` still holds every
+     season -- which is why "the latest week behind us" was last April's
+     national championship even once `currentSeason` had opened 2026-27 on the
+     Year dropdown: the week was settled on games the season filter was about
+     to throw away, and what survived was everything from that Monday on, all
+     94 games of the new season. CUR_WEEK further down was written with the
+     same trap in mind. */
+  const curPool = !(curView && FILT.current) ? list
+    : FILT.season == null ? list : list.filter(g => g.season === FILT.season);
   const thisWeek = curView && FILT.current
-    ? list.filter(g => g.date >= weekStart() && g.date <= weekEnd()) : [];
+    ? curPool.filter(g => g.date >= weekStart() && g.date <= weekEnd()) : [];
   if (thisWeek.length) {
     list = thisWeek;
-  } else if (curView && FILT.current && list.length) {
+  } else if (curView && FILT.current && curPool.length) {
     // ...and THE FALLBACK LOOKS BACKWARDS, NEVER FORWARDS (2026-10-12). Since
     // TV Windows started carrying games out to the end of the regular season,
     // "the latest week there is" would otherwise mean the furthest FUTURE one
     // -- basketball in September would open on March. Only once there is
     // nothing behind us at all does the whole list stand in.
     const today = todayISO();
-    const back = list.filter(g => g.date <= today);
-    const pool = back.length ? back : list;
-    if (SPORT_OF[TAB] === "CFB") {
+    const back = curPool.filter(g => g.date <= today);
+    /* ...AND WITH NOTHING BEHIND US IT TAKES THE FIRST WEEK, NOT THE LAST
+       (his call 2026-10-20: "Open on Nov 2026-27"). Once `currentSeason`
+       opens a season that has not tipped off, every game is ahead, and the
+       rule below -- the latest week in the pool -- would land on March 2027.
+       The opening block is asked for by its WEEK KEY rather than by seven
+       days, so basketball answers with the whole November bucket and the Week
+       dropdown reads "November" through CUR_WEEK; football would answer with
+       its first numbered week. */
+    if (!back.length) {
+      const first = curPool.map(g => g.date).sort()[0];
+      const k0 = String(weekKeyOf(curPool.find(g => g.date === first)));
+      list = curPool.filter(g => String(weekKeyOf(g)) === k0);
+    } else if (SPORT_OF[TAB] === "CFB") {
       const key = g => g.week == null ? -1 : g.season * 100 + g.week;
-      const top = Math.max.apply(null, pool.map(key));
-      list = list.filter(g => key(g) === top);
+      const top = Math.max.apply(null, back.map(key));
+      list = curPool.filter(g => key(g) === top);
     } else {
-      const last = pool.map(g => g.date).sort().pop();
+      const last = back.map(g => g.date).sort().pop();
       const d = new Date(last + "T12:00:00Z");
       const mon = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5)
         .toISOString().slice(0, 10);
-      list = list.filter(g => g.date >= mon);
+      list = curPool.filter(g => g.date >= mon);
     }
   }
   // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
@@ -3333,6 +3354,35 @@ function latestSeason() {
     .map(g => g.season);
   if (own.length) return Math.max.apply(null, own);
   return SEASONS.length ? Math.max.apply(null, SEASONS) : null;
+}
+
+/* THE SEASON THAT IS UNDERWAY, OR THE NEXT ONE TO START (his call
+   2026-10-20: "Open on Nov 2026-27"). CURRENT used to open on the newest
+   season with a game PLAYED, which is right for ten months of the year and
+   wrong for the other two: in October the newest played basketball season is
+   last season, so College CBB opened on April's national championship -- one
+   card, the end of a season he had finished with.
+
+   A season is UNDERWAY when today falls between its first game and its last.
+   When none is, the one starting soonest wins, which is 2026-27 from the day
+   the schedule loads until it tips off on 1 November. Football is unaffected:
+   today sits inside its season, so it answers as it always did. */
+function currentSeason() {
+  const today = todayISO();
+  const span = {};
+  GAMES.forEach(g => {
+    if (SPORT_OF[TAB] && g.sport !== SPORT_OF[TAB]) return;
+    if (g.rivals_only) return;
+    const s = span[g.season] || (span[g.season] = [g.date, g.date]);
+    if (g.date < s[0]) s[0] = g.date;
+    if (g.date > s[1]) s[1] = g.date;
+  });
+  const years = Object.keys(span).map(Number).sort((a, b) => a - b);
+  if (!years.length) return latestSeason();
+  const live = years.filter(y => span[y][0] <= today && today <= span[y][1]);
+  if (live.length) return Math.max.apply(null, live);
+  const ahead = years.filter(y => span[y][0] > today);
+  return ahead.length ? Math.min.apply(null, ahead) : years[years.length - 1];
 }
 
 // Opening state, not an empty one: the newest season with games, and Marquee
@@ -4173,10 +4223,10 @@ function enterCurrent() {
   CURRENT_PREV = { filt: Object.assign({}, FILT, { current: false }),
                    sort: FILT.marquee ? (SPORT_OF[TAB] === "CBB" ? "desc" : "asc") : SORT };
   // ...and CURRENT CARRIES THE SEASON (his call 2026-09-20): the Year filter
-  // reads this season, the latest one with a game played
-  const played = GAMES.filter(g => g.sport === SPORT_OF[TAB] && !g.rivals_only &&
-    !upcoming(g)).map(g => g.season);
-  FILT = { season: played.length ? Math.max.apply(null, played) : latestSeason(),
+  // reads the season that is UNDERWAY, or the next one to start -- see
+  // currentSeason, which replaced "the latest one with a game played" on
+  // 2026-10-20
+  FILT = { season: currentSeason(),
            week: null, month: null, type: null,
            windows: null, team: null, marquee: false, rival: null,
            post: false, winner: null, net: null, recent: false,
