@@ -1016,6 +1016,26 @@ games lose the label -- nine of them from 2020-21's compressed season, the
 rest from 2011, 2012, 2014 and 2015. Since 2017, outside that one season,
 every December Big Ten game has been played before the 25th anyway.
 
+## Thanksgiving and Black Friday in a CBB header
+
+**The two days of the year that have their own name (his call 2026-10-20),
+on the College CBB view.** A basketball card with no window label reads its
+WEEKDAY, so Feast Week's MTEs -- Battle 4 Atlantis, the NIT Tip-Off, Fort
+Myers, Las Vegas -- all read a flat THURSDAY or FRIDAY on the two dates nobody
+calls that. `holidayDay` names them instead: 15 games on Thanksgiving, 26 on
+the Friday after (27 exist; one does not reach the view).
+
+It is built on the SAME fourth-Thursday reckoning as the November buckets
+(`thanksgiving`), so the two can never disagree about which Thursday it is.
+It sits where the WEEKDAY sits, not in front of the label, so a window still
+outranks it exactly as it outranks the day name -- which displaces nothing as
+things stand, all 42 of those games carrying no header at all.
+
+**SCOPED TO `VIEW === "both"` AND THE CBB TAB**, which is where he asked for
+it. Michigan's own basketball view builds its header from `lead`/`tail`
+rather than this branch, and the old CBB tab's two views still read the plain
+day: 82 other Thursdays and 57 other Fridays on College CBB are untouched.
+
 ## Wins, and Positive
 
 **Two buttons that cut by what the RESULT was (his calls 2026-10-20).** Both

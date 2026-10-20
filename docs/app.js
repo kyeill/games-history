@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261020-090740";
+const BUILD = "20261020-143017";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -888,7 +888,15 @@ function rowHtml(g, browse) {
     // never leave the header empty.
     if (!when) when = esc(DAYS[g.dow] || g.dow);
   } else {
-    when = esc(label || DAYS[g.dow] || g.dow);
+    /* THE TWO DAYS THAT HAVE THEIR OWN NAME (his call 2026-10-20), on the
+       College CBB view. A basketball card with no window label reads its
+       weekday, so Feast Week's MTEs -- Battle 4 Atlantis, the NIT Tip-Off,
+       Fort Myers, Las Vegas -- all read a flat THURSDAY or FRIDAY on the two
+       dates nobody calls that. It sits where the WEEKDAY sits, not in front
+       of the label: a window still outranks it, exactly as it outranks the
+       day name today. Nothing is displaced as it stands -- all 42 of those
+       games carry no header at all. */
+    when = esc(label || holidayDay(g) || DAYS[g.dow] || g.dow);
   }
   // the Michigan view draws its own card from the same header and chips.
   // THERE A COLOUR IS ALL OR NOTHING (his call 2026-09-14): the network alone
@@ -2961,6 +2969,20 @@ function thanksgiving(season) {
 }
 const CBB_BUCKETS = [["nov", "November"], ["feast", "Feast Week"],
                      ["dec1", "Early December"], ["dec2", "Late December"]];
+/* THANKSGIVING AND BLACK FRIDAY, by name rather than by weekday (his call
+   2026-10-20) -- the College CBB view only, which is where he asked for it;
+   Michigan's own basketball view and the two old CBB tabs still read the
+   plain day. Built on the SAME fourth-Thursday reckoning as the buckets
+   above, so the two can never disagree about which Thursday it is. 15 games
+   fall on Thanksgiving and 27 on the Friday after. */
+function holidayDay(g) {
+  if (g.sport !== "CBB" || g.stage) return null;
+  if (!(VIEW === "both" && SPORT_OF[TAB] === "CBB")) return null;
+  const off = Math.round((Date.UTC(+g.date.slice(0, 4), +g.date.slice(5, 7) - 1,
+                                   +g.date.slice(8, 10))
+    - thanksgiving(g.season).getTime()) / 864e5);
+  return off === 0 ? "Thanksgiving" : off === 1 ? "Black Friday" : null;
+}
 // the Monday of a date's week, as a timestamp
 function mondayOf(d) {
   const m = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5);
