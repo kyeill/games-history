@@ -3193,6 +3193,11 @@ function visible() {
   // Michigan over Oklahoma in Week 2 -- when the ranks make them upsets too
   // (his call 2026-09-20)
   if (FILT.upset) list = list.filter(g => /Upsets$/.test(g.type || "") || isUpset(g));
+  // WINS and POSITIVE (his calls 2026-10-20) -- see michWon and positive.
+  // Both sit here, among the cuts rather than among the view rules, so they
+  // stack with the season, the opponent and everything else.
+  if (FILT.wins) list = list.filter(michWon);
+  if (FILT.pos) list = list.filter(positive);
   // HIS RECENT STRETCH (2026-09-14): football from 2021, basketball from the
   // 2020-21 season -- which is season 2020 in the file, a basketball season
   // being named for the year it starts in.
@@ -3319,7 +3324,7 @@ function clearFilters() {
     // TV Windows opens on Marquee -- the games he plans a weekend around
     marquee: VIEW === "tv",
     week: null, month: null, team: null, rival: null, post: false, winner: null,
-    upset: false
+    upset: false, wins: false, pos: false
   };
   // Combined's opening state is every season's Special games
   if (typeof TAB !== "undefined" && !SPORT_OF[TAB] && teamView()) {
@@ -3578,7 +3583,13 @@ function filterChips() {
     const hkyBtn = (!sport && teamView())
       ? '<button class="f" data-act="nohky" aria-pressed="' + !FILT.nohky +
         '">Hockey</button>' : "";
-    return h + group("", extra + curBtn + hkyBtn + sortButton());
+    // WINS leads the row on all four Michigan views (his call 2026-10-20),
+    // Combined included -- it is the cut he reaches for first. Cornell's two
+    // views do not have it; he asked for Michigan.
+    const winBtn = VIEW === "michigan"
+      ? '<button class="f" data-act="wins" aria-pressed="' + !!FILT.wins +
+        '">Wins</button>' : "";
+    return h + group("", winBtn + extra + curBtn + hkyBtn + sortButton());
   }
   // RIVALS has its own filters (his call 2026-09-11): Year, Rival, Winner and
   // a Postseason button -- no week, month, game type, TV window, team or
@@ -3904,6 +3915,45 @@ function rivalsBorder(g) {
   return null;
 }
 
+/* WINS, on every Michigan view (his call 2026-10-20). Football and
+   basketball are simply the games Michigan won. HOCKEY counts an OVERTIME win
+   and a SHOOTOUT win but not a tie: ESPN marks an overtime winner like any
+   other, so `win` already covers that one, but a college shootout goes down
+   as a TIE and only USCHO's note says who took it -- which harvest records as
+   `sho_win`, relative to the focus team. A Big Ten tie settled in 3-on-3
+   (rules.EXTRA_POINT) is recorded the same way and counts the same.
+
+   So a PURE tie is out, a shootout LOST is out, and a game not yet played is
+   out -- nobody has won it. Michigan's 517 hockey games hold 281 wins in
+   regulation or overtime and 15 more in a shootout or the 3-on-3, against 170
+   defeats and 23 ties nobody took. */
+function michWon(g) {
+  if (upcoming(g)) return false;
+  if (g.sho_win === true) return true;        // the shootout or the 3-on-3
+  if (g.tie) return false;                    // ...and nobody took this one
+  const m = g.teams.find(t => t.id === focusId());
+  return !!(m && m.win);
+}
+
+/* POSITIVE, on the College CFB and CBB views (his call 2026-10-20): the list
+   without the two results he would rather not see again -- a Michigan defeat,
+   and a win for Ohio State, Michigan State or Notre Dame.
+
+   It is a WIDER cut than Wins, and deliberately so: these views carry games
+   Michigan is not in, and a game neither Michigan nor a rival plays in is
+   neither good nor bad, so it stays. A game NOT YET PLAYED stays too -- it is
+   not a bad result, it is not a result. Two rivals playing each other always
+   produce a rival win, so they go; very few reach these views anyway, Combined
+   already dropping the pair unless the game is marquee or one of his Results.
+   A Michigan tie is not a defeat and stays, though neither sport has one in
+   the archive. */
+function positive(g) {
+  if (upcoming(g)) return true;
+  const m = g.teams.find(t => t.id === MICHIGAN);
+  if (m && !m.win && !g.tie) return false;
+  return !g.teams.some(t => RIVALS.indexOf(t.id) > -1 && t.win);
+}
+
 // Rivals shows every game until this is pressed, then only the CFP and the
 // NCAA Tournament (his call 2026-09-11)
 function postButton() {
@@ -3936,6 +3986,10 @@ function quickButtons() {
     ((VIEW === "big" && SPORT_OF[TAB] === "CFB") || both
       ? '<button class="f" data-act="upset" aria-pressed="' + !!FILT.upset +
         '">Upsets</button>' : "") +
+    // POSITIVE, next to Upsets because both cut by what the result WAS (his
+    // call 2026-10-20) -- see the `positive` predicate
+    (both ? '<button class="f" data-act="pos" aria-pressed="' + !!FILT.pos +
+        '">Positive</button>' : "") +
     /* 2021-ONWARD, ON BOTH COMBINED VIEWS (his call 2026-10-14). The filter
        itself is old -- it is the Michigan views' button -- and the floor is
        the sport's own: football from 2021, basketball from the 2020-21
@@ -4237,6 +4291,10 @@ async function init() {
       FILT.nohky = !FILT.nohky;
     } else if (b.dataset.act === "upset") {
       FILT.upset = !FILT.upset;
+    } else if (b.dataset.act === "wins") {
+      FILT.wins = !FILT.wins;
+    } else if (b.dataset.act === "pos") {
+      FILT.pos = !FILT.pos;
     } else if (b.dataset.act === "post") {
       FILT.post = !FILT.post;
     } else if (b.dataset.act === "recent") {

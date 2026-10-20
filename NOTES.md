@@ -1016,6 +1016,48 @@ games lose the label -- nine of them from 2020-21's compressed season, the
 rest from 2011, 2012, 2014 and 2015. Since 2017, outside that one season,
 every December Big Ten game has been played before the 25th anyway.
 
+## Wins, and Positive
+
+**Two buttons that cut by what the RESULT was (his calls 2026-10-20).** Both
+sit among the ordinary filters in `visible`, so they stack with the season,
+the opponent and the rest.
+
+**WINS, on all four Michigan views** (Football, Basketball, Hockey, Combined;
+`VIEW === "michigan"`, so Cornell's two do not have it). Football and
+basketball are simply the games Michigan won. HOCKEY counts an overtime win
+and a shootout win, and `michWon` needs two clauses to say so:
+
+* an OVERTIME win is marked `win` like any other -- ESPN names the winner;
+* a SHOOTOUT goes down as a TIE, so only `sho_win` says who took it, which
+  harvest reads off USCHO's note and records RELATIVE TO THE FOCUS TEAM. A
+  Big Ten tie settled in 3-on-3 (`rules.EXTRA_POINT`) is recorded the same way
+  and counts the same.
+
+A pure tie is out, a shootout LOST is out, and an unplayed game is out. Of
+Michigan's 517 hockey games: 281 won in regulation or overtime, 15 more in a
+shootout or the 3-on-3, 170 lost, 23 tied with nobody taking them, 28 to come.
+
+**A WEEKEND SPLITS UNDER THIS, deliberately.** Hockey cards are built AFTER
+filtering (`hockeyUnits`), so a weekend Michigan split comes back as a
+one-game card -- which is what "no losses" has to mean. That is the opposite
+of the HIGHLIGHTS filter, which asks its question of the whole card on purpose
+(his catch 2026-09-25) so a hand-picked weekend is not torn in half. The lone
+card renders correctly: `series[1]` is undefined, so the rank box goes and
+Michigan's rank reads in maize beside the footer, exactly as a single MTE game
+already did.
+
+**POSITIVE, on the College CFB and CBB views** (`VIEW === "both"`): everything
+except a Michigan defeat and a win for Ohio State, Michigan State or Notre
+Dame. It is WIDER than Wins on purpose -- these views carry games Michigan is
+not in, and a game neither Michigan nor a rival plays in is neither good nor
+bad, so it stays. An unplayed game stays too: not a bad result, not a result.
+TWO RIVALS PLAYING EACH OTHER ALWAYS PRODUCE A RIVAL WIN, so the pair goes;
+few reach these views anyway, Combined already dropping them unless the game
+is marquee or one of his Results (2 such games in CFB 2023, 1 in CBB 2023-24).
+
+Like every button but Sort, both RELEASE CURRENT when pressed, and `enterCurrent`
+clears them by rebuilding `FILT` without them -- the same contract `upset` has.
+
 ## The Detroit tab's season line
 
 **TWO LINES (his call 2026-10-12): what his team did, then who won the
