@@ -70418,19 +70418,22 @@
 "name":"Green Bay",
 "attended":false,
 "case":"",
-"shade":false,
+"shade":true,
 "border":"",
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"",
-"score_font":"",
+"score_bg":"#000000",
+"score_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
 "jersey":""
 },
-"flags":[]
+"flags":[
+"box",
+"shade"
+]
 }
 ],
 [
