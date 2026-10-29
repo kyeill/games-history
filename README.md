@@ -25,7 +25,6 @@ python colors.py     the row-wash colour per team -> output/colors.json
 python seed_series.py  series + Buy Game tags -> docs/tags.json (merges)
 python series_scan.py  new series candidates -> output/series_review.txt (review first)
 python site.py       build the app -> docs/  (GitHub Pages serves this)
-python mock.py       the three row treatments Kyle chose from -> output/mockups.html
 ```
 
 Python is not on PATH:
@@ -499,11 +498,6 @@ and never apply to a conference tournament — `ABC`/`NBC` plus the day on any
 day of the week, `FOX Saturday` for the Saturday afternoon `FOX Primetime`
 does not cover, and `CBS Sunday`. Everything else falls back to the weekday.
 
-**TV window chips carry their network's colour** — FOX yellow, CBS a lighter
-blue, NBC grey, ABC a darker blue, ESPN red, Peacock mirroring NBC. The mapping
-is explicit in `rules.WINDOW_NET`: parsing the window name does not work, since
-"Big Monday", "Super Tuesday" and "B1G Peacock" name no network at all.
-
 No **game type** is drawn on any card, either view — the field survives only
 to drive the Game Type filter.
 
@@ -573,21 +567,20 @@ current season and the upcoming week rather than the whole archive.
 | file | what it does |
 |---|---|
 | `rules.py` | the rule set, and only that |
-| `harvest.py` | ESPN → `output/games.json` |
-| `colors.py` | row-wash colour per team |
-| `seed_tags.py` | College GameDay / Big Noon Kickoff tags, merged into `docs/tags.json` |
-| `seed_series.py` | Home & Home / Neutral & Neutral / Home & Neutral / Annual / Buy Game tags, merged into `docs/tags.json` |
-| `series_scan.py` | review tool: finds series candidates for `seed_series.py` |
-| `window-overrides.json` | re-files a game into a window, header and all |
-| `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
-| `game-overrides.json` (per-game city / event where ESPN has none, by game
-id), `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
-| `michigan.csv` | his per-game details for the Michigan view: emoji, border, caps (an override -- the championship rule decides by default), uniform, note (open in Excel or Sheets; keep it CSV UTF-8) |
-| `ratings.csv` | his final SP+ / KenPom rank for each opponent, per season, for the Michigan view |
-| `event-overrides.json` | a clean name for a basketball event chip (sponsor and capitals stripped), or null for the city; matched case-blind |
-| `logos.py` | ported from sports-daily; measures both crest variants |
-| `site.py` | builds `docs/` — HTML, icons, manifest, service worker |
+| `harvest.py` | ESPN + his Google Sheet -> `output/games.json` |
+| `site.py` | builds `docs/` -- HTML, CSS, icons, manifest, service worker |
 | `app.js` | the whole client app; `site.py` fills its `__PLACEHOLDERS__` |
-| `mock.py` | the three row treatments, for reference |
+| `colors.py` | row-wash colour per team (`--write` refreshes new teams) |
+| `logos.py` | ported from sports-daily; measures both crest variants |
+| `seed_series.py` | Home & Home / Neutral & Neutral / Annual / Buy Game tags |
+| `series_scan.py` | review tool, not part of the build: finds series candidates for `seed_series.py` |
+| `game-overrides.json` | per-game city or event where ESPN has none, by game id |
+| `event-overrides.json` | a clean name for a basketball event chip, or null for the city; matched case-blind |
+| `network-overrides.json` | networks for the games ESPN lists with none; the window rules then judge them |
+| `window-extras.json` | adds a window a game is only FILTERED under (and Marquee) |
+| `window-overrides.json` | re-files a game into a window, header and all. Empty since 2026-10-15 -- delayed kickoffs are fixed at the source in `data/kickoff.json` |
+| `data/sheet-cache/` | the last good read of each Google Sheet tab, row by row, so he can keep rows collapsed |
+| `data/kickoff.json` | the date, time and networks each game was SCHEDULED for, before any delay |
+| `data/` (the rest) | what harvest works out once and keeps: champions, conference maps, final ranks, USCHO, pro seeds and places |
 | `docs/tags.json` | **the shared state the app writes.** Never rebuilt |
 | `cache/` | raw ESPN responses (gitignored, ~600 MB) |

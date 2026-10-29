@@ -5284,7 +5284,6 @@ def harvest():
                "final_rank": fr, "conf_place": cp, "champs": ch,
                "pro_place": pp, "pro_champ": pc,
                "ivy_titles": rules.IVY_TITLES,
-               "window_net": rules.WINDOW_NET,
                "hidden_windows": rules.HIDDEN_WINDOWS,
                "header_tint": rules.HEADER_TINT, "net_tint": rules.NET_TINT,
                "big_ten": rules.BIG_TEN, "season_names": rules.SEASON_NAMES,

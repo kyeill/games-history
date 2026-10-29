@@ -770,14 +770,13 @@ CFB and CBB tabs with only a couple views; that's fine for now, will likely
 delete soon". Each held TV Windows and Key Games, and Combined is both at
 once. The nav is three tabs wide: **Michigan | College | Detroit**.
 
-THE TWO VIEWS ARE LEFT IN THE CODE, unreachable rather than ripped out.
-`VIEW === "tv"` and `VIEW === "big"` appear in 24 places, nearly all as one
-arm of an `||` that Combined shares -- the upcoming-game rules, the Current
-button, the CBB week dropdown, the Important Results chip -- so unpicking them
-would be two dozen edits to live Combined behaviour for no gain. `tvShows`,
-`keyShows`, `bigViewAllows` and `keyRing` are needed either way: `combShows`
-is built from the first two, and the Game Type cut on Combined is
-`bigViewAllows`. A separate sweep if the dead branches ever get in the way.
+The two VIEWS were left behind unreachable for nine days and **swept out on
+2026-10-29**: 24 `VIEW === "tv"` / `VIEW === "big"` tests, the Key Games ring
+and week clamp, the CBB November-to-March cut, the TV Windows opening, and
+`netClass` / `rankedBefore` / `WINDOW_NET` with them. `tvShows` and `keyShows`
+STAY -- `combShows` is built from them -- as does `bigViewAllows`, which is
+Combined's Game Type cut. Proof the sweep changed nothing: card counts for all
+16 views across every season, 5,854 numbers, identical before and after.
 
 `TOPS` is `Object.keys(NAV)`, so the swipe order follows the nav order with no
 second list to keep in step; the only other place the tabs are written out is
@@ -2418,7 +2417,8 @@ things. Measured: 71 games in the window across 41 Saturdays, exactly one
 Primetime label on each, none missing and none doubled.
 
 **The app icon is the scoreboard** -- two team rows, winner washed maize (his
-pick of six; `icons.py` draws all six and a preview page). It is declared
+pick of six; the generator that drew the candidates went on 2026-10-29, and is
+in git history if another set is ever wanted). It is declared
 `purpose: "any maskable"`, so Android crops the square to the launcher shape:
 the background must be FULL BLEED and every mark must sit inside the safe
 circle of radius 0.40 about centre. **Measure it, do not eyeball it** -- the

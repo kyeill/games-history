@@ -274,7 +274,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .t-slot.n-nbc{background:#2c2c31;border-color:#414147;color:#bcbcb7}
 .t-slot.n-abc{background:#1b2440;border-color:#2b3860;color:#93a9dc}
 .t-slot.n-espn{background:#3a1d1f;border-color:#5a2c2f;color:#e69a9a}
-.t-big{background:#33261f;border-color:#4a382c;color:#e0a983}
 /* conference championship / event name / neutral-site location -- BLUE,
    his call 2026-09-09 (it was purple) */
 .t-champ{background:#1b2a40;border-color:#2c4265;color:#9dbde8}
@@ -455,8 +454,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 .row.mdense .meta{grid-template-rows:1fr;min-width:0}
 /* Dense: network over time, small, inside one team line -- side by side they
    took 40px from the opponent name on a phone */
-.row.mdense .mrow.mstack{flex-direction:column;align-items:flex-end;
-  justify-content:center;font-size:11.5px;line-height:1.2}
 .t-uni{background:#2c2c31;border-color:#414147;color:#d6d6d1}
 .t-uni i{display:inline-block;width:9px;height:9px;border-radius:2px;
   margin-right:5px;vertical-align:-1px;box-shadow:0 0 0 1px #55555c}
@@ -557,7 +554,8 @@ self.addEventListener("fetch",e=>{
 
 def png(size):
     """The app icon: the archive's own card, reduced to two team rows with the
-    winner washed maize. His pick of six candidates (see icons.py).
+    winner washed maize -- his pick of six candidates, whose generator
+    (icons.py) was retired on 2026-10-29 and lives on in git history.
 
     Drawn by pixel maths -- there is no image library on this machine. The
     manifest declares `purpose: "any maskable"`, which means Android crops this

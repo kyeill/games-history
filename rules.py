@@ -312,17 +312,6 @@ HIDDEN_WINDOWS = {"CFB": ["ABC Saturday"],
                   "CBB": ["ABC Weekend", "ESPN Saturday",
                           "Big Monday", "Super Tuesday"]}
 
-# Which network paints each window's chip. Explicit rather than parsed from the
-# name: "Big Monday", "Super Tuesday" and "B1G Peacock" carry no network in
-# their names at all. Peacock mirrors NBC; ESPN is red.
-WINDOW_NET = {
-    "FOX Big Noon": "fox", "FOX Friday": "fox", "FOX Weekend": "fox",
-    "CBS B1G Time": "cbs", "CBS Weekend": "cbs",
-    "NBC Saturday Night": "nbc", "NBC Weekend": "nbc", "B1G Peacock": "nbc",
-    "ABC Saturday": "abc", "ABC Weekend": "abc",
-    "Big Monday": "espn", "Super Tuesday": "espn", "ESPN Saturday": "espn",
-}
-
 # The header line is tinted by the window it belongs to -- his hexes,
 # 2026-09-09. Anything not listed keeps the muted default.
 # FOOTBALL header tints. ABC Saturday and FOX Friday are deliberately absent:
