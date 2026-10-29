@@ -1157,6 +1157,25 @@ can convert one at a time, columns first, with no code change. `opp_bg` and
 box's colours, so a blank cell looks the same as a game not yet played. The
 eleven remaining 2026 games show two grey boxes, which is what he expects.
 
+**OVERTIME UNDERLINES THE WINNER'S BOX AND ONLY THAT ONE (his call
+2026-10-29).** The generic rule is `.row.ot .tl.won .sc`, written for a card
+where each team owns its own score. On the Lions card `.tl.won` means DETROIT
+won, and it reached every `.sc` inside -- one box until the split, two after,
+so an overtime win underlined the opponent's losing figure as well. The mark
+now goes on the WINNING TEAM's box, whichever side that is, which is what the
+generic card has always meant by it. Three consequences:
+
+* an overtime WIN underlines Detroit's box alone (7 games);
+* an overtime LOSS underlines the OPPONENT's box, where nothing was
+  underlined before -- the single box could not say it (4 games);
+* a TIE underlines neither, nobody having won it (2 games: 2021-11-14 and
+  2019-09-08).
+
+`:not(.u)` keeps the blanket rule and the box's own mark off each other rather
+than fighting on specificity. The other four Detroit tabs and the Michigan
+views are untouched -- their one box still carries the blanket rule, so a Red
+Wings overtime win reads exactly as it did.
+
 **TWO TRAPS WORTH KEEPING:**
 
 1. `.row.mich .tl` is a TWO-COLUMN GRID. A third child drops to a row of its

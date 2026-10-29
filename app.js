@@ -1497,12 +1497,23 @@ function michCard(g, p) {
        A SHUTOUT IS A SCORE, NOT A BLANK: `t` is tested against null rather
        than for truthiness, or an NFL 0 would empty its own box -- three
        games in the archive (2018-12-30, 2020-11-22, 2022-10-09). */
-    const cell = (bg, fg, t) => '<span class="sc mbox half' + (lost ? " l" : "") + '"' +
+    /* OVERTIME UNDERLINES THE WINNER'S BOX AND ONLY THAT ONE (his call
+       2026-10-29). The generic rule is `.row.ot .tl.won .sc`, written for a
+       card where each team owns its own score; on the Lions card `.tl.won`
+       means DETROIT won and it reached every `.sc` inside -- which was one
+       box until today and is now two, so an overtime win underlined the
+       opponent's losing figure as well. The mark goes on the winning team's
+       box instead, whichever side that is, which is what the generic card
+       has always meant by it. A TIE UNDERLINES NEITHER: nobody won it, and
+       the archive holds three (2021-11-14, 2019-09-08 and 2016-09-11). */
+    const otMark = !upcoming(x) && !!x.ot;
+    const cell = (bg, fg, t, team) => '<span class="sc mbox half' +
+      (lost ? " l" : "") + (otMark && team && team.win ? " u" : "") + '"' +
       paint(michColour(bg) || UNSET, michColour(fg) || null) + ">" +
       (upcoming(x) || t == null ? "" : t) + "</span>";
     return '<span class="sc2">' +
-      cell(xb.score_bg, xb.score_font, me && me.score) +
-      cell(xb.opp_bg, xb.opp_font, op && op.score) +
+      cell(xb.score_bg, xb.score_font, me && me.score, me) +
+      cell(xb.opp_bg, xb.opp_font, op && op.score, op) +
       "</span>";
   };
   let score = g.sport === "NFL" ? twoBox(g) : bubble(g);

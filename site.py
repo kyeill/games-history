@@ -371,6 +371,12 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
    every NFL score the archive holds, and the pair comes out no wider than the
    single box it replaces. */
 .row.mich .sc2{display:inline-flex;align-items:center;gap:4px}
+/* AN OVERTIME GAME UNDERLINES THE WINNER'S BOX ALONE (his call 2026-10-29).
+   `.row.ot .tl.won .sc` above reaches every score inside the winning line,
+   which on this pair is both of them; the box that won carries `u` instead,
+   and every other box in the pair gives the decoration up. `:not(.u)` keeps
+   the two rules off each other rather than fighting on specificity. */
+.row.ot .tl.won .sc2 .sc:not(.u){text-decoration:none}
 .row.mich.mich-nfl .sc.mbox.half{min-width:calc(2.4ch + 16px)}
 /* an unplayed game: the box keeps its size so the card does not jump, but
    carries no colour and no number (his call 2026-09-12) */
