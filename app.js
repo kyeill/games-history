@@ -1476,7 +1476,36 @@ function michCard(g, p) {
         : me.score + "-" + op.score) +
       "</span>";
   };
-  let score = bubble(g);
+  /* TWO SCORE BOXES, HIS TEAM'S AND THE OPPONENT'S (his call 2026-10-29),
+     where the Lions card drew one reading "31-30". His Lions tab gives four
+     colours now -- Lions BG, Lions Font, Opp BG, Opp Font -- so each figure
+     is painted on its own, and the pair keeps the order the combined box
+     read: Detroit first, then the opponent. A DEFEAT ITALICISES BOTH, as it
+     italicised the one. They travel inside a single wrapper because `.tl` is
+     a two-column grid: a third child would drop to a row of its own.
+     A row with no Opp colours falls back to the team's own pair, which is
+     what the eleven unplayed games of this season do. */
+  const twoBox = x => {
+    const xb = (x.mx && x.mx.box) || {};
+    const me = x.teams.find(t => t.id === fid), op = x.teams.find(t => t.id !== fid);
+    const lost = !upcoming(x) && !x.tie && me && !me.win;
+    /* A BOX HE HAS NOT COLOURED READS THE UNPLAYED GREY (his call
+       2026-10-29), not the team's own default and not the other box's
+       colours: `UNSET` with white ink, which `ink` already gives for that
+       background, so a blank cell looks the same whether the game is still
+       to come or he simply has not filled it in.
+       A SHUTOUT IS A SCORE, NOT A BLANK: `t` is tested against null rather
+       than for truthiness, or an NFL 0 would empty its own box -- three
+       games in the archive (2018-12-30, 2020-11-22, 2022-10-09). */
+    const cell = (bg, fg, t) => '<span class="sc mbox half' + (lost ? " l" : "") + '"' +
+      paint(michColour(bg) || UNSET, michColour(fg) || null) + ">" +
+      (upcoming(x) || t == null ? "" : t) + "</span>";
+    return '<span class="sc2">' +
+      cell(xb.score_bg, xb.score_font, me && me.score) +
+      cell(xb.opp_bg, xb.opp_font, op && op.score) +
+      "</span>";
+  };
+  let score = g.sport === "NFL" ? twoBox(g) : bubble(g);
   // Michigan's rank sits on the THIRD ROW, under the score and the same width
   // as it, its number centred (his calls 2026-09-11). It reads "No. 1" in the
   // CFP or the NCAA Tournament, a bare seed in a conference tournament, "#3" in

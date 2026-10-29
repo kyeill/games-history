@@ -1134,6 +1134,43 @@ is marquee or one of his Results (2 such games in CFB 2023, 1 in CBB 2023-24).
 Like every button but Sort, both RELEASE CURRENT when pressed, and `enterCurrent`
 clears them by rebuilding `FILT` without them -- the same contract `upset` has.
 
+## The Lions' two score boxes
+
+**ONE BOX BECAME TWO (his call 2026-10-29).** The Lions card drew a single
+bubble reading "31-30"; it now draws Detroit's figure and the opponent's in
+boxes of their own, in that order -- the one the combined box already read.
+A DEFEAT ITALICISES BOTH, as it italicised the one.
+
+His Lions tab carries four colour columns in place of the old Score pair:
+
+    Lions BG | Lions Font | Opp BG | Opp Font
+
+**A TAB MAY NAME ITS OWN BOX AFTER ITS TEAM.** `load_sheet` reads
+`cell("score bg") or cell(tab.lower() + " bg")`, so "Score BG" and "Lions BG"
+both answer for the team's own box and the remaining four Detroit tabs keep
+working untouched -- HIS CALL, 2026-10-29: "Leave the other teams as is". They
+can convert one at a time, columns first, with no code change. `opp_bg` and
+`opp_font` are new keys on the same box dict.
+
+**A BOX HE HAS NOT COLOURED READS THE UNPLAYED GREY** (his call), `UNSET`
+#4a4a52 with white ink -- not the team's PRO_BOX default and not the other
+box's colours, so a blank cell looks the same as a game not yet played. The
+eleven remaining 2026 games show two grey boxes, which is what he expects.
+
+**TWO TRAPS WORTH KEEPING:**
+
+1. `.row.mich .tl` is a TWO-COLUMN GRID. A third child drops to a row of its
+   own, so the pair travels inside one `.sc2` wrapper. At 410px the pair
+   measures 71px against the single box's 68 -- no wider in practice.
+2. A SHUTOUT IS A SCORE, NOT A BLANK. Scores arrive as numbers, so testing
+   `t` for truthiness emptied the box on a 0. Three games in the archive would
+   have been wrong: 2018-12-30 (31-0), 2020-11-22 (0-20), 2022-10-09 (0-29).
+   It is tested against null instead.
+
+Checked against the sheet row by row for 2023: twenty games, zero mismatches
+on all four colours. The font colours still take the `readable` nudge his
+sheet colours have had since 2026-09-18, so #b0b7bc on blue renders #ccd0d3.
+
 ## The Detroit tab's season line
 
 **TWO LINES (his call 2026-10-12): what his team did, then who won the

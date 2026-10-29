@@ -3214,7 +3214,19 @@ def load_sheet():
                           else y if code == "MLB" else (y if m >= 7 else y - 1))
             if season is None or date is None:
                 continue
-            box = {"score_bg": cell("score bg"), "score_font": cell("score font"),
+            # A TAB MAY NAME ITS OWN BOX AFTER ITS TEAM (2026-10-29). His
+            # Lions tab now reads "Lions BG"/"Lions Font" for Detroit's score
+            # and "Opp BG"/"Opp Font" for the other side, in place of the
+            # single "Score BG"/"Score Font" pair the rest still use -- two
+            # boxes on the card instead of one "31-30". Either spelling
+            # answers for the team's OWN box, keyed off the tab's name, so
+            # the remaining tabs can follow one at a time without a code
+            # change. A tab with no Opp columns simply has none, and the card
+            # falls back to the one box it always drew.
+            own = tab.lower()
+            box = {"score_bg": cell("score bg") or cell(own + " bg"),
+                   "score_font": cell("score font") or cell(own + " font"),
+                   "opp_bg": cell("opp bg"), "opp_font": cell("opp font"),
                    "rank_bg": cell("rank bg"), "rank_font": cell("rank font")}
             row = {
                 # HIS OWN WORD from the Attended column (2026-09-23): "Gm1" or

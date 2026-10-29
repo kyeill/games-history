@@ -341,6 +341,14 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
   border-radius:4px;font-size:14.5px;font-weight:400;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .row.mich .sc.mbox{min-width:calc(7.2ch + 16px)}
+/* THE LIONS' TWO SCORE BOXES (his call 2026-10-29): his team's figure and the
+   opponent's, each taking its own pair of colours from his Lions tab. They
+   travel as ONE grid child, `.tl` being a two-column grid -- a third child
+   would drop to a row of its own. Each is sized for two digits, which covers
+   every NFL score the archive holds, and the pair comes out no wider than the
+   single box it replaces. */
+.row.mich .sc2{display:inline-flex;align-items:center;gap:4px}
+.row.mich.mich-nfl .sc.mbox.half{min-width:calc(2.4ch + 16px)}
 /* an unplayed game: the box keeps its size so the card does not jump, but
    carries no colour and no number (his call 2026-09-12) */
 /* football never reaches three digits, so its score box is narrower */
@@ -473,6 +481,6 @@ nav button:focus-visible{outline:2px solid var(--rank);outline-offset:-2px}
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20261029-113113"></script>
+<script src="app.js?v=20261029-095624"></script>
 </body>
 </html>

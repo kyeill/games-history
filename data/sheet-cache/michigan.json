@@ -15922,6 +15922,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -15949,6 +15951,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -15976,6 +15980,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16003,6 +16009,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16030,6 +16038,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16057,6 +16067,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16084,6 +16096,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16111,6 +16125,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16138,6 +16154,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16165,6 +16183,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16192,6 +16212,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16219,6 +16241,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16246,6 +16270,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16273,6 +16299,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16300,6 +16328,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16327,6 +16357,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16354,6 +16386,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16381,6 +16415,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16408,6 +16444,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16435,6 +16473,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16462,6 +16502,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16489,6 +16531,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16516,6 +16560,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16543,6 +16589,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16570,6 +16618,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16597,6 +16647,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16624,6 +16676,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16651,6 +16705,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16678,6 +16734,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -16705,6 +16763,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -22709,6 +22769,8 @@
 "box":{
 "score_bg":"Maize",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Maize",
 "rank_font":"White"
 },
@@ -22740,6 +22802,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Maize",
 "rank_font":"White"
 },
@@ -22774,6 +22838,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Maize",
 "rank_font":"Blue"
 },
@@ -22805,6 +22871,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Blue",
 "rank_font":"Maize"
 },
@@ -22837,6 +22905,8 @@
 "box":{
 "score_bg":"White",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Blue",
 "rank_font":"Blue"
 },
@@ -22867,6 +22937,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Maize",
 "rank_font":"Maize"
 },
@@ -22898,6 +22970,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Blue",
 "rank_font":"White"
 },
@@ -22928,6 +23002,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -22955,6 +23031,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -22982,6 +23060,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -23009,6 +23089,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -23036,6 +23118,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37413,6 +37497,8 @@
 "box":{
 "score_bg":"White",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37442,6 +37528,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37471,6 +37559,8 @@
 "box":{
 "score_bg":"White",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37500,6 +37590,8 @@
 "box":{
 "score_bg":"White",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37529,6 +37621,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37560,6 +37654,8 @@
 "box":{
 "score_bg":"Blue",
 "score_font":"Maize",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37591,6 +37687,8 @@
 "box":{
 "score_bg":"Maize",
 "score_font":"Blue",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37622,6 +37720,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37649,6 +37749,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37676,6 +37778,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37703,6 +37807,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37730,6 +37836,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37757,6 +37865,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37784,6 +37894,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37811,6 +37923,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37838,6 +37952,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37865,6 +37981,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37892,6 +38010,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37919,6 +38039,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37946,6 +38068,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -37973,6 +38097,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38000,6 +38126,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38027,6 +38155,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38054,6 +38184,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38081,6 +38213,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38108,6 +38242,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38135,6 +38271,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38162,6 +38300,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38189,6 +38329,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38216,6 +38358,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38243,6 +38387,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38270,6 +38416,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38297,6 +38445,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38324,6 +38474,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -38351,6 +38503,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38380,6 +38534,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38409,6 +38565,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38439,6 +38597,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38468,6 +38628,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38497,6 +38659,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -38526,6 +38690,8 @@
 "box":{
 "score_bg":"White",
 "score_font":"Red",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"White",
 "rank_font":"Red"
 },
@@ -38555,6 +38721,8 @@
 "box":{
 "score_bg":"Black",
 "score_font":"Red",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Black",
 "rank_font":"Red"
 },
@@ -38584,6 +38752,8 @@
 "box":{
 "score_bg":"Red",
 "score_font":"White",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"Red",
 "rank_font":"White"
 },
@@ -53608,6 +53778,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53635,6 +53807,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53662,6 +53836,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53689,6 +53865,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53716,6 +53894,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53743,6 +53923,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53770,6 +53952,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53797,6 +53981,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53824,6 +54010,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53851,6 +54039,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53878,6 +54068,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53905,6 +54097,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53932,6 +54126,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53959,6 +54155,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -53986,6 +54184,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54013,6 +54213,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54040,6 +54242,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54067,6 +54271,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54094,6 +54300,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54121,6 +54329,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54148,6 +54358,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54175,6 +54387,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54202,6 +54416,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54229,6 +54445,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54256,6 +54474,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54283,6 +54503,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54310,6 +54532,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54337,6 +54561,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54364,6 +54590,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54391,6 +54619,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54418,6 +54648,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54447,6 +54679,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54477,6 +54711,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54507,6 +54743,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54538,6 +54776,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54568,6 +54808,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54598,6 +54840,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54628,6 +54872,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54659,6 +54905,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54688,6 +54936,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54717,6 +54967,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54746,6 +54998,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54775,6 +55029,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54804,6 +55060,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54833,6 +55091,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54863,6 +55123,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54893,6 +55155,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54922,6 +55186,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54953,6 +55219,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -54982,6 +55250,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55011,6 +55281,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55040,6 +55312,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55069,6 +55343,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55098,6 +55374,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55127,6 +55405,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55157,6 +55437,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55187,6 +55469,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55216,6 +55500,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55245,6 +55531,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55276,6 +55564,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55306,6 +55596,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55336,6 +55628,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55366,6 +55660,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55397,6 +55693,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55426,6 +55724,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55455,6 +55755,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55484,6 +55786,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55513,6 +55817,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55543,6 +55849,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55572,6 +55880,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55601,6 +55911,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55631,6 +55943,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55662,6 +55976,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55691,6 +56007,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55720,6 +56038,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55749,6 +56069,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55778,6 +56100,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55807,6 +56131,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55836,6 +56162,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55865,6 +56193,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55894,6 +56224,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55923,6 +56255,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55953,6 +56287,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -55984,6 +56320,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56013,6 +56351,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56042,6 +56382,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56071,6 +56413,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56100,6 +56444,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56129,6 +56475,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56160,6 +56508,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56189,6 +56539,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56220,6 +56572,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56249,6 +56603,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56278,6 +56634,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56307,6 +56665,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56336,6 +56696,8 @@
 "box":{
 "score_bg":"Gray",
 "score_font":"#182d55",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56365,6 +56727,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56394,6 +56758,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56424,6 +56790,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56453,6 +56821,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56483,6 +56853,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56513,6 +56885,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56542,6 +56916,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56573,6 +56949,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56603,6 +56981,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56633,6 +57013,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56663,6 +57045,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56694,6 +57078,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56723,6 +57109,8 @@
 "box":{
 "score_bg":"#9d2235",
 "score_font":"#041e42",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56752,6 +57140,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56782,6 +57172,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56812,6 +57204,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56841,6 +57235,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56871,6 +57267,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56902,6 +57300,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56931,6 +57331,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56960,6 +57362,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -56989,6 +57393,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57018,6 +57424,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57047,6 +57455,8 @@
 "box":{
 "score_bg":"#6f263d",
 "score_font":"#ffb81c",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57076,6 +57486,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57105,6 +57517,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57134,6 +57548,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57163,6 +57579,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57192,6 +57610,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57221,6 +57641,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57248,6 +57670,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57275,6 +57699,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57302,6 +57728,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57329,6 +57757,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57359,6 +57789,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57389,6 +57821,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57418,6 +57852,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57447,6 +57883,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57477,6 +57915,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57506,6 +57946,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57537,6 +57979,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57566,6 +58010,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57595,6 +58041,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57624,6 +58072,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57653,6 +58103,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57682,6 +58134,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57709,6 +58163,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57736,6 +58192,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57763,6 +58221,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57790,6 +58250,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57820,6 +58282,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57850,6 +58314,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57880,6 +58346,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57911,6 +58379,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57940,6 +58410,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57969,6 +58441,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -57998,6 +58472,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58027,6 +58503,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58056,6 +58534,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58083,6 +58563,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58110,6 +58592,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58137,6 +58621,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58164,6 +58650,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58194,6 +58682,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58224,6 +58714,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58253,6 +58745,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58282,6 +58776,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58312,6 +58808,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58341,6 +58839,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58372,6 +58872,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58401,6 +58903,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58430,6 +58934,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58459,6 +58965,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58488,6 +58996,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58517,6 +59027,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58546,6 +59058,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58575,6 +59089,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#b9975b",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58604,6 +59120,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#6f263d",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58633,6 +59151,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58662,6 +59182,8 @@
 "box":{
 "score_bg":"#041e42",
 "score_font":"#9d2235",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58691,6 +59213,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58722,6 +59246,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58751,6 +59277,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58782,6 +59310,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58813,6 +59343,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58845,6 +59377,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58876,6 +59410,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58907,6 +59443,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58936,6 +59474,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58965,6 +59505,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -58994,6 +59536,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59025,6 +59569,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59057,6 +59603,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59086,6 +59634,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59117,6 +59667,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59148,6 +59700,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59177,6 +59731,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59208,6 +59764,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59240,6 +59798,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59272,6 +59832,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59301,6 +59863,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59333,6 +59897,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59365,6 +59931,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59397,6 +59965,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59427,6 +59997,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59457,6 +60029,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59486,6 +60060,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59516,6 +60092,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59547,6 +60125,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59577,6 +60157,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59606,6 +60188,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59635,6 +60219,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59665,6 +60251,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59695,6 +60283,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59726,6 +60316,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59756,6 +60348,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59785,6 +60379,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59814,6 +60410,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59844,6 +60442,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59873,6 +60473,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59903,6 +60505,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59934,6 +60538,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59963,6 +60569,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -59992,6 +60600,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60021,6 +60631,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60050,6 +60662,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60079,6 +60693,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60108,6 +60724,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60137,6 +60755,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60167,6 +60787,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60197,6 +60819,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60226,6 +60850,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60256,6 +60882,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60287,6 +60915,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60317,6 +60947,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60347,6 +60979,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60376,6 +61010,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60405,6 +61041,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60434,6 +61072,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60464,6 +61104,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60495,6 +61137,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60524,6 +61168,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60553,6 +61199,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60582,6 +61230,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60611,6 +61261,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60640,6 +61292,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60669,6 +61323,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60699,6 +61355,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60729,6 +61387,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60759,6 +61419,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60790,6 +61452,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60820,6 +61484,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60850,6 +61516,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60880,6 +61548,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60909,6 +61579,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60938,6 +61610,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60969,6 +61643,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -60998,6 +61674,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61027,6 +61705,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61056,6 +61736,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61085,6 +61767,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61114,6 +61798,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61143,6 +61829,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61172,6 +61860,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61202,6 +61892,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61231,6 +61923,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61261,6 +61955,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61291,6 +61987,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61322,6 +62020,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61352,6 +62052,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61382,6 +62084,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61411,6 +62115,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61441,6 +62147,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61472,6 +62180,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61501,6 +62211,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61530,6 +62242,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61559,6 +62273,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61588,6 +62304,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61617,6 +62335,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61646,6 +62366,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61675,6 +62397,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61704,6 +62428,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61733,6 +62459,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61762,6 +62490,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61791,6 +62521,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61820,6 +62552,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61849,6 +62583,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61878,6 +62614,8 @@
 "box":{
 "score_bg":"#b1b3b3",
 "score_font":"#010101",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61907,6 +62645,8 @@
 "box":{
 "score_bg":"#b1b3b3",
 "score_font":"#010101",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61936,6 +62676,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61965,6 +62707,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -61994,6 +62738,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62021,6 +62767,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62048,6 +62796,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62075,6 +62825,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62102,6 +62854,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62129,6 +62883,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62156,6 +62912,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62183,6 +62941,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62210,6 +62970,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62239,6 +63001,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62268,6 +63032,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62297,6 +63063,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62326,6 +63094,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62355,6 +63125,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62384,6 +63156,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62411,6 +63185,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62438,6 +63214,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62465,6 +63243,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62494,6 +63274,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62523,6 +63305,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62553,6 +63337,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62582,6 +63368,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62611,6 +63399,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62641,6 +63431,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62671,6 +63463,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62702,6 +63496,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62731,6 +63527,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62760,6 +63558,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62789,6 +63589,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62818,6 +63620,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62847,6 +63651,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62876,6 +63682,8 @@
 "box":{
 "score_bg":"#1d42ba",
 "score_font":"#c8102e",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62905,6 +63713,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62934,6 +63744,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62962,7 +63774,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -62993,6 +63807,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63023,6 +63839,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63053,6 +63871,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63082,6 +63902,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63110,7 +63932,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63139,7 +63963,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63169,6 +63995,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63198,6 +64026,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63226,7 +64056,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63256,6 +64088,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63284,7 +64118,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63315,6 +64151,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63345,7 +64183,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63374,7 +64214,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63404,6 +64246,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63432,7 +64276,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63462,6 +64308,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63491,6 +64339,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63519,7 +64369,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63549,7 +64401,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63579,6 +64433,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63607,7 +64463,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63636,7 +64494,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63666,6 +64526,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63695,6 +64557,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63724,6 +64588,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63752,7 +64618,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63781,7 +64649,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63811,6 +64681,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63840,6 +64712,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63869,6 +64743,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63897,7 +64773,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63926,7 +64804,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63956,6 +64836,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -63984,7 +64866,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64013,7 +64897,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64043,6 +64929,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64072,6 +64960,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64101,7 +64991,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64130,7 +65022,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64160,6 +65054,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64189,6 +65085,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64218,7 +65116,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64248,6 +65148,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64277,6 +65179,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64305,7 +65209,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64335,6 +65241,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64365,6 +65273,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64394,6 +65304,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64423,7 +65335,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64453,6 +65367,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64481,7 +65397,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64511,6 +65429,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64539,7 +65459,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64570,6 +65492,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64598,7 +65522,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64627,7 +65553,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64657,6 +65585,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64687,6 +65617,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64716,6 +65648,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64744,7 +65678,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64775,7 +65711,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64805,6 +65743,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64834,6 +65774,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64862,7 +65804,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64892,6 +65836,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64920,7 +65866,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64948,8 +65896,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"#ffffff",
+"score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -64979,6 +65929,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65008,6 +65960,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65036,7 +65990,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65065,7 +66021,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65096,6 +66054,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65125,6 +66085,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65155,6 +66117,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65183,7 +66147,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65212,7 +66178,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65243,6 +66211,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65271,7 +66241,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65300,7 +66272,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65331,6 +66305,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65359,7 +66335,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65388,7 +66366,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65418,6 +66398,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65448,6 +66430,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65478,6 +66462,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65507,7 +66493,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65536,7 +66524,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65567,6 +66557,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65596,6 +66588,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65625,7 +66619,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65655,6 +66651,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65683,7 +66681,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65713,6 +66713,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65742,6 +66744,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65770,7 +66774,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65800,6 +66806,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65829,6 +66837,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65859,6 +66869,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65888,6 +66900,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65917,6 +66931,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65946,6 +66962,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -65974,7 +66992,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66004,6 +67024,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66034,6 +67056,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66063,6 +67087,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66090,8 +67116,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66121,6 +67149,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66150,6 +67180,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66177,8 +67209,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66208,6 +67242,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66237,6 +67273,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66266,7 +67304,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66295,7 +67335,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66325,6 +67367,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66353,8 +67397,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66384,6 +67430,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66414,6 +67462,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66443,6 +67493,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66471,7 +67523,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66501,6 +67555,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66528,8 +67584,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66557,8 +67615,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66588,6 +67648,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66616,7 +67678,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66645,7 +67709,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66675,6 +67741,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66703,7 +67771,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66732,7 +67802,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66762,6 +67834,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66792,6 +67866,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66819,8 +67895,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66850,6 +67928,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66879,6 +67959,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66908,6 +67990,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66937,6 +68021,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66965,7 +68051,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -66995,6 +68083,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67023,7 +68113,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67051,8 +68143,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67082,6 +68176,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67111,6 +68207,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67140,6 +68238,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67169,6 +68269,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67197,7 +68299,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67226,7 +68330,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67256,6 +68362,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67285,6 +68393,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67314,6 +68424,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67341,8 +68453,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67372,6 +68486,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67401,6 +68517,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67430,6 +68548,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67459,6 +68579,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67486,8 +68608,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67517,6 +68641,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67545,7 +68671,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67575,6 +68703,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67602,8 +68732,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67633,6 +68765,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67662,6 +68796,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67690,7 +68826,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67718,8 +68856,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67749,6 +68889,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67777,7 +68919,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67807,6 +68951,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67836,6 +68982,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67865,6 +69013,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67893,7 +69043,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67922,7 +69074,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67952,6 +69106,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -67979,8 +69135,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68010,7 +69168,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68040,6 +69200,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68068,7 +69230,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68097,7 +69261,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68127,6 +69293,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68157,6 +69325,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68186,6 +69356,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68215,6 +69387,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68244,6 +69418,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68272,7 +69448,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68301,7 +69479,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68329,8 +69509,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68360,6 +69542,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68390,6 +69574,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68418,7 +69604,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68446,8 +69634,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#d9d9d9",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68476,7 +69666,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68505,7 +69697,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68534,7 +69728,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68564,6 +69760,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68591,8 +69789,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68621,7 +69821,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68651,7 +69853,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68682,6 +69886,8 @@
 "box":{
 "score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68710,7 +69916,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68739,7 +69947,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68770,7 +69980,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68799,7 +70011,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68829,6 +70043,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#0076b6",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68856,8 +70072,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68887,7 +70105,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68916,8 +70136,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"#ffffff",
+"score_bg":"#0076b6",
 "score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68946,8 +70168,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -68976,7 +70200,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69005,7 +70231,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69034,7 +70262,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69064,7 +70294,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69095,7 +70327,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69123,8 +70357,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#b0b7bc",
+"score_bg":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69154,7 +70390,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69185,7 +70423,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#0076b6",
+"opp_font":"#b0b7bc",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69216,7 +70456,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69245,7 +70487,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69275,7 +70519,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#b0b7bc",
+"score_font":"#ffffff",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69304,7 +70550,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69334,6 +70582,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69363,7 +70613,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69392,7 +70644,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69422,7 +70676,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69451,7 +70707,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69482,7 +70740,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69512,7 +70772,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69541,7 +70803,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69570,7 +70834,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69601,7 +70867,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69633,6 +70901,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69661,7 +70931,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69691,7 +70963,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69722,6 +70996,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69752,7 +71028,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69781,7 +71059,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69810,7 +71090,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69839,7 +71121,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69869,7 +71153,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69898,7 +71184,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69927,7 +71215,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69957,6 +71247,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -69986,7 +71278,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70015,7 +71309,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70044,7 +71340,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70074,6 +71372,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70102,8 +71402,10 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"Gray",
-"score_font":"#0076b6",
+"score_bg":"#0076b6",
+"score_font":"#b0b7bc",
+"opp_bg":"#b0b7bc",
+"opp_font":"#d9d9d9",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70132,7 +71434,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70162,7 +71466,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70191,7 +71497,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70221,6 +71529,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70249,7 +71559,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70278,7 +71590,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#0076b6",
+"score_font":"#ffffff",
+"opp_bg":"#0076b6",
+"opp_font":"#ffffff",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70308,7 +71622,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70337,7 +71653,9 @@
 "footer":"",
 "box":{
 "score_bg":"#0076b6",
-"score_font":"#b0b7bc",
+"score_font":"#ffffff",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70366,7 +71684,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#ffffff",
+"score_font":"#0076b6",
+"opp_bg":"#ffffff",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70395,7 +71715,9 @@
 "footer":"",
 "box":{
 "score_bg":"#ffffff",
-"score_font":"#b0b7bc",
+"score_font":"#0076b6",
+"opp_bg":"#b0b7bc",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70425,6 +71747,8 @@
 "box":{
 "score_bg":"#000000",
 "score_font":"#0076b6",
+"opp_bg":"#000000",
+"opp_font":"#0076b6",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70455,6 +71779,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70482,6 +71808,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70509,6 +71837,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70536,6 +71866,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70563,6 +71895,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70590,6 +71924,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70617,6 +71953,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70644,6 +71982,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70671,6 +72011,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70698,6 +72040,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70725,6 +72069,8 @@
 "box":{
 "score_bg":"",
 "score_font":"",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70752,6 +72098,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70781,6 +72129,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70812,6 +72162,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70843,6 +72195,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70872,6 +72226,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70903,6 +72259,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70935,6 +72293,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70966,6 +72326,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -70997,6 +72359,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71028,6 +72392,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71060,6 +72426,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71089,6 +72457,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71121,6 +72491,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71153,6 +72525,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71185,6 +72559,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71214,6 +72590,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71246,6 +72624,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71278,6 +72658,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71310,6 +72692,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71342,6 +72726,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71374,6 +72760,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71405,6 +72793,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71434,6 +72824,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71463,6 +72855,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71494,6 +72888,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71525,6 +72921,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71557,6 +72955,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71586,6 +72986,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71617,6 +73019,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71648,6 +73052,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71679,6 +73085,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71708,6 +73116,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71740,6 +73150,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71771,6 +73183,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71800,6 +73214,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71831,6 +73247,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71862,6 +73280,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71891,6 +73311,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71923,6 +73345,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71955,6 +73379,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -71987,6 +73413,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72019,6 +73447,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72051,6 +73481,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72081,6 +73513,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72111,6 +73545,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72141,6 +73577,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72172,6 +73610,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72201,6 +73641,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72230,6 +73672,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72259,6 +73703,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72288,6 +73734,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72317,6 +73765,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72346,6 +73796,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72376,6 +73828,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72406,6 +73860,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72436,6 +73892,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72467,6 +73925,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72496,6 +73956,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72525,6 +73987,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72554,6 +74018,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72583,6 +74049,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72612,6 +74080,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72641,6 +74111,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72670,6 +74142,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72699,6 +74173,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72728,6 +74204,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72757,6 +74235,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72786,6 +74266,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72815,6 +74297,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72844,6 +74328,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72875,6 +74361,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72906,6 +74394,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72937,6 +74427,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -72969,6 +74461,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73000,6 +74494,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73031,6 +74527,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73060,6 +74558,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73091,6 +74591,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73123,6 +74625,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73155,6 +74659,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73184,6 +74690,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73216,6 +74724,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73245,6 +74755,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73274,6 +74786,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73306,6 +74820,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73338,6 +74854,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73367,6 +74885,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73399,6 +74919,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73431,6 +74953,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73463,6 +74987,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73495,6 +75021,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73524,6 +75052,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73553,6 +75083,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73582,6 +75114,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73611,6 +75145,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73641,6 +75177,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73671,6 +75209,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73700,6 +75240,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73730,6 +75272,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73761,6 +75305,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73790,6 +75336,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73819,6 +75367,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73848,6 +75398,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73877,6 +75429,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73906,6 +75460,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73935,6 +75491,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73964,6 +75522,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -73993,6 +75553,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74022,6 +75584,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74051,6 +75615,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74080,6 +75646,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74109,6 +75677,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74138,6 +75708,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74168,6 +75740,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74198,6 +75772,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74227,6 +75803,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74256,6 +75834,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74286,6 +75866,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74317,6 +75899,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74346,6 +75930,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74376,6 +75962,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74405,6 +75993,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74435,6 +76025,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74465,6 +76057,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74496,6 +76090,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74525,6 +76121,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74554,6 +76152,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74583,6 +76183,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74612,6 +76214,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74641,6 +76245,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74670,6 +76276,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74701,6 +76309,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74732,6 +76342,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74761,6 +76373,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74790,6 +76404,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74821,6 +76437,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74853,6 +76471,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74885,6 +76505,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74917,6 +76539,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74949,6 +76573,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -74981,6 +76607,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75012,6 +76640,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75043,6 +76673,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75074,6 +76706,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75103,6 +76737,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75135,6 +76771,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75164,6 +76802,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75196,6 +76836,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75228,6 +76870,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75257,6 +76901,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75289,6 +76935,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75318,6 +76966,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75350,6 +77000,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75380,6 +77032,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75410,6 +77064,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75440,6 +77096,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75471,6 +77129,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75501,6 +77161,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75530,6 +77192,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75559,6 +77223,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75589,6 +77255,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75619,6 +77287,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75648,6 +77318,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75679,6 +77351,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75710,6 +77384,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75741,6 +77417,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75770,6 +77448,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75801,6 +77481,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75832,6 +77514,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75861,6 +77545,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75890,6 +77576,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75919,6 +77607,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75948,6 +77638,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -75977,6 +77669,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76006,6 +77700,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76035,6 +77731,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76064,6 +77762,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76094,6 +77794,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76123,6 +77825,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76153,6 +77857,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76183,6 +77889,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76212,6 +77920,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76243,6 +77953,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76272,6 +77984,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76301,6 +78015,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76330,6 +78046,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76359,6 +78077,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76388,6 +78108,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76418,6 +78140,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76448,6 +78172,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76478,6 +78204,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76509,6 +78237,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76538,6 +78268,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76567,6 +78299,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76596,6 +78330,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76625,6 +78361,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76654,6 +78392,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76683,6 +78423,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76712,6 +78454,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76741,6 +78485,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76770,6 +78516,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76799,6 +78547,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76828,6 +78578,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76857,6 +78609,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76886,6 +78640,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76916,6 +78672,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76945,6 +78703,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -76975,6 +78735,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77004,6 +78766,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77034,6 +78798,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77065,6 +78831,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77094,6 +78862,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77123,6 +78893,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77152,6 +78924,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77181,6 +78955,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77210,6 +78986,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77239,6 +79017,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77268,6 +79048,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77297,6 +79079,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77326,6 +79110,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77355,6 +79141,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77384,6 +79172,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77413,6 +79203,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77442,6 +79234,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77471,6 +79265,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77500,6 +79296,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77529,6 +79327,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77558,6 +79358,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77587,6 +79389,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77616,6 +79420,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77645,6 +79451,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77674,6 +79482,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77703,6 +79513,8 @@
 "box":{
 "score_bg":"#ce1126",
 "score_font":"#ffffff",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
@@ -77732,6 +79544,8 @@
 "box":{
 "score_bg":"#ffffff",
 "score_font":"#ce1126",
+"opp_bg":"",
+"opp_font":"",
 "rank_bg":"",
 "rank_font":""
 },
