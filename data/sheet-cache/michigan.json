@@ -37721,8 +37721,8 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"",
-"score_font":"",
+"score_bg":"White",
+"score_font":"Blue",
 "opp_bg":"",
 "opp_font":"",
 "rank_bg":"",
@@ -37730,7 +37730,9 @@
 },
 "jersey":""
 },
-"flags":[]
+"flags":[
+"box"
+]
 }
 ],
 [
@@ -37750,8 +37752,8 @@
 "note":"",
 "footer":"",
 "box":{
-"score_bg":"",
-"score_font":"",
+"score_bg":"White",
+"score_font":"Blue",
 "opp_bg":"",
 "opp_font":"",
 "rank_bg":"",
@@ -37759,7 +37761,9 @@
 },
 "jersey":""
 },
-"flags":[]
+"flags":[
+"box"
+]
 }
 ],
 [
