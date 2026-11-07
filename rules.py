@@ -205,7 +205,16 @@ ECAC_HOCKEY = {"Brown", "Clarkson", "Colgate", "Cornell", "Dartmouth", "Harvard"
                "Princeton", "Quinnipiac", "Rensselaer", "St. Lawrence", "Union", "Yale"}
 IVY = {"Brown", "Columbia", "Cornell", "Dartmouth", "Harvard", "Pennsylvania",
        "Penn", "Princeton", "Yale"}
-MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2026)),
+# EVERY ONE OF THESE RANGES HAS TO REACH THE SEASON NOW BEING PLAYED. Football
+# and hockey were carried forward to 2026-27 and basketball was not, which cost
+# the Michigan Basketball view its first two results of 2026-27 (caught
+# 2026-11-07). A Michigan game is only MARKED as one when its season is named
+# here; the games still ahead come off the team schedule, which asks nothing of
+# this map, so the view looked right until the opener was played -- then the
+# Oakland win vanished (nothing else kept it) and the UConn loss stayed on the
+# College view alone, with no focus team. The symptom is always the same: the
+# schedule is there, the results are not.
+MICHIGAN_SEASONS = {"CFB": set(range(2011, 2027)), "CBB": set(range(2011, 2027)),
                     # hockey from 2013-14 (his call 2026-09-16), through the
                     # season now starting
                     "CHK": set(range(2013, 2027))}
