@@ -176,6 +176,17 @@ PRO_NATIONAL = ["FOX", "ABC", "NBC", "CBS", "ESPN", "TNT", "TBS", "FS1", "ESPN2"
                 "YouTube", "Roku", "Facebook Watch"]
 # from when (the season's starting year) each team's national games are kept
 PRO_NATIONAL_FROM = {"mlb-6": 2011, "nba-8": 2013, "nhl-5": 2013}
+# THE RED WINGS' TWO OLD RIVALS (his call 2026-11-08): every Chicago and every
+# Colorado game from 2013-14 on, whatever network carried it. National TV is
+# otherwise the only thing that keeps a regular-season game (the map above),
+# and it was keeping barely one of these a season out of the five or six
+# played -- the rivalry read as a scattering.
+PRO_RIVALS = {"nhl-5": (2013, {"4", "17"})}        # Blackhawks, Avalanche
+# ...AND THE FIRST WIN OVER AN EXPANSION TEAM (his call 2026-11-08). Two have
+# arrived inside any of these archives, both in the Red Wings': Vegas in
+# 2017-18 and Seattle in 2021-22. THE FIRST WIN ONLY -- every meeting after it
+# needs a reason of its own, like any other game.
+PRO_EXPANSION = {"nhl-5": {"37", "124292"}}        # Golden Knights, Kraken
 
 CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
                   # ESPN spells it out; every other St. Paul here is short

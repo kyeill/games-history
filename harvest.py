@@ -1885,6 +1885,34 @@ def pro_seeds(league, y):
     return out
 
 
+def pro_extra(fid, y, cs, tid, beaten):
+    """TWO MORE REASONS TO KEEP A REGULAR-SEASON GAME (his calls 2026-11-08),
+    beyond its being on national television.
+
+    A RIVAL -- rules.PRO_RIVALS names the pair and the season they start from:
+    every Red Wings meeting with Chicago or Colorado, 2013-14 on.
+
+    THE FIRST WIN OVER AN EXPANSION TEAM -- rules.PRO_EXPANSION. `beaten` is
+    the set of them already beaten, and it is why this has to be the FIRST:
+    the caller walks the seasons in order and each season's games by date, so
+    the first win to reach here is the first one played, and the set keeps
+    every meeting after it out. It is per TEAM, not per season.
+    """
+    foe = next((str((k.get("team") or {}).get("id") or "")
+                for k in cs if str((k.get("team") or {}).get("id") or "") != tid), "")
+    if not foe:
+        return False
+    since, rivals = rules.PRO_RIVALS.get(fid, (None, set()))
+    if since is not None and y >= since and foe in rivals:
+        return True
+    if foe in rules.PRO_EXPANSION.get(fid, set()) and foe not in beaten and any(
+            k.get("winner") and
+            str((k.get("team") or {}).get("id") or "") == tid for k in cs):
+        beaten.add(foe)
+        return True
+    return False
+
+
 def pro_games(teams, start):
     """Every PLAYOFF game of the three, and the NBA Cup games of the two NBA
     teams, as team-card records. The ROUND is the series' place in the run
@@ -1897,6 +1925,7 @@ def pro_games(teams, start):
         for k, v in pro_teams(league, prefix).items():
             teams[k] = v
         last = upcoming_season("CBB", start)
+        beaten = set()          # expansion teams already beaten -- see pro_extra
         for y in range(first, last + 1):
             # 5 is the NBA PLAY-IN, counted with the playoffs (his call 2026-09-18)
             nat_from = rules.PRO_NATIONAL_FROM.get(fid)
@@ -1917,12 +1946,16 @@ def pro_games(teams, start):
                     cs = c.get("competitors") or []
                     heads = [n.get("headline") or "" for n in c.get("notes") or []]
                     cup_note = next((h for h in heads if "NBA Cup" in h or "In-Season" in h), None)
+                    # (the two tests below want the competitors, so the
+                    # shape check comes first now -- it drops nothing it did
+                    # not drop before)
+                    if len(cs) != 2 or not (c.get("status") or {}).get("type", {}).get("completed"):
+                        continue
                     # a REGULAR-SEASON game is kept on national TV alone (his
                     # call 2026-09-22) -- the Pistons and the Red Wings, 2013-14 on
+                    # ...or for one of the two reasons in pro_extra (2026-11-08)
                     national = want_reg and bool(set(networks(c)) & set(rules.PRO_NATIONAL))
-                    if stype == 2 and not cup_note and not national:
-                        continue
-                    if len(cs) != 2 or not (c.get("status") or {}).get("type", {}).get("completed"):
+                    if stype == 2 and not cup_note and not national                             and not pro_extra(fid, y, cs, tid, beaten):
                         continue
                     try:
                         d = (dt.datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")

@@ -2884,3 +2884,34 @@ near-black colour rule, the conference-at-the-time assumption, and a structural
 check of the built page (balanced tags, every `getElementById` present in the
 HTML). The last one already runs ad hoc and catches real breakage; note that
 `settings` and `sheet` look unused because they are reached through `show()`.
+
+## The Detroit headers, and two more reasons to keep a Red Wings game
+
+**2026-11-08**, from four notes of his.
+
+**A DETROIT HEADER COLOURS ITSELF.** A playoff game reads white
+(`var(--ink)`) and an NBA Cup game gold (`#d4af37`); everything else keeps the
+muted grey. The two are deliberately unalike -- the Cup is played in November
+and is not the playoffs, which is why the Playoffs filter steps around it.
+`detTone` sits in FRONT of `stageColor`, whose golds and blues are the college
+stages; a Detroit game never has one, so nothing is overruled. The Lions' date
+is pinned to the muted grey by a rule of its own, which would have left a grey
+date inside a white header -- but no Detroit card renders `.hdate` at all (the
+date goes into the header text), so the override written for it was dropped
+again the same day rather than left sitting unreachable.
+
+**TWO MORE REASONS TO KEEP A REGULAR-SEASON GAME** (`pro_extra`), where
+national TV used to be the only one:
+
+- `rules.PRO_RIVALS` -- every Red Wings meeting with **Chicago or Colorado
+  from 2013-14 on**, whatever network carried it. National TV was catching
+  barely one a season out of the five or six played. 58 games now, two against
+  each per season, except 2020-21: that was the realigned COVID division, so
+  it reads 8 Chicago and 0 Colorado, which is what was played.
+- `rules.PRO_EXPANSION` -- the **first win** over an expansion team. Two have
+  arrived inside any of these archives, both the Red Wings': Vegas 2017-18 and
+  Seattle 2021-22. Detroit beat Vegas 6-3 on 2017-10-13, their first ever
+  meeting, and Seattle 4-3 on 2021-12-01, also their first. The `beaten` set
+  is per TEAM, not per season, and the caller walks seasons in order and games
+  by date -- that ordering is the whole mechanism, so do not reorder it. His
+  call: no chip on these two, so the card says nothing about why it is there.

@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261107-143840";
+const BUILD = "20261108-174836";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -1906,7 +1906,20 @@ function michCard(g, p) {
   // A NEW YEAR'S SIX bowl reads in CFP gold too (his call 2026-09-14) -- for
   // Michigan that is the 2011 Sugar, the 2016 Orange and the 2018 Peach. A CFP
   // game played IN one of them already carries the gold through its own stage.
-  const stageCol = stageColor(g);
+  /* A DETROIT HEADER COLOURS ITSELF (his calls 2026-11-08): a PLAYOFF game
+     reads white and an NBA CUP game gold, where both used to read the same
+     muted grey as a Tuesday in January. The Cup is deliberately not white --
+     it is played in November and is not the playoffs, which is the whole
+     reason the Playoffs filter steps around it (see the list that builds
+     `post`), so the two must not look alike.
+     This sits in FRONT of stageColor, whose golds and blues are the college
+     stages -- a Detroit game never has one, so nothing is being overruled. */
+  const detCup = (g.stage || "").indexOf("NBA Cup") === 0;
+  const detTone = !proView() ? null
+    : detCup ? "#d4af37"
+    : g.post ? "var(--ink)" : null;
+  if (detTone) cls += " hdtone";
+  const stageCol = detTone || stageColor(g);
   // THE RED WINGS', PISTONS' AND CAVALIERS' CARD (his call 2026-09-18):
   //   2026 FIRST ROUND | GAME 2 (1-1)
   //   [logo] 4  Orlando                           [98-95]
