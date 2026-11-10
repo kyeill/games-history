@@ -188,7 +188,10 @@ PRO_RIVALS = {"nhl-5": (2013, {"4", "17"})}        # Blackhawks, Avalanche
 # needs a reason of its own, like any other game.
 PRO_EXPANSION = {"nhl-5": {"37", "124292"}}        # Golden Knights, Kraken
 
-CITY_OVERRIDES = {"Washington": "Washington DC", "Uncasville": "Connecticut",
+CITY_OVERRIDES = {"Washington": "Washington DC",
+                  # Uncasville read "Connecticut" until 2026-11-09; he wants
+                  # the building, which is what anyone calls that arena
+                  "Uncasville": "Mohegan Sun",
                   # ESPN spells it out; every other St. Paul here is short
                   "Saint Paul": "St. Paul",
                   # the 2024 hockey regional: he calls it St. Louis
