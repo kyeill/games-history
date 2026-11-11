@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261111-124327";
+const BUILD = "20261111-142518";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -3106,8 +3106,24 @@ function visible() {
      same trap in mind. */
   const curPool = !(curView && FILT.current) ? list
     : FILT.season == null ? list : list.filter(g => g.season === FILT.season);
-  const thisWeek = curView && FILT.current
+  /* CURRENT IS A WEEK OF THE WEEK DROPDOWN, NOT SEVEN DAYS (his call
+     2026-11-11). It was Monday to Sunday flat, which football never noticed
+     -- its week key IS the week number, so Current and "Week 11" held the
+     same nine games -- but basketball's November and December are FORTNIGHT
+     buckets, so Current showed three of November's seven while the dropdown
+     beside it, set from CUR_WEEK below, read "November". Seven days still
+     pick the week OUT; its KEY is what fills it. From January basketball's
+     keys are 7-day weeks again and this changes nothing.
+     A span whose games DISAGREE about their key -- a March week that is part
+     regular season, part tournament -- keeps the seven days, there being no
+     single week to widen to. */
+  const span = curView && FILT.current
     ? curPool.filter(g => g.date >= weekStart() && g.date <= weekEnd()) : [];
+  const spanKey = span.length ? String(weekKeyOf(span[0])) : null;
+  const thisWeek = !span.length ? span
+    : span.every(g => String(weekKeyOf(g)) === spanKey)
+      ? curPool.filter(g => String(weekKeyOf(g)) === spanKey)
+      : span;
   if (thisWeek.length) {
     list = thisWeek;
   } else if (curView && FILT.current && curPool.length) {
@@ -3135,11 +3151,13 @@ function visible() {
       const top = Math.max.apply(null, back.map(key));
       list = curPool.filter(g => key(g) === top);
     } else {
+      // ...and the FALLBACK answers by key too (2026-11-11), for the same
+      // reason. It took the seven days from the latest Monday behind us and
+      // everything after them, which on a basketball bucket meant half a
+      // bucket plus the whole rest of the season.
       const last = back.map(g => g.date).sort().pop();
-      const d = new Date(last + "T12:00:00Z");
-      const mon = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5)
-        .toISOString().slice(0, 10);
-      list = curPool.filter(g => g.date >= mon);
+      const k = String(weekKeyOf(curPool.find(g => g.date === last)));
+      list = curPool.filter(g => String(weekKeyOf(g)) === k);
     }
   }
   // the NETWORK a card actually names -- primaryNet, not every net ESPN lists,
