@@ -4694,7 +4694,14 @@ def harvest():
                 continue
             if far and (x.get("season") or {}).get("type") != 2:
                 continue          # see season_reach: no stage, so no postseason
-            nets = set(networks(c)) or set(net_overrides.get(x["id"], ()))
+            # HIS NETWORK WINS HERE TOO (2026-11-14). This path had the
+            # precedence the other way round, so an override could only fill a
+            # blank -- the very thing the file says it stopped doing on
+            # 2026-09-13. It went unnoticed because every override until now
+            # was for an old game, which comes down the archive path; the
+            # first one for a game still AHEAD -- Michigan at Oregon, moved to
+            # FOX on the morning of the game -- was simply ignored.
+            nets = set(net_overrides.get(x["id"], ())) or set(networks(c))
             side, side_teams = [], {}
             for k in cs:
                 t = k.get("team") or {}
