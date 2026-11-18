@@ -4,7 +4,7 @@
 // Every data file carries the build stamp. Without it a rebuild keeps serving
 // the PREVIOUS games.json out of the service worker / HTTP cache -- which it
 // did, silently, and the page rendered games missing their newest fields.
-const BUILD = "20261117-231619";
+const BUILD = "20261118-090148";
 const CARD = [0x1e, 0x1e, 0x23];
 let GAMES = [], TEAMS = {}, COLORS = {}, CRESTS = {}, TAGS = {};
 // TAB is the SPORT (his call 2026-09-09 -- he wants each population isolable);
@@ -715,6 +715,19 @@ function primaryNet(nets) {
   return best;
 }
 
+/* WHAT A NETWORK IS CALLED ON A CARD (his call 2026-11-18), where ESPN's own
+   spelling is an abbreviation: it sends "USA Net", and the card has room for
+   the whole name -- "USA Network" measures 71px against the 78px the meta
+   column already reserves, and ACC Network and SEC Network have rendered at
+   that width all along.
+   DISPLAY ONLY. "USA Net" stays the KEY everywhere one is looked up: NET_RANK
+   above, NATIONAL and PRO_NATIONAL below, PRO_NATIONAL in rules.py, and the
+   Network filter's value. Renaming the string itself would have meant
+   changing all five in step or watching the matches quietly stop, and it
+   would have to be undone the day ESPN spells it out itself. */
+const NET_LABEL = { "USA Net": "USA Network" };
+function netLabel(n) { return NET_LABEL[n] || n || ""; }
+
 // His bottom-row tags each carry a colour: the pregame shows are branded,
 // H&H and OT are incidental detail.
 // The scheduling tags (Home & Home, Neutral & Neutral, Home & Neutral, Annual,
@@ -983,7 +996,7 @@ function rowHtml(g, browse) {
     // network keeps the card's own colour
     '<div class="meta"><div class="mrow"' +
       col(g.sport === "CFB" && primaryNet(g.nets) === "ABC" ? "#e03a3a" : netCol) + ">" +
-      esc(primaryNet(g.nets) || "—") + '</div><div class="mrow"' +
+      esc(netLabel(primaryNet(g.nets)) || "—") + '</div><div class="mrow"' +
       col(timeCol) + ">" + fmtTime(g.time) + "</div></div>" +
     '<div class="tags">' + tags.join("") + "</div></div>";
 }
@@ -1034,7 +1047,7 @@ function nflParts(g) {
                 Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
   const net = primaryNet(g.nets);
   const t = fmtTime(g.time).replace(/(am|pm)$/, " $1").toUpperCase();
-  const tv = (net ? net + " " : "") + t;
+  const tv = (net ? netLabel(net) + " " : "") + t;
   const netCls = net ? " n-" + net.toLowerCase().replace(/[^a-z]/g, "") : "";
   const date = fmtDate(g.date);
   if (g.stage) {
@@ -1189,7 +1202,7 @@ function michCard(g, p) {
   // 2026-09-27): ESPN+ carries nearly everything else it plays, which tells
   // him nothing he wants on a card.
   const netTxt = cuPlain && (g.stage || "").indexOf("NCAA Tournament") !== 0
-    ? "" : primaryNet(g.nets);
+    ? "" : netLabel(primaryNet(g.nets));
   const tvTxt = netTxt ? netTxt + " " + fmtTime(g.time) : fmtTime(g.time);
   // ESPN lists no broadcast at all for 20 basketball games -- early-season
   // ones against small schools. They now show the TIME alone rather than an
@@ -1940,7 +1953,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + netLabel(net) : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       (chips ? '<div class="tags">' + chips + "</div>" : "") + "</div>";
   }
@@ -1954,7 +1967,7 @@ function michCard(g, p) {
     return '<div class="row' + cls + '" data-id="' + g.id + '" style="--winwash:' +
       shade(teamColor(opp)) + ring + '">' +
       '<div class="sport"' + col(p.headCol) + "><span>" + fmtDate(g.date) + " | " +
-      esc(g.dow + " " + t + (net ? " | " + net : "")) + "</span></div>" +
+      esc(g.dow + " " + t + (net ? " | " + netLabel(net) : "")) + "</span></div>" +
       '<div class="teams">' + oppLine + "</div></div>";
   }
   if (g.sport === "NHL" || g.sport === "NBA" || g.sport === "MLB") {
@@ -1992,7 +2005,7 @@ function michCard(g, p) {
       '<div class="sport"' + col(stageCol || p.headCol) + "><span>" + head + "</span></div>" +
       '<div class="teams">' + oppLine + "</div>" +
       '<div class="tags mdets">' + mySeed + '<span class="mdl"><span class="mdet">' +
-      fmtDate(g.date) + " | " + esc((net ? net + " " : "") + t) + "</span></span></div></div>";
+      fmtDate(g.date) + " | " + esc((net ? netLabel(net) + " " : "") + t) + "</span></span></div></div>";
   }
   // THE LIONS' CARD (his call 2026-09-18): the header, the opponent, and a
   // third row of CHIPS like TV Windows' -- no record box
@@ -3618,7 +3631,9 @@ function filterChips() {
     const restNet = Array.from(seenNet)
       .filter(n => namedNet.indexOf(n) < 0)
       .sort((x, y) => x.localeCompare(y, undefined, { sensitivity: "base" }));
-    const netOpt = n => [n, n];
+    // the option's LABEL is what he reads, its VALUE is what FILT.net
+    // matches on -- so the label is spelled out and the value left alone
+    const netOpt = n => [netLabel(n), n];
     let netOpts = [];
     groups.concat([restNet]).forEach(grp => {
       const have = grp.filter(n => seenNet.has(n));
