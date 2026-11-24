@@ -23107,7 +23107,7 @@
 "case":"",
 "shade":true,
 "border":"Opponent",
-"note":"",
+"note":"B1G Expansion",
 "footer":"",
 "box":{
 "score_bg":"Blue",
@@ -23123,6 +23123,7 @@
 "border",
 "box",
 "jersey",
+"note",
 "shade"
 ]
 }
